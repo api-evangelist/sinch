@@ -1,0 +1,726 @@
+openapi: 3.1.0
+info:
+  title: Sinch Elastic SIP Trunking API
+  description: >-
+    The Sinch Elastic SIP Trunking (EST) API enables developers to
+    programmatically create and manage SIP trunks for connecting existing
+    telephony infrastructure to the Sinch network. It provides endpoints for
+    managing SIP endpoints, trunk configurations, and access control lists.
+    The API supports elastic scaling of voice capacity without requiring
+    fixed-capacity commitments, allowing businesses to connect their PBX
+    systems, contact centers, or communication platforms to global PSTN
+    connectivity.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+externalDocs:
+  description: Sinch Elastic SIP Trunking API Documentation
+  url: https://developers.sinch.com/docs/est
+servers:
+  - url: https://elastic-trunking.api.sinch.com
+    description: Global Production Server
+tags:
+  - name: SIP Trunks
+    description: >-
+      Create, view, update, and remove SIP trunks that connect your telephony
+      infrastructure to the Sinch network.
+  - name: SIP Endpoints
+    description: >-
+      Manage SIP endpoints that represent your SIP infrastructure such as
+      PBX systems and contact centers.
+  - name: Phone Numbers
+    description: >-
+      Assign and remove phone numbers from SIP trunks for inbound and
+      outbound calling.
+  - name: Access Control Lists
+    description: >-
+      Manage IP address access control lists for securing SIP trunk access.
+security:
+  - oAuth2: []
+  - basicAuth: []
+paths:
+  /v1/projects/{project_id}/trunks:
+    get:
+      operationId: listTrunks
+      summary: List SIP trunks
+      description: >-
+        Returns a list of all SIP trunks in the project with pagination support.
+      tags:
+        - SIP Trunks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: page
+          in: query
+          description: The page number to retrieve
+          schema:
+            type: integer
+        - name: pageSize
+          in: query
+          description: The number of trunks per page
+          schema:
+            type: integer
+            default: 20
+      responses:
+        '200':
+          description: List of SIP trunks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrunkList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createTrunk
+      summary: Create a SIP trunk
+      description: >-
+        Creates a new SIP trunk for connecting your telephony infrastructure
+        to the Sinch network.
+      tags:
+        - SIP Trunks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTrunkRequest'
+      responses:
+        '200':
+          description: Trunk created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trunk'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/trunks/{trunk_id}:
+    get:
+      operationId: getTrunk
+      summary: Get a SIP trunk
+      description: >-
+        Returns the details and configuration of a specific SIP trunk.
+      tags:
+        - SIP Trunks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: Trunk details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trunk'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Trunk not found
+    patch:
+      operationId: updateTrunk
+      summary: Update a SIP trunk
+      description: >-
+        Updates the configuration of an existing SIP trunk.
+      tags:
+        - SIP Trunks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTrunkRequest'
+      responses:
+        '200':
+          description: Trunk updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trunk'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Trunk not found
+    delete:
+      operationId: deleteTrunk
+      summary: Delete a SIP trunk
+      description: >-
+        Deletes a specific SIP trunk and all its associated configuration.
+      tags:
+        - SIP Trunks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: Trunk deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Trunk not found
+  /v1/projects/{project_id}/trunks/{trunk_id}/sipEndpoints:
+    get:
+      operationId: listSipEndpoints
+      summary: List SIP endpoints
+      description: >-
+        Returns a list of SIP endpoints associated with a specific trunk.
+      tags:
+        - SIP Endpoints
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: List of SIP endpoints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpointList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createSipEndpoint
+      summary: Create a SIP endpoint
+      description: >-
+        Creates a new SIP endpoint representing your SIP infrastructure
+        (PBX, contact center, etc.) and associates it with a trunk.
+      tags:
+        - SIP Endpoints
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSipEndpointRequest'
+      responses:
+        '200':
+          description: SIP endpoint created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpoint'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/trunks/{trunk_id}/sipEndpoints/{endpoint_id}:
+    get:
+      operationId: getSipEndpoint
+      summary: Get a SIP endpoint
+      description: >-
+        Returns the details of a specific SIP endpoint.
+      tags:
+        - SIP Endpoints
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+        - $ref: '#/components/parameters/EndpointId'
+      responses:
+        '200':
+          description: SIP endpoint details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpoint'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Endpoint not found
+    patch:
+      operationId: updateSipEndpoint
+      summary: Update a SIP endpoint
+      description: >-
+        Updates the configuration of a specific SIP endpoint.
+      tags:
+        - SIP Endpoints
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+        - $ref: '#/components/parameters/EndpointId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSipEndpointRequest'
+      responses:
+        '200':
+          description: SIP endpoint updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpoint'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Endpoint not found
+    delete:
+      operationId: deleteSipEndpoint
+      summary: Delete a SIP endpoint
+      description: >-
+        Deletes a specific SIP endpoint from the trunk.
+      tags:
+        - SIP Endpoints
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+        - $ref: '#/components/parameters/EndpointId'
+      responses:
+        '200':
+          description: SIP endpoint deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Endpoint not found
+  /v1/projects/{project_id}/trunks/{trunk_id}/phoneNumbers:
+    get:
+      operationId: listTrunkPhoneNumbers
+      summary: List phone numbers for a trunk
+      description: >-
+        Returns the list of phone numbers assigned to a specific SIP trunk.
+      tags:
+        - Phone Numbers
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: List of phone numbers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrunkPhoneNumberList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: addPhoneNumberToTrunk
+      summary: Add phone number to trunk
+      description: >-
+        Assigns a phone number to a SIP trunk for inbound and outbound calling.
+      tags:
+        - Phone Numbers
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddPhoneNumberRequest'
+      responses:
+        '200':
+          description: Phone number added
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/trunks/{trunk_id}/phoneNumbers/{phone_number}:
+    delete:
+      operationId: removePhoneNumberFromTrunk
+      summary: Remove phone number from trunk
+      description: >-
+        Removes a phone number from a SIP trunk.
+      tags:
+        - Phone Numbers
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+        - name: phone_number
+          in: path
+          required: true
+          description: The phone number in E.164 format
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Phone number removed
+        '401':
+          description: Unauthorized
+        '404':
+          description: Phone number not found
+  /v1/projects/{project_id}/trunks/{trunk_id}/accessControlLists:
+    get:
+      operationId: listAccessControlLists
+      summary: List access control lists
+      description: >-
+        Returns the access control lists configured for a specific SIP trunk.
+      tags:
+        - Access Control Lists
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: List of ACLs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AclList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createAccessControlList
+      summary: Create an access control list
+      description: >-
+        Creates a new IP address access control list for a SIP trunk to
+        restrict which IP addresses can connect.
+      tags:
+        - Access Control Lists
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAclRequest'
+      responses:
+        '200':
+          description: ACL created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Acl'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/trunks/{trunk_id}/accessControlLists/{acl_id}:
+    get:
+      operationId: getAccessControlList
+      summary: Get an access control list
+      description: >-
+        Returns the details of a specific access control list.
+      tags:
+        - Access Control Lists
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+        - $ref: '#/components/parameters/AclId'
+      responses:
+        '200':
+          description: ACL details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Acl'
+        '401':
+          description: Unauthorized
+        '404':
+          description: ACL not found
+    patch:
+      operationId: updateAccessControlList
+      summary: Update an access control list
+      description: >-
+        Updates the configuration of a specific access control list.
+      tags:
+        - Access Control Lists
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+        - $ref: '#/components/parameters/AclId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAclRequest'
+      responses:
+        '200':
+          description: ACL updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Acl'
+        '401':
+          description: Unauthorized
+        '404':
+          description: ACL not found
+    delete:
+      operationId: deleteAccessControlList
+      summary: Delete an access control list
+      description: >-
+        Deletes a specific access control list from the trunk.
+      tags:
+        - Access Control Lists
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/TrunkId'
+        - $ref: '#/components/parameters/AclId'
+      responses:
+        '200':
+          description: ACL deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: ACL not found
+components:
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: >-
+        OAuth 2.0 client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
+      type: http
+      scheme: basic
+      description: >-
+        Key ID as username and key secret as password.
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    EndpointId:
+      name: endpoint_id
+      in: path
+      required: true
+      description: The unique SIP endpoint identifier
+      schema:
+        type: string
+    AclId:
+      name: acl_id
+      in: path
+      required: true
+      description: The unique access control list identifier
+      schema:
+        type: string
+  schemas:
+    Trunk:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique trunk identifier
+        name:
+          type: string
+          description: The trunk name
+        hostName:
+          type: string
+          description: The Sinch SIP hostname for the trunk
+        topLevelDomain:
+          type: string
+          description: The top-level domain
+        domain:
+          type: string
+          description: The full SIP domain for the trunk
+        callsPerSecond:
+          type: integer
+          description: Maximum calls per second
+        enableCallingToBeta:
+          type: boolean
+          description: Whether calling to beta numbers is enabled
+        createTime:
+          type: string
+          format: date-time
+          description: When the trunk was created
+        updateTime:
+          type: string
+          format: date-time
+          description: When the trunk was last updated
+    TrunkList:
+      type: object
+      properties:
+        trunks:
+          type: array
+          description: List of SIP trunks
+          items:
+            $ref: '#/components/schemas/Trunk'
+        totalSize:
+          type: integer
+          description: Total number of trunks
+    CreateTrunkRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The trunk name
+        hostName:
+          type: string
+          description: The Sinch SIP hostname
+    UpdateTrunkRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Updated trunk name
+    SipEndpoint:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique endpoint identifier
+        sipAddress:
+          type: string
+          description: The SIP address of the endpoint
+        priority:
+          type: integer
+          description: The endpoint priority for routing
+        enabled:
+          type: boolean
+          description: Whether the endpoint is enabled
+        createTime:
+          type: string
+          format: date-time
+          description: When the endpoint was created
+        updateTime:
+          type: string
+          format: date-time
+          description: When the endpoint was last updated
+    SipEndpointList:
+      type: object
+      properties:
+        sipEndpoints:
+          type: array
+          description: List of SIP endpoints
+          items:
+            $ref: '#/components/schemas/SipEndpoint'
+    CreateSipEndpointRequest:
+      type: object
+      required:
+        - sipAddress
+      properties:
+        sipAddress:
+          type: string
+          description: The SIP address for the endpoint
+        priority:
+          type: integer
+          description: Routing priority
+        enabled:
+          type: boolean
+          description: Whether the endpoint is enabled
+          default: true
+    UpdateSipEndpointRequest:
+      type: object
+      properties:
+        sipAddress:
+          type: string
+          description: Updated SIP address
+        priority:
+          type: integer
+          description: Updated priority
+        enabled:
+          type: boolean
+          description: Updated enabled status
+    TrunkPhoneNumberList:
+      type: object
+      properties:
+        phoneNumbers:
+          type: array
+          description: List of phone numbers
+          items:
+            type: object
+            properties:
+              phoneNumber:
+                type: string
+                description: The phone number in E.164 format
+              trunkId:
+                type: string
+                description: The trunk ID
+    AddPhoneNumberRequest:
+      type: object
+      required:
+        - phoneNumber
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in E.164 format to assign
+    Acl:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ACL identifier
+        name:
+          type: string
+          description: The ACL name
+        enabled:
+          type: boolean
+          description: Whether the ACL is active
+        entries:
+          type: array
+          description: List of IP address entries
+          items:
+            $ref: '#/components/schemas/AclEntry'
+        createTime:
+          type: string
+          format: date-time
+          description: When the ACL was created
+        updateTime:
+          type: string
+          format: date-time
+          description: When the ACL was last updated
+    AclEntry:
+      type: object
+      properties:
+        ipRange:
+          type: string
+          description: The IP address or CIDR range
+        description:
+          type: string
+          description: A description of this entry
+    AclList:
+      type: object
+      properties:
+        accessControlLists:
+          type: array
+          description: List of access control lists
+          items:
+            $ref: '#/components/schemas/Acl'
+    CreateAclRequest:
+      type: object
+      required:
+        - name
+      properties:
+        name:
+          type: string
+          description: The ACL name
+        enabled:
+          type: boolean
+          description: Whether the ACL is active
+          default: true
+        entries:
+          type: array
+          description: IP address entries
+          items:
+            $ref: '#/components/schemas/AclEntry'
+    UpdateAclRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Updated ACL name
+        enabled:
+          type: boolean
+          description: Updated enabled status
+        entries:
+          type: array
+          description: Updated IP entries
+          items:
+            $ref: '#/components/schemas/AclEntry'

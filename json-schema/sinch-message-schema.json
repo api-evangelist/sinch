@@ -1,0 +1,246 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://api-evangelist.com/schemas/sinch/message.json",
+  "title": "Sinch Message",
+  "description": "Schema representing a message in the Sinch platform, covering SMS, MMS, and omnichannel conversation messages across all supported channels.",
+  "type": "object",
+  "required": ["to", "body"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The unique message identifier assigned by the Sinch platform"
+    },
+    "to": {
+      "oneOf": [
+        {
+          "type": "string",
+          "pattern": "^\\+?[1-9]\\d{1,14}$",
+          "description": "A single recipient phone number in E.164 format"
+        },
+        {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "pattern": "^\\+?[1-9]\\d{1,14}$"
+          },
+          "minItems": 1,
+          "description": "A list of recipient phone numbers in E.164 format"
+        }
+      ],
+      "description": "The message recipient or recipients"
+    },
+    "from": {
+      "type": "string",
+      "description": "The sender phone number, short code, or alphanumeric sender ID"
+    },
+    "body": {
+      "oneOf": [
+        {
+          "type": "string",
+          "description": "Plain text message body"
+        },
+        {
+          "$ref": "#/$defs/RichMessage"
+        }
+      ],
+      "description": "The message content"
+    },
+    "type": {
+      "type": "string",
+      "enum": ["mt_text", "mt_binary", "mt_media"],
+      "description": "The message type for SMS/MMS"
+    },
+    "channel": {
+      "type": "string",
+      "enum": [
+        "SMS", "MMS", "RCS", "WHATSAPP", "MESSENGER", "INSTAGRAM",
+        "VIBER", "VIBERBM", "TELEGRAM", "KAKAOTALK", "LINE"
+      ],
+      "description": "The messaging channel for Conversation API messages"
+    },
+    "direction": {
+      "type": "string",
+      "enum": ["TO_APP", "TO_CONTACT", "INBOUND", "OUTBOUND"],
+      "description": "The message direction"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "Queued", "Dispatched", "Delivered", "Failed",
+        "Expired", "Cancelled", "Rejected"
+      ],
+      "description": "The current message delivery status"
+    },
+    "delivery_report": {
+      "type": "string",
+      "enum": ["none", "summary", "full", "per_recipient"],
+      "description": "The delivery report type requested for SMS batch messages"
+    },
+    "send_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Scheduled send time for the message"
+    },
+    "expire_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Expiration time for undelivered messages"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the message was created"
+    },
+    "received_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the message was received (for inbound messages)"
+    },
+    "callback_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to receive delivery report callbacks"
+    },
+    "flash_message": {
+      "type": "boolean",
+      "default": false,
+      "description": "Whether to send as a flash message that displays immediately"
+    },
+    "conversation_id": {
+      "type": "string",
+      "description": "The associated conversation identifier for Conversation API"
+    },
+    "contact_id": {
+      "type": "string",
+      "description": "The associated contact identifier for Conversation API"
+    },
+    "app_id": {
+      "type": "string",
+      "description": "The Conversation API app identifier"
+    },
+    "metadata": {
+      "type": "string",
+      "description": "Custom metadata associated with the message"
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Parameterized message substitution values for batch messaging",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "RichMessage": {
+      "type": "object",
+      "description": "A rich message with structured content for omnichannel messaging",
+      "properties": {
+        "text_message": {
+          "type": "object",
+          "description": "A text message component",
+          "properties": {
+            "text": {
+              "type": "string",
+              "maxLength": 2000,
+              "description": "The message text"
+            }
+          },
+          "required": ["text"]
+        },
+        "media_message": {
+          "type": "object",
+          "description": "A media message component",
+          "properties": {
+            "url": {
+              "type": "string",
+              "format": "uri",
+              "description": "The media URL"
+            },
+            "thumbnail_url": {
+              "type": "string",
+              "format": "uri",
+              "description": "The thumbnail URL"
+            }
+          },
+          "required": ["url"]
+        },
+        "template_message": {
+          "type": "object",
+          "description": "A template-based message",
+          "properties": {
+            "template_id": {
+              "type": "string",
+              "description": "The template identifier"
+            },
+            "version": {
+              "type": "string",
+              "description": "The template version"
+            },
+            "language_code": {
+              "type": "string",
+              "description": "The language code"
+            },
+            "parameters": {
+              "type": "object",
+              "description": "Template parameter values"
+            }
+          },
+          "required": ["template_id"]
+        },
+        "card_message": {
+          "type": "object",
+          "description": "A card message with title, description, media, and actions",
+          "properties": {
+            "title": {
+              "type": "string",
+              "description": "The card title"
+            },
+            "description": {
+              "type": "string",
+              "description": "The card description"
+            },
+            "media_url": {
+              "type": "string",
+              "format": "uri",
+              "description": "The card media URL"
+            },
+            "choices": {
+              "type": "array",
+              "description": "Action choices on the card",
+              "items": {
+                "$ref": "#/$defs/Choice"
+              }
+            }
+          }
+        }
+      }
+    },
+    "Choice": {
+      "type": "object",
+      "description": "An interactive choice or action button",
+      "properties": {
+        "text": {
+          "type": "string",
+          "description": "The choice display text"
+        },
+        "postback_data": {
+          "type": "string",
+          "description": "Data sent back when the choice is selected"
+        },
+        "url": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to open when the choice is selected"
+        },
+        "call_phone_number": {
+          "type": "string",
+          "description": "Phone number to call when the choice is selected"
+        }
+      },
+      "required": ["text"]
+    }
+  }
+}

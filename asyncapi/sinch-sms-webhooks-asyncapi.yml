@@ -1,0 +1,284 @@
+asyncapi: 2.6.0
+info:
+  title: Sinch SMS Webhooks
+  description: >-
+    Event-driven webhooks for the Sinch SMS API. The SMS API delivers delivery
+    reports and inbound messages via HTTP POST callbacks to your configured
+    webhook URL. Delivery reports notify you of the delivery status of sent
+    messages, while inbound message callbacks deliver messages sent to your
+    numbers by end users.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+servers:
+  customerServer:
+    url: '{callbackUrl}'
+    protocol: https
+    description: >-
+      Your server endpoint configured to receive SMS webhook callbacks.
+      The URL is configured per batch or globally in the Sinch Dashboard.
+    variables:
+      callbackUrl:
+        description: Your webhook endpoint URL
+    security:
+      - basicAuth: []
+channels:
+  /sms/delivery-report:
+    description: >-
+      Receives delivery report callbacks for sent SMS and MMS messages.
+      Reports can be summary or full depending on the delivery_report
+      setting when sending the batch.
+    publish:
+      operationId: receiveDeliveryReport
+      summary: Receive a delivery report
+      description: >-
+        Called when the delivery status of a batch or individual recipient
+        changes. The type field indicates whether this is a summary report
+        for the entire batch or a per-recipient report.
+      message:
+        oneOf:
+          - $ref: '#/components/messages/DeliveryReportSms'
+          - $ref: '#/components/messages/RecipientDeliveryReportSms'
+          - $ref: '#/components/messages/DeliveryReportMms'
+          - $ref: '#/components/messages/RecipientDeliveryReportMms'
+  /sms/incoming:
+    description: >-
+      Receives inbound SMS and MMS messages sent to your short codes or
+      long numbers from mobile phones.
+    publish:
+      operationId: receiveIncomingSms
+      summary: Receive an incoming SMS
+      description: >-
+        Called when an end user sends an SMS or MMS message to one of your
+        configured numbers. The callback URL must be configured in the
+        Sinch Dashboard.
+      message:
+        oneOf:
+          - $ref: '#/components/messages/IncomingSms'
+          - $ref: '#/components/messages/IncomingMms'
+components:
+  securitySchemes:
+    basicAuth:
+      type: httpBasicAuth
+      description: >-
+        Optional Basic Authentication for webhook callbacks. Custom headers
+        and OAuth 2.0 are also supported for callback authentication.
+  messages:
+    DeliveryReportSms:
+      name: delivery_report_sms
+      title: SMS Delivery Report
+      summary: Batch-level delivery report for SMS messages
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/DeliveryReportSmsPayload'
+    RecipientDeliveryReportSms:
+      name: recipient_delivery_report_sms
+      title: SMS Recipient Delivery Report
+      summary: Per-recipient delivery report for an SMS message
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/RecipientDeliveryReportPayload'
+    DeliveryReportMms:
+      name: delivery_report_mms
+      title: MMS Delivery Report
+      summary: Batch-level delivery report for MMS messages
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/DeliveryReportMmsPayload'
+    RecipientDeliveryReportMms:
+      name: recipient_delivery_report_mms
+      title: MMS Recipient Delivery Report
+      summary: Per-recipient delivery report for an MMS message
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/RecipientDeliveryReportPayload'
+    IncomingSms:
+      name: incoming_sms
+      title: Incoming SMS
+      summary: An inbound SMS message from an end user
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/IncomingSmsPayload'
+    IncomingMms:
+      name: incoming_mms
+      title: Incoming MMS
+      summary: An inbound MMS message from an end user
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/IncomingMmsPayload'
+  schemas:
+    DeliveryReportSmsPayload:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - delivery_report_sms
+          description: The callback event type
+        batch_id:
+          type: string
+          description: The batch identifier
+        statuses:
+          type: array
+          description: Aggregate status counts
+          items:
+            type: object
+            properties:
+              code:
+                type: integer
+                description: The status code
+              status:
+                type: string
+                enum:
+                  - Queued
+                  - Dispatched
+                  - Delivered
+                  - Failed
+                  - Expired
+                  - Cancelled
+                  - Rejected
+                description: The delivery status
+              count:
+                type: integer
+                description: Number of recipients with this status
+              recipients:
+                type: array
+                description: List of recipient numbers
+                items:
+                  type: string
+        total_message_count:
+          type: integer
+          description: Total number of messages in the batch
+    RecipientDeliveryReportPayload:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - recipient_delivery_report_sms
+            - recipient_delivery_report_mms
+          description: The callback event type
+        batch_id:
+          type: string
+          description: The batch identifier
+        recipient:
+          type: string
+          description: The recipient phone number
+        code:
+          type: integer
+          description: The delivery status code
+        status:
+          type: string
+          description: The delivery status
+        at:
+          type: string
+          format: date-time
+          description: When the status was updated
+        operator_status_at:
+          type: string
+          format: date-time
+          description: When the operator reported the status
+        client_reference:
+          type: string
+          description: Client reference from the batch
+        applied_originator:
+          type: string
+          description: The originator used for the message
+        encoding:
+          type: string
+          description: The message encoding used
+    DeliveryReportMmsPayload:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - delivery_report_mms
+          description: The callback event type
+        batch_id:
+          type: string
+          description: The batch identifier
+        statuses:
+          type: array
+          description: Aggregate status counts
+          items:
+            type: object
+            properties:
+              code:
+                type: integer
+                description: The status code
+              status:
+                type: string
+                description: The delivery status
+              count:
+                type: integer
+                description: Number of recipients with this status
+        total_message_count:
+          type: integer
+          description: Total number of messages in the batch
+    IncomingSmsPayload:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - mo_text
+          description: The callback event type
+        id:
+          type: string
+          description: The inbound message identifier
+        from:
+          type: string
+          description: The sender phone number
+        to:
+          type: string
+          description: The destination number
+        body:
+          type: string
+          description: The message body text
+        received_at:
+          type: string
+          format: date-time
+          description: When the message was received
+        operator_id:
+          type: string
+          description: The mobile operator identifier
+        client_reference:
+          type: string
+          description: Client reference if applicable
+        sent_at:
+          type: string
+          format: date-time
+          description: When the message was sent
+    IncomingMmsPayload:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - mo_media
+          description: The callback event type
+        id:
+          type: string
+          description: The inbound message identifier
+        from:
+          type: string
+          description: The sender phone number
+        to:
+          type: string
+          description: The destination number
+        body:
+          type: object
+          description: The MMS message body with media
+          properties:
+            subject:
+              type: string
+              description: The MMS subject
+            message:
+              type: string
+              description: The text portion of the MMS
+        received_at:
+          type: string
+          format: date-time
+          description: When the message was received

@@ -1,0 +1,451 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands API
+  description: >-
+    The Sinch Brands API allows developers to create, update, and manage
+    customer brand profiles used across Sinch messaging products. Brands
+    represent the business identity associated with messaging campaigns and
+    sender registrations. The API provides endpoints for creating brand
+    records, updating brand details, listing brands, and deleting brands,
+    enabling programmatic management of the brand entities required for
+    compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands
+servers:
+  - url: https://brands.api.sinch.com
+    description: Global Production Server
+tags:
+  - name: Brands
+    description: >-
+      Create, update, list, and delete customer brand profiles used for
+      messaging campaigns and sender registrations.
+  - name: Brand Metadata
+    description: >-
+      Retrieve metadata about brand configuration options and requirements.
+security:
+  - bearerAuth: []
+paths:
+  /v1/projects/{project_id}/brands:
+    get:
+      operationId: listBrands
+      summary: List brands
+      description: >-
+        Returns a list of all brand profiles in the project with pagination
+        support.
+      tags:
+        - Brands
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: pageSize
+          in: query
+          description: Number of results per page
+          schema:
+            type: integer
+            default: 20
+        - name: pageToken
+          in: query
+          description: Pagination token
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of brands
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createBrand
+      summary: Create a brand
+      description: >-
+        Creates a new brand profile with business identity information
+        including name, address, industry, and contact details.
+      tags:
+        - Brands
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBrandRequest'
+      responses:
+        '200':
+          description: Brand created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/brands:submit:
+    post:
+      operationId: createAndSubmitBrand
+      summary: Create and submit a brand
+      description: >-
+        Creates a new brand profile and immediately submits it for
+        verification in a single operation.
+      tags:
+        - Brands
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBrandRequest'
+      responses:
+        '200':
+          description: Brand created and submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/brands/{brand_id}:
+    get:
+      operationId: getBrand
+      summary: Get a brand
+      description: >-
+        Returns the details of a specific brand profile including its
+        verification status.
+      tags:
+        - Brands
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/BrandId'
+      responses:
+        '200':
+          description: Brand details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Brand not found
+    put:
+      operationId: updateBrand
+      summary: Update a brand
+      description: >-
+        Updates the details of an existing brand profile.
+      tags:
+        - Brands
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/BrandId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBrandRequest'
+      responses:
+        '200':
+          description: Brand updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Brand not found
+    delete:
+      operationId: deleteBrand
+      summary: Delete a brand
+      description: >-
+        Deletes a specific brand profile from the project.
+      tags:
+        - Brands
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/BrandId'
+      responses:
+        '200':
+          description: Brand deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Brand not found
+  /v1/projects/{project_id}/brands/{brand_id}:submit:
+    post:
+      operationId: submitBrand
+      summary: Submit a brand for verification
+      description: >-
+        Submits an existing brand profile for verification. Once submitted,
+        the brand enters the review process.
+      tags:
+        - Brands
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/BrandId'
+      responses:
+        '200':
+          description: Brand submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Brand not found
+  /v1/projects/{project_id}/brand-metadata:
+    get:
+      operationId: getBrandMetadata
+      summary: Get brand metadata
+      description: >-
+        Returns metadata about brand configuration options including
+        available industries, entity types, and required fields.
+      tags:
+        - Brand Metadata
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Brand metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandMetadata'
+        '401':
+          description: Unauthorized
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: >-
+        Bearer token authentication.
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    BrandId:
+      name: brand_id
+      in: path
+      required: true
+      description: The unique brand identifier
+      schema:
+        type: string
+  schemas:
+    Brand:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique brand identifier
+        projectId:
+          type: string
+          description: The project ID
+        displayName:
+          type: string
+          description: The brand display name
+        companyName:
+          type: string
+          description: The legal company name
+        entityType:
+          type: string
+          description: The business entity type
+        ein:
+          type: string
+          description: Employer Identification Number
+        country:
+          type: string
+          description: The country of incorporation
+        street:
+          type: string
+          description: Street address
+        city:
+          type: string
+          description: City
+        state:
+          type: string
+          description: State or province
+        postalCode:
+          type: string
+          description: Postal or ZIP code
+        website:
+          type: string
+          format: uri
+          description: Brand website URL
+        verticalType:
+          type: string
+          description: The business vertical or industry
+        contactEmail:
+          type: string
+          format: email
+          description: Contact email address
+        contactPhone:
+          type: string
+          description: Contact phone number
+        status:
+          type: string
+          enum:
+            - DRAFT
+            - SUBMITTED
+            - VERIFIED
+            - UNVERIFIED
+            - REJECTED
+          description: The current brand verification status
+        identityStatus:
+          type: string
+          description: The identity verification status
+        createTime:
+          type: string
+          format: date-time
+          description: When the brand was created
+        updateTime:
+          type: string
+          format: date-time
+          description: When the brand was last updated
+    BrandList:
+      type: object
+      properties:
+        brands:
+          type: array
+          description: List of brands
+          items:
+            $ref: '#/components/schemas/Brand'
+        nextPageToken:
+          type: string
+          description: Pagination token
+        totalSize:
+          type: integer
+          description: Total number of brands
+    CreateBrandRequest:
+      type: object
+      required:
+        - displayName
+        - companyName
+        - country
+      properties:
+        displayName:
+          type: string
+          description: The brand display name
+        companyName:
+          type: string
+          description: The legal company name
+        entityType:
+          type: string
+          description: Business entity type
+        ein:
+          type: string
+          description: Employer Identification Number
+        country:
+          type: string
+          description: Country of incorporation
+        street:
+          type: string
+          description: Street address
+        city:
+          type: string
+          description: City
+        state:
+          type: string
+          description: State or province
+        postalCode:
+          type: string
+          description: Postal code
+        website:
+          type: string
+          format: uri
+          description: Brand website
+        verticalType:
+          type: string
+          description: Business vertical
+        contactEmail:
+          type: string
+          format: email
+          description: Contact email
+        contactPhone:
+          type: string
+          description: Contact phone
+    UpdateBrandRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Updated display name
+        companyName:
+          type: string
+          description: Updated company name
+        entityType:
+          type: string
+          description: Updated entity type
+        ein:
+          type: string
+          description: Updated EIN
+        country:
+          type: string
+          description: Updated country
+        street:
+          type: string
+          description: Updated street
+        city:
+          type: string
+          description: Updated city
+        state:
+          type: string
+          description: Updated state
+        postalCode:
+          type: string
+          description: Updated postal code
+        website:
+          type: string
+          format: uri
+          description: Updated website
+        verticalType:
+          type: string
+          description: Updated vertical
+        contactEmail:
+          type: string
+          format: email
+          description: Updated contact email
+        contactPhone:
+          type: string
+          description: Updated contact phone
+    BrandMetadata:
+      type: object
+      properties:
+        entityTypes:
+          type: array
+          description: Available entity types
+          items:
+            type: string
+        verticalTypes:
+          type: array
+          description: Available business verticals
+          items:
+            type: string
+        requiredFields:
+          type: array
+          description: Required fields for brand creation
+          items:
+            type: string
+        countries:
+          type: array
+          description: Supported countries
+          items:
+            type: string

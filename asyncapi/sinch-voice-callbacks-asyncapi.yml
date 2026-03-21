@@ -1,0 +1,363 @@
+asyncapi: 2.6.0
+info:
+  title: Sinch Voice Callbacks
+  description: >-
+    Event-driven callbacks for the Sinch Voice API. The Voice API sends HTTP
+    POST callbacks to your application during the lifecycle of a voice call.
+    Your application responds with SVAML (Sinch Voice Application Markup
+    Language) instructions to control the call flow including playing prompts,
+    connecting calls, and handling DTMF input.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+servers:
+  customerServer:
+    url: '{callbackUrl}'
+    protocol: https
+    description: >-
+      Your server endpoint configured to receive Voice API callbacks.
+      Callback URLs are configured per application in the Sinch Dashboard.
+    variables:
+      callbackUrl:
+        description: Your callback endpoint URL
+channels:
+  /voice/ice:
+    description: >-
+      Receives Incoming Call Event (ICE) callbacks when the Sinch platform
+      receives an incoming call. Your response instructs the platform how
+      to handle the call using SVAML.
+    publish:
+      operationId: receiveIncomingCallEvent
+      summary: Receive an Incoming Call Event
+      description: >-
+        Triggered when an incoming call is received by the Sinch platform.
+        The response must contain SVAML instructions to control the call.
+      message:
+        $ref: '#/components/messages/IncomingCallEvent'
+  /voice/ace:
+    description: >-
+      Receives Answered Call Event (ACE) callbacks when a call is answered.
+      Your response can provide additional SVAML instructions.
+    publish:
+      operationId: receiveAnsweredCallEvent
+      summary: Receive an Answered Call Event
+      description: >-
+        Triggered when a call is answered by the callee. Can be used to
+        render additional IVR prompts or connect to a conference.
+      message:
+        $ref: '#/components/messages/AnsweredCallEvent'
+  /voice/dice:
+    description: >-
+      Receives Disconnected Call Event (DiCE) callbacks when a call is
+      disconnected for any reason.
+    publish:
+      operationId: receiveDisconnectedCallEvent
+      summary: Receive a Disconnected Call Event
+      description: >-
+        Triggered when a call is disconnected. Provides the reason for
+        disconnection, call duration, and pricing information.
+      message:
+        $ref: '#/components/messages/DisconnectedCallEvent'
+  /voice/pie:
+    description: >-
+      Receives Prompt Input Event (PIE) callbacks when a user provides
+      DTMF input during an IVR session.
+    publish:
+      operationId: receivePromptInputEvent
+      summary: Receive a Prompt Input Event
+      description: >-
+        Triggered when a user enters DTMF digits during an IVR prompt.
+        Your response can provide new SVAML instructions based on the input.
+      message:
+        $ref: '#/components/messages/PromptInputEvent'
+  /voice/notify:
+    description: >-
+      Receives notification callbacks for various call events such as
+      call progress and recording completion.
+    publish:
+      operationId: receiveNotification
+      summary: Receive a notification event
+      description: >-
+        Triggered for various asynchronous call events including recording
+        completion and call progress updates.
+      message:
+        $ref: '#/components/messages/NotifyEvent'
+components:
+  messages:
+    IncomingCallEvent:
+      name: ice
+      title: Incoming Call Event
+      summary: An incoming call has been received
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/IcePayload'
+    AnsweredCallEvent:
+      name: ace
+      title: Answered Call Event
+      summary: A call has been answered
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/AcePayload'
+    DisconnectedCallEvent:
+      name: dice
+      title: Disconnected Call Event
+      summary: A call has been disconnected
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/DicePayload'
+    PromptInputEvent:
+      name: pie
+      title: Prompt Input Event
+      summary: User DTMF input received
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/PiePayload'
+    NotifyEvent:
+      name: notify
+      title: Notification Event
+      summary: Asynchronous call notification
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/NotifyPayload'
+  schemas:
+    IcePayload:
+      type: object
+      properties:
+        event:
+          type: string
+          enum:
+            - ice
+          description: The event type
+        callId:
+          type: string
+          description: The unique call identifier
+        callResourceUrl:
+          type: string
+          format: uri
+          description: URL to manage this call
+        timestamp:
+          type: string
+          format: date-time
+          description: When the event occurred
+        version:
+          type: integer
+          description: The callback version
+        cli:
+          type: string
+          description: The caller ID
+        to:
+          type: object
+          description: The destination
+          properties:
+            type:
+              type: string
+              description: The destination type
+            endpoint:
+              type: string
+              description: The destination endpoint
+        domain:
+          type: string
+          enum:
+            - pstn
+            - mxp
+          description: The call domain
+        applicationKey:
+          type: string
+          description: The application key
+        originationType:
+          type: string
+          enum:
+            - MXP
+            - PSTN
+          description: The origination type
+        rdnis:
+          type: string
+          description: The redirecting number
+        userRate:
+          type: object
+          description: The user rate for the call
+          properties:
+            currencyId:
+              type: string
+              description: Currency code
+            amount:
+              type: number
+              description: Rate amount
+    AcePayload:
+      type: object
+      properties:
+        event:
+          type: string
+          enum:
+            - ace
+          description: The event type
+        callId:
+          type: string
+          description: The unique call identifier
+        callResourceUrl:
+          type: string
+          format: uri
+          description: URL to manage this call
+        timestamp:
+          type: string
+          format: date-time
+          description: When the event occurred
+        version:
+          type: integer
+          description: The callback version
+        amd:
+          type: object
+          description: Answering machine detection result
+          properties:
+            status:
+              type: string
+              enum:
+                - human
+                - machine
+              description: Whether a human or machine answered
+            reason:
+              type: string
+              description: The detection reason
+            duration:
+              type: integer
+              description: Detection duration in milliseconds
+    DicePayload:
+      type: object
+      properties:
+        event:
+          type: string
+          enum:
+            - dice
+          description: The event type
+        callId:
+          type: string
+          description: The unique call identifier
+        callResourceUrl:
+          type: string
+          format: uri
+          description: URL to manage this call
+        timestamp:
+          type: string
+          format: date-time
+          description: When the event occurred
+        version:
+          type: integer
+          description: The callback version
+        reason:
+          type: string
+          enum:
+            - N/A
+            - TIMEOUT
+            - CALLERHANGUP
+            - CALLEEHANGUP
+            - BLOCKED
+            - MANAGERHANGUP
+            - NOCREDITPARTNER
+            - GENERALERROR
+            - CANCEL
+            - USERNOTFOUND
+          description: The reason for disconnection
+        result:
+          type: string
+          enum:
+            - ANSWERED
+            - BUSY
+            - NOANSWER
+            - FAILED
+          description: The call result
+        from:
+          type: string
+          description: The caller number
+        to:
+          type: string
+          description: The callee number
+        duration:
+          type: integer
+          description: The call duration in seconds
+        debit:
+          type: object
+          description: The call charge
+          properties:
+            currencyId:
+              type: string
+              description: Currency code
+            amount:
+              type: number
+              description: Charge amount
+        userRate:
+          type: object
+          description: The user rate
+          properties:
+            currencyId:
+              type: string
+              description: Currency code
+            amount:
+              type: number
+              description: Rate amount
+    PiePayload:
+      type: object
+      properties:
+        event:
+          type: string
+          enum:
+            - pie
+          description: The event type
+        callId:
+          type: string
+          description: The unique call identifier
+        callResourceUrl:
+          type: string
+          format: uri
+          description: URL to manage this call
+        timestamp:
+          type: string
+          format: date-time
+          description: When the event occurred
+        version:
+          type: integer
+          description: The callback version
+        menuResult:
+          type: object
+          description: The IVR menu input result
+          properties:
+            menuId:
+              type: string
+              description: The menu identifier
+            type:
+              type: string
+              enum:
+                - sequence
+                - timeout
+                - hangup
+                - invalidinput
+              description: The input result type
+            value:
+              type: string
+              description: The DTMF digits entered
+            inputMethod:
+              type: string
+              enum:
+                - dtmf
+                - voice
+              description: How the input was provided
+    NotifyPayload:
+      type: object
+      properties:
+        event:
+          type: string
+          enum:
+            - notify
+          description: The event type
+        callId:
+          type: string
+          description: The unique call identifier
+        version:
+          type: integer
+          description: The callback version
+        type:
+          type: string
+          description: The notification type
+        custom:
+          type: string
+          description: Custom data passed from SVAML

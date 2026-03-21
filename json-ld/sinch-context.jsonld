@@ -1,0 +1,250 @@
+{
+  "@context": {
+    "@version": 1.1,
+    "sinch": "https://developers.sinch.com/ns/",
+    "schema": "https://schema.org/",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcterms": "http://purl.org/dc/terms/",
+
+    "Message": {
+      "@id": "sinch:Message",
+      "@context": {
+        "messageId": "sinch:messageId",
+        "body": "sinch:body",
+        "from": "sinch:from",
+        "to": "sinch:to",
+        "channel": "sinch:channel",
+        "direction": "sinch:direction",
+        "status": "sinch:status",
+        "type": "sinch:messageType",
+        "conversationId": "sinch:conversationId",
+        "contactId": "sinch:contactId",
+        "appId": "sinch:appId",
+        "metadata": "sinch:metadata",
+        "callbackUrl": {
+          "@id": "sinch:callbackUrl",
+          "@type": "@id"
+        },
+        "createdAt": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "receivedAt": {
+          "@id": "sinch:receivedAt",
+          "@type": "xsd:dateTime"
+        },
+        "sendAt": {
+          "@id": "sinch:sendAt",
+          "@type": "xsd:dateTime"
+        },
+        "expireAt": {
+          "@id": "sinch:expireAt",
+          "@type": "xsd:dateTime"
+        }
+      }
+    },
+
+    "Contact": {
+      "@id": "sinch:Contact",
+      "@context": {
+        "contactId": "sinch:contactId",
+        "displayName": "schema:name",
+        "email": "schema:email",
+        "externalId": "sinch:externalId",
+        "language": "schema:inLanguage",
+        "metadata": "sinch:metadata",
+        "channelIdentities": {
+          "@id": "sinch:channelIdentities",
+          "@container": "@set"
+        }
+      }
+    },
+
+    "ChannelIdentity": {
+      "@id": "sinch:ChannelIdentity",
+      "@context": {
+        "channel": "sinch:channel",
+        "identity": "sinch:identity",
+        "appId": "sinch:appId"
+      }
+    },
+
+    "Conversation": {
+      "@id": "sinch:Conversation",
+      "@context": {
+        "conversationId": "sinch:conversationId",
+        "appId": "sinch:appId",
+        "contactId": "sinch:contactId",
+        "active": "sinch:active",
+        "activeChannel": "sinch:activeChannel",
+        "metadata": "sinch:metadata"
+      }
+    },
+
+    "Verification": {
+      "@id": "sinch:Verification",
+      "@context": {
+        "verificationId": "sinch:verificationId",
+        "method": "sinch:verificationMethod",
+        "status": "sinch:verificationStatus",
+        "reason": "sinch:reason",
+        "reference": "sinch:reference",
+        "identity": "sinch:identity",
+        "price": "schema:price"
+      }
+    },
+
+    "Batch": {
+      "@id": "sinch:Batch",
+      "@context": {
+        "batchId": "sinch:batchId",
+        "from": "sinch:from",
+        "body": "sinch:body",
+        "deliveryReport": "sinch:deliveryReport",
+        "canceled": "sinch:canceled",
+        "recipients": {
+          "@id": "sinch:recipients",
+          "@container": "@set"
+        },
+        "createdAt": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "modifiedAt": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
+        },
+        "sendAt": {
+          "@id": "sinch:sendAt",
+          "@type": "xsd:dateTime"
+        }
+      }
+    },
+
+    "PhoneNumber": {
+      "@id": "sinch:PhoneNumber",
+      "@context": {
+        "phoneNumber": "schema:telephone",
+        "regionCode": "sinch:regionCode",
+        "type": "sinch:numberType",
+        "displayName": "schema:name",
+        "capability": {
+          "@id": "sinch:capability",
+          "@container": "@set"
+        },
+        "nextChargeDate": {
+          "@id": "sinch:nextChargeDate",
+          "@type": "xsd:dateTime"
+        }
+      }
+    },
+
+    "Brand": {
+      "@id": "sinch:Brand",
+      "@context": {
+        "brandId": "sinch:brandId",
+        "displayName": "schema:name",
+        "companyName": "schema:legalName",
+        "entityType": "sinch:entityType",
+        "country": "schema:addressCountry",
+        "street": "schema:streetAddress",
+        "city": "schema:addressLocality",
+        "state": "schema:addressRegion",
+        "postalCode": "schema:postalCode",
+        "website": {
+          "@id": "schema:url",
+          "@type": "@id"
+        },
+        "verticalType": "schema:industry",
+        "contactEmail": "schema:email",
+        "contactPhone": "schema:telephone",
+        "status": "sinch:status",
+        "createdAt": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "updatedAt": {
+          "@id": "dcterms:modified",
+          "@type": "xsd:dateTime"
+        }
+      }
+    },
+
+    "SipTrunk": {
+      "@id": "sinch:SipTrunk",
+      "@context": {
+        "trunkId": "sinch:trunkId",
+        "name": "schema:name",
+        "hostName": "sinch:hostName",
+        "domain": "sinch:domain",
+        "callsPerSecond": "sinch:callsPerSecond",
+        "createdAt": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        }
+      }
+    },
+
+    "FaxDocument": {
+      "@id": "sinch:FaxDocument",
+      "@context": {
+        "faxId": "sinch:faxId",
+        "from": "sinch:from",
+        "to": "sinch:to",
+        "direction": "sinch:direction",
+        "status": "sinch:status",
+        "pageCount": "sinch:pageCount",
+        "contentUrl": {
+          "@id": "schema:contentUrl",
+          "@type": "@id"
+        },
+        "createdAt": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "completedAt": {
+          "@id": "sinch:completedAt",
+          "@type": "xsd:dateTime"
+        }
+      }
+    },
+
+    "VoiceCall": {
+      "@id": "sinch:VoiceCall",
+      "@context": {
+        "callId": "sinch:callId",
+        "from": "sinch:from",
+        "to": "sinch:to",
+        "domain": "sinch:domain",
+        "status": "sinch:status",
+        "result": "sinch:result",
+        "reason": "sinch:reason",
+        "duration": "sinch:duration",
+        "timestamp": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        }
+      }
+    },
+
+    "Registration": {
+      "@id": "sinch:Registration",
+      "@context": {
+        "registrationId": "sinch:registrationId",
+        "marketId": "sinch:marketId",
+        "senderId": "sinch:senderId",
+        "senderType": "sinch:senderType",
+        "status": "sinch:status",
+        "displayName": "schema:name",
+        "createdAt": {
+          "@id": "dcterms:created",
+          "@type": "xsd:dateTime"
+        },
+        "submittedAt": {
+          "@id": "sinch:submittedAt",
+          "@type": "xsd:dateTime"
+        }
+      }
+    }
+  }
+}

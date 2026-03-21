@@ -1,0 +1,931 @@
+openapi: 3.1.0
+info:
+  title: Sinch SMS API
+  description: >-
+    The Sinch SMS API enables developers to send and receive SMS messages
+    globally at scale. It supports batch messaging with scheduled delivery,
+    message templates, delivery reports, and inbound message handling via
+    webhooks. The API provides group management for organizing recipients,
+    automatic message encoding optimization, and supports both transactional
+    and marketing use cases across carriers worldwide.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+externalDocs:
+  description: Sinch SMS API Documentation
+  url: https://developers.sinch.com/docs/sms
+servers:
+  - url: https://us.sms.api.sinch.com
+    description: US Production Server
+  - url: https://eu.sms.api.sinch.com
+    description: EU Production Server
+  - url: https://au.sms.api.sinch.com
+    description: Australia Production Server
+  - url: https://br.sms.api.sinch.com
+    description: Brazil Production Server
+  - url: https://ca.sms.api.sinch.com
+    description: Canada Production Server
+tags:
+  - name: Batches
+    description: >-
+      Batches are sets of SMS messages. You can send a single message or many
+      messages at once. Batches are queued and sent at the rate limit in
+      first-in-first-out order.
+  - name: Delivery Reports
+    description: >-
+      Delivery reports provide the status of sent messages. Reports can be
+      retrieved via the API or delivered via webhook callbacks.
+  - name: Groups
+    description: >-
+      Groups are sets of phone numbers (MSISDNs) that can be used as targets
+      when sending SMS. A phone number can only occur once in a group.
+  - name: Inbounds
+    description: >-
+      Inbound messages (Mobile Originated) are incoming messages sent to your
+      short codes or long numbers from mobile phones.
+security:
+  - bearerAuth: []
+paths:
+  /xms/v1/{service_plan_id}/batches:
+    post:
+      operationId: sendBatch
+      summary: Send a batch message
+      description: >-
+        Sends a batch of SMS messages. A batch can contain one or more messages
+        to one or more recipients. The API supports scheduled delivery,
+        parameterized messages, and delivery report configuration.
+      tags:
+        - Batches
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendBatchRequest'
+      responses:
+        '201':
+          description: Batch created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+    get:
+      operationId: listBatches
+      summary: List batches
+      description: >-
+        Returns a list of batches with pagination support. You can filter
+        batches by various criteria including start date and end date.
+      tags:
+        - Batches
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - name: page
+          in: query
+          description: The page number to retrieve
+          schema:
+            type: integer
+            default: 0
+        - name: page_size
+          in: query
+          description: The number of batches per page
+          schema:
+            type: integer
+            default: 30
+            maximum: 100
+        - name: from
+          in: query
+          description: Filter batches sent from this date
+          schema:
+            type: string
+            format: date-time
+        - name: to
+          in: query
+          description: Filter batches sent up to this date
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: List of batches
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchList'
+        '401':
+          description: Unauthorized
+  /xms/v1/{service_plan_id}/batches/{batch_id}:
+    get:
+      operationId: getBatch
+      summary: Get a batch
+      description: >-
+        Returns the details of a specific batch identified by the batch ID.
+      tags:
+        - Batches
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - $ref: '#/components/parameters/BatchId'
+      responses:
+        '200':
+          description: Batch details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Batch not found
+    post:
+      operationId: updateBatch
+      summary: Update a batch
+      description: >-
+        Updates a batch message. Only batches that have not yet been delivered
+        can be updated.
+      tags:
+        - Batches
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - $ref: '#/components/parameters/BatchId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBatchRequest'
+      responses:
+        '200':
+          description: Batch updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Batch not found
+  /xms/v1/{service_plan_id}/batches/{batch_id}/cancel:
+    put:
+      operationId: cancelBatch
+      summary: Cancel a batch
+      description: >-
+        Cancels a batch that has not yet been delivered. A batch can only be
+        canceled if it has not yet started sending.
+      tags:
+        - Batches
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - $ref: '#/components/parameters/BatchId'
+      responses:
+        '200':
+          description: Batch canceled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Batch not found
+  /xms/v1/{service_plan_id}/batches/{batch_id}/dry_run:
+    post:
+      operationId: dryRunBatch
+      summary: Dry run a batch
+      description: >-
+        Performs a dry run of a batch without actually sending messages. This
+        can be used to validate the batch configuration and estimate the number
+        of recipients.
+      tags:
+        - Batches
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - $ref: '#/components/parameters/BatchId'
+      responses:
+        '200':
+          description: Dry run result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DryRunResponse'
+        '401':
+          description: Unauthorized
+  /xms/v1/{service_plan_id}/batches/{batch_id}/delivery_report:
+    get:
+      operationId: getBatchDeliveryReport
+      summary: Retrieve a batch delivery report
+      description: >-
+        Returns the aggregate delivery report for a specific batch. The report
+        contains status counts and details about message delivery.
+      tags:
+        - Delivery Reports
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - $ref: '#/components/parameters/BatchId'
+        - name: type
+          in: query
+          description: The type of delivery report to retrieve
+          schema:
+            type: string
+            enum:
+              - summary
+              - full
+      responses:
+        '200':
+          description: Delivery report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryReport'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Batch not found
+  /xms/v1/{service_plan_id}/batches/{batch_id}/delivery_report/{recipient_msisdn}:
+    get:
+      operationId: getRecipientDeliveryReport
+      summary: Retrieve a recipient delivery report
+      description: >-
+        Returns the delivery report for a specific recipient in a batch.
+      tags:
+        - Delivery Reports
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - $ref: '#/components/parameters/BatchId'
+        - name: recipient_msisdn
+          in: path
+          required: true
+          description: The phone number of the recipient
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Recipient delivery report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientDeliveryReport'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Report not found
+  /xms/v1/{service_plan_id}/delivery_reports:
+    get:
+      operationId: listDeliveryReports
+      summary: List delivery reports
+      description: >-
+        Returns a list of delivery reports with pagination support.
+      tags:
+        - Delivery Reports
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - name: page
+          in: query
+          description: The page number to retrieve
+          schema:
+            type: integer
+            default: 0
+        - name: page_size
+          in: query
+          description: The number of reports per page
+          schema:
+            type: integer
+            default: 30
+            maximum: 100
+      responses:
+        '200':
+          description: List of delivery reports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryReportList'
+        '401':
+          description: Unauthorized
+  /xms/v1/{service_plan_id}/groups:
+    post:
+      operationId: createGroup
+      summary: Create a group
+      description: >-
+        Creates a new group of phone numbers that can be used as recipients
+        when sending SMS batches.
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupRequest'
+      responses:
+        '201':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+    get:
+      operationId: listGroups
+      summary: List groups
+      description: >-
+        Returns a list of groups with pagination support.
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - name: page
+          in: query
+          description: The page number to retrieve
+          schema:
+            type: integer
+            default: 0
+        - name: page_size
+          in: query
+          description: The number of groups per page
+          schema:
+            type: integer
+            default: 30
+            maximum: 100
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupList'
+        '401':
+          description: Unauthorized
+  /xms/v1/{service_plan_id}/groups/{group_id}:
+    get:
+      operationId: getGroup
+      summary: Get a group
+      description: >-
+        Returns the details of a specific group.
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - $ref: '#/components/parameters/GroupId'
+      responses:
+        '200':
+          description: Group details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Group not found
+    post:
+      operationId: updateGroup
+      summary: Update a group
+      description: >-
+        Updates an existing group by adding or removing members or changing
+        the group name.
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - $ref: '#/components/parameters/GroupId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGroupRequest'
+      responses:
+        '200':
+          description: Group updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Group not found
+    delete:
+      operationId: deleteGroup
+      summary: Delete a group
+      description: >-
+        Deletes a group and all its members.
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - $ref: '#/components/parameters/GroupId'
+      responses:
+        '200':
+          description: Group deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Group not found
+  /xms/v1/{service_plan_id}/groups/{group_id}/members:
+    get:
+      operationId: getGroupMembers
+      summary: Get group members
+      description: >-
+        Returns the list of phone numbers that are members of the specified group.
+      tags:
+        - Groups
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - $ref: '#/components/parameters/GroupId'
+      responses:
+        '200':
+          description: List of group members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '401':
+          description: Unauthorized
+        '404':
+          description: Group not found
+  /xms/v1/{service_plan_id}/inbounds:
+    get:
+      operationId: listInboundMessages
+      summary: List inbound messages
+      description: >-
+        Returns a list of inbound (Mobile Originated) messages with pagination
+        support. Messages can be filtered by start date and end date.
+      tags:
+        - Inbounds
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - name: page
+          in: query
+          description: The page number to retrieve
+          schema:
+            type: integer
+            default: 0
+        - name: page_size
+          in: query
+          description: The number of messages per page
+          schema:
+            type: integer
+            default: 30
+            maximum: 100
+        - name: to
+          in: query
+          description: Filter by destination number
+          schema:
+            type: string
+        - name: start_date
+          in: query
+          description: Filter messages received after this date
+          schema:
+            type: string
+            format: date-time
+        - name: end_date
+          in: query
+          description: Filter messages received before this date
+          schema:
+            type: string
+            format: date-time
+      responses:
+        '200':
+          description: List of inbound messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundMessageList'
+        '401':
+          description: Unauthorized
+  /xms/v1/{service_plan_id}/inbounds/{inbound_id}:
+    get:
+      operationId: getInboundMessage
+      summary: Get an inbound message
+      description: >-
+        Returns the details of a specific inbound message.
+      tags:
+        - Inbounds
+      parameters:
+        - $ref: '#/components/parameters/ServicePlanId'
+        - name: inbound_id
+          in: path
+          required: true
+          description: The unique identifier of the inbound message
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Inbound message details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundMessage'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Message not found
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: >-
+        API token sent in the Authorization header preceded by Bearer.
+  parameters:
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
+    BatchId:
+      name: batch_id
+      in: path
+      required: true
+      description: The unique identifier for the batch
+      schema:
+        type: string
+    GroupId:
+      name: group_id
+      in: path
+      required: true
+      description: The unique identifier for the group
+      schema:
+        type: string
+  schemas:
+    SendBatchRequest:
+      type: object
+      required:
+        - to
+        - from
+        - body
+      properties:
+        to:
+          type: array
+          description: List of recipient phone numbers in E.164 format or group IDs
+          items:
+            type: string
+        from:
+          type: string
+          description: The sender phone number in E.164 format or short code
+        body:
+          type: string
+          description: The message body text
+        type:
+          type: string
+          enum:
+            - mt_text
+            - mt_binary
+          description: The type of batch message
+        delivery_report:
+          type: string
+          enum:
+            - none
+            - summary
+            - full
+            - per_recipient
+          description: The type of delivery report requested
+        send_at:
+          type: string
+          format: date-time
+          description: Scheduled send time for the batch
+        expire_at:
+          type: string
+          format: date-time
+          description: Expiration time for undelivered messages
+        callback_url:
+          type: string
+          format: uri
+          description: URL to receive delivery report callbacks
+        flash_message:
+          type: boolean
+          description: Whether to send as a flash message
+          default: false
+        parameters:
+          type: object
+          description: Parameterized message substitution values
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: string
+    Batch:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique batch identifier
+        to:
+          type: array
+          description: List of recipients
+          items:
+            type: string
+        from:
+          type: string
+          description: The sender number
+        body:
+          type: string
+          description: The message body
+        type:
+          type: string
+          description: The batch type
+        created_at:
+          type: string
+          format: date-time
+          description: When the batch was created
+        modified_at:
+          type: string
+          format: date-time
+          description: When the batch was last modified
+        canceled:
+          type: boolean
+          description: Whether the batch has been canceled
+        delivery_report:
+          type: string
+          description: The delivery report type
+        send_at:
+          type: string
+          format: date-time
+          description: The scheduled send time
+        expire_at:
+          type: string
+          format: date-time
+          description: The expiration time
+    BatchList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of batches
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of batches per page
+        batches:
+          type: array
+          description: List of batch objects
+          items:
+            $ref: '#/components/schemas/Batch'
+    UpdateBatchRequest:
+      type: object
+      properties:
+        to_add:
+          type: array
+          description: Phone numbers to add to the batch
+          items:
+            type: string
+        to_remove:
+          type: array
+          description: Phone numbers to remove from the batch
+          items:
+            type: string
+        from:
+          type: string
+          description: Updated sender number
+        body:
+          type: string
+          description: Updated message body
+        delivery_report:
+          type: string
+          enum:
+            - none
+            - summary
+            - full
+            - per_recipient
+          description: Updated delivery report type
+    DryRunResponse:
+      type: object
+      properties:
+        number_of_recipients:
+          type: integer
+          description: The estimated number of recipients
+        number_of_messages:
+          type: integer
+          description: The estimated number of messages
+        per_recipient:
+          type: array
+          description: Per-recipient details
+          items:
+            type: object
+            properties:
+              recipient:
+                type: string
+                description: The recipient phone number
+              number_of_parts:
+                type: integer
+                description: The number of message parts
+              body:
+                type: string
+                description: The rendered message body
+              encoding:
+                type: string
+                description: The message encoding
+    DeliveryReport:
+      type: object
+      properties:
+        batch_id:
+          type: string
+          description: The batch identifier
+        type:
+          type: string
+          description: The delivery report type
+        statuses:
+          type: array
+          description: List of status objects with counts
+          items:
+            type: object
+            properties:
+              code:
+                type: integer
+                description: The status code
+              status:
+                type: string
+                description: The delivery status
+              count:
+                type: integer
+                description: The number of recipients with this status
+              recipients:
+                type: array
+                description: List of recipient phone numbers
+                items:
+                  type: string
+        total_message_count:
+          type: integer
+          description: Total number of messages in the batch
+    RecipientDeliveryReport:
+      type: object
+      properties:
+        batch_id:
+          type: string
+          description: The batch identifier
+        recipient:
+          type: string
+          description: The recipient phone number
+        code:
+          type: integer
+          description: The delivery status code
+        status:
+          type: string
+          description: The delivery status
+        at:
+          type: string
+          format: date-time
+          description: When the status was updated
+        operator_status_at:
+          type: string
+          format: date-time
+          description: When the operator reported the status
+    DeliveryReportList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of delivery reports
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of reports per page
+        delivery_reports:
+          type: array
+          description: List of delivery report objects
+          items:
+            $ref: '#/components/schemas/DeliveryReport'
+    CreateGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the group
+        members:
+          type: array
+          description: List of phone numbers to add as members
+          items:
+            type: string
+        child_groups:
+          type: array
+          description: List of child group IDs
+          items:
+            type: string
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique group identifier
+        name:
+          type: string
+          description: The group name
+        size:
+          type: integer
+          description: The number of members in the group
+        created_at:
+          type: string
+          format: date-time
+          description: When the group was created
+        modified_at:
+          type: string
+          format: date-time
+          description: When the group was last modified
+        child_groups:
+          type: array
+          description: List of child group IDs
+          items:
+            type: string
+    GroupList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of groups
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of groups per page
+        groups:
+          type: array
+          description: List of group objects
+          items:
+            $ref: '#/components/schemas/Group'
+    UpdateGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Updated group name
+        add:
+          type: array
+          description: Phone numbers to add to the group
+          items:
+            type: string
+        remove:
+          type: array
+          description: Phone numbers to remove from the group
+          items:
+            type: string
+        add_from_group:
+          type: string
+          description: Add all members from another group
+        remove_from_group:
+          type: string
+          description: Remove all members that are in another group
+    InboundMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique inbound message identifier
+        from:
+          type: string
+          description: The sender phone number
+        to:
+          type: string
+          description: The destination number
+        body:
+          type: string
+          description: The message body
+        type:
+          type: string
+          description: The message type
+        received_at:
+          type: string
+          format: date-time
+          description: When the message was received
+        operator_id:
+          type: string
+          description: The mobile operator identifier
+        client_reference:
+          type: string
+          description: Client reference from the original batch
+    InboundMessageList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of inbound messages
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of messages per page
+        inbounds:
+          type: array
+          description: List of inbound message objects
+          items:
+            $ref: '#/components/schemas/InboundMessage'

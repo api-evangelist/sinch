@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://api-evangelist.com/schemas/sinch/contact.json",
+  "title": "Sinch Contact",
+  "description": "Schema representing a contact in the Sinch Conversation API. A contact groups together underlying connected channel recipient identities, enabling omnichannel communication with a single person across SMS, WhatsApp, Messenger, and other channels.",
+  "type": "object",
+  "required": ["channel_identities"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The unique contact identifier assigned by the platform"
+    },
+    "display_name": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "The display name of the contact"
+    },
+    "email": {
+      "type": "string",
+      "format": "email",
+      "description": "The contact email address"
+    },
+    "external_id": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "An external identifier for cross-referencing with other systems"
+    },
+    "language": {
+      "type": "string",
+      "pattern": "^[a-z]{2}(-[A-Z]{2})?$",
+      "description": "The preferred language of the contact in BCP 47 format"
+    },
+    "metadata": {
+      "type": "string",
+      "maxLength": 1024,
+      "description": "Custom metadata associated with the contact"
+    },
+    "channel_identities": {
+      "type": "array",
+      "minItems": 1,
+      "description": "The channel identities for reaching the contact on various channels",
+      "items": {
+        "$ref": "#/$defs/ChannelIdentity"
+      }
+    },
+    "channel_priority": {
+      "type": "array",
+      "description": "Preferred channel order for reaching the contact",
+      "items": {
+        "type": "string",
+        "enum": [
+          "SMS", "MMS", "RCS", "WHATSAPP", "MESSENGER", "INSTAGRAM",
+          "VIBER", "VIBERBM", "TELEGRAM", "KAKAOTALK", "LINE"
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "ChannelIdentity": {
+      "type": "object",
+      "description": "A channel-specific identity for reaching the contact",
+      "required": ["channel", "identity"],
+      "properties": {
+        "channel": {
+          "type": "string",
+          "enum": [
+            "SMS", "MMS", "RCS", "WHATSAPP", "MESSENGER", "INSTAGRAM",
+            "VIBER", "VIBERBM", "TELEGRAM", "KAKAOTALK", "LINE"
+          ],
+          "description": "The messaging channel type"
+        },
+        "identity": {
+          "type": "string",
+          "description": "The channel-specific identity such as phone number or user ID"
+        },
+        "app_id": {
+          "type": "string",
+          "description": "The Conversation API app ID associated with this channel identity"
+        }
+      }
+    }
+  }
+}

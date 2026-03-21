@@ -1,0 +1,167 @@
+asyncapi: 2.6.0
+info:
+  title: Sinch Verification Callbacks
+  description: >-
+    Event-driven callbacks for the Sinch Verification API. The Verification API
+    sends HTTP POST callbacks to your application during the verification
+    lifecycle. These include verification request events when a verification
+    is initiated and verification result events when a verification is
+    completed or fails.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+servers:
+  customerServer:
+    url: '{callbackUrl}'
+    protocol: https
+    description: >-
+      Your server endpoint configured to receive Verification API callbacks.
+      The callback URL is configured per application.
+    variables:
+      callbackUrl:
+        description: Your callback endpoint URL
+channels:
+  /verification/request:
+    description: >-
+      Receives verification request events when a new verification is
+      initiated. Your response can allow or deny the verification and
+      override the verification method.
+    publish:
+      operationId: receiveVerificationRequest
+      summary: Receive a verification request event
+      description: >-
+        Triggered when a new verification is initiated via the SDK or API.
+        Your response determines whether the verification proceeds and can
+        override the method (SMS, flashcall, callout).
+      message:
+        $ref: '#/components/messages/VerificationRequestEvent'
+  /verification/result:
+    description: >-
+      Receives verification result events when a verification is completed,
+      either successfully or with a failure.
+    publish:
+      operationId: receiveVerificationResult
+      summary: Receive a verification result event
+      description: >-
+        Triggered when a verification reaches a terminal state, either
+        successful, failed, or denied. Includes the verification method
+        and identity details.
+      message:
+        $ref: '#/components/messages/VerificationResultEvent'
+components:
+  messages:
+    VerificationRequestEvent:
+      name: VerificationRequestEvent
+      title: Verification Request Event
+      summary: A new verification has been initiated
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/VerificationRequestPayload'
+    VerificationResultEvent:
+      name: VerificationResultEvent
+      title: Verification Result Event
+      summary: A verification has reached a terminal state
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/VerificationResultPayload'
+  schemas:
+    VerificationRequestPayload:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The verification request identifier
+        event:
+          type: string
+          enum:
+            - VerificationRequestEvent
+          description: The event type
+        method:
+          type: string
+          enum:
+            - sms
+            - flashcall
+            - callout
+            - seamless
+          description: The requested verification method
+        identity:
+          type: object
+          description: The identity being verified
+          properties:
+            type:
+              type: string
+              description: The identity type
+            endpoint:
+              type: string
+              description: The phone number in E.164 format
+        reference:
+          type: string
+          description: Custom reference string if provided
+        custom:
+          type: string
+          description: Custom data if provided
+        price:
+          type: object
+          description: The verification price
+          properties:
+            currencyId:
+              type: string
+              description: Currency code
+            amount:
+              type: number
+              description: Price amount
+        acceptLanguage:
+          type: array
+          description: Accepted languages from the SDK
+          items:
+            type: string
+    VerificationResultPayload:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The verification request identifier
+        event:
+          type: string
+          enum:
+            - VerificationResultEvent
+          description: The event type
+        method:
+          type: string
+          enum:
+            - sms
+            - flashcall
+            - callout
+            - seamless
+          description: The verification method used
+        identity:
+          type: object
+          description: The verified identity
+          properties:
+            type:
+              type: string
+              description: The identity type
+            endpoint:
+              type: string
+              description: The phone number
+        status:
+          type: string
+          enum:
+            - SUCCESSFUL
+            - FAIL
+            - DENIED
+            - ERROR
+          description: The verification result
+        reason:
+          type: string
+          description: The reason for the result
+        reference:
+          type: string
+          description: Custom reference string
+        source:
+          type: string
+          enum:
+            - intercepted
+            - manual
+          description: How the code was reported

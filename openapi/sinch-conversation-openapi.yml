@@ -1,0 +1,1530 @@
+openapi: 3.1.0
+info:
+  title: Sinch Conversation API
+  description: >-
+    The Sinch Conversation API is an omnichannel messaging platform that
+    enables developers to send and receive messages across multiple channels
+    including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber,
+    Telegram, KakaoTalk, and LINE through a single unified API. It provides
+    contact management, conversation tracking, message templating, and webhook
+    callbacks for real-time event handling. The API normalizes message formats
+    across channels, allowing developers to build multichannel messaging
+    experiences without channel-specific integrations.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+externalDocs:
+  description: Sinch Conversation API Documentation
+  url: https://developers.sinch.com/docs/conversation
+servers:
+  - url: https://us.conversation.api.sinch.com
+    description: US Production Server
+  - url: https://eu.conversation.api.sinch.com
+    description: EU Production Server
+  - url: https://br.conversation.api.sinch.com
+    description: Brazil Production Server
+tags:
+  - name: Apps
+    description: >-
+      Manage Conversation API applications including channel credentials and
+      webhook configurations.
+  - name: Contacts
+    description: >-
+      Manage contacts and their channel identities. Contacts group together
+      underlying connected channel recipient identities.
+  - name: Conversations
+    description: >-
+      Manage conversations which are collections of messages tied to a specific
+      app and contact.
+  - name: Messages
+    description: >-
+      Send and retrieve messages across all supported channels using a
+      normalized message format.
+  - name: Events
+    description: >-
+      Send and receive events such as composing indicators across supported
+      channels.
+  - name: Transcoding
+    description: >-
+      Transcode generic message formats to channel-specific formats for
+      preview purposes.
+  - name: Webhooks
+    description: >-
+      Manage webhook endpoints for receiving callbacks on message delivery,
+      inbound messages, and other events.
+  - name: Capability
+    description: >-
+      Query channel capabilities for specific contacts to determine which
+      channels can be used to reach them.
+security:
+  - oAuth2: []
+  - basicAuth: []
+paths:
+  /v1/projects/{project_id}/messages:send:
+    post:
+      operationId: sendMessage
+      summary: Send a message
+      description: >-
+        Sends a message to a contact on a specific channel or using the
+        Conversation API intelligent channel selection. Supports text, media,
+        template, and card messages in a normalized format.
+      tags:
+        - Messages
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/messages:
+    get:
+      operationId: listMessages
+      summary: List messages
+      description: >-
+        Returns a list of messages in a project with optional filtering by
+        conversation, contact, app, and channel.
+      tags:
+        - Messages
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: conversation_id
+          in: query
+          description: Filter by conversation ID
+          schema:
+            type: string
+        - name: contact_id
+          in: query
+          description: Filter by contact ID
+          schema:
+            type: string
+        - name: app_id
+          in: query
+          description: Filter by app ID
+          schema:
+            type: string
+        - name: channel
+          in: query
+          description: Filter by channel
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          description: The number of messages per page
+          schema:
+            type: integer
+            default: 10
+        - name: page_token
+          in: query
+          description: Pagination token for the next page
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageList'
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/messages/{message_id}:
+    get:
+      operationId: getMessage
+      summary: Get a message
+      description: >-
+        Returns the details of a specific message.
+      tags:
+        - Messages
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: message_id
+          in: path
+          required: true
+          description: The unique message identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Message details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationMessage'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Message not found
+    delete:
+      operationId: deleteMessage
+      summary: Delete a message
+      description: >-
+        Deletes a specific message from the conversation history.
+      tags:
+        - Messages
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: message_id
+          in: path
+          required: true
+          description: The unique message identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Message deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Message not found
+  /v1/projects/{project_id}/contacts:
+    post:
+      operationId: createContact
+      summary: Create a contact
+      description: >-
+        Creates a new contact with one or more channel identities.
+      tags:
+        - Contacts
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContactRequest'
+      responses:
+        '200':
+          description: Contact created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+    get:
+      operationId: listContacts
+      summary: List contacts
+      description: >-
+        Returns a list of contacts in the project with pagination support.
+      tags:
+        - Contacts
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: page_size
+          in: query
+          description: The number of contacts per page
+          schema:
+            type: integer
+            default: 10
+        - name: page_token
+          in: query
+          description: Pagination token for the next page
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactList'
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/contacts/{contact_id}:
+    get:
+      operationId: getContact
+      summary: Get a contact
+      description: >-
+        Returns the details of a specific contact.
+      tags:
+        - Contacts
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ContactId'
+      responses:
+        '200':
+          description: Contact details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Contact not found
+    patch:
+      operationId: updateContact
+      summary: Update a contact
+      description: >-
+        Updates the properties of a specific contact.
+      tags:
+        - Contacts
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ContactId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContactRequest'
+      responses:
+        '200':
+          description: Contact updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Contact not found
+    delete:
+      operationId: deleteContact
+      summary: Delete a contact
+      description: >-
+        Deletes a specific contact and all associated data.
+      tags:
+        - Contacts
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ContactId'
+      responses:
+        '200':
+          description: Contact deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Contact not found
+  /v1/projects/{project_id}/contacts:merge:
+    post:
+      operationId: mergeContacts
+      summary: Merge contacts
+      description: >-
+        Merges two contacts into one, combining their channel identities
+        and conversation history.
+      tags:
+        - Contacts
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - destination_id
+                - source_id
+              properties:
+                destination_id:
+                  type: string
+                  description: The contact ID to merge into
+                source_id:
+                  type: string
+                  description: The contact ID to merge from
+      responses:
+        '200':
+          description: Contacts merged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/conversations:
+    get:
+      operationId: listConversations
+      summary: List conversations
+      description: >-
+        Returns a list of conversations for a project with optional filtering.
+      tags:
+        - Conversations
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: only_active
+          in: query
+          description: Only return active conversations
+          schema:
+            type: boolean
+        - name: app_id
+          in: query
+          description: Filter by app ID
+          schema:
+            type: string
+        - name: contact_id
+          in: query
+          description: Filter by contact ID
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          description: The number of conversations per page
+          schema:
+            type: integer
+            default: 10
+        - name: page_token
+          in: query
+          description: Pagination token for the next page
+          schema:
+            type: string
+      responses:
+        '200':
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createConversation
+      summary: Create a conversation
+      description: >-
+        Creates a new conversation associated with a contact and app.
+      tags:
+        - Conversations
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConversationRequest'
+      responses:
+        '200':
+          description: Conversation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/conversations/{conversation_id}:
+    get:
+      operationId: getConversation
+      summary: Get a conversation
+      description: >-
+        Returns the details of a specific conversation.
+      tags:
+        - Conversations
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ConversationId'
+      responses:
+        '200':
+          description: Conversation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conversation not found
+    patch:
+      operationId: updateConversation
+      summary: Update a conversation
+      description: >-
+        Updates the properties of a specific conversation.
+      tags:
+        - Conversations
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ConversationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConversationRequest'
+      responses:
+        '200':
+          description: Conversation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conversation not found
+    delete:
+      operationId: deleteConversation
+      summary: Delete a conversation
+      description: >-
+        Deletes a specific conversation and optionally its messages.
+      tags:
+        - Conversations
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ConversationId'
+      responses:
+        '200':
+          description: Conversation deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conversation not found
+  /v1/projects/{project_id}/conversations/{conversation_id}:stop:
+    post:
+      operationId: stopConversation
+      summary: Stop a conversation
+      description: >-
+        Stops an active conversation, marking it as inactive.
+      tags:
+        - Conversations
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/ConversationId'
+      responses:
+        '200':
+          description: Conversation stopped
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conversation not found
+  /v1/projects/{project_id}/apps:
+    get:
+      operationId: listApps
+      summary: List apps
+      description: >-
+        Returns a list of all Conversation API apps in the project.
+      tags:
+        - Apps
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: List of apps
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createApp
+      summary: Create an app
+      description: >-
+        Creates a new Conversation API app with channel credentials.
+      tags:
+        - Apps
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppRequest'
+      responses:
+        '200':
+          description: App created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/apps/{app_id}:
+    get:
+      operationId: getApp
+      summary: Get an app
+      description: >-
+        Returns the details of a specific Conversation API app.
+      tags:
+        - Apps
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/AppId'
+      responses:
+        '200':
+          description: App details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '401':
+          description: Unauthorized
+        '404':
+          description: App not found
+    patch:
+      operationId: updateApp
+      summary: Update an app
+      description: >-
+        Updates the properties of a specific Conversation API app.
+      tags:
+        - Apps
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/AppId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAppRequest'
+      responses:
+        '200':
+          description: App updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '401':
+          description: Unauthorized
+        '404':
+          description: App not found
+    delete:
+      operationId: deleteApp
+      summary: Delete an app
+      description: >-
+        Deletes a specific Conversation API app.
+      tags:
+        - Apps
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/AppId'
+      responses:
+        '200':
+          description: App deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: App not found
+  /v1/projects/{project_id}/apps/{app_id}/webhooks:
+    get:
+      operationId: listWebhooks
+      summary: List webhooks
+      description: >-
+        Returns the list of webhooks configured for a specific app. Up to
+        5 webhooks can be configured per app.
+      tags:
+        - Webhooks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/AppId'
+      responses:
+        '200':
+          description: List of webhooks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WebhookList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createWebhook
+      summary: Create a webhook
+      description: >-
+        Creates a new webhook for the specified app with trigger subscriptions.
+      tags:
+        - Webhooks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/AppId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWebhookRequest'
+      responses:
+        '200':
+          description: Webhook created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/webhooks/{webhook_id}:
+    get:
+      operationId: getWebhook
+      summary: Get a webhook
+      description: >-
+        Returns the details of a specific webhook.
+      tags:
+        - Webhooks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: webhook_id
+          in: path
+          required: true
+          description: The unique webhook identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Webhook not found
+    patch:
+      operationId: updateWebhook
+      summary: Update a webhook
+      description: >-
+        Updates the properties of a specific webhook.
+      tags:
+        - Webhooks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: webhook_id
+          in: path
+          required: true
+          description: The unique webhook identifier
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWebhookRequest'
+      responses:
+        '200':
+          description: Webhook updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Webhook'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Webhook not found
+    delete:
+      operationId: deleteWebhook
+      summary: Delete a webhook
+      description: >-
+        Deletes a specific webhook.
+      tags:
+        - Webhooks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: webhook_id
+          in: path
+          required: true
+          description: The unique webhook identifier
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Webhook deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Webhook not found
+  /v1/projects/{project_id}/events:send:
+    post:
+      operationId: sendEvent
+      summary: Send an event
+      description: >-
+        Sends an event such as a composing indicator to a contact on a
+        specific channel.
+      tags:
+        - Events
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEventRequest'
+      responses:
+        '200':
+          description: Event sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEventResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/messages:transcode:
+    post:
+      operationId: transcodeMessage
+      summary: Transcode a message
+      description: >-
+        Transcodes a generic message format to a channel-specific format
+        for preview purposes without sending the message.
+      tags:
+        - Transcoding
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranscodeRequest'
+      responses:
+        '200':
+          description: Transcoded message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranscodeResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/capability:query:
+    post:
+      operationId: queryCapability
+      summary: Query channel capability
+      description: >-
+        Queries the capability of a specific channel for a contact to
+        determine if the channel can be used to reach them.
+      tags:
+        - Capability
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapabilityQueryRequest'
+      responses:
+        '200':
+          description: Capability result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilityQueryResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+components:
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: >-
+        OAuth 2.0 client credentials flow using project key ID and secret.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
+      type: http
+      scheme: basic
+      description: >-
+        Key ID as username and key secret as password.
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    ContactId:
+      name: contact_id
+      in: path
+      required: true
+      description: The unique contact identifier
+      schema:
+        type: string
+    ConversationId:
+      name: conversation_id
+      in: path
+      required: true
+      description: The unique conversation identifier
+      schema:
+        type: string
+    AppId:
+      name: app_id
+      in: path
+      required: true
+      description: The unique app identifier
+      schema:
+        type: string
+  schemas:
+    SendMessageRequest:
+      type: object
+      required:
+        - app_id
+        - message
+        - recipient
+      properties:
+        app_id:
+          type: string
+          description: The ID of the Conversation API app
+        recipient:
+          type: object
+          description: The message recipient
+          properties:
+            contact_id:
+              type: string
+              description: The contact ID to send to
+            identified_by:
+              type: object
+              description: Channel identity to address
+              properties:
+                channel_identities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChannelIdentity'
+        message:
+          $ref: '#/components/schemas/AppMessage'
+        message_metadata:
+          type: string
+          description: Metadata to associate with the message
+        conversation_metadata:
+          type: string
+          description: Metadata to associate with the conversation
+        channel_priority_order:
+          type: array
+          description: Ordered list of channels to try
+          items:
+            type: string
+        queue:
+          type: string
+          enum:
+            - NORMAL_PRIORITY
+            - HIGH_PRIORITY
+          description: The message queue priority
+        ttl:
+          type: integer
+          description: Time-to-live in seconds for the message
+    AppMessage:
+      type: object
+      properties:
+        text_message:
+          type: object
+          description: A text message
+          properties:
+            text:
+              type: string
+              description: The message text
+        media_message:
+          type: object
+          description: A media message
+          properties:
+            url:
+              type: string
+              format: uri
+              description: The media URL
+            thumbnail_url:
+              type: string
+              format: uri
+              description: The thumbnail URL
+        template_message:
+          type: object
+          description: A template message
+          properties:
+            omni_template:
+              type: object
+              description: The template reference
+              properties:
+                template_id:
+                  type: string
+                  description: The template identifier
+                version:
+                  type: string
+                  description: The template version
+                language_code:
+                  type: string
+                  description: The language code
+                parameters:
+                  type: object
+                  description: Template parameter values
+        card_message:
+          type: object
+          description: A card message with title, description, and media
+          properties:
+            title:
+              type: string
+              description: The card title
+            description:
+              type: string
+              description: The card description
+            media_message:
+              type: object
+              description: The card media
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  description: The media URL
+            choices:
+              type: array
+              description: Action choices on the card
+              items:
+                $ref: '#/components/schemas/Choice'
+        list_message:
+          type: object
+          description: A list message with sections
+          properties:
+            title:
+              type: string
+              description: The list title
+            description:
+              type: string
+              description: The list description
+            sections:
+              type: array
+              description: List sections
+              items:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: Section title
+                  items:
+                    type: array
+                    description: Section items
+                    items:
+                      $ref: '#/components/schemas/Choice'
+    Choice:
+      type: object
+      properties:
+        text_message:
+          type: object
+          description: Text choice
+          properties:
+            text:
+              type: string
+              description: The choice text
+        postback_data:
+          type: string
+          description: Data sent back when the choice is selected
+    ChannelIdentity:
+      type: object
+      properties:
+        channel:
+          type: string
+          enum:
+            - SMS
+            - RCS
+            - WHATSAPP
+            - MESSENGER
+            - INSTAGRAM
+            - VIBER
+            - VIBERBM
+            - TELEGRAM
+            - KAKAOTALK
+            - LINE
+            - MMS
+          description: The channel type
+        identity:
+          type: string
+          description: The channel-specific identity
+        app_id:
+          type: string
+          description: The app ID for the channel
+    SendMessageResponse:
+      type: object
+      properties:
+        message_id:
+          type: string
+          description: The unique message identifier
+        accepted_time:
+          type: string
+          format: date-time
+          description: When the message was accepted
+    ConversationMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique message identifier
+        direction:
+          type: string
+          enum:
+            - TO_APP
+            - TO_CONTACT
+          description: The message direction
+        app_message:
+          $ref: '#/components/schemas/AppMessage'
+        contact_message:
+          type: object
+          description: The inbound contact message
+        channel_identity:
+          $ref: '#/components/schemas/ChannelIdentity'
+        conversation_id:
+          type: string
+          description: The conversation this message belongs to
+        contact_id:
+          type: string
+          description: The contact who sent or received the message
+        metadata:
+          type: string
+          description: Message metadata
+        accept_time:
+          type: string
+          format: date-time
+          description: When the message was accepted
+    MessageList:
+      type: object
+      properties:
+        messages:
+          type: array
+          description: List of messages
+          items:
+            $ref: '#/components/schemas/ConversationMessage'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique contact identifier
+        display_name:
+          type: string
+          description: The display name of the contact
+        email:
+          type: string
+          format: email
+          description: The contact email address
+        external_id:
+          type: string
+          description: An external identifier for the contact
+        language:
+          type: string
+          description: The preferred language of the contact
+        metadata:
+          type: string
+          description: Contact metadata
+        channel_identities:
+          type: array
+          description: The channel identities for the contact
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
+    CreateContactRequest:
+      type: object
+      required:
+        - channel_identities
+      properties:
+        display_name:
+          type: string
+          description: The display name
+        email:
+          type: string
+          format: email
+          description: The email address
+        external_id:
+          type: string
+          description: An external identifier
+        language:
+          type: string
+          description: The preferred language
+        metadata:
+          type: string
+          description: Contact metadata
+        channel_identities:
+          type: array
+          description: Channel identities
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
+    UpdateContactRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+          description: Updated display name
+        email:
+          type: string
+          format: email
+          description: Updated email address
+        external_id:
+          type: string
+          description: Updated external identifier
+        language:
+          type: string
+          description: Updated preferred language
+        metadata:
+          type: string
+          description: Updated metadata
+        channel_identities:
+          type: array
+          description: Updated channel identities
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
+    ContactList:
+      type: object
+      properties:
+        contacts:
+          type: array
+          description: List of contacts
+          items:
+            $ref: '#/components/schemas/Contact'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique conversation identifier
+        app_id:
+          type: string
+          description: The app ID
+        contact_id:
+          type: string
+          description: The contact ID
+        active:
+          type: boolean
+          description: Whether the conversation is active
+        active_channel:
+          type: string
+          description: The currently active channel
+        metadata:
+          type: string
+          description: Conversation metadata
+        metadata_json:
+          type: object
+          description: Structured conversation metadata
+    CreateConversationRequest:
+      type: object
+      required:
+        - app_id
+        - contact_id
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        contact_id:
+          type: string
+          description: The contact ID
+        active:
+          type: boolean
+          description: Whether the conversation is active
+          default: true
+        active_channel:
+          type: string
+          description: The active channel
+        metadata:
+          type: string
+          description: Conversation metadata
+    UpdateConversationRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: Updated active status
+        active_channel:
+          type: string
+          description: Updated active channel
+        metadata:
+          type: string
+          description: Updated metadata
+    ConversationList:
+      type: object
+      properties:
+        conversations:
+          type: array
+          description: List of conversations
+          items:
+            $ref: '#/components/schemas/Conversation'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
+    App:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique app identifier
+        display_name:
+          type: string
+          description: The app display name
+        channel_credentials:
+          type: array
+          description: Channel credential configurations
+          items:
+            $ref: '#/components/schemas/ChannelCredential'
+        conversation_metadata_report_view:
+          type: string
+          description: Metadata report configuration
+    CreateAppRequest:
+      type: object
+      required:
+        - display_name
+      properties:
+        display_name:
+          type: string
+          description: The app display name
+        channel_credentials:
+          type: array
+          description: Channel credential configurations
+          items:
+            $ref: '#/components/schemas/ChannelCredential'
+    UpdateAppRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+          description: Updated display name
+        channel_credentials:
+          type: array
+          description: Updated channel credentials
+          items:
+            $ref: '#/components/schemas/ChannelCredential'
+    AppList:
+      type: object
+      properties:
+        apps:
+          type: array
+          description: List of apps
+          items:
+            $ref: '#/components/schemas/App'
+    ChannelCredential:
+      type: object
+      properties:
+        channel:
+          type: string
+          description: The channel type
+        static_bearer:
+          type: object
+          description: Static bearer token credential
+          properties:
+            claimed_identity:
+              type: string
+              description: The claimed identity
+            token:
+              type: string
+              description: The bearer token
+        static_token:
+          type: object
+          description: Static token credential
+          properties:
+            token:
+              type: string
+              description: The token value
+        callback_secret:
+          type: string
+          description: Secret for validating callbacks from the channel
+    Webhook:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique webhook identifier
+        app_id:
+          type: string
+          description: The app this webhook belongs to
+        target:
+          type: string
+          format: uri
+          description: The webhook target URL
+        target_type:
+          type: string
+          enum:
+            - HTTP
+            - GRPC
+          description: The target type
+        triggers:
+          type: array
+          description: List of event triggers this webhook subscribes to
+          items:
+            type: string
+            enum:
+              - MESSAGE_INBOUND
+              - EVENT_INBOUND
+              - MESSAGE_DELIVERY
+              - MESSAGE_SUBMIT
+              - CONTACT_CREATE
+              - CONTACT_DELETE
+              - CONTACT_MERGE
+              - CONTACT_UPDATE
+              - CONVERSATION_START
+              - CONVERSATION_STOP
+              - CONVERSATION_DELETE
+              - CAPABILITY
+              - OPT_IN
+              - OPT_OUT
+              - CHANNEL_EVENT
+              - CONTACT_IDENTITIES_DUPLICATION
+              - UNSUPPORTED
+              - RECORD_NOTIFICATION
+              - SMART_CONVERSATIONS
+        secret:
+          type: string
+          description: Secret for HMAC signature validation
+    CreateWebhookRequest:
+      type: object
+      required:
+        - app_id
+        - target
+        - triggers
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        target:
+          type: string
+          format: uri
+          description: The webhook target URL
+        target_type:
+          type: string
+          enum:
+            - HTTP
+            - GRPC
+          description: The target type
+          default: HTTP
+        triggers:
+          type: array
+          description: Event triggers to subscribe to
+          items:
+            type: string
+        secret:
+          type: string
+          description: Secret for HMAC validation
+    UpdateWebhookRequest:
+      type: object
+      properties:
+        target:
+          type: string
+          format: uri
+          description: Updated target URL
+        target_type:
+          type: string
+          description: Updated target type
+        triggers:
+          type: array
+          description: Updated trigger list
+          items:
+            type: string
+        secret:
+          type: string
+          description: Updated secret
+    WebhookList:
+      type: object
+      properties:
+        webhooks:
+          type: array
+          description: List of webhooks
+          items:
+            $ref: '#/components/schemas/Webhook'
+    SendEventRequest:
+      type: object
+      required:
+        - app_id
+        - recipient
+        - event
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        recipient:
+          type: object
+          description: The event recipient
+          properties:
+            contact_id:
+              type: string
+              description: The contact ID
+        event:
+          type: object
+          description: The event to send
+          properties:
+            composing_event:
+              type: object
+              description: Composing indicator event
+    SendEventResponse:
+      type: object
+      properties:
+        event_id:
+          type: string
+          description: The unique event identifier
+        accepted_time:
+          type: string
+          format: date-time
+          description: When the event was accepted
+    TranscodeRequest:
+      type: object
+      required:
+        - app_id
+        - app_message
+        - channels
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        app_message:
+          $ref: '#/components/schemas/AppMessage'
+        channels:
+          type: array
+          description: Target channels for transcoding
+          items:
+            type: string
+    TranscodeResponse:
+      type: object
+      properties:
+        transcoded_message:
+          type: object
+          description: Map of channel to transcoded message
+          additionalProperties:
+            type: string
+    CapabilityQueryRequest:
+      type: object
+      required:
+        - app_id
+        - recipient
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        recipient:
+          type: object
+          description: The recipient to query capability for
+          properties:
+            contact_id:
+              type: string
+              description: The contact ID
+            identified_by:
+              type: object
+              description: Channel identity to query
+              properties:
+                channel_identities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChannelIdentity'
+    CapabilityQueryResponse:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        recipient:
+          type: object
+          description: The queried recipient
+        request_id:
+          type: string
+          description: The capability query request ID

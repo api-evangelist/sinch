@@ -1,0 +1,586 @@
+asyncapi: 2.6.0
+info:
+  title: Sinch Conversation API Webhooks
+  description: >-
+    Event-driven webhooks for the Sinch Conversation API. The Conversation API
+    delivers contact messages, delivery receipts, and various notifications
+    through HTTP POST callbacks. Up to 5 webhooks can be configured per app,
+    each subscribing to specific event triggers including inbound messages,
+    delivery reports, contact changes, and conversation lifecycle events.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+servers:
+  customerServer:
+    url: '{webhookTarget}'
+    protocol: https
+    description: >-
+      Your server endpoint configured as a webhook target for the Conversation
+      API app. Webhooks are configured via the API or Sinch Dashboard.
+    variables:
+      webhookTarget:
+        description: Your webhook target URL
+    security:
+      - hmacAuth: []
+channels:
+  /conversation/message-inbound:
+    description: >-
+      Receives inbound message events from end users across all connected
+      messaging channels.
+    publish:
+      operationId: receiveInboundMessage
+      summary: Receive an inbound message
+      description: >-
+        Triggered when an end user sends a message on any connected channel.
+        The message is normalized to the Conversation API format.
+      message:
+        $ref: '#/components/messages/MessageInbound'
+  /conversation/message-delivery:
+    description: >-
+      Receives delivery receipt events for messages sent to contacts.
+    publish:
+      operationId: receiveMessageDelivery
+      summary: Receive a message delivery receipt
+      description: >-
+        Triggered when the delivery status of a sent message changes,
+        indicating delivery success or failure on the channel.
+      message:
+        $ref: '#/components/messages/MessageDelivery'
+  /conversation/event-inbound:
+    description: >-
+      Receives inbound events from end users such as composing indicators
+      and read receipts.
+    publish:
+      operationId: receiveInboundEvent
+      summary: Receive an inbound event
+      description: >-
+        Triggered when an end user generates an event on a channel, such as
+        starting to type or reading a message.
+      message:
+        $ref: '#/components/messages/EventInbound'
+  /conversation/contact-create:
+    description: >-
+      Receives notifications when a new contact is created.
+    publish:
+      operationId: receiveContactCreate
+      summary: Receive a contact creation event
+      message:
+        $ref: '#/components/messages/ContactEvent'
+  /conversation/contact-update:
+    description: >-
+      Receives notifications when a contact is updated.
+    publish:
+      operationId: receiveContactUpdate
+      summary: Receive a contact update event
+      message:
+        $ref: '#/components/messages/ContactEvent'
+  /conversation/contact-delete:
+    description: >-
+      Receives notifications when a contact is deleted.
+    publish:
+      operationId: receiveContactDelete
+      summary: Receive a contact deletion event
+      message:
+        $ref: '#/components/messages/ContactEvent'
+  /conversation/contact-merge:
+    description: >-
+      Receives notifications when two contacts are merged.
+    publish:
+      operationId: receiveContactMerge
+      summary: Receive a contact merge event
+      message:
+        $ref: '#/components/messages/ContactMergeEvent'
+  /conversation/conversation-start:
+    description: >-
+      Receives notifications when a new conversation is started.
+    publish:
+      operationId: receiveConversationStart
+      summary: Receive a conversation start event
+      message:
+        $ref: '#/components/messages/ConversationEvent'
+  /conversation/conversation-stop:
+    description: >-
+      Receives notifications when a conversation is stopped.
+    publish:
+      operationId: receiveConversationStop
+      summary: Receive a conversation stop event
+      message:
+        $ref: '#/components/messages/ConversationEvent'
+  /conversation/channel-event:
+    description: >-
+      Receives channel-specific events that do not map to the standard
+      Conversation API event model.
+    publish:
+      operationId: receiveChannelEvent
+      summary: Receive a channel event
+      message:
+        $ref: '#/components/messages/ChannelEvent'
+  /conversation/capability:
+    description: >-
+      Receives capability lookup results for contacts.
+    publish:
+      operationId: receiveCapabilityResult
+      summary: Receive a capability lookup result
+      message:
+        $ref: '#/components/messages/CapabilityEvent'
+  /conversation/opt-in:
+    description: >-
+      Receives opt-in events when contacts opt in to messaging.
+    publish:
+      operationId: receiveOptIn
+      summary: Receive an opt-in event
+      message:
+        $ref: '#/components/messages/OptEvent'
+  /conversation/opt-out:
+    description: >-
+      Receives opt-out events when contacts opt out of messaging.
+    publish:
+      operationId: receiveOptOut
+      summary: Receive an opt-out event
+      message:
+        $ref: '#/components/messages/OptEvent'
+  /conversation/smart-conversations:
+    description: >-
+      Receives smart conversation analysis results including sentiment
+      analysis and intent classification.
+    publish:
+      operationId: receiveSmartConversationResult
+      summary: Receive a smart conversation result
+      message:
+        $ref: '#/components/messages/SmartConversationEvent'
+components:
+  securitySchemes:
+    hmacAuth:
+      type: httpApiKey
+      in: header
+      name: x-sinch-webhook-signature
+      description: >-
+        HMAC signature for webhook payload verification using the secret
+        configured on the webhook.
+  messages:
+    MessageInbound:
+      name: MESSAGE_INBOUND
+      title: Inbound Message
+      summary: An inbound message from an end user
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/MessageInboundPayload'
+    MessageDelivery:
+      name: MESSAGE_DELIVERY
+      title: Message Delivery Receipt
+      summary: Delivery status update for a sent message
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/MessageDeliveryPayload'
+    EventInbound:
+      name: EVENT_INBOUND
+      title: Inbound Event
+      summary: An inbound event from an end user
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/EventInboundPayload'
+    ContactEvent:
+      name: CONTACT_EVENT
+      title: Contact Event
+      summary: A contact lifecycle event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/ContactEventPayload'
+    ContactMergeEvent:
+      name: CONTACT_MERGE
+      title: Contact Merge Event
+      summary: Two contacts were merged
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/ContactMergeEventPayload'
+    ConversationEvent:
+      name: CONVERSATION_EVENT
+      title: Conversation Event
+      summary: A conversation lifecycle event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/ConversationEventPayload'
+    ChannelEvent:
+      name: CHANNEL_EVENT
+      title: Channel Event
+      summary: A channel-specific event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/ChannelEventPayload'
+    CapabilityEvent:
+      name: CAPABILITY
+      title: Capability Event
+      summary: Capability lookup result
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/CapabilityEventPayload'
+    OptEvent:
+      name: OPT_EVENT
+      title: Opt Event
+      summary: An opt-in or opt-out event
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/OptEventPayload'
+    SmartConversationEvent:
+      name: SMART_CONVERSATIONS
+      title: Smart Conversation Event
+      summary: Smart conversation analysis result
+      contentType: application/json
+      payload:
+        $ref: '#/components/schemas/SmartConversationPayload'
+  schemas:
+    MessageInboundPayload:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app identifier
+        accepted_time:
+          type: string
+          format: date-time
+          description: When the event was accepted
+        event_time:
+          type: string
+          format: date-time
+          description: When the event occurred
+        project_id:
+          type: string
+          description: The project identifier
+        message:
+          type: object
+          description: The inbound message
+          properties:
+            id:
+              type: string
+              description: The message identifier
+            direction:
+              type: string
+              description: The message direction
+            contact_message:
+              type: object
+              description: The contact message content
+              properties:
+                text_message:
+                  type: object
+                  properties:
+                    text:
+                      type: string
+                      description: The message text
+                media_message:
+                  type: object
+                  properties:
+                    url:
+                      type: string
+                      description: Media URL
+            channel_identity:
+              type: object
+              description: The channel identity
+              properties:
+                channel:
+                  type: string
+                  description: The channel type
+                identity:
+                  type: string
+                  description: The channel-specific identity
+                app_id:
+                  type: string
+                  description: The app ID
+            conversation_id:
+              type: string
+              description: The conversation identifier
+            contact_id:
+              type: string
+              description: The contact identifier
+            metadata:
+              type: string
+              description: Message metadata
+            accept_time:
+              type: string
+              format: date-time
+              description: When the message was accepted
+        message_metadata:
+          type: string
+          description: Additional message metadata
+    MessageDeliveryPayload:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app identifier
+        accepted_time:
+          type: string
+          format: date-time
+          description: When the event was accepted
+        event_time:
+          type: string
+          format: date-time
+          description: When the event occurred
+        project_id:
+          type: string
+          description: The project identifier
+        message_delivery_report:
+          type: object
+          description: The delivery report
+          properties:
+            message_id:
+              type: string
+              description: The message identifier
+            conversation_id:
+              type: string
+              description: The conversation identifier
+            status:
+              type: string
+              enum:
+                - QUEUED_ON_CHANNEL
+                - DELIVERED
+                - READ
+                - FAILED
+                - SWITCHING_CHANNEL
+              description: The delivery status
+            channel_identity:
+              type: object
+              description: The channel identity
+              properties:
+                channel:
+                  type: string
+                  description: The channel type
+                identity:
+                  type: string
+                  description: The channel identity
+            contact_id:
+              type: string
+              description: The contact identifier
+            reason:
+              type: string
+              description: Reason for failure if applicable
+            metadata:
+              type: string
+              description: Delivery metadata
+    EventInboundPayload:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app identifier
+        accepted_time:
+          type: string
+          format: date-time
+          description: When the event was accepted
+        project_id:
+          type: string
+          description: The project identifier
+        event:
+          type: object
+          description: The inbound event
+          properties:
+            composing_event:
+              type: object
+              description: Composing indicator event
+            contact_id:
+              type: string
+              description: The contact identifier
+            channel_identity:
+              type: object
+              description: The channel identity
+              properties:
+                channel:
+                  type: string
+                  description: The channel type
+                identity:
+                  type: string
+                  description: The channel identity
+    ContactEventPayload:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app identifier
+        accepted_time:
+          type: string
+          format: date-time
+          description: When the event was accepted
+        project_id:
+          type: string
+          description: The project identifier
+        contact:
+          type: object
+          description: The contact object
+          properties:
+            id:
+              type: string
+              description: The contact identifier
+            display_name:
+              type: string
+              description: The contact display name
+            channel_identities:
+              type: array
+              description: Channel identities
+              items:
+                type: object
+                properties:
+                  channel:
+                    type: string
+                  identity:
+                    type: string
+    ContactMergeEventPayload:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app identifier
+        project_id:
+          type: string
+          description: The project identifier
+        preserved_contact:
+          type: object
+          description: The surviving contact after merge
+          properties:
+            id:
+              type: string
+              description: The contact identifier
+        deleted_contact:
+          type: object
+          description: The contact that was merged and deleted
+          properties:
+            id:
+              type: string
+              description: The contact identifier
+    ConversationEventPayload:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app identifier
+        project_id:
+          type: string
+          description: The project identifier
+        conversation:
+          type: object
+          description: The conversation
+          properties:
+            id:
+              type: string
+              description: The conversation identifier
+            app_id:
+              type: string
+              description: The app identifier
+            contact_id:
+              type: string
+              description: The contact identifier
+            active:
+              type: boolean
+              description: Whether the conversation is active
+    ChannelEventPayload:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app identifier
+        project_id:
+          type: string
+          description: The project identifier
+        channel:
+          type: string
+          description: The channel type
+        event_type:
+          type: string
+          description: The channel-specific event type
+        additional_data:
+          type: object
+          description: Channel-specific event data
+    CapabilityEventPayload:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app identifier
+        project_id:
+          type: string
+          description: The project identifier
+        request_id:
+          type: string
+          description: The capability query request ID
+        contact_id:
+          type: string
+          description: The contact identifier
+        channel:
+          type: string
+          description: The channel queried
+        capability_status:
+          type: string
+          description: The capability status result
+        reason:
+          type: string
+          description: Reason if capability is unavailable
+    OptEventPayload:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app identifier
+        project_id:
+          type: string
+          description: The project identifier
+        contact_id:
+          type: string
+          description: The contact identifier
+        channel:
+          type: string
+          description: The channel
+        identity:
+          type: string
+          description: The channel identity
+        status:
+          type: string
+          enum:
+            - OPT_IN_SUCCEEDED
+            - OPT_IN_FAILED
+            - OPT_OUT_SUCCEEDED
+            - OPT_OUT_FAILED
+          description: The opt event status
+        request_id:
+          type: string
+          description: The request identifier
+    SmartConversationPayload:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app identifier
+        project_id:
+          type: string
+          description: The project identifier
+        message_id:
+          type: string
+          description: The analyzed message identifier
+        contact_id:
+          type: string
+          description: The contact identifier
+        conversation_id:
+          type: string
+          description: The conversation identifier
+        analysis_results:
+          type: object
+          description: Smart conversation analysis results
+          properties:
+            sentiment_analysis:
+              type: object
+              description: Sentiment analysis result
+              properties:
+                sentiment:
+                  type: string
+                  description: The detected sentiment
+                score:
+                  type: number
+                  description: The confidence score
+            intent_analysis:
+              type: object
+              description: Intent classification result
+              properties:
+                intent:
+                  type: string
+                  description: The detected intent
+                score:
+                  type: number
+                  description: The confidence score

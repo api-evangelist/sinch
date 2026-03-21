@@ -1,0 +1,164 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://api-evangelist.com/schemas/sinch/verification.json",
+  "title": "Sinch Verification",
+  "description": "Schema representing a phone number verification request in the Sinch Verification API. Supports multiple verification methods including SMS OTP, flashcall, phone call, and seamless data verification.",
+  "type": "object",
+  "required": ["identity", "method"],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The unique verification request identifier"
+    },
+    "identity": {
+      "$ref": "#/$defs/Identity",
+      "description": "The identity to verify"
+    },
+    "method": {
+      "type": "string",
+      "enum": ["sms", "flashcall", "callout", "seamless"],
+      "description": "The verification method to use"
+    },
+    "status": {
+      "type": "string",
+      "enum": ["PENDING", "SUCCESSFUL", "FAIL", "DENIED", "ERROR"],
+      "description": "The current verification status"
+    },
+    "reason": {
+      "type": "string",
+      "enum": [
+        "Not enough credit", "Blocked", "Denied by callback",
+        "Invalid callback response", "Internal error",
+        "Destination denied", "Network error or number unreachable",
+        "Failed pending", "SMS delivery failure",
+        "Invalid CLI", "Invalid code", "Expired"
+      ],
+      "description": "The reason for a non-successful verification status"
+    },
+    "reference": {
+      "type": "string",
+      "maxLength": 128,
+      "description": "A custom reference string for tracking the verification"
+    },
+    "custom": {
+      "type": "string",
+      "description": "Custom data to pass to verification callbacks"
+    },
+    "price": {
+      "$ref": "#/$defs/Price",
+      "description": "The price of the verification"
+    },
+    "sms": {
+      "$ref": "#/$defs/SmsVerificationDetails",
+      "description": "SMS-specific verification details"
+    },
+    "flashcall": {
+      "$ref": "#/$defs/FlashcallVerificationDetails",
+      "description": "Flashcall-specific verification details"
+    },
+    "callout": {
+      "$ref": "#/$defs/CalloutVerificationDetails",
+      "description": "Callout-specific verification details"
+    },
+    "seamless": {
+      "$ref": "#/$defs/SeamlessVerificationDetails",
+      "description": "Seamless-specific verification details"
+    }
+  },
+  "$defs": {
+    "Identity": {
+      "type": "object",
+      "description": "The identity to verify, typically a phone number",
+      "required": ["type", "endpoint"],
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": ["number"],
+          "description": "The identity type"
+        },
+        "endpoint": {
+          "type": "string",
+          "pattern": "^\\+?[1-9]\\d{1,14}$",
+          "description": "The phone number in E.164 format"
+        }
+      }
+    },
+    "Price": {
+      "type": "object",
+      "description": "A monetary amount with currency",
+      "properties": {
+        "currencyId": {
+          "type": "string",
+          "minLength": 3,
+          "maxLength": 3,
+          "description": "The ISO 4217 currency code"
+        },
+        "amount": {
+          "type": "number",
+          "minimum": 0,
+          "description": "The monetary amount"
+        }
+      }
+    },
+    "SmsVerificationDetails": {
+      "type": "object",
+      "description": "Details specific to SMS verification",
+      "properties": {
+        "code": {
+          "type": "string",
+          "pattern": "^[0-9]{4,8}$",
+          "description": "The OTP code sent or received"
+        },
+        "template": {
+          "type": "string",
+          "description": "The SMS template used for the verification message"
+        },
+        "interceptionTimeout": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Timeout in seconds for automatic SMS interception"
+        }
+      }
+    },
+    "FlashcallVerificationDetails": {
+      "type": "object",
+      "description": "Details specific to flashcall verification",
+      "properties": {
+        "cli": {
+          "type": "string",
+          "description": "The CLI (Caller Line Identification) of the flashcall"
+        },
+        "cliFilter": {
+          "type": "string",
+          "description": "Regex filter pattern for matching the flashcall CLI"
+        },
+        "interceptionTimeout": {
+          "type": "integer",
+          "minimum": 0,
+          "description": "Timeout in seconds for flashcall interception"
+        }
+      }
+    },
+    "CalloutVerificationDetails": {
+      "type": "object",
+      "description": "Details specific to phone call verification",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "The verification code spoken during the call"
+        }
+      }
+    },
+    "SeamlessVerificationDetails": {
+      "type": "object",
+      "description": "Details specific to seamless data verification",
+      "properties": {
+        "targetUri": {
+          "type": "string",
+          "format": "uri",
+          "description": "The target URI for data verification"
+        }
+      }
+    }
+  }
+}
