@@ -1,0 +1,131 @@
+naftiko: "1.0.0-alpha1"
+
+info:
+  label: "Sinch Voice and Verification"
+  description: >-
+    Unified voice and identity verification workflow combining the Sinch Voice
+    API and Verification API. Used by identity platforms, financial services,
+    healthcare applications, and any business needing to verify user phone
+    numbers via OTP SMS, flashcalls, or automated phone verification calls.
+  tags:
+    - Voice
+    - Verification
+    - Identity
+    - OTP
+    - Authentication
+    - Calling
+  created: "2026-05-02"
+  modified: "2026-05-02"
+
+binds:
+  - namespace: env
+    keys:
+      SINCH_APPLICATION_KEY: SINCH_APPLICATION_KEY
+      SINCH_APPLICATION_SECRET: SINCH_APPLICATION_SECRET
+
+capability:
+  consumes:
+    - import: sinch-voice
+      location: ./shared/voice.yaml
+    - import: sinch-verification
+      location: ./shared/verification.yaml
+
+  exposes:
+    - type: rest
+      port: 8081
+      namespace: voice-and-verification-api
+      description: "Unified REST API for Sinch voice calls and phone number verification."
+      resources:
+        - path: /v1/callouts
+          name: callouts
+          description: Make outbound voice calls
+          operations:
+            - method: POST
+              name: make-callout
+              description: Initiate a voice callout with TTS or custom audio
+              call: "sinch-voice.make-callout"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+        - path: /v1/calls/{callId}
+          name: calls
+          description: Manage active voice calls
+          operations:
+            - method: GET
+              name: get-call
+              description: Get information about a voice call
+              call: "sinch-voice.get-call"
+              with:
+                callId: "rest.callId"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+        - path: /v1/verifications
+          name: verifications
+          description: Start phone number verification flows
+          operations:
+            - method: POST
+              name: start-verification
+              description: Start a phone number verification via SMS or call
+              call: "sinch-verification.start-verification"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+
+    - type: mcp
+      port: 9091
+      namespace: voice-and-verification-mcp
+      transport: http
+      description: "MCP server for AI-assisted voice calling and phone number verification."
+      tools:
+        - name: make-voice-call
+          description: Make an outbound voice call with text-to-speech or IVR
+          hints:
+            readOnly: false
+            destructive: false
+          call: "sinch-voice.make-callout"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: get-call-status
+          description: Get the status and details of a voice call
+          hints:
+            readOnly: true
+            openWorld: false
+          call: "sinch-voice.get-call"
+          with:
+            callId: "tools.callId"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: start-sms-verification
+          description: Start a phone number verification flow sending an OTP via SMS
+          hints:
+            readOnly: false
+            destructive: false
+          call: "sinch-verification.start-verification"
+          with:
+            method: "sms"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: start-call-verification
+          description: Start a phone number verification via automated phone call
+          hints:
+            readOnly: false
+            destructive: false
+          call: "sinch-verification.start-verification"
+          with:
+            method: "callout"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: report-verification-code
+          description: Report the OTP code entered by the user to complete verification
+          hints:
+            readOnly: false
+            destructive: false
+          call: "sinch-verification.report-verification-by-id"
+          outputParameters:
+            - type: object
+              mapping: "$."

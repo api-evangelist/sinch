@@ -1,0 +1,91 @@
+rules:
+  sinch-bearer-auth:
+    description: All Sinch API operations must use Bearer token authentication
+    message: "Operation is missing bearerAuth security requirement"
+    severity: error
+    given: "$.paths.*.*.security"
+    then:
+      function: truthy
+
+  sinch-versioned-paths:
+    description: All Sinch API paths must include a version segment (v1, v2, etc.)
+    message: "API path '{{value}}' must include a version segment like /v1/"
+    severity: error
+    given: "$.paths[*]~"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^/v[0-9]+/"
+
+  sinch-project-id-in-path:
+    description: Resource paths should include project_id as a path parameter
+    message: "Consider using project_id scoping in path parameters"
+    severity: warn
+    given: "$.paths[?(@property.match(/projects/))]"
+    then:
+      function: truthy
+
+  sinch-camel-case-operation-ids:
+    description: All operationId values must use camelCase
+    message: "operationId '{{value}}' should use camelCase"
+    severity: error
+    given: "$.paths.*.*.operationId"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[a-z][a-zA-Z0-9]+$"
+
+  sinch-title-case-summaries:
+    description: All operation summaries must use Title Case
+    message: "Summary '{{value}}' should use Title Case"
+    severity: warn
+    given: "$.paths.*.*.summary"
+    then:
+      function: pattern
+      functionOptions:
+        match: "^[A-Z]"
+
+  sinch-tags-required:
+    description: All operations must have at least one tag
+    message: "Operation is missing tags"
+    severity: warn
+    given: "$.paths.*.*"
+    then:
+      field: tags
+      function: truthy
+
+  sinch-contact-info:
+    description: API info must include contact information
+    message: "API info is missing contact details"
+    severity: warn
+    given: "$.info"
+    then:
+      field: contact
+      function: truthy
+
+  sinch-external-docs:
+    description: API should include external documentation link
+    message: "API is missing externalDocs reference"
+    severity: info
+    given: "$"
+    then:
+      field: externalDocs
+      function: truthy
+
+  sinch-terms-of-service:
+    description: API info must include terms of service URL
+    message: "API info is missing termsOfService"
+    severity: warn
+    given: "$.info"
+    then:
+      field: termsOfService
+      function: truthy
+
+  sinch-servers-defined:
+    description: API must define at least one server
+    message: "API is missing server definitions"
+    severity: error
+    given: "$"
+    then:
+      field: servers
+      function: truthy

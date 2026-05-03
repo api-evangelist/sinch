@@ -1,0 +1,211 @@
+naftiko: "1.0.0-alpha1"
+
+info:
+  label: "Sinch Omnichannel Messaging"
+  description: >-
+    Unified omnichannel messaging workflow combining SMS batch messaging and
+    Conversation API for multi-channel delivery across SMS, WhatsApp, RCS,
+    Facebook Messenger, Viber, Telegram, and more. Used by marketing teams,
+    customer engagement platforms, and notification services needing to reach
+    customers on their preferred channel.
+  tags:
+    - Messaging
+    - SMS
+    - Omnichannel
+    - WhatsApp
+    - Conversation
+  created: "2026-05-02"
+  modified: "2026-05-02"
+
+binds:
+  - namespace: env
+    keys:
+      SINCH_API_TOKEN: SINCH_API_TOKEN
+      SINCH_SERVICE_PLAN_ID: SINCH_SERVICE_PLAN_ID
+      SINCH_PROJECT_ID: SINCH_PROJECT_ID
+
+capability:
+  consumes:
+    - import: sinch-sms
+      location: ./shared/sms.yaml
+    - import: sinch-conversation
+      location: ./shared/conversation.yaml
+
+  exposes:
+    - type: rest
+      port: 8080
+      namespace: omnichannel-messaging-api
+      description: "Unified REST API for Sinch omnichannel messaging workflows."
+      resources:
+        - path: /v1/sms/batches
+          name: sms-batches
+          description: Send SMS messages in bulk
+          operations:
+            - method: POST
+              name: send-sms-batch
+              description: Send a batch SMS message to multiple recipients
+              call: "sinch-sms.send-batch"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+            - method: GET
+              name: list-sms-batches
+              description: List sent SMS batches
+              call: "sinch-sms.list-batches"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+        - path: /v1/sms/inbounds
+          name: sms-inbound
+          description: Retrieve received SMS messages
+          operations:
+            - method: GET
+              name: list-inbound-sms
+              description: List inbound SMS messages
+              call: "sinch-sms.list-inbound-messages"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+        - path: /v1/messages
+          name: messages
+          description: Send omnichannel messages via Conversation API
+          operations:
+            - method: POST
+              name: send-message
+              description: Send a message via any supported channel
+              call: "sinch-conversation.send-message"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+            - method: GET
+              name: list-messages
+              description: List sent and received messages
+              call: "sinch-conversation.list-messages"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+        - path: /v1/contacts
+          name: contacts
+          description: Manage messaging contacts
+          operations:
+            - method: POST
+              name: create-contact
+              description: Create a new contact
+              call: "sinch-conversation.create-contact"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+            - method: GET
+              name: list-contacts
+              description: List contacts
+              call: "sinch-conversation.list-contacts"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+        - path: /v1/conversations
+          name: conversations
+          description: Manage conversation threads
+          operations:
+            - method: GET
+              name: list-conversations
+              description: List conversation threads
+              call: "sinch-conversation.list-conversations"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+
+    - type: mcp
+      port: 9090
+      namespace: omnichannel-messaging-mcp
+      transport: http
+      description: "MCP server for AI-assisted omnichannel messaging and customer engagement."
+      tools:
+        - name: send-sms
+          description: Send a batch SMS message to one or more phone numbers
+          hints:
+            readOnly: false
+            destructive: false
+          call: "sinch-sms.send-batch"
+          with:
+            from: "tools.from"
+            to: "tools.to"
+            body: "tools.body"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: list-sms-batches
+          description: List sent SMS batches with delivery status
+          hints:
+            readOnly: true
+            openWorld: true
+          call: "sinch-sms.list-batches"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: get-sms-delivery-report
+          description: Get delivery report for an SMS batch
+          hints:
+            readOnly: true
+            openWorld: false
+          call: "sinch-sms.get-batch-delivery-report"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: list-inbound-sms
+          description: List received inbound SMS messages
+          hints:
+            readOnly: true
+            openWorld: true
+          call: "sinch-sms.list-inbound-messages"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: send-omnichannel-message
+          description: Send a message via WhatsApp, RCS, Facebook Messenger, Viber, or other channels
+          hints:
+            readOnly: false
+            destructive: false
+          call: "sinch-conversation.send-message"
+          with:
+            app_id: "tools.app_id"
+            recipient: "tools.recipient"
+            message: "tools.message"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: list-messages
+          description: List sent and received messages across all channels
+          hints:
+            readOnly: true
+            openWorld: true
+          call: "sinch-conversation.list-messages"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: create-contact
+          description: Create a new omnichannel contact
+          hints:
+            readOnly: false
+            destructive: false
+          call: "sinch-conversation.create-contact"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: list-contacts
+          description: List messaging contacts
+          hints:
+            readOnly: true
+            openWorld: true
+          call: "sinch-conversation.list-contacts"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: list-conversations
+          description: List conversation threads across channels
+          hints:
+            readOnly: true
+            openWorld: true
+          call: "sinch-conversation.list-conversations"
+          outputParameters:
+            - type: object
+              mapping: "$."

@@ -1,178 +1,224 @@
-# Sinch (sinch)
-Sinch is a cloud communications platform that provides APIs for SMS, voice, video, and messaging across multiple channels. Their developer platform enables businesses to integrate programmable communications into applications, supporting everything from phone number provisioning and verification to omnichannel messaging via WhatsApp, RCS, Facebook Messenger, and more.
+# Sinch
 
-**URL:** [Visit APIs.json URL](https://raw.githubusercontent.com/api-evangelist/sinch/refs/heads/main/apis.yml)
+Sinch is a cloud communications platform providing APIs for SMS, voice, video, fax, verification, and omnichannel messaging. It enables businesses to integrate global communication capabilities into their applications through programmable APIs for sending messages, making calls, verifying phone numbers, and managing sender identities across carrier networks worldwide.
+
+**URL:** [https://raw.githubusercontent.com/api-evangelist/sinch/refs/heads/main/apis.yml](https://raw.githubusercontent.com/api-evangelist/sinch/refs/heads/main/apis.yml)
 
 ## Scope
 
-- **Type:** Contract
-- **Position:** Consuming
+- **Type:** Index
+- **Position:** Consumer
 - **Access:** 3rd-Party
 
-## Tags:
+## Tags
 
- - SMS, Voice, Messaging, Verification, Omnichannel, Telephony, Fax, SIP, Phone Numbers
+- Communications
+- Messaging
+- SMS
+- Voice
+- Verification
+- CPaaS
 
 ## Timestamps
 
-- **Created:** 2025-03-01
-- **Modified:** 2026-03-20
+- **Created:** 2025-01-01
+- **Modified:** 2026-05-02
 
 ## APIs
 
 ### Sinch SMS API
-The Sinch SMS API enables developers to send and receive SMS messages globally at scale. It supports batch messaging with scheduled delivery, message templates, delivery reports, and inbound message handling via webhooks. The API provides group management for organizing recipients, automatic message encoding optimization, and supports both transactional and marketing use cases across carriers worldwide.
 
-**Human URL:** [https://developers.sinch.com/docs/sms](https://developers.sinch.com/docs/sms)
+The Sinch SMS API enables developers to send and receive SMS messages globally at scale with batch messaging, scheduled delivery, delivery reports, group management, and inbound message handling via webhooks.
 
-
-#### Tags:
-
- - SMS, Messaging, Text Messages, Notifications
+**Human URL:** https://developers.sinch.com/docs/sms
+**Base URL:** https://us.sms.api.sinch.com
 
 #### Properties
 
-- [Documentation](https://developers.sinch.com/docs/sms/api-reference)
-
-### Sinch Voice API
-The Sinch Voice API is a programmable voice platform that allows developers to make, receive, and manage voice calls over PSTN, SIP, and in-app channels. It supports text-to-speech in over 115 languages, interactive voice response (IVR) menus, call recording, transcription, number masking, and conferencing. The API enables outbound and inbound calling with real-time call control through callbacks and SVAML instructions.
-
-**Human URL:** [https://developers.sinch.com/docs/voice](https://developers.sinch.com/docs/voice)
-
-
-#### Tags:
-
- - Voice, Calling, Telephony, Text To Speech, IVR
-
-#### Properties
-
-- [Documentation](https://developers.sinch.com/docs/voice/api-reference/authentication)
-
-### Sinch Verification API
-The Sinch Verification API provides phone number verification through multiple methods including SMS, flashcalls, phone calls, and data verification. It enables developers to verify user identity by sending one-time codes or initiating automated verification flows. The API can be consumed directly via REST endpoints or through the Sinch Verification SDKs, and supports configurable verification workflows to optimize cost and conversion rates.
-
-**Human URL:** [https://developers.sinch.com/docs/verification](https://developers.sinch.com/docs/verification)
-
-
-#### Tags:
-
- - Verification, Identity, Phone Numbers, Authentication
-
-#### Properties
-
-- [Documentation](https://developers.sinch.com/docs/verification/api-reference/)
+- [Documentation](https://developers.sinch.com/docs/sms)
+- [OpenAPI](openapi/sinch-sms-openapi.yml)
+- [AsyncAPI](asyncapi/sinch-sms-webhooks-asyncapi.yml)
 
 ### Sinch Conversation API
-The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API. It provides contact management, conversation tracking, message templating, and webhook callbacks for real-time event handling. The API normalizes message formats across channels, allowing developers to build multichannel messaging experiences without channel-specific integrations.
 
-**Human URL:** [https://developers.sinch.com/docs/conversation](https://developers.sinch.com/docs/conversation)
+The Sinch Conversation API is an omnichannel messaging platform supporting SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
 
-
-#### Tags:
-
- - Messaging, Omnichannel, WhatsApp, RCS, Facebook Messenger
+**Human URL:** https://developers.sinch.com/docs/conversation
 
 #### Properties
 
-- [Documentation](https://developers.sinch.com/docs/conversation/api-reference)
+- [Documentation](https://developers.sinch.com/docs/conversation)
+- [OpenAPI](openapi/sinch-conversation-openapi.yml)
+- [AsyncAPI](asyncapi/sinch-conversation-webhooks-asyncapi.yml)
+
+### Sinch Voice API
+
+The Sinch Voice API is a programmable voice platform for making, receiving, and managing voice calls over PSTN, SIP, and in-app channels with TTS, IVR, recording, transcription, and conferencing.
+
+**Human URL:** https://developers.sinch.com/docs/voice
+
+#### Properties
+
+- [Documentation](https://developers.sinch.com/docs/voice)
+- [OpenAPI](openapi/sinch-voice-openapi.yml)
+- [AsyncAPI](asyncapi/sinch-voice-callbacks-asyncapi.yml)
+
+### Sinch Verification API
+
+The Sinch Verification API provides phone number verification via SMS OTP, flashcalls, and automated phone calls for user identity verification.
+
+**Human URL:** https://developers.sinch.com/docs/verification
+
+#### Properties
+
+- [Documentation](https://developers.sinch.com/docs/verification)
+- [OpenAPI](openapi/sinch-verification-openapi.yml)
+- [AsyncAPI](asyncapi/sinch-verification-callbacks-asyncapi.yml)
 
 ### Sinch Numbers API
-The Sinch Numbers API enables developers to programmatically search for, purchase, configure, and manage phone numbers across multiple countries. It supports local, national, mobile, and toll-free number types that can be used with Sinch SMS, Voice, and Conversation APIs. The API provides endpoints for listing available numbers by region and type, activating numbers, updating number configurations, and releasing numbers when they are no longer needed.
 
-**Human URL:** [https://developers.sinch.com/docs/numbers](https://developers.sinch.com/docs/numbers)
+The Sinch Numbers API enables programmatic search, purchase, configuration, and management of phone numbers across multiple countries.
 
-
-#### Tags:
-
- - Phone Numbers, Provisioning, Telephony
+**Human URL:** https://developers.sinch.com/docs/numbers
 
 #### Properties
 
-- [Documentation](https://developers.sinch.com/docs/numbers/api-reference/numbers/available-number)
+- [Documentation](https://developers.sinch.com/docs/numbers)
+- [OpenAPI](openapi/sinch-numbers-openapi.yml)
 
 ### Sinch Fax API
-The Sinch Fax API allows developers to send and receive faxes programmatically at scale. It supports sending faxes to single or multiple recipients, downloading received faxes, and managing fax numbers. The API is HIPAA, SOC 2 Type 1, and GDPR compliant, making it suitable for healthcare and other regulated industries that require secure document transmission. It integrates with the Sinch Numbers API for provisioning fax-capable phone numbers.
 
-**Human URL:** [https://developers.sinch.com/docs/fax](https://developers.sinch.com/docs/fax)
+The Sinch Fax API enables programmatic fax sending and receiving with HIPAA, SOC 2 Type 1, and GDPR compliance.
 
-
-#### Tags:
-
- - Fax, Documents, Healthcare, HIPAA
+**Human URL:** https://developers.sinch.com/docs/fax
 
 #### Properties
 
-- [Documentation](https://developers.sinch.com/docs/fax/api-reference)
+- [Documentation](https://developers.sinch.com/docs/fax)
+- [OpenAPI](openapi/sinch-fax-openapi.yml)
 
 ### Sinch Elastic SIP Trunking API
-The Sinch Elastic SIP Trunking (EST) API enables developers to programmatically create and manage SIP trunks for connecting existing telephony infrastructure to the Sinch network. It provides endpoints for managing SIP endpoints, trunk configurations, and access control lists. The API supports elastic scaling of voice capacity without requiring fixed-capacity commitments, allowing businesses to connect their PBX systems, contact centers, or communication platforms to global PSTN connectivity.
 
-**Human URL:** [https://developers.sinch.com/docs/est](https://developers.sinch.com/docs/est)
+The Sinch Elastic SIP Trunking API enables programmatic creation and management of SIP trunks for connecting telephony infrastructure to the Sinch network.
 
-
-#### Tags:
-
- - SIP, Trunking, Voice, Telephony
+**Human URL:** https://developers.sinch.com/docs/est
 
 #### Properties
 
-- [Documentation](https://developers.sinch.com/docs/est/api-reference/est/sip-endpoints)
-
-### Sinch Provisioning API
-The Sinch Provisioning API allows developers to programmatically set up senders, accounts, and templates on the messaging platforms used by the Sinch Conversation API. It provides endpoints for configuring messaging channel integrations, managing sender identities, and setting up message templates for approval. This API streamlines the onboarding process for new messaging channels and automates the configuration that would otherwise require manual setup through dashboards.
-
-**Human URL:** [https://developers.sinch.com/docs/provisioning-api](https://developers.sinch.com/docs/provisioning-api)
-
-
-#### Tags:
-
- - Provisioning, Configuration, Messaging
-
-#### Properties
-
-- [Documentation](https://developers.sinch.com/docs/provisioning-api/api-reference)
-
-### Sinch Registration API
-The Sinch Registration API provides endpoints for managing sender ID registrations required by various markets and regulatory bodies. It enables developers to retrieve market-specific requirements, create and submit registrations for sender IDs, and track the status of registration applications. This API helps businesses comply with local messaging regulations across different countries where sender registration is mandatory for SMS delivery.
-
-**Human URL:** [https://developers.sinch.com/docs/registration-api](https://developers.sinch.com/docs/registration-api)
-
-
-#### Tags:
-
- - Registration, Sender ID, Compliance
-
-#### Properties
-
-- [Documentation](https://developers.sinch.com/docs/registration-api/api-reference)
+- [Documentation](https://developers.sinch.com/docs/est)
+- [OpenAPI](openapi/sinch-elastic-sip-trunking-openapi.yml)
 
 ### Sinch Brands API
-The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
 
-**Human URL:** [https://developers.sinch.com/docs/brands](https://developers.sinch.com/docs/brands)
+The Sinch Brands API allows creation and management of brand profiles required for compliant A2P business messaging.
 
-
-#### Tags:
-
- - Brands, Identity, Messaging
+**Human URL:** https://developers.sinch.com/docs/brands
 
 #### Properties
 
-- [Documentation](https://developers.sinch.com/docs/brands/api-reference/brands/overview)
+- [Documentation](https://developers.sinch.com/docs/brands)
+- [OpenAPI](openapi/sinch-brands-openapi.yml)
 
-## Common Properties
+### Sinch Provisioning API
 
-- [Portal](https://developers.sinch.com/)
-- [Documentation](https://developers.sinch.com/docs)
-- [Website](https://www.sinch.com/)
-- [PrivacyPolicy](https://www.sinch.com/privacy-notice/)
-- [TermsOfService](https://www.sinch.com/terms-of-service/)
-- [Support](https://www.sinch.com/contact-us/)
-- [Blog](https://www.sinch.com/blog/)
-- [Login](https://dashboard.sinch.com/)
+The Sinch Provisioning API enables programmatic setup of messaging channel senders, accounts, and templates.
+
+**Human URL:** https://developers.sinch.com/docs/provisioning-api
+
+#### Properties
+
+- [Documentation](https://developers.sinch.com/docs/provisioning-api)
+- [OpenAPI](openapi/sinch-provisioning-openapi.yml)
+
+### Sinch Registration API
+
+The Sinch Registration API manages sender ID registrations for compliant business messaging in regulated markets.
+
+**Human URL:** https://developers.sinch.com/docs/registration-api
+
+#### Properties
+
+- [Documentation](https://developers.sinch.com/docs/registration-api)
+- [OpenAPI](openapi/sinch-registration-openapi.yml)
+
+## OpenAPI Specifications
+
+- [SMS API](openapi/sinch-sms-openapi.yml)
+- [Conversation API](openapi/sinch-conversation-openapi.yml)
+- [Voice API](openapi/sinch-voice-openapi.yml)
+- [Verification API](openapi/sinch-verification-openapi.yml)
+- [Numbers API](openapi/sinch-numbers-openapi.yml)
+- [Fax API](openapi/sinch-fax-openapi.yml)
+- [Elastic SIP Trunking API](openapi/sinch-elastic-sip-trunking-openapi.yml)
+- [Brands API](openapi/sinch-brands-openapi.yml)
+- [Provisioning API](openapi/sinch-provisioning-openapi.yml)
+- [Registration API](openapi/sinch-registration-openapi.yml)
+
+## AsyncAPI Specifications
+
+- [SMS Webhooks](asyncapi/sinch-sms-webhooks-asyncapi.yml)
+- [Conversation Webhooks](asyncapi/sinch-conversation-webhooks-asyncapi.yml)
+- [Voice Callbacks](asyncapi/sinch-voice-callbacks-asyncapi.yml)
+- [Verification Callbacks](asyncapi/sinch-verification-callbacks-asyncapi.yml)
+
+## Capabilities
+
+- [Omnichannel Messaging](capabilities/omnichannel-messaging.yaml) - Unified SMS and Conversation API messaging workflow
+- [Voice and Verification](capabilities/voice-and-verification.yaml) - Voice calling and phone number verification workflow
+- [Number Management](capabilities/number-management.yaml) - Phone number search, provisioning, and management
+
+### Shared Definitions
+
+- [SMS](capabilities/shared/sms.yaml)
+- [Conversation](capabilities/shared/conversation.yaml)
+- [Voice](capabilities/shared/voice.yaml)
+- [Verification](capabilities/shared/verification.yaml)
+- [Numbers](capabilities/shared/numbers.yaml)
+
+## Rules
+
+- [Sinch Rules](rules/sinch-rules.yml)
+
+## JSON Schemas
+
+- [Message Schema](json-schema/sinch-message-schema.json)
+- [Contact Schema](json-schema/sinch-contact-schema.json)
+- [Verification Schema](json-schema/sinch-verification-schema.json)
+
+## JSON Structures
+
+- [Message Structure](json-structure/sinch-message-structure.json)
+- [Contact Structure](json-structure/sinch-contact-structure.json)
+
+## JSON-LD
+
+- [Sinch Context](json-ld/sinch-context.jsonld)
+
+## Examples
+
+- [Send SMS Batch](examples/sinch-send-sms-batch-example.json)
+- [Send Conversation Message](examples/sinch-send-conversation-message-example.json)
+- [Start Verification](examples/sinch-start-verification-example.json)
+
+## Vocabulary
+
+- [Sinch Vocabulary](vocabulary/sinch-vocabulary.yml)
+
+## Common Links
+
+- **Website:** https://www.sinch.com/
+- **Developer Portal:** https://developers.sinch.com/
+- **Documentation:** https://developers.sinch.com/docs/
+- **Pricing:** https://www.sinch.com/pricing/
+- **Blog:** https://www.sinch.com/blog/
+- **GitHub:** https://github.com/sinch
+- **Sign Up:** https://dashboard.sinch.com/signup
+- **Support:** https://www.sinch.com/contact-us/
+- **Status:** https://status.sinch.com/
+- **Terms of Service:** https://www.sinch.com/terms-of-service/
+- **Privacy Policy:** https://www.sinch.com/privacy-policy/
 
 ## Maintainers
 
-**FN:** API Evangelist
-
-**Email:** info@apievangelist.com
+**FN:** Kin Lane
+**Email:** kin@apievangelist.com

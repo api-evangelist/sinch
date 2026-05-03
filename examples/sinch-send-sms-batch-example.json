@@ -1,0 +1,39 @@
+{
+  "title": "Send SMS Batch Example",
+  "description": "Example request and response for sending a batch SMS message via the Sinch SMS API",
+  "request": {
+    "method": "POST",
+    "url": "https://us.sms.api.sinch.com/xms/v1/{service_plan_id}/batches",
+    "headers": {
+      "Authorization": "Bearer your-api-token-here",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "from": "+12025551234",
+      "to": ["+14155552345", "+14155553456"],
+      "body": "Your verification code is: ${code}",
+      "parameters": {
+        "code": {
+          "+14155552345": "847291",
+          "+14155553456": "193847"
+        }
+      },
+      "delivery_report": "full",
+      "send_at": "2026-05-02T15:00:00Z"
+    }
+  },
+  "response": {
+    "status": 201,
+    "body": {
+      "id": "01H6XYZABC123DEF456GHI",
+      "from": "+12025551234",
+      "to": ["+14155552345", "+14155553456"],
+      "body": "Your verification code is: ${code}",
+      "delivery_report": "full",
+      "send_at": "2026-05-02T15:00:00Z",
+      "created_at": "2026-05-02T12:00:00Z",
+      "modified_at": "2026-05-02T12:00:00Z",
+      "status": "Queued"
+    }
+  }
+}

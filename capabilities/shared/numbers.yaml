@@ -1,0 +1,157 @@
+naftiko: "1.0.0-alpha1"
+
+info:
+  label: "Sinch Numbers API"
+  description: >-
+    The Sinch Numbers API enables programmatic search, purchase, configuration,
+    and management of phone numbers across multiple countries supporting local,
+    national, mobile, and toll-free number types.
+  tags:
+    - Numbers
+    - Phone Numbers
+    - Provisioning
+  created: "2026-05-02"
+  modified: "2026-05-02"
+
+binds:
+  - namespace: env
+    keys:
+      SINCH_API_TOKEN: SINCH_API_TOKEN
+      SINCH_PROJECT_ID: SINCH_PROJECT_ID
+
+capability:
+  consumes:
+    - type: http
+      namespace: sinch-numbers
+      baseUri: https://numbers.api.sinch.com
+      description: "Sinch Numbers API for phone number management"
+      authentication:
+        type: bearer
+        token: "{{SINCH_API_TOKEN}}"
+      resources:
+        - name: available-numbers
+          path: /v1/projects/{projectId}/availableNumbers
+          description: Search for available phone numbers
+          operations:
+            - name: list-available-numbers
+              method: GET
+              description: List available phone numbers by region and type
+              inputParameters:
+                - name: projectId
+                  in: path
+                  type: string
+                  required: true
+                  description: The Sinch project identifier
+                - name: regionCode
+                  in: query
+                  type: string
+                  required: false
+                  description: ISO 3166-1 alpha-2 country code
+                - name: type
+                  in: query
+                  type: string
+                  required: false
+                  description: Number type (LOCAL, TOLL_FREE, MOBILE)
+              outputRawFormat: json
+              outputParameters:
+                - name: result
+                  type: object
+                  value: "$."
+        - name: active-numbers
+          path: /v1/projects/{projectId}/activeNumbers
+          description: Manage active (purchased) phone numbers
+          operations:
+            - name: list-active-numbers
+              method: GET
+              description: List active phone numbers
+              inputParameters:
+                - name: projectId
+                  in: path
+                  type: string
+                  required: true
+                  description: The Sinch project identifier
+              outputRawFormat: json
+              outputParameters:
+                - name: result
+                  type: object
+                  value: "$."
+            - name: rent-any-number
+              method: POST
+              description: Rent any available phone number matching criteria
+              inputParameters:
+                - name: projectId
+                  in: path
+                  type: string
+                  required: true
+                  description: The Sinch project identifier
+              outputRawFormat: json
+              outputParameters:
+                - name: result
+                  type: object
+                  value: "$."
+              body:
+                type: json
+                data:
+                  regionCode: "{{tools.regionCode}}"
+                  type: "{{tools.type}}"
+
+  exposes:
+    - type: rest
+      port: 8105
+      namespace: sinch-numbers-rest
+      resources:
+        - path: /v1/numbers/available
+          name: available-numbers
+          description: Search for available numbers
+          operations:
+            - method: GET
+              name: list-available-numbers
+              description: Search available numbers by region
+              call: "sinch-numbers.list-available-numbers"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+        - path: /v1/numbers/active
+          name: active-numbers
+          description: Manage active numbers
+          operations:
+            - method: GET
+              name: list-active-numbers
+              description: List active phone numbers
+              call: "sinch-numbers.list-active-numbers"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+
+    - type: mcp
+      port: 9105
+      namespace: sinch-numbers-mcp
+      transport: http
+      tools:
+        - name: search-available-numbers
+          description: Search for available phone numbers by country and type
+          hints:
+            readOnly: true
+            openWorld: true
+          call: "sinch-numbers.list-available-numbers"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: list-active-numbers
+          description: List all active phone numbers in the project
+          hints:
+            readOnly: true
+            openWorld: false
+          call: "sinch-numbers.list-active-numbers"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: rent-phone-number
+          description: Rent any available phone number matching the specified criteria
+          hints:
+            readOnly: false
+            destructive: false
+          call: "sinch-numbers.rent-any-number"
+          outputParameters:
+            - type: object
+              mapping: "$."

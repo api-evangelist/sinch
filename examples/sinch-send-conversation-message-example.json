@@ -1,0 +1,31 @@
+{
+  "title": "Send Conversation Message Example",
+  "description": "Example request and response for sending a WhatsApp message via the Sinch Conversation API",
+  "request": {
+    "method": "POST",
+    "url": "https://us.conversation.api.sinch.com/v1/projects/{project_id}/messages",
+    "headers": {
+      "Authorization": "Bearer your-api-token-here",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "app_id": "your-app-id",
+      "recipient": {
+        "contact_id": "contact-01H6XYZ"
+      },
+      "message": {
+        "text_message": {
+          "text": "Hello! Your order #12345 has been shipped and will arrive in 2-3 business days."
+        }
+      },
+      "channel_priority_order": ["WHATSAPP", "SMS"]
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "accepted_id": "01H6MSG789ABC",
+      "message_id": null
+    }
+  }
+}

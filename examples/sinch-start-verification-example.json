@@ -1,0 +1,30 @@
+{
+  "title": "Start Phone Verification Example",
+  "description": "Example request and response for starting a phone number verification via SMS OTP",
+  "request": {
+    "method": "POST",
+    "url": "https://verification.api.sinch.com/verification/v1/verifications",
+    "headers": {
+      "Authorization": "Basic base64(app-key:app-secret)",
+      "Content-Type": "application/json"
+    },
+    "body": {
+      "method": "sms",
+      "identity": {
+        "type": "number",
+        "endpoint": "+14155552345"
+      }
+    }
+  },
+  "response": {
+    "status": 200,
+    "body": {
+      "id": "ver-01H6ABC123",
+      "method": "sms",
+      "status": "PENDING",
+      "sms": {
+        "template": "Your code is {{code}}."
+      }
+    }
+  }
+}

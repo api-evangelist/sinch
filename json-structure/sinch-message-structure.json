@@ -1,0 +1,76 @@
+{
+  "title": "Sinch Message Structure",
+  "description": "Documentation of the message data structure returned by the Sinch Conversation API",
+  "type": "object",
+  "fields": [
+    {
+      "name": "id",
+      "type": "string",
+      "required": true,
+      "description": "Unique message identifier assigned by Sinch"
+    },
+    {
+      "name": "direction",
+      "type": "enum",
+      "required": true,
+      "values": ["TO_APP", "TO_CONTACT"],
+      "description": "Message direction - TO_APP means received from contact, TO_CONTACT means sent to contact"
+    },
+    {
+      "name": "contact_id",
+      "type": "string",
+      "required": false,
+      "description": "The contact identifier associated with this message"
+    },
+    {
+      "name": "conversation_id",
+      "type": "string",
+      "required": false,
+      "description": "The conversation thread identifier"
+    },
+    {
+      "name": "channel_identity",
+      "type": "object",
+      "required": true,
+      "description": "The channel and identity used for this message (e.g., SMS number, WhatsApp identity)"
+    },
+    {
+      "name": "channel_identity.channel",
+      "type": "enum",
+      "required": true,
+      "values": ["SMS", "RCS", "WHATSAPP", "MESSENGER", "INSTAGRAM", "VIBER", "TELEGRAM", "KAKAOTALK", "LINE"],
+      "description": "The messaging channel used"
+    },
+    {
+      "name": "channel_identity.identity",
+      "type": "string",
+      "required": true,
+      "description": "The channel-specific identity (phone number, PSID, etc.)"
+    },
+    {
+      "name": "app_message",
+      "type": "object",
+      "required": false,
+      "description": "The message content sent to the contact"
+    },
+    {
+      "name": "contact_message",
+      "type": "object",
+      "required": false,
+      "description": "The message content received from the contact"
+    },
+    {
+      "name": "accept_time",
+      "type": "string (ISO 8601 datetime)",
+      "required": false,
+      "description": "When the message was accepted by the Sinch platform"
+    },
+    {
+      "name": "processing_mode",
+      "type": "enum",
+      "required": false,
+      "values": ["CONVERSATION", "DISPATCH"],
+      "description": "How the message was processed"
+    }
+  ]
+}

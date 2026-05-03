@@ -1,0 +1,186 @@
+naftiko: "1.0.0-alpha1"
+
+info:
+  label: "Sinch SMS API"
+  description: >-
+    The Sinch SMS API enables global SMS messaging with batch sending, scheduled
+    delivery, delivery reports, group management, and inbound message handling.
+  tags:
+    - SMS
+    - Messaging
+    - Batch Messaging
+  created: "2026-05-02"
+  modified: "2026-05-02"
+
+binds:
+  - namespace: env
+    keys:
+      SINCH_SERVICE_PLAN_ID: SINCH_SERVICE_PLAN_ID
+      SINCH_API_TOKEN: SINCH_API_TOKEN
+
+capability:
+  consumes:
+    - type: http
+      namespace: sinch-sms
+      baseUri: https://us.sms.api.sinch.com
+      description: "Sinch SMS API for global messaging"
+      authentication:
+        type: bearer
+        token: "{{SINCH_API_TOKEN}}"
+      resources:
+        - name: batches
+          path: /xms/v1/{service_plan_id}/batches
+          description: Send and manage SMS batches
+          operations:
+            - name: send-batch
+              method: POST
+              description: Send a batch SMS message to one or more recipients
+              inputParameters:
+                - name: service_plan_id
+                  in: path
+                  type: string
+                  required: true
+                  description: The service plan ID
+              outputRawFormat: json
+              outputParameters:
+                - name: result
+                  type: object
+                  value: "$."
+              body:
+                type: json
+                data:
+                  from: "{{tools.from}}"
+                  to: "{{tools.to}}"
+                  body: "{{tools.body}}"
+            - name: list-batches
+              method: GET
+              description: List SMS batches
+              inputParameters:
+                - name: service_plan_id
+                  in: path
+                  type: string
+                  required: true
+                  description: The service plan ID
+              outputRawFormat: json
+              outputParameters:
+                - name: result
+                  type: object
+                  value: "$."
+        - name: delivery-reports
+          path: /xms/v1/{service_plan_id}/batches/{batch_id}/delivery_report
+          description: Retrieve delivery reports for SMS batches
+          operations:
+            - name: get-batch-delivery-report
+              method: GET
+              description: Retrieve a batch delivery report
+              inputParameters:
+                - name: service_plan_id
+                  in: path
+                  type: string
+                  required: true
+                  description: The service plan ID
+                - name: batch_id
+                  in: path
+                  type: string
+                  required: true
+                  description: The batch identifier
+              outputRawFormat: json
+              outputParameters:
+                - name: result
+                  type: object
+                  value: "$."
+        - name: inbound-messages
+          path: /xms/v1/{service_plan_id}/inbounds
+          description: Retrieve inbound SMS messages
+          operations:
+            - name: list-inbound-messages
+              method: GET
+              description: List inbound SMS messages
+              inputParameters:
+                - name: service_plan_id
+                  in: path
+                  type: string
+                  required: true
+                  description: The service plan ID
+              outputRawFormat: json
+              outputParameters:
+                - name: result
+                  type: object
+                  value: "$."
+
+  exposes:
+    - type: rest
+      port: 8101
+      namespace: sinch-sms-rest
+      resources:
+        - path: /v1/sms/batches
+          name: sms-batches
+          description: Send and manage SMS batches
+          operations:
+            - method: POST
+              name: send-batch
+              description: Send a batch SMS message
+              call: "sinch-sms.send-batch"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+            - method: GET
+              name: list-batches
+              description: List SMS batches
+              call: "sinch-sms.list-batches"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+        - path: /v1/sms/inbounds
+          name: sms-inbound
+          description: Retrieve inbound SMS messages
+          operations:
+            - method: GET
+              name: list-inbound-messages
+              description: List inbound messages
+              call: "sinch-sms.list-inbound-messages"
+              outputParameters:
+                - type: object
+                  mapping: "$."
+
+    - type: mcp
+      port: 9101
+      namespace: sinch-sms-mcp
+      transport: http
+      tools:
+        - name: send-sms-batch
+          description: Send a batch SMS message to one or more recipients
+          hints:
+            readOnly: false
+            destructive: false
+          call: "sinch-sms.send-batch"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: list-sms-batches
+          description: List SMS batches
+          hints:
+            readOnly: true
+            openWorld: true
+          call: "sinch-sms.list-batches"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: get-sms-delivery-report
+          description: Get delivery report for an SMS batch
+          hints:
+            readOnly: true
+            openWorld: false
+          call: "sinch-sms.get-batch-delivery-report"
+          outputParameters:
+            - type: object
+              mapping: "$."
+        - name: list-inbound-sms
+          description: List received inbound SMS messages
+          hints:
+            readOnly: true
+            openWorld: true
+          call: "sinch-sms.list-inbound-messages"
+          outputParameters:
+            - type: object
+              mapping: "$."
