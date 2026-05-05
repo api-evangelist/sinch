@@ -1,0 +1,33 @@
+specification: API Commons Rate Limits
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
+provider: Sinch
+providerId: sinch
+created: '2026-05-04'
+modified: '2026-05-04'
+reconciled: true
+tags:
+  - Rate Limiting
+  - Communications
+description: Sinch API rate limits per service plan.
+sources:
+  - https://www.sinch.com/pricing/
+  - https://developers.sinch.com/docs/sms/api-reference/
+headers:
+  retryAfter: Retry-After
+responseCodes:
+  throttled: 429
+limits:
+  - name: SMS API
+    scope: service_plan
+    metric: messages_per_second
+    limit: 100
+    timeFrame: second
+  - name: Voice API
+    scope: app
+    metric: calls_per_second
+    limit: varies
+  - name: RCS API
+    scope: agent
+    metric: messages_per_second
+    limit: varies

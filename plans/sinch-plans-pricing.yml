@@ -1,0 +1,85 @@
+specification: API Commons Plans
+specificationVersion: '0.1'
+schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/Plans
+provider: Sinch
+providerId: sinch
+created: '2026-05-04'
+modified: '2026-05-04'
+reconciled: true
+tags:
+  - Communications
+  - SMS
+  - Voice
+  - RCS
+description: Sinch pay-as-you-go pricing across SMS, Voice, RCS, Email channels.
+sources:
+  - https://www.sinch.com/pricing/
+plans:
+  - id: sinch-payg
+    name: Pay As You Go
+    type: usage-based
+    description: Per-message/minute rates by destination country.
+    entries:
+      - label: SMS (varies by country)
+        name: sms
+        type: metered
+        metric: message
+        limit: -1
+        timeFrame: usage
+        geo: global
+        unit: 1
+        price: varies
+        userMultiplied: false
+      - label: Voice (varies by country)
+        name: voice
+        type: metered
+        metric: minute
+        limit: -1
+        timeFrame: usage
+        geo: global
+        unit: 1
+        price: varies
+        userMultiplied: false
+      - label: RCS (varies)
+        name: rcs
+        type: metered
+        metric: message
+        limit: -1
+        timeFrame: usage
+        geo: global
+        unit: 1
+        price: varies
+        userMultiplied: false
+      - label: Email (Mailgun/Mailjet)
+        name: email
+        type: metered
+        metric: email
+        limit: -1
+        timeFrame: usage
+        geo: global
+        unit: 1
+        price: varies
+        userMultiplied: false
+    elements:
+      - name: Multi-channel CPaaS
+      - name: Tier 1 carrier (Sinch owns network)
+      - name: Pay only for what you send
+  - id: sinch-enterprise
+    name: Enterprise / Committed Use
+    type: enterprise
+    description: Volume contracts.
+    entries:
+      - label: Annual (custom)
+        name: annual
+        type: subscription
+        metric: year
+        limit: -1
+        timeFrame: year
+        geo: global
+        unit: 1
+        price: custom
+        userMultiplied: false
+    elements:
+      - name: Volume discounts
+      - name: Dedicated CSM
+      - name: Multi-product bundles
