@@ -1,0 +1,197 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Elastic SIP Trunking API — Access Control Lists
+  description: 'Sinch Elastic SIP Trunking API — Access Control Lists. 5 operations. Lead operation: List Access Control Lists.
+    Self-contained Naftiko capability covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Access Control Lists
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: elastic-sip-trunking-access-control-lists
+    baseUri: https://elastic-trunking.api.sinch.com
+    description: Sinch Elastic SIP Trunking API — Access Control Lists business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-trunks-trunk_id-accessControlLists
+      path: /v1/projects/{project_id}/trunks/{trunk_id}/accessControlLists
+      operations:
+      - name: listaccesscontrollists
+        method: GET
+        description: List Access Control Lists
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: createaccesscontrollist
+        method: POST
+        description: Create an Access Control List
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: v1-projects-project_id-trunks-trunk_id-accessControlLists-acl_id
+      path: /v1/projects/{project_id}/trunks/{trunk_id}/accessControlLists/{acl_id}
+      operations:
+      - name: getaccesscontrollist
+        method: GET
+        description: Get an Access Control List
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updateaccesscontrollist
+        method: PATCH
+        description: Update an Access Control List
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: deleteaccesscontrollist
+        method: DELETE
+        description: Delete an Access Control List
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: elastic-sip-trunking-access-control-lists-rest
+    port: 8080
+    description: REST adapter for Sinch Elastic SIP Trunking API — Access Control Lists. One Spectral-compliant resource per
+      consumed operation, prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/trunks/{trunk-id}/accesscontrollists
+      name: v1-projects-project-id-trunks-trunk-id-accesscontrollists
+      description: REST surface for v1-projects-project_id-trunks-trunk_id-accessControlLists.
+      operations:
+      - method: GET
+        name: listaccesscontrollists
+        description: List Access Control Lists
+        call: elastic-sip-trunking-access-control-lists.listaccesscontrollists
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createaccesscontrollist
+        description: Create an Access Control List
+        call: elastic-sip-trunking-access-control-lists.createaccesscontrollist
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/trunks/{trunk-id}/accesscontrollists/{acl-id}
+      name: v1-projects-project-id-trunks-trunk-id-accesscontrollists-acl-id
+      description: REST surface for v1-projects-project_id-trunks-trunk_id-accessControlLists-acl_id.
+      operations:
+      - method: GET
+        name: getaccesscontrollist
+        description: Get an Access Control List
+        call: elastic-sip-trunking-access-control-lists.getaccesscontrollist
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateaccesscontrollist
+        description: Update an Access Control List
+        call: elastic-sip-trunking-access-control-lists.updateaccesscontrollist
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deleteaccesscontrollist
+        description: Delete an Access Control List
+        call: elastic-sip-trunking-access-control-lists.deleteaccesscontrollist
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: elastic-sip-trunking-access-control-lists-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Elastic SIP Trunking API — Access Control Lists. One tool per consumed operation, routed
+      inline through this capability's consumes block.
+    tools:
+    - name: list-access-control-lists
+      description: List Access Control Lists
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: elastic-sip-trunking-access-control-lists.listaccesscontrollists
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-access-control-list
+      description: Create an Access Control List
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: elastic-sip-trunking-access-control-lists.createaccesscontrollist
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-access-control-list
+      description: Get an Access Control List
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: elastic-sip-trunking-access-control-lists.getaccesscontrollist
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-access-control-list
+      description: Update an Access Control List
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: elastic-sip-trunking-access-control-lists.updateaccesscontrollist
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-access-control-list
+      description: Delete an Access Control List
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: elastic-sip-trunking-access-control-lists.deleteaccesscontrollist
+      outputParameters:
+      - type: object
+        mapping: $.

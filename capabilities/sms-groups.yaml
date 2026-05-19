@@ -1,0 +1,244 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch SMS API — Groups
+  description: 'Sinch SMS API — Groups. 6 operations. Lead operation: Create a Group. Self-contained Naftiko capability covering
+    one Sinch business surface.'
+  tags:
+  - Sinch
+  - Groups
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: sms-groups
+    baseUri: https://us.sms.api.sinch.com
+    description: Sinch SMS API — Groups business capability. Self-contained, no shared references.
+    resources:
+    - name: xms-v1-service_plan_id-groups
+      path: /xms/v1/{service_plan_id}/groups
+      operations:
+      - name: creategroup
+        method: POST
+        description: Create a Group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: listgroups
+        method: GET
+        description: List Groups
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: page
+          in: query
+          type: integer
+          description: The page number to retrieve
+        - name: page_size
+          in: query
+          type: integer
+          description: The number of groups per page
+    - name: xms-v1-service_plan_id-groups-group_id
+      path: /xms/v1/{service_plan_id}/groups/{group_id}
+      operations:
+      - name: getgroup
+        method: GET
+        description: Get a Group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updategroup
+        method: POST
+        description: Update a Group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: deletegroup
+        method: DELETE
+        description: Delete a Group
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: xms-v1-service_plan_id-groups-group_id-members
+      path: /xms/v1/{service_plan_id}/groups/{group_id}/members
+      operations:
+      - name: getgroupmembers
+        method: GET
+        description: Get Group Members
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: sms-groups-rest
+    port: 8080
+    description: REST adapter for Sinch SMS API — Groups. One Spectral-compliant resource per consumed operation, prefixed
+      with /v1.
+    resources:
+    - path: /v1/xms/v1/{service-plan-id}/groups
+      name: xms-v1-service-plan-id-groups
+      description: REST surface for xms-v1-service_plan_id-groups.
+      operations:
+      - method: POST
+        name: creategroup
+        description: Create a Group
+        call: sms-groups.creategroup
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: listgroups
+        description: List Groups
+        call: sms-groups.listgroups
+        with:
+          page: rest.page
+          page_size: rest.page_size
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/xms/v1/{service-plan-id}/groups/{group-id}
+      name: xms-v1-service-plan-id-groups-group-id
+      description: REST surface for xms-v1-service_plan_id-groups-group_id.
+      operations:
+      - method: GET
+        name: getgroup
+        description: Get a Group
+        call: sms-groups.getgroup
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: updategroup
+        description: Update a Group
+        call: sms-groups.updategroup
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deletegroup
+        description: Delete a Group
+        call: sms-groups.deletegroup
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/xms/v1/{service-plan-id}/groups/{group-id}/members
+      name: xms-v1-service-plan-id-groups-group-id-members
+      description: REST surface for xms-v1-service_plan_id-groups-group_id-members.
+      operations:
+      - method: GET
+        name: getgroupmembers
+        description: Get Group Members
+        call: sms-groups.getgroupmembers
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: sms-groups-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch SMS API — Groups. One tool per consumed operation, routed inline through this capability's
+      consumes block.
+    tools:
+    - name: create-group
+      description: Create a Group
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: sms-groups.creategroup
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-groups
+      description: List Groups
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: sms-groups.listgroups
+      with:
+        page: tools.page
+        page_size: tools.page_size
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-group
+      description: Get a Group
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: sms-groups.getgroup
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-group
+      description: Update a Group
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: sms-groups.updategroup
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-group
+      description: Delete a Group
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: sms-groups.deletegroup
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-group-members
+      description: Get Group Members
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: sms-groups.getgroupmembers
+      outputParameters:
+      - type: object
+        mapping: $.

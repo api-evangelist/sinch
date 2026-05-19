@@ -1,0 +1,70 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Brands API — Brand Metadata
+  description: 'Sinch Brands API — Brand Metadata. 1 operations. Lead operation: Get Brand Metadata. Self-contained Naftiko
+    capability covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Brand Metadata
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: brands-brand-metadata
+    baseUri: https://brands.api.sinch.com
+    description: Sinch Brands API — Brand Metadata business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-brand-metadata
+      path: /v1/projects/{project_id}/brand-metadata
+      operations:
+      - name: getbrandmetadata
+        method: GET
+        description: Get Brand Metadata
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: brands-brand-metadata-rest
+    port: 8080
+    description: REST adapter for Sinch Brands API — Brand Metadata. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/brand-metadata
+      name: v1-projects-project-id-brand-metadata
+      description: REST surface for v1-projects-project_id-brand-metadata.
+      operations:
+      - method: GET
+        name: getbrandmetadata
+        description: Get Brand Metadata
+        call: brands-brand-metadata.getbrandmetadata
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: brands-brand-metadata-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Brands API — Brand Metadata. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: get-brand-metadata
+      description: Get Brand Metadata
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: brands-brand-metadata.getbrandmetadata
+      outputParameters:
+      - type: object
+        mapping: $.

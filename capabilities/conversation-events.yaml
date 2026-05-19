@@ -1,0 +1,80 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Conversation API — Events
+  description: 'Sinch Conversation API — Events. 1 operations. Lead operation: Send an Event. Self-contained Naftiko capability
+    covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Events
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: conversation-events
+    baseUri: https://us.conversation.api.sinch.com
+    description: Sinch Conversation API — Events business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-events:send
+      path: /v1/projects/{project_id}/events:send
+      operations:
+      - name: sendevent
+        method: POST
+        description: Send an Event
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: conversation-events-rest
+    port: 8080
+    description: REST adapter for Sinch Conversation API — Events. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/events-send
+      name: v1-projects-project-id-events-send
+      description: REST surface for v1-projects-project_id-events:send.
+      operations:
+      - method: POST
+        name: sendevent
+        description: Send an Event
+        call: conversation-events.sendevent
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: conversation-events-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Conversation API — Events. One tool per consumed operation, routed inline through this
+      capability's consumes block.
+    tools:
+    - name: send-event
+      description: Send an Event
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: conversation-events.sendevent
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

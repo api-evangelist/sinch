@@ -1,0 +1,106 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Voice API — Calls
+  description: 'Sinch Voice API — Calls. 2 operations. Lead operation: Get Call Information. Self-contained Naftiko capability
+    covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Calls
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: voice-calls
+    baseUri: https://calling.api.sinch.com
+    description: Sinch Voice API — Calls business capability. Self-contained, no shared references.
+    resources:
+    - name: calling-v1-calls-id-call_id
+      path: /calling/v1/calls/id/{call_id}
+      operations:
+      - name: getcall
+        method: GET
+        description: Get Call Information
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updatecall
+        method: PATCH
+        description: Update a Call
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: basic
+      username: '{{env.SINCH_USER}}'
+      password: '{{env.SINCH_PASS}}'
+  exposes:
+  - type: rest
+    namespace: voice-calls-rest
+    port: 8080
+    description: REST adapter for Sinch Voice API — Calls. One Spectral-compliant resource per consumed operation, prefixed
+      with /v1.
+    resources:
+    - path: /v1/calling/v1/calls/id/{call-id}
+      name: calling-v1-calls-id-call-id
+      description: REST surface for calling-v1-calls-id-call_id.
+      operations:
+      - method: GET
+        name: getcall
+        description: Get Call Information
+        call: voice-calls.getcall
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updatecall
+        description: Update a Call
+        call: voice-calls.updatecall
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: voice-calls-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Voice API — Calls. One tool per consumed operation, routed inline through this capability's
+      consumes block.
+    tools:
+    - name: get-call-information
+      description: Get Call Information
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: voice-calls.getcall
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-call
+      description: Update a Call
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: voice-calls.updatecall
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

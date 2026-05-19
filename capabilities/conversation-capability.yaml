@@ -1,0 +1,80 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Conversation API — Capability
+  description: 'Sinch Conversation API — Capability. 1 operations. Lead operation: Query Channel Capability. Self-contained
+    Naftiko capability covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Capability
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: conversation-capability
+    baseUri: https://us.conversation.api.sinch.com
+    description: Sinch Conversation API — Capability business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-capability:query
+      path: /v1/projects/{project_id}/capability:query
+      operations:
+      - name: querycapability
+        method: POST
+        description: Query Channel Capability
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: conversation-capability-rest
+    port: 8080
+    description: REST adapter for Sinch Conversation API — Capability. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/capability-query
+      name: v1-projects-project-id-capability-query
+      description: REST surface for v1-projects-project_id-capability:query.
+      operations:
+      - method: POST
+        name: querycapability
+        description: Query Channel Capability
+        call: conversation-capability.querycapability
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: conversation-capability-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Conversation API — Capability. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: query-channel-capability
+      description: Query Channel Capability
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: false
+      call: conversation-capability.querycapability
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

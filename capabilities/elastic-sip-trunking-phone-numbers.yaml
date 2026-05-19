@@ -1,0 +1,147 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Elastic SIP Trunking API — Phone Numbers
+  description: 'Sinch Elastic SIP Trunking API — Phone Numbers. 3 operations. Lead operation: List Phone Numbers for a Trunk.
+    Self-contained Naftiko capability covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Phone Numbers
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: elastic-sip-trunking-phone-numbers
+    baseUri: https://elastic-trunking.api.sinch.com
+    description: Sinch Elastic SIP Trunking API — Phone Numbers business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-trunks-trunk_id-phoneNumbers
+      path: /v1/projects/{project_id}/trunks/{trunk_id}/phoneNumbers
+      operations:
+      - name: listtrunkphonenumbers
+        method: GET
+        description: List Phone Numbers for a Trunk
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: addphonenumbertotrunk
+        method: POST
+        description: Add Phone Number to Trunk
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: v1-projects-project_id-trunks-trunk_id-phoneNumbers-phone_number
+      path: /v1/projects/{project_id}/trunks/{trunk_id}/phoneNumbers/{phone_number}
+      operations:
+      - name: removephonenumberfromtrunk
+        method: DELETE
+        description: Remove Phone Number from Trunk
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: phone_number
+          in: path
+          type: string
+          description: The phone number in E.164 format
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: elastic-sip-trunking-phone-numbers-rest
+    port: 8080
+    description: REST adapter for Sinch Elastic SIP Trunking API — Phone Numbers. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/trunks/{trunk-id}/phonenumbers
+      name: v1-projects-project-id-trunks-trunk-id-phonenumbers
+      description: REST surface for v1-projects-project_id-trunks-trunk_id-phoneNumbers.
+      operations:
+      - method: GET
+        name: listtrunkphonenumbers
+        description: List Phone Numbers for a Trunk
+        call: elastic-sip-trunking-phone-numbers.listtrunkphonenumbers
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: addphonenumbertotrunk
+        description: Add Phone Number to Trunk
+        call: elastic-sip-trunking-phone-numbers.addphonenumbertotrunk
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/trunks/{trunk-id}/phonenumbers/{phone-number}
+      name: v1-projects-project-id-trunks-trunk-id-phonenumbers-phone-number
+      description: REST surface for v1-projects-project_id-trunks-trunk_id-phoneNumbers-phone_number.
+      operations:
+      - method: DELETE
+        name: removephonenumberfromtrunk
+        description: Remove Phone Number from Trunk
+        call: elastic-sip-trunking-phone-numbers.removephonenumberfromtrunk
+        with:
+          phone_number: rest.phone_number
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: elastic-sip-trunking-phone-numbers-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Elastic SIP Trunking API — Phone Numbers. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: list-phone-numbers-trunk
+      description: List Phone Numbers for a Trunk
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: elastic-sip-trunking-phone-numbers.listtrunkphonenumbers
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: add-phone-number-trunk
+      description: Add Phone Number to Trunk
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: elastic-sip-trunking-phone-numbers.addphonenumbertotrunk
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: remove-phone-number-trunk
+      description: Remove Phone Number from Trunk
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: elastic-sip-trunking-phone-numbers.removephonenumberfromtrunk
+      with:
+        phone_number: tools.phone_number
+      outputParameters:
+      - type: object
+        mapping: $.

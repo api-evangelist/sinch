@@ -1,0 +1,168 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch SMS API — Delivery Reports
+  description: 'Sinch SMS API — Delivery Reports. 3 operations. Lead operation: Retrieve a Batch Delivery Report. Self-contained
+    Naftiko capability covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Delivery Reports
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: sms-delivery-reports
+    baseUri: https://us.sms.api.sinch.com
+    description: Sinch SMS API — Delivery Reports business capability. Self-contained, no shared references.
+    resources:
+    - name: xms-v1-service_plan_id-batches-batch_id-delivery_report
+      path: /xms/v1/{service_plan_id}/batches/{batch_id}/delivery_report
+      operations:
+      - name: getbatchdeliveryreport
+        method: GET
+        description: Retrieve a Batch Delivery Report
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: type
+          in: query
+          type: string
+          description: The type of delivery report to retrieve
+    - name: xms-v1-service_plan_id-batches-batch_id-delivery_report-recipient_msisdn
+      path: /xms/v1/{service_plan_id}/batches/{batch_id}/delivery_report/{recipient_msisdn}
+      operations:
+      - name: getrecipientdeliveryreport
+        method: GET
+        description: Retrieve a Recipient Delivery Report
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: recipient_msisdn
+          in: path
+          type: string
+          description: The phone number of the recipient
+          required: true
+    - name: xms-v1-service_plan_id-delivery_reports
+      path: /xms/v1/{service_plan_id}/delivery_reports
+      operations:
+      - name: listdeliveryreports
+        method: GET
+        description: List Delivery Reports
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: page
+          in: query
+          type: integer
+          description: The page number to retrieve
+        - name: page_size
+          in: query
+          type: integer
+          description: The number of reports per page
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: sms-delivery-reports-rest
+    port: 8080
+    description: REST adapter for Sinch SMS API — Delivery Reports. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/xms/v1/{service-plan-id}/batches/{batch-id}/delivery-report
+      name: xms-v1-service-plan-id-batches-batch-id-delivery-report
+      description: REST surface for xms-v1-service_plan_id-batches-batch_id-delivery_report.
+      operations:
+      - method: GET
+        name: getbatchdeliveryreport
+        description: Retrieve a Batch Delivery Report
+        call: sms-delivery-reports.getbatchdeliveryreport
+        with:
+          type: rest.type
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/xms/v1/{service-plan-id}/batches/{batch-id}/delivery-report/{recipient-msisdn}
+      name: xms-v1-service-plan-id-batches-batch-id-delivery-report-recipient-msisdn
+      description: REST surface for xms-v1-service_plan_id-batches-batch_id-delivery_report-recipient_msisdn.
+      operations:
+      - method: GET
+        name: getrecipientdeliveryreport
+        description: Retrieve a Recipient Delivery Report
+        call: sms-delivery-reports.getrecipientdeliveryreport
+        with:
+          recipient_msisdn: rest.recipient_msisdn
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/xms/v1/{service-plan-id}/delivery-reports
+      name: xms-v1-service-plan-id-delivery-reports
+      description: REST surface for xms-v1-service_plan_id-delivery_reports.
+      operations:
+      - method: GET
+        name: listdeliveryreports
+        description: List Delivery Reports
+        call: sms-delivery-reports.listdeliveryreports
+        with:
+          page: rest.page
+          page_size: rest.page_size
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: sms-delivery-reports-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch SMS API — Delivery Reports. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: retrieve-batch-delivery-report
+      description: Retrieve a Batch Delivery Report
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: sms-delivery-reports.getbatchdeliveryreport
+      with:
+        type: tools.type
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: retrieve-recipient-delivery-report
+      description: Retrieve a Recipient Delivery Report
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: sms-delivery-reports.getrecipientdeliveryreport
+      with:
+        recipient_msisdn: tools.recipient_msisdn
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-delivery-reports
+      description: List Delivery Reports
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: sms-delivery-reports.listdeliveryreports
+      with:
+        page: tools.page
+        page_size: tools.page_size
+      outputParameters:
+      - type: object
+        mapping: $.

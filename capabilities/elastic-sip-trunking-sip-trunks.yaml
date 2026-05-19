@@ -1,0 +1,212 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Elastic SIP Trunking API — SIP Trunks
+  description: 'Sinch Elastic SIP Trunking API — SIP Trunks. 5 operations. Lead operation: List Sip Trunks. Self-contained
+    Naftiko capability covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - SIP Trunks
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: elastic-sip-trunking-sip-trunks
+    baseUri: https://elastic-trunking.api.sinch.com
+    description: Sinch Elastic SIP Trunking API — SIP Trunks business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-trunks
+      path: /v1/projects/{project_id}/trunks
+      operations:
+      - name: listtrunks
+        method: GET
+        description: List Sip Trunks
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: page
+          in: query
+          type: integer
+          description: The page number to retrieve
+        - name: pageSize
+          in: query
+          type: integer
+          description: The number of trunks per page
+      - name: createtrunk
+        method: POST
+        description: Create a Sip Trunk
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: v1-projects-project_id-trunks-trunk_id
+      path: /v1/projects/{project_id}/trunks/{trunk_id}
+      operations:
+      - name: gettrunk
+        method: GET
+        description: Get a Sip Trunk
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updatetrunk
+        method: PATCH
+        description: Update a Sip Trunk
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: deletetrunk
+        method: DELETE
+        description: Delete a Sip Trunk
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: elastic-sip-trunking-sip-trunks-rest
+    port: 8080
+    description: REST adapter for Sinch Elastic SIP Trunking API — SIP Trunks. One Spectral-compliant resource per consumed
+      operation, prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/trunks
+      name: v1-projects-project-id-trunks
+      description: REST surface for v1-projects-project_id-trunks.
+      operations:
+      - method: GET
+        name: listtrunks
+        description: List Sip Trunks
+        call: elastic-sip-trunking-sip-trunks.listtrunks
+        with:
+          page: rest.page
+          pageSize: rest.pageSize
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createtrunk
+        description: Create a Sip Trunk
+        call: elastic-sip-trunking-sip-trunks.createtrunk
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/trunks/{trunk-id}
+      name: v1-projects-project-id-trunks-trunk-id
+      description: REST surface for v1-projects-project_id-trunks-trunk_id.
+      operations:
+      - method: GET
+        name: gettrunk
+        description: Get a Sip Trunk
+        call: elastic-sip-trunking-sip-trunks.gettrunk
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updatetrunk
+        description: Update a Sip Trunk
+        call: elastic-sip-trunking-sip-trunks.updatetrunk
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deletetrunk
+        description: Delete a Sip Trunk
+        call: elastic-sip-trunking-sip-trunks.deletetrunk
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: elastic-sip-trunking-sip-trunks-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Elastic SIP Trunking API — SIP Trunks. One tool per consumed operation, routed inline
+      through this capability's consumes block.
+    tools:
+    - name: list-sip-trunks
+      description: List Sip Trunks
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: elastic-sip-trunking-sip-trunks.listtrunks
+      with:
+        page: tools.page
+        pageSize: tools.pageSize
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-sip-trunk
+      description: Create a Sip Trunk
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: elastic-sip-trunking-sip-trunks.createtrunk
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-sip-trunk
+      description: Get a Sip Trunk
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: elastic-sip-trunking-sip-trunks.gettrunk
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-sip-trunk
+      description: Update a Sip Trunk
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: elastic-sip-trunking-sip-trunks.updatetrunk
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-sip-trunk
+      description: Delete a Sip Trunk
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: elastic-sip-trunking-sip-trunks.deletetrunk
+      outputParameters:
+      - type: object
+        mapping: $.

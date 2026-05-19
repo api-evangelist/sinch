@@ -1,0 +1,197 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Conversation API — Apps
+  description: 'Sinch Conversation API — Apps. 5 operations. Lead operation: List Apps. Self-contained Naftiko capability
+    covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Apps
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: conversation-apps
+    baseUri: https://us.conversation.api.sinch.com
+    description: Sinch Conversation API — Apps business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-apps
+      path: /v1/projects/{project_id}/apps
+      operations:
+      - name: listapps
+        method: GET
+        description: List Apps
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: createapp
+        method: POST
+        description: Create an App
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: v1-projects-project_id-apps-app_id
+      path: /v1/projects/{project_id}/apps/{app_id}
+      operations:
+      - name: getapp
+        method: GET
+        description: Get an App
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updateapp
+        method: PATCH
+        description: Update an App
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: deleteapp
+        method: DELETE
+        description: Delete an App
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: conversation-apps-rest
+    port: 8080
+    description: REST adapter for Sinch Conversation API — Apps. One Spectral-compliant resource per consumed operation, prefixed
+      with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/apps
+      name: v1-projects-project-id-apps
+      description: REST surface for v1-projects-project_id-apps.
+      operations:
+      - method: GET
+        name: listapps
+        description: List Apps
+        call: conversation-apps.listapps
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createapp
+        description: Create an App
+        call: conversation-apps.createapp
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/apps/{app-id}
+      name: v1-projects-project-id-apps-app-id
+      description: REST surface for v1-projects-project_id-apps-app_id.
+      operations:
+      - method: GET
+        name: getapp
+        description: Get an App
+        call: conversation-apps.getapp
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateapp
+        description: Update an App
+        call: conversation-apps.updateapp
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deleteapp
+        description: Delete an App
+        call: conversation-apps.deleteapp
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: conversation-apps-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Conversation API — Apps. One tool per consumed operation, routed inline through this
+      capability's consumes block.
+    tools:
+    - name: list-apps
+      description: List Apps
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: conversation-apps.listapps
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-app
+      description: Create an App
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: conversation-apps.createapp
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-app
+      description: Get an App
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: conversation-apps.getapp
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-app
+      description: Update an App
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: conversation-apps.updateapp
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-app
+      description: Delete an App
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: conversation-apps.deleteapp
+      outputParameters:
+      - type: object
+        mapping: $.

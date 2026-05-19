@@ -1,0 +1,185 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Numbers API — Available Numbers
+  description: 'Sinch Numbers API — Available Numbers. 3 operations. Lead operation: List Available Numbers. Self-contained
+    Naftiko capability covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Available Numbers
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: numbers-available-numbers
+    baseUri: https://numbers.api.sinch.com
+    description: Sinch Numbers API — Available Numbers business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-availableNumbers
+      path: /v1/projects/{project_id}/availableNumbers
+      operations:
+      - name: listavailablenumbers
+        method: GET
+        description: List Available Numbers
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: regionCode
+          in: query
+          type: string
+          description: The ISO 3166-1 alpha-2 country code
+          required: true
+        - name: type
+          in: query
+          type: string
+          description: The number type to search for
+          required: true
+        - name: numberPattern.pattern
+          in: query
+          type: string
+          description: Pattern to search for in the phone number
+        - name: numberPattern.searchPattern
+          in: query
+          type: string
+          description: Where in the number to search for the pattern
+        - name: capabilities
+          in: query
+          type: array
+          description: Filter by capabilities
+        - name: size
+          in: query
+          type: integer
+          description: The maximum number of results to return
+    - name: v1-projects-project_id-availableNumbers-phone_number
+      path: /v1/projects/{project_id}/availableNumbers/{phone_number}
+      operations:
+      - name: getavailablenumber
+        method: GET
+        description: Get an Available Number
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: v1-projects-project_id-availableNumbers-phone_number}:rent
+      path: /v1/projects/{project_id}/availableNumbers/{phone_number}:rent
+      operations:
+      - name: rentnumber
+        method: POST
+        description: Rent a Number
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: numbers-available-numbers-rest
+    port: 8080
+    description: REST adapter for Sinch Numbers API — Available Numbers. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/availablenumbers
+      name: v1-projects-project-id-availablenumbers
+      description: REST surface for v1-projects-project_id-availableNumbers.
+      operations:
+      - method: GET
+        name: listavailablenumbers
+        description: List Available Numbers
+        call: numbers-available-numbers.listavailablenumbers
+        with:
+          regionCode: rest.regionCode
+          type: rest.type
+          numberPattern.pattern: rest.numberPattern.pattern
+          numberPattern.searchPattern: rest.numberPattern.searchPattern
+          capabilities: rest.capabilities
+          size: rest.size
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/availablenumbers/{phone-number}
+      name: v1-projects-project-id-availablenumbers-phone-number
+      description: REST surface for v1-projects-project_id-availableNumbers-phone_number.
+      operations:
+      - method: GET
+        name: getavailablenumber
+        description: Get an Available Number
+        call: numbers-available-numbers.getavailablenumber
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/availablenumbers/phone-number-rent
+      name: v1-projects-project-id-availablenumbers-phone-number-rent
+      description: REST surface for v1-projects-project_id-availableNumbers-phone_number}:rent.
+      operations:
+      - method: POST
+        name: rentnumber
+        description: Rent a Number
+        call: numbers-available-numbers.rentnumber
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: numbers-available-numbers-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Numbers API — Available Numbers. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-available-numbers
+      description: List Available Numbers
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: numbers-available-numbers.listavailablenumbers
+      with:
+        regionCode: tools.regionCode
+        type: tools.type
+        numberPattern.pattern: tools.numberPattern.pattern
+        numberPattern.searchPattern: tools.numberPattern.searchPattern
+        capabilities: tools.capabilities
+        size: tools.size
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-available-number
+      description: Get an Available Number
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: numbers-available-numbers.getavailablenumber
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: rent-number
+      description: Rent a Number
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: numbers-available-numbers.rentnumber
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

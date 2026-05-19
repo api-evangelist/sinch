@@ -1,0 +1,79 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Numbers API — Available Regions
+  description: 'Sinch Numbers API — Available Regions. 1 operations. Lead operation: List Available Regions. Self-contained
+    Naftiko capability covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Available Regions
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: numbers-available-regions
+    baseUri: https://numbers.api.sinch.com
+    description: Sinch Numbers API — Available Regions business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-availableRegions
+      path: /v1/projects/{project_id}/availableRegions
+      operations:
+      - name: listavailableregions
+        method: GET
+        description: List Available Regions
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: types
+          in: query
+          type: array
+          description: Filter by number types
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: numbers-available-regions-rest
+    port: 8080
+    description: REST adapter for Sinch Numbers API — Available Regions. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/availableregions
+      name: v1-projects-project-id-availableregions
+      description: REST surface for v1-projects-project_id-availableRegions.
+      operations:
+      - method: GET
+        name: listavailableregions
+        description: List Available Regions
+        call: numbers-available-regions.listavailableregions
+        with:
+          types: rest.types
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: numbers-available-regions-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Numbers API — Available Regions. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-available-regions
+      description: List Available Regions
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: numbers-available-regions.listavailableregions
+      with:
+        types: tools.types
+      outputParameters:
+      - type: object
+        mapping: $.

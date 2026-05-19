@@ -1,0 +1,250 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Registration API — Registrations
+  description: 'Sinch Registration API — Registrations. 6 operations. Lead operation: List Registrations. Self-contained Naftiko
+    capability covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Registrations
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: registration-registrations
+    baseUri: https://registration.api.sinch.com
+    description: Sinch Registration API — Registrations business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-registrations
+      path: /v1/projects/{project_id}/registrations
+      operations:
+      - name: listregistrations
+        method: GET
+        description: List Registrations
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: status
+          in: query
+          type: string
+          description: Filter by registration status
+        - name: pageSize
+          in: query
+          type: integer
+          description: Number of results per page
+        - name: pageToken
+          in: query
+          type: string
+          description: Pagination token
+      - name: createregistration
+        method: POST
+        description: Create a Registration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: v1-projects-project_id-registrations-registration_id
+      path: /v1/projects/{project_id}/registrations/{registration_id}
+      operations:
+      - name: getregistration
+        method: GET
+        description: Get a Registration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updateregistration
+        method: PATCH
+        description: Update a Registration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: deleteregistration
+        method: DELETE
+        description: Delete a Registration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: v1-projects-project_id-registrations-registration_id}:submit
+      path: /v1/projects/{project_id}/registrations/{registration_id}:submit
+      operations:
+      - name: submitregistration
+        method: POST
+        description: Submit a Registration
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: registration-registrations-rest
+    port: 8080
+    description: REST adapter for Sinch Registration API — Registrations. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/registrations
+      name: v1-projects-project-id-registrations
+      description: REST surface for v1-projects-project_id-registrations.
+      operations:
+      - method: GET
+        name: listregistrations
+        description: List Registrations
+        call: registration-registrations.listregistrations
+        with:
+          status: rest.status
+          pageSize: rest.pageSize
+          pageToken: rest.pageToken
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: createregistration
+        description: Create a Registration
+        call: registration-registrations.createregistration
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/registrations/{registration-id}
+      name: v1-projects-project-id-registrations-registration-id
+      description: REST surface for v1-projects-project_id-registrations-registration_id.
+      operations:
+      - method: GET
+        name: getregistration
+        description: Get a Registration
+        call: registration-registrations.getregistration
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updateregistration
+        description: Update a Registration
+        call: registration-registrations.updateregistration
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deleteregistration
+        description: Delete a Registration
+        call: registration-registrations.deleteregistration
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/registrations/registration-id-submit
+      name: v1-projects-project-id-registrations-registration-id-submit
+      description: REST surface for v1-projects-project_id-registrations-registration_id}:submit.
+      operations:
+      - method: POST
+        name: submitregistration
+        description: Submit a Registration
+        call: registration-registrations.submitregistration
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: registration-registrations-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Registration API — Registrations. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-registrations
+      description: List Registrations
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: registration-registrations.listregistrations
+      with:
+        status: tools.status
+        pageSize: tools.pageSize
+        pageToken: tools.pageToken
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-registration
+      description: Create a Registration
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: registration-registrations.createregistration
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-registration
+      description: Get a Registration
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: registration-registrations.getregistration
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-registration
+      description: Update a Registration
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: registration-registrations.updateregistration
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-registration
+      description: Delete a Registration
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: registration-registrations.deleteregistration
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: submit-registration
+      description: Submit a Registration
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: registration-registrations.submitregistration
+      outputParameters:
+      - type: object
+        mapping: $.

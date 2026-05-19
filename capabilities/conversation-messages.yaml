@@ -1,0 +1,228 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Conversation API — Messages
+  description: 'Sinch Conversation API — Messages. 4 operations. Lead operation: List Messages. Self-contained Naftiko capability
+    covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Messages
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: conversation-messages
+    baseUri: https://us.conversation.api.sinch.com
+    description: Sinch Conversation API — Messages business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-messages
+      path: /v1/projects/{project_id}/messages
+      operations:
+      - name: listmessages
+        method: GET
+        description: List Messages
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: conversation_id
+          in: query
+          type: string
+          description: Filter by conversation ID
+        - name: contact_id
+          in: query
+          type: string
+          description: Filter by contact ID
+        - name: app_id
+          in: query
+          type: string
+          description: Filter by app ID
+        - name: channel
+          in: query
+          type: string
+          description: Filter by channel
+        - name: page_size
+          in: query
+          type: integer
+          description: The number of messages per page
+        - name: page_token
+          in: query
+          type: string
+          description: Pagination token for the next page
+    - name: v1-projects-project_id-messages-message_id
+      path: /v1/projects/{project_id}/messages/{message_id}
+      operations:
+      - name: getmessage
+        method: GET
+        description: Get a Message
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: message_id
+          in: path
+          type: string
+          description: The unique message identifier
+          required: true
+      - name: deletemessage
+        method: DELETE
+        description: Delete a Message
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: message_id
+          in: path
+          type: string
+          description: The unique message identifier
+          required: true
+    - name: v1-projects-project_id-messages:send
+      path: /v1/projects/{project_id}/messages:send
+      operations:
+      - name: sendmessage
+        method: POST
+        description: Send a Message
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: conversation-messages-rest
+    port: 8080
+    description: REST adapter for Sinch Conversation API — Messages. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/messages
+      name: v1-projects-project-id-messages
+      description: REST surface for v1-projects-project_id-messages.
+      operations:
+      - method: GET
+        name: listmessages
+        description: List Messages
+        call: conversation-messages.listmessages
+        with:
+          conversation_id: rest.conversation_id
+          contact_id: rest.contact_id
+          app_id: rest.app_id
+          channel: rest.channel
+          page_size: rest.page_size
+          page_token: rest.page_token
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/messages/{message-id}
+      name: v1-projects-project-id-messages-message-id
+      description: REST surface for v1-projects-project_id-messages-message_id.
+      operations:
+      - method: GET
+        name: getmessage
+        description: Get a Message
+        call: conversation-messages.getmessage
+        with:
+          message_id: rest.message_id
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deletemessage
+        description: Delete a Message
+        call: conversation-messages.deletemessage
+        with:
+          message_id: rest.message_id
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/messages-send
+      name: v1-projects-project-id-messages-send
+      description: REST surface for v1-projects-project_id-messages:send.
+      operations:
+      - method: POST
+        name: sendmessage
+        description: Send a Message
+        call: conversation-messages.sendmessage
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: conversation-messages-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Conversation API — Messages. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-messages
+      description: List Messages
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: conversation-messages.listmessages
+      with:
+        conversation_id: tools.conversation_id
+        contact_id: tools.contact_id
+        app_id: tools.app_id
+        channel: tools.channel
+        page_size: tools.page_size
+        page_token: tools.page_token
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-message
+      description: Get a Message
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: conversation-messages.getmessage
+      with:
+        message_id: tools.message_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-message
+      description: Delete a Message
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: conversation-messages.deletemessage
+      with:
+        message_id: tools.message_id
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: send-message
+      description: Send a Message
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: conversation-messages.sendmessage
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.

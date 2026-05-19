@@ -1,0 +1,229 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch Provisioning API — RCS Senders
+  description: 'Sinch Provisioning API — RCS Senders. 6 operations. Lead operation: List Rcs Senders. Self-contained Naftiko
+    capability covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - RCS Senders
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: provisioning-rcs-senders
+    baseUri: https://provisioning.api.sinch.com
+    description: Sinch Provisioning API — RCS Senders business capability. Self-contained, no shared references.
+    resources:
+    - name: v1-projects-project_id-rcs-senders
+      path: /v1/projects/{project_id}/rcs/senders
+      operations:
+      - name: listrcssenders
+        method: GET
+        description: List Rcs Senders
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: creatercssender
+        method: POST
+        description: Create an Rcs Sender
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: v1-projects-project_id-rcs-senders-sender_id
+      path: /v1/projects/{project_id}/rcs/senders/{sender_id}
+      operations:
+      - name: getrcssender
+        method: GET
+        description: Get an Rcs Sender
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updatercssender
+        method: PATCH
+        description: Update an Rcs Sender
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: deletercssender
+        method: DELETE
+        description: Delete an Rcs Sender
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: v1-projects-project_id-rcs-senders-sender_id-launch
+      path: /v1/projects/{project_id}/rcs/senders/{sender_id}/launch
+      operations:
+      - name: launchrcssender
+        method: POST
+        description: Launch an Rcs Sender
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: provisioning-rcs-senders-rest
+    port: 8080
+    description: REST adapter for Sinch Provisioning API — RCS Senders. One Spectral-compliant resource per consumed operation,
+      prefixed with /v1.
+    resources:
+    - path: /v1/v1/projects/{project-id}/rcs/senders
+      name: v1-projects-project-id-rcs-senders
+      description: REST surface for v1-projects-project_id-rcs-senders.
+      operations:
+      - method: GET
+        name: listrcssenders
+        description: List Rcs Senders
+        call: provisioning-rcs-senders.listrcssenders
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: creatercssender
+        description: Create an Rcs Sender
+        call: provisioning-rcs-senders.creatercssender
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/rcs/senders/{sender-id}
+      name: v1-projects-project-id-rcs-senders-sender-id
+      description: REST surface for v1-projects-project_id-rcs-senders-sender_id.
+      operations:
+      - method: GET
+        name: getrcssender
+        description: Get an Rcs Sender
+        call: provisioning-rcs-senders.getrcssender
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: PATCH
+        name: updatercssender
+        description: Update an Rcs Sender
+        call: provisioning-rcs-senders.updatercssender
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: DELETE
+        name: deletercssender
+        description: Delete an Rcs Sender
+        call: provisioning-rcs-senders.deletercssender
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/v1/projects/{project-id}/rcs/senders/{sender-id}/launch
+      name: v1-projects-project-id-rcs-senders-sender-id-launch
+      description: REST surface for v1-projects-project_id-rcs-senders-sender_id-launch.
+      operations:
+      - method: POST
+        name: launchrcssender
+        description: Launch an Rcs Sender
+        call: provisioning-rcs-senders.launchrcssender
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: provisioning-rcs-senders-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch Provisioning API — RCS Senders. One tool per consumed operation, routed inline through
+      this capability's consumes block.
+    tools:
+    - name: list-rcs-senders
+      description: List Rcs Senders
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: provisioning-rcs-senders.listrcssenders
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: create-rcs-sender
+      description: Create an Rcs Sender
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: provisioning-rcs-senders.creatercssender
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-rcs-sender
+      description: Get an Rcs Sender
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: provisioning-rcs-senders.getrcssender
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-rcs-sender
+      description: Update an Rcs Sender
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: provisioning-rcs-senders.updatercssender
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: delete-rcs-sender
+      description: Delete an Rcs Sender
+      hints:
+        readOnly: false
+        destructive: true
+        idempotent: true
+      call: provisioning-rcs-senders.deletercssender
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: launch-rcs-sender
+      description: Launch an Rcs Sender
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: provisioning-rcs-senders.launchrcssender
+      outputParameters:
+      - type: object
+        mapping: $.

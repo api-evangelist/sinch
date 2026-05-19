@@ -1,0 +1,263 @@
+naftiko: 1.0.0-alpha2
+info:
+  label: Sinch SMS API — Batches
+  description: 'Sinch SMS API — Batches. 6 operations. Lead operation: Send a Batch Message. Self-contained Naftiko capability
+    covering one Sinch business surface.'
+  tags:
+  - Sinch
+  - Batches
+  created: '2026-05-19'
+  modified: '2026-05-19'
+binds:
+- namespace: env
+  keys:
+    SINCH_API_KEY: SINCH_API_KEY
+capability:
+  consumes:
+  - type: http
+    namespace: sms-batches
+    baseUri: https://us.sms.api.sinch.com
+    description: Sinch SMS API — Batches business capability. Self-contained, no shared references.
+    resources:
+    - name: xms-v1-service_plan_id-batches
+      path: /xms/v1/{service_plan_id}/batches
+      operations:
+      - name: sendbatch
+        method: POST
+        description: Send a Batch Message
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+      - name: listbatches
+        method: GET
+        description: List Batches
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: page
+          in: query
+          type: integer
+          description: The page number to retrieve
+        - name: page_size
+          in: query
+          type: integer
+          description: The number of batches per page
+        - name: from
+          in: query
+          type: string
+          description: Filter batches sent from this date
+        - name: to
+          in: query
+          type: string
+          description: Filter batches sent up to this date
+    - name: xms-v1-service_plan_id-batches-batch_id
+      path: /xms/v1/{service_plan_id}/batches/{batch_id}
+      operations:
+      - name: getbatch
+        method: GET
+        description: Get a Batch
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+      - name: updatebatch
+        method: POST
+        description: Update a Batch
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+        inputParameters:
+        - name: body
+          in: body
+          type: object
+          description: Request body (JSON).
+          required: true
+    - name: xms-v1-service_plan_id-batches-batch_id-cancel
+      path: /xms/v1/{service_plan_id}/batches/{batch_id}/cancel
+      operations:
+      - name: cancelbatch
+        method: PUT
+        description: Cancel a Batch
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    - name: xms-v1-service_plan_id-batches-batch_id-dry_run
+      path: /xms/v1/{service_plan_id}/batches/{batch_id}/dry_run
+      operations:
+      - name: dryrunbatch
+        method: POST
+        description: Dry Run a Batch
+        outputRawFormat: json
+        outputParameters:
+        - name: result
+          type: object
+          value: $.
+    authentication:
+      type: bearer
+      token: '{{env.SINCH_API_KEY}}'
+  exposes:
+  - type: rest
+    namespace: sms-batches-rest
+    port: 8080
+    description: REST adapter for Sinch SMS API — Batches. One Spectral-compliant resource per consumed operation, prefixed
+      with /v1.
+    resources:
+    - path: /v1/xms/v1/{service-plan-id}/batches
+      name: xms-v1-service-plan-id-batches
+      description: REST surface for xms-v1-service_plan_id-batches.
+      operations:
+      - method: POST
+        name: sendbatch
+        description: Send a Batch Message
+        call: sms-batches.sendbatch
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: GET
+        name: listbatches
+        description: List Batches
+        call: sms-batches.listbatches
+        with:
+          page: rest.page
+          page_size: rest.page_size
+          from: rest.from
+          to: rest.to
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/xms/v1/{service-plan-id}/batches/{batch-id}
+      name: xms-v1-service-plan-id-batches-batch-id
+      description: REST surface for xms-v1-service_plan_id-batches-batch_id.
+      operations:
+      - method: GET
+        name: getbatch
+        description: Get a Batch
+        call: sms-batches.getbatch
+        outputParameters:
+        - type: object
+          mapping: $.
+      - method: POST
+        name: updatebatch
+        description: Update a Batch
+        call: sms-batches.updatebatch
+        with:
+          body: rest.body
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/xms/v1/{service-plan-id}/batches/{batch-id}/cancel
+      name: xms-v1-service-plan-id-batches-batch-id-cancel
+      description: REST surface for xms-v1-service_plan_id-batches-batch_id-cancel.
+      operations:
+      - method: PUT
+        name: cancelbatch
+        description: Cancel a Batch
+        call: sms-batches.cancelbatch
+        outputParameters:
+        - type: object
+          mapping: $.
+    - path: /v1/xms/v1/{service-plan-id}/batches/{batch-id}/dry-run
+      name: xms-v1-service-plan-id-batches-batch-id-dry-run
+      description: REST surface for xms-v1-service_plan_id-batches-batch_id-dry_run.
+      operations:
+      - method: POST
+        name: dryrunbatch
+        description: Dry Run a Batch
+        call: sms-batches.dryrunbatch
+        outputParameters:
+        - type: object
+          mapping: $.
+  - type: mcp
+    namespace: sms-batches-mcp
+    port: 9090
+    transport: http
+    description: MCP adapter for Sinch SMS API — Batches. One tool per consumed operation, routed inline through this capability's
+      consumes block.
+    tools:
+    - name: send-batch-message
+      description: Send a Batch Message
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: sms-batches.sendbatch
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: list-batches
+      description: List Batches
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: sms-batches.listbatches
+      with:
+        page: tools.page
+        page_size: tools.page_size
+        from: tools.from
+        to: tools.to
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: get-batch
+      description: Get a Batch
+      hints:
+        readOnly: true
+        destructive: false
+        idempotent: true
+      call: sms-batches.getbatch
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: update-batch
+      description: Update a Batch
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: sms-batches.updatebatch
+      with:
+        body: tools.body
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: cancel-batch
+      description: Cancel a Batch
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: true
+      call: sms-batches.cancelbatch
+      outputParameters:
+      - type: object
+        mapping: $.
+    - name: dry-run-batch
+      description: Dry Run a Batch
+      hints:
+        readOnly: false
+        destructive: false
+        idempotent: false
+      call: sms-batches.dryrunbatch
+      outputParameters:
+      - type: object
+        mapping: $.
