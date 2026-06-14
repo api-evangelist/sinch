@@ -1,0 +1,948 @@
+"""
+Sinch GraphQL Schema
+Conceptual schema derived from Sinch REST APIs:
+SMS API, Conversation API, Voice API, Verification API,
+Numbers API, Fax API, Elastic SIP Trunking, Brands API,
+Provisioning API, and Registration API.
+Source: https://developers.sinch.com/reference/
+"""
+
+# -------------------------------------------------------------------
+# Scalars
+# -------------------------------------------------------------------
+
+scalar DateTime
+scalar JSON
+
+# -------------------------------------------------------------------
+# Enums
+# -------------------------------------------------------------------
+
+enum MessageStatus {
+  QUEUED
+  SENT
+  DELIVERED
+  FAILED
+  UNKNOWN
+}
+
+enum MessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+enum MessageChannel {
+  SMS
+  MMS
+  RCS
+  WHATSAPP
+  MESSENGER
+  INSTAGRAM
+  VIBER
+  TELEGRAM
+  KAKAO_TALK
+  LINE
+}
+
+enum CallState {
+  INITIATING
+  PROGRESSING
+  ESTABLISHED
+  ENDED
+  FAILED
+}
+
+enum CallDirection {
+  INCOMING
+  OUTGOING
+}
+
+enum VerificationMethod {
+  SMS
+  FLASHCALL
+  CALLOUT
+  DATA
+  SEAMLESS
+}
+
+enum VerificationStatus {
+  PENDING
+  SUCCESSFUL
+  FAIL
+  DENIED
+  ABORTED
+  ERROR
+}
+
+enum NumberType {
+  LOCAL
+  NATIONAL
+  MOBILE
+  TOLL_FREE
+  SHARED_COST
+  PREMIUM_RATE
+}
+
+enum NumberCapabilityType {
+  SMS
+  VOICE
+  DATA
+}
+
+enum WebhookTriggerType {
+  MESSAGE_DELIVERY
+  MESSAGE_INBOUND
+  CALL_EVENT
+  VERIFICATION_RESULT
+  CONTACT_CREATE
+  CONTACT_UPDATE
+  CONVERSATION_START
+  CONVERSATION_STOP
+  CAPABILITY_QUERY
+  OPT_IN
+  OPT_OUT
+  UNSUPPORTED
+}
+
+enum RecordingStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  PROCESSING
+}
+
+enum ConversationStatus {
+  ACTIVE
+  INACTIVE
+  DELETED
+}
+
+enum EventType {
+  MESSAGE_INBOUND
+  MESSAGE_DELIVERY_REPORT
+  CALL_INITIATED
+  CALL_ESTABLISHED
+  CALL_ENDED
+  VERIFICATION_RESULT
+  CAPABILITY_QUERY_RESPONSE
+  OPT_IN
+  OPT_OUT
+  CONTACT_MERGED
+  CONVERSATION_DELETED
+  SMART_CONVERSATION_RESULT
+}
+
+# -------------------------------------------------------------------
+# Messaging — Base and SMS/MMS
+# -------------------------------------------------------------------
+
+"""Base interface shared by all message types."""
+interface Message {
+  id: ID!
+  direction: MessageDirection!
+  status: MessageStatus!
+  channel: MessageChannel!
+  from: String!
+  to: String!
+  body: String
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+"""An outbound or inbound SMS message."""
+type SMSMessage implements Message {
+  id: ID!
+  direction: MessageDirection!
+  status: MessageStatus!
+  channel: MessageChannel!
+  from: String!
+  to: String!
+  body: String
+  encoding: String
+  operator: String
+  segments: Int
+  flashMessage: Boolean
+  deliveryReport: DeliveryReport
+  createdAt: DateTime!
+  updatedAt: DateTime
+  expireAt: DateTime
+  feedbackEnabled: Boolean
+  batch: Batch
+}
+
+"""An outbound or inbound MMS message."""
+type MMSMessage implements Message {
+  id: ID!
+  direction: MessageDirection!
+  status: MessageStatus!
+  channel: MessageChannel!
+  from: String!
+  to: String!
+  body: String
+  mediaUrl: String
+  subject: String
+  deliveryReport: DeliveryReport
+  createdAt: DateTime!
+  updatedAt: DateTime
+  batch: Batch
+}
+
+"""An inbound SMS or MMS message received via webhook."""
+type InboundMessage {
+  id: ID!
+  from: String!
+  to: String!
+  body: String
+  type: MessageChannel!
+  operatorId: String
+  sendAt: DateTime
+  receivedAt: DateTime!
+  clientReference: String
+}
+
+# -------------------------------------------------------------------
+# Omnichannel / Conversation API Messages
+# -------------------------------------------------------------------
+
+"""A message sent or received over WhatsApp."""
+type WhatsAppMessage implements Message {
+  id: ID!
+  direction: MessageDirection!
+  status: MessageStatus!
+  channel: MessageChannel!
+  from: String!
+  to: String!
+  body: String
+  templateName: String
+  templateLanguage: String
+  mediaUrl: String
+  caption: String
+  createdAt: DateTime!
+  updatedAt: DateTime
+  conversation: Conversation
+}
+
+"""A message sent over RCS (Rich Communication Services)."""
+type RCSMessage implements Message {
+  id: ID!
+  direction: MessageDirection!
+  status: MessageStatus!
+  channel: MessageChannel!
+  from: String!
+  to: String!
+  body: String
+  richCard: JSON
+  suggestions: [JSON]
+  mediaUrl: String
+  createdAt: DateTime!
+  updatedAt: DateTime
+  conversation: Conversation
+}
+
+"""A message sent over Viber."""
+type ViberMessage implements Message {
+  id: ID!
+  direction: MessageDirection!
+  status: MessageStatus!
+  channel: MessageChannel!
+  from: String!
+  to: String!
+  body: String
+  mediaUrl: String
+  trackingData: String
+  ttl: Int
+  createdAt: DateTime!
+  updatedAt: DateTime
+  conversation: Conversation
+}
+
+"""A message sent over Facebook Messenger."""
+type Messenger implements Message {
+  id: ID!
+  direction: MessageDirection!
+  status: MessageStatus!
+  channel: MessageChannel!
+  from: String!
+  to: String!
+  body: String
+  attachmentUrl: String
+  quickReplies: [String]
+  createdAt: DateTime!
+  updatedAt: DateTime
+  conversation: Conversation
+}
+
+"""A message sent over Instagram Direct."""
+type InstagramMessage implements Message {
+  id: ID!
+  direction: MessageDirection!
+  status: MessageStatus!
+  channel: MessageChannel!
+  from: String!
+  to: String!
+  body: String
+  storyUrl: String
+  mediaUrl: String
+  createdAt: DateTime!
+  updatedAt: DateTime
+  conversation: Conversation
+}
+
+# -------------------------------------------------------------------
+# Batches and Campaigns
+# -------------------------------------------------------------------
+
+"""A batch SMS send operation targeting multiple recipients."""
+type Batch {
+  id: ID!
+  from: String!
+  to: [String!]!
+  body: String!
+  type: MessageChannel!
+  deliveryReportMode: String
+  sendAt: DateTime
+  expireAt: DateTime
+  callbackUrl: String
+  clientReference: String
+  flashMessage: Boolean
+  feedbackEnabled: Boolean
+  status: MessageStatus!
+  createdAt: DateTime!
+  modifiedAt: DateTime
+  recipients: [BatchRecipient!]
+  deliveries: [BatchDelivery!]
+}
+
+"""Per-recipient delivery state within a batch."""
+type BatchDelivery {
+  id: ID!
+  batchId: ID!
+  recipient: String!
+  status: MessageStatus!
+  statusCode: Int
+  statusMessage: String
+  operator: String
+  deliveredAt: DateTime
+}
+
+"""A single recipient entry in a batch."""
+type BatchRecipient {
+  phoneNumber: String!
+  parameters: JSON
+}
+
+"""An SMS marketing campaign."""
+type Campaign {
+  id: ID!
+  name: String!
+  description: String
+  status: String
+  useCase: String
+  subUseCases: [String]
+  messageFlow: String
+  sampleMessages: [String]
+  brand: Brand
+  groups: [Group]
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+"""A message associated with a campaign."""
+type CampaignMessage {
+  id: ID!
+  campaign: Campaign!
+  message: SMSMessage
+  sentAt: DateTime
+  status: MessageStatus!
+}
+
+"""A delivery report for a message or batch."""
+type DeliveryReport {
+  batchId: ID
+  messageId: ID
+  recipient: String
+  status: MessageStatus!
+  statusCode: Int
+  statusMessage: String
+  operator: String
+  appliedOriginator: String
+  numberOfMessageParts: Int
+  operatorStatusAt: DateTime
+  at: DateTime!
+}
+
+# -------------------------------------------------------------------
+# Voice
+# -------------------------------------------------------------------
+
+"""A voice call."""
+type Call {
+  id: ID!
+  from: String!
+  to: String!
+  direction: CallDirection!
+  state: CallState!
+  duration: Int
+  price: Float
+  currency: String
+  startedAt: DateTime
+  endedAt: DateTime
+  legs: [CallLeg!]
+  recording: Recording
+  transcription: Transcription
+  conference: Conference
+  application: Application
+}
+
+"""One leg (segment) of a voice call."""
+type CallLeg {
+  id: ID!
+  callId: ID!
+  from: String!
+  to: String!
+  direction: CallDirection!
+  state: CallState!
+  duration: Int
+  startedAt: DateTime
+  endedAt: DateTime
+}
+
+"""A multi-party voice conference."""
+type Conference {
+  id: ID!
+  name: String
+  participants: [Call!]
+  startedAt: DateTime
+  endedAt: DateTime
+  maxParticipants: Int
+  recording: Recording
+}
+
+"""A PSTN (Public Switched Telephone Network) call configuration."""
+type PSTN {
+  id: ID!
+  number: String!
+  country: String
+  capabilities: [NumberCapabilityType!]
+  call: Call
+}
+
+"""A SIP trunk or SIP call endpoint."""
+type SIP {
+  id: ID!
+  trunkId: ID
+  username: String!
+  domain: String!
+  transport: String
+  call: Call
+}
+
+"""A data/in-app call."""
+type DataCall {
+  id: ID!
+  userId: String!
+  applicationKey: String!
+  call: Call
+}
+
+"""A voice call recording."""
+type Recording {
+  id: ID!
+  callId: ID!
+  status: RecordingStatus!
+  url: String
+  duration: Int
+  format: String
+  startedAt: DateTime
+  endedAt: DateTime
+  expiresAt: DateTime
+}
+
+"""A speech-to-text transcription of a recording."""
+type Transcription {
+  id: ID!
+  recordingId: ID!
+  callId: ID!
+  language: String
+  text: String
+  confidence: Float
+  words: [JSON]
+  createdAt: DateTime!
+}
+
+# -------------------------------------------------------------------
+# Verification
+# -------------------------------------------------------------------
+
+"""A phone number verification attempt."""
+type Verification {
+  id: ID!
+  method: VerificationMethod!
+  status: VerificationStatus!
+  identity: String!
+  price: Float
+  currency: String
+  reason: String
+  callComplete: Boolean
+  countryId: String
+  verificationTimestamp: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+"""A request to initiate phone number verification."""
+type VerificationRequest {
+  id: ID!
+  method: VerificationMethod!
+  identity: String!
+  reference: String
+  custom: String
+  metadata: JSON
+  createdAt: DateTime!
+}
+
+"""A phone number lookup/check result."""
+type NumberCheck {
+  id: ID!
+  phoneNumber: String!
+  countryId: String
+  numberType: NumberType
+  isValid: Boolean!
+  operator: String
+  mcc: String
+  mnc: String
+  checkedAt: DateTime!
+}
+
+"""A data-based (carrier) verification."""
+type DataVerification {
+  id: ID!
+  identity: String!
+  status: VerificationStatus!
+  price: Float
+  currency: String
+  createdAt: DateTime!
+}
+
+"""A voice callout verification."""
+type CalloutRequest {
+  id: ID!
+  method: VerificationMethod!
+  identity: String!
+  cli: String
+  ttsLocale: String
+  speechLocale: String
+  custom: String
+  createdAt: DateTime!
+}
+
+"""A text-to-speech voice call."""
+type TextToSpeech {
+  id: ID!
+  text: String!
+  locale: String!
+  destinationNumber: String!
+  cli: String
+  dtmf: String
+  prompts: String
+  callId: ID
+  createdAt: DateTime!
+}
+
+"""A flash call verification (rings and hangs up; CLI is the code)."""
+type FlashCall {
+  id: ID!
+  identity: String!
+  cliFilter: String
+  dialTimeout: Int
+  callTimeout: Int
+  status: VerificationStatus!
+  cli: String
+  createdAt: DateTime!
+}
+
+# -------------------------------------------------------------------
+# Numbers
+# -------------------------------------------------------------------
+
+"""A phone number managed on the Sinch platform."""
+type PhoneNumber {
+  e164Number: String!
+  displayName: String
+  regionCode: String!
+  type: NumberType!
+  capability: [NumberCapabilityType!]!
+  money: JSON
+  paymentIntervalMonths: Int
+  nextChargeDate: DateTime
+  expireAt: DateTime
+  smsConfiguration: JSON
+  voiceConfiguration: JSON
+  callbackUrl: String
+}
+
+"""A phone number capability descriptor."""
+type NumberCapability {
+  capability: NumberCapabilityType!
+  description: String
+}
+
+"""A DID (Direct Inward Dialing) number order."""
+type DIDOrder {
+  id: ID!
+  e164Number: String!
+  regionCode: String!
+  type: NumberType!
+  capabilities: [NumberCapabilityType!]!
+  quantity: Int
+  status: String
+  price: Float
+  currency: String
+  createdAt: DateTime!
+}
+
+# -------------------------------------------------------------------
+# Applications and Auth
+# -------------------------------------------------------------------
+
+"""A Sinch application (voice/messaging app context)."""
+type App {
+  id: ID!
+  name: String!
+  key: String!
+  secret: String
+  rateLimits: JSON
+  voiceAppId: String
+  callbacks: JSON
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+"""An application configuration for the Conversation API."""
+type Application {
+  id: ID!
+  displayName: String!
+  channelCredentials: [Credential!]
+  conversationMetadataReportView: String
+  processingMode: String
+  webhooks: [Webhook!]
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+"""An API key for authenticating with Sinch APIs."""
+type APIKey {
+  keyId: ID!
+  keySecret: String
+  projectId: String!
+  displayName: String
+  createdAt: DateTime!
+  expiresAt: DateTime
+}
+
+"""Channel-specific credentials attached to an Application."""
+type Credential {
+  id: ID!
+  channel: MessageChannel!
+  credential: JSON!
+  callbackSecret: String
+  state: String
+  application: Application
+}
+
+"""A webhook endpoint registered to receive Sinch events."""
+type Webhook {
+  id: ID!
+  appId: ID!
+  target: String!
+  targetType: String
+  secret: String
+  triggers: [WebhookTrigger!]
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+"""A single trigger type registered on a webhook."""
+type WebhookTrigger {
+  id: ID!
+  webhookId: ID!
+  type: WebhookTriggerType!
+}
+
+# -------------------------------------------------------------------
+# Contacts and Groups
+# -------------------------------------------------------------------
+
+"""A contact in the Sinch Conversation API contact book."""
+type Contact {
+  id: ID!
+  channelIdentities: [JSON]
+  channelPriority: [MessageChannel]
+  displayName: String
+  email: String
+  externalId: String
+  metadata: String
+  language: String
+  createdAt: DateTime!
+  updatedAt: DateTime
+  groups: [Group]
+}
+
+"""A group of contacts for batch messaging."""
+type Group {
+  id: ID!
+  name: String
+  size: Int
+  childGroups: [ID]
+  autoUpdate: JSON
+  createdAt: DateTime!
+  modifiedAt: DateTime
+  members: [GroupMember]
+}
+
+"""A member entry within a group."""
+type GroupMember {
+  phoneNumber: String!
+  group: Group!
+  addedAt: DateTime
+}
+
+# -------------------------------------------------------------------
+# Conversations and Events
+# -------------------------------------------------------------------
+
+"""A conversation thread in the Conversation API."""
+type Conversation {
+  id: ID!
+  appId: ID!
+  contact: Contact
+  lastMessage: ConversationMessage
+  status: ConversationStatus!
+  channel: MessageChannel
+  metadata: String
+  activeChannel: MessageChannel
+  createdAt: DateTime!
+  updatedAt: DateTime
+  messages: [ConversationMessage!]
+}
+
+"""A message within a conversation thread."""
+type ConversationMessage {
+  id: ID!
+  conversationId: ID!
+  direction: MessageDirection!
+  contactMessage: JSON
+  appMessage: JSON
+  channelIdentity: JSON
+  processingMode: String
+  metadata: String
+  injected: Boolean
+  sendAt: DateTime
+  acceptedAt: DateTime
+  queuedAt: DateTime
+  deliveredAt: DateTime
+  readAt: DateTime
+}
+
+"""A platform event (generic envelope for webhook payloads)."""
+type Event {
+  id: ID!
+  type: EventType!
+  channel: MessageChannel
+  contactId: ID
+  conversationId: ID
+  payload: JSON!
+  processingMode: String
+  createdAt: DateTime!
+}
+
+"""An inbound channel event (e.g. opt-in, opt-out, generic user action)."""
+type IncomingEvent {
+  id: ID!
+  channel: MessageChannel!
+  from: String!
+  to: String!
+  type: String
+  payload: JSON
+  receivedAt: DateTime!
+}
+
+"""A Sinch platform user / account."""
+type User {
+  id: ID!
+  email: String
+  name: String
+  projectId: String
+  roles: [String]
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+# -------------------------------------------------------------------
+# Brands (Brands API)
+# -------------------------------------------------------------------
+
+"""A brand profile used for messaging campaign registration."""
+type Brand {
+  id: ID!
+  displayName: String!
+  companyName: String!
+  ein: String
+  einIssuingCountry: String
+  entityType: String
+  cspId: String
+  status: String
+  vertical: String
+  altBusinessId: String
+  altBusinessIdType: String
+  universalEin: String
+  referenceId: String
+  identityStatus: String
+  createdAt: DateTime!
+  updatedAt: DateTime
+}
+
+# -------------------------------------------------------------------
+# Fax
+# -------------------------------------------------------------------
+
+"""A fax message."""
+type Fax {
+  id: ID!
+  from: String!
+  to: String!
+  status: MessageStatus!
+  direction: MessageDirection!
+  numberOfPages: Int
+  mediaUrl: String
+  headerTimeZone: String
+  headerText: String
+  callbackUrl: String
+  errorCode: String
+  retryDelay: Int
+  maxRetries: Int
+  createdAt: DateTime!
+  completedAt: DateTime
+}
+
+# -------------------------------------------------------------------
+# Root Operations
+# -------------------------------------------------------------------
+
+type Query {
+  # SMS
+  batch(id: ID!): Batch
+  batches(servicePlanId: String, page: Int, pageSize: Int): [Batch!]
+  inboundMessages(servicePlanId: String, page: Int, pageSize: Int): [InboundMessage!]
+  deliveryReport(batchId: ID!, recipientMsisdn: String): DeliveryReport
+
+  # Conversation
+  conversation(appId: ID!, conversationId: ID!): Conversation
+  conversations(appId: ID!, contactId: ID, channel: MessageChannel, status: ConversationStatus, pageSize: Int, pageToken: String): [Conversation!]
+  conversationMessage(messageId: ID!): ConversationMessage
+
+  # Contact
+  contact(id: ID!): Contact
+  contacts(appId: ID!, externalId: String, channel: MessageChannel, identity: String, pageSize: Int, pageToken: String): [Contact!]
+
+  # Group
+  group(servicePlanId: String!, groupId: ID!): Group
+  groups(servicePlanId: String!, page: Int, pageSize: Int): [Group!]
+
+  # Voice
+  call(callId: ID!): Call
+  conference(conferenceId: ID!): Conference
+  recording(callId: ID!, recordingId: ID!): Recording
+  transcription(callId: ID!, recordingId: ID!): Transcription
+
+  # Verification
+  verification(id: ID!): Verification
+  verificationByIdentity(identity: String!, method: VerificationMethod): Verification
+
+  # Numbers
+  phoneNumber(projectId: ID!, phoneNumber: String!): PhoneNumber
+  availableNumbers(projectId: ID!, regionCode: String!, type: NumberType!, capability: NumberCapabilityType, size: Int): [PhoneNumber!]
+  activeNumbers(projectId: ID!, regionCode: String, type: NumberType, capability: NumberCapabilityType, pageSize: Int, pageToken: String): [PhoneNumber!]
+
+  # Application / Webhook
+  application(appId: ID!): Application
+  applications(pageSize: Int, pageToken: String): [Application!]
+  webhook(appId: ID!, webhookId: ID!): Webhook
+  webhooks(appId: ID!): [Webhook!]
+
+  # Brand
+  brand(brandId: ID!): Brand
+  brands(pageSize: Int, pageToken: String): [Brand!]
+
+  # Fax
+  fax(projectId: ID!, faxId: ID!): Fax
+  faxes(projectId: ID!, to: String, from: String, direction: MessageDirection, pageSize: Int, pageToken: String): [Fax!]
+
+  # Events
+  event(conversationId: ID!, eventId: ID!): Event
+}
+
+type Mutation {
+  # SMS Batch
+  sendBatch(servicePlanId: String!, from: String!, to: [String!]!, body: String!, sendAt: DateTime, expireAt: DateTime, deliveryReport: String, callbackUrl: String, clientReference: String, flashMessage: Boolean): Batch
+  cancelBatch(servicePlanId: String!, batchId: ID!): Batch
+  updateBatch(servicePlanId: String!, batchId: ID!, from: String, body: String, toAdd: [String], toRemove: [String]): Batch
+  sendDryRunBatch(servicePlanId: String!, from: String!, to: [String!]!, body: String!): JSON
+
+  # Group management
+  createGroup(servicePlanId: String!, name: String!, members: [String]): Group
+  updateGroup(servicePlanId: String!, groupId: ID!, name: String): Group
+  addGroupMembers(servicePlanId: String!, groupId: ID!, members: [String!]!): Group
+  removeGroupMembers(servicePlanId: String!, groupId: ID!, members: [String!]!): Group
+  deleteGroup(servicePlanId: String!, groupId: ID!): Boolean
+
+  # Conversation send
+  sendMessage(appId: ID!, to: String!, channel: MessageChannel!, body: String!, templateName: String, templateLanguage: String, mediaUrl: String): ConversationMessage
+
+  # Contact
+  createContact(appId: ID!, channelIdentities: [JSON]!, displayName: String, email: String, externalId: String, language: String): Contact
+  updateContact(contactId: ID!, displayName: String, email: String, externalId: String, language: String): Contact
+  mergeContact(destinationId: ID!, sourceId: ID!): Contact
+  deleteContact(contactId: ID!): Boolean
+
+  # Conversation management
+  createConversation(appId: ID!, contactId: ID!, channel: MessageChannel): Conversation
+  stopActiveConversation(conversationId: ID!): Boolean
+  deleteConversation(conversationId: ID!): Boolean
+  injectMessage(conversationId: ID!, direction: MessageDirection!, contactMessage: JSON, appMessage: JSON, sendAt: DateTime): ConversationMessage
+
+  # Voice
+  initiateCall(from: String!, to: String!, applicationKey: String!, cli: String): Call
+  manageLeg(callId: ID!, action: String!, parameters: JSON): CallLeg
+  stopRecording(callId: ID!): Recording
+  stopConference(conferenceId: ID!): Conference
+  removeParticipant(conferenceId: ID!, callId: ID!): Boolean
+
+  # Verification
+  startVerification(method: VerificationMethod!, identity: String!, reference: String, custom: String): VerificationRequest
+  reportVerification(id: ID!, code: String!): Verification
+  reportVerificationByIdentity(identity: String!, method: VerificationMethod!, code: String!): Verification
+
+  # Numbers
+  rentNumber(projectId: ID!, phoneNumber: String!): PhoneNumber
+  releaseNumber(projectId: ID!, phoneNumber: String!): Boolean
+  updateNumber(projectId: ID!, phoneNumber: String!, displayName: String, smsConfiguration: JSON, voiceConfiguration: JSON, callbackUrl: String): PhoneNumber
+
+  # Application
+  createApplication(displayName: String!, channelCredentials: [JSON], processingMode: String): Application
+  updateApplication(appId: ID!, displayName: String, channelCredentials: [JSON]): Application
+  deleteApplication(appId: ID!): Boolean
+
+  # Webhook
+  createWebhook(appId: ID!, target: String!, triggers: [WebhookTriggerType!]!, secret: String): Webhook
+  updateWebhook(webhookId: ID!, target: String, triggers: [WebhookTriggerType], secret: String): Webhook
+  deleteWebhook(appId: ID!, webhookId: ID!): Boolean
+
+  # Fax
+  sendFax(projectId: ID!, to: String!, from: String!, contentUrl: String!, headerText: String, maxRetries: Int, callbackUrl: String): Fax
+  deleteFax(projectId: ID!, faxId: ID!): Boolean
+
+  # Brand
+  createBrand(displayName: String!, companyName: String!, ein: String, entityType: String, vertical: String): Brand
+  updateBrand(brandId: ID!, displayName: String, companyName: String): Brand
+}
