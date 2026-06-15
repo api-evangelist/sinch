@@ -1,0 +1,543 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch SMS API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Batches",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Batches",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/batches",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "The page number to retrieve"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of batches per page"
+              },
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "Filter batches sent from this date"
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "Filter batches sent up to this date"
+              }
+            ]
+          },
+          "docs": "Returns a list of batches with pagination support. You can filter batches by various criteria including start date and end date."
+        },
+        {
+          "info": {
+            "name": "Send a Batch Message",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/batches",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Sends a batch of SMS messages. A batch can contain one or more messages to one or more recipients. The API supports scheduled delivery, parameterized messages, and delivery report configuration."
+        },
+        {
+          "info": {
+            "name": "Get a Batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific batch identified by the batch ID."
+        },
+        {
+          "info": {
+            "name": "Update a Batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates a batch message. Only batches that have not yet been delivered can be updated."
+        },
+        {
+          "info": {
+            "name": "Cancel a Batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id/cancel",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              }
+            ]
+          },
+          "docs": "Cancels a batch that has not yet been delivered. A batch can only be canceled if it has not yet started sending."
+        },
+        {
+          "info": {
+            "name": "Dry Run a Batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id/dry_run",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              }
+            ]
+          },
+          "docs": "Performs a dry run of a batch without actually sending messages. This can be used to validate the batch configuration and estimate the number of recipients."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Delivery Reports",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve a Batch Delivery Report",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id/delivery_report",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "The type of delivery report to retrieve"
+              }
+            ]
+          },
+          "docs": "Returns the aggregate delivery report for a specific batch. The report contains status counts and details about message delivery."
+        },
+        {
+          "info": {
+            "name": "Retrieve a Recipient Delivery Report",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id/delivery_report/:recipient_msisdn",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              },
+              {
+                "name": "recipient_msisdn",
+                "value": "",
+                "type": "path",
+                "description": "The phone number of the recipient"
+              }
+            ]
+          },
+          "docs": "Returns the delivery report for a specific recipient in a batch."
+        },
+        {
+          "info": {
+            "name": "List Delivery Reports",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/delivery_reports",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "The page number to retrieve"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of reports per page"
+              }
+            ]
+          },
+          "docs": "Returns a list of delivery reports with pagination support."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Groups",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Groups",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/groups",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "The page number to retrieve"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of groups per page"
+              }
+            ]
+          },
+          "docs": "Returns a list of groups with pagination support."
+        },
+        {
+          "info": {
+            "name": "Create a Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/groups",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new group of phone numbers that can be used as recipients when sending SMS batches."
+        },
+        {
+          "info": {
+            "name": "Get a Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/groups/:group_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the group"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific group."
+        },
+        {
+          "info": {
+            "name": "Update a Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/groups/:group_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the group"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates an existing group by adding or removing members or changing the group name."
+        },
+        {
+          "info": {
+            "name": "Delete a Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/groups/:group_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the group"
+              }
+            ]
+          },
+          "docs": "Deletes a group and all its members."
+        },
+        {
+          "info": {
+            "name": "Get Group Members",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/groups/:group_id/members",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the group"
+              }
+            ]
+          },
+          "docs": "Returns the list of phone numbers that are members of the specified group."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Inbounds",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Inbound Messages",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/inbounds",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "The page number to retrieve"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of messages per page"
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "Filter by destination number"
+              },
+              {
+                "name": "start_date",
+                "value": "",
+                "type": "query",
+                "description": "Filter messages received after this date"
+              },
+              {
+                "name": "end_date",
+                "value": "",
+                "type": "query",
+                "description": "Filter messages received before this date"
+              }
+            ]
+          },
+          "docs": "Returns a list of inbound (Mobile Originated) messages with pagination support. Messages can be filtered by start date and end date."
+        },
+        {
+          "info": {
+            "name": "Get an Inbound Message",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.sms.api.sinch.com/xms/v1/:service_plan_id/inbounds/:inbound_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "inbound_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier of the inbound message"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific inbound message."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

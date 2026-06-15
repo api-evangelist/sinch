@@ -1,0 +1,245 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Registration API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "client_credentials",
+      "accessTokenUrl": "https://auth.sinch.com/oauth2/token",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Registrations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Registrations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://registration.api.sinch.com/v1/projects/:project_id/registrations",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "status",
+                "value": "",
+                "type": "query",
+                "description": "Filter by registration status"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Number of results per page"
+              },
+              {
+                "name": "pageToken",
+                "value": "",
+                "type": "query",
+                "description": "Pagination token"
+              }
+            ]
+          },
+          "docs": "Returns a list of all sender ID registrations in the project with their current status and submission details."
+        },
+        {
+          "info": {
+            "name": "Create a Registration",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://registration.api.sinch.com/v1/projects/:project_id/registrations",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new sender ID registration for a specific market. The registration must include all required fields as defined by the market requirements."
+        },
+        {
+          "info": {
+            "name": "Get a Registration",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://registration.api.sinch.com/v1/projects/:project_id/registrations/:registration_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "registration_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique registration identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details and current status of a specific sender ID registration."
+        },
+        {
+          "info": {
+            "name": "Update a Registration",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://registration.api.sinch.com/v1/projects/:project_id/registrations/:registration_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "registration_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique registration identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates a sender ID registration. Only registrations that have not yet been submitted for approval can be updated."
+        },
+        {
+          "info": {
+            "name": "Delete a Registration",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://registration.api.sinch.com/v1/projects/:project_id/registrations/:registration_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "registration_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique registration identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific sender ID registration."
+        },
+        {
+          "info": {
+            "name": "Submit a Registration",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://registration.api.sinch.com/v1/projects/:project_id/registrations/:registration_id:submit",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "registration_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique registration identifier"
+              }
+            ]
+          },
+          "docs": "Submits a sender ID registration for approval. Once submitted, the registration enters the review process and cannot be modified."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Market Requirements",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Markets",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://registration.api.sinch.com/v1/projects/:project_id/markets",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ]
+          },
+          "docs": "Returns a list of available markets with their sender ID registration requirements and supported sender types."
+        },
+        {
+          "info": {
+            "name": "Get Market Requirements",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://registration.api.sinch.com/v1/projects/:project_id/markets/:market_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "market_id",
+                "value": "",
+                "type": "path",
+                "description": "The market identifier"
+              }
+            ]
+          },
+          "docs": "Returns the detailed registration requirements for a specific market including required fields, supported sender types, and approval timelines."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,868 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Conversation API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "client_credentials",
+      "accessTokenUrl": "https://auth.sinch.com/oauth2/token",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Messages",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Send a Message",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/messages:send",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Sends a message to a contact on a specific channel or using the Conversation API intelligent channel selection. Supports text, media, template, and card messages in a normalized format."
+        },
+        {
+          "info": {
+            "name": "List Messages",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/messages",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "conversation_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter by conversation ID"
+              },
+              {
+                "name": "contact_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter by contact ID"
+              },
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter by app ID"
+              },
+              {
+                "name": "channel",
+                "value": "",
+                "type": "query",
+                "description": "Filter by channel"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of messages per page"
+              },
+              {
+                "name": "page_token",
+                "value": "",
+                "type": "query",
+                "description": "Pagination token for the next page"
+              }
+            ]
+          },
+          "docs": "Returns a list of messages in a project with optional filtering by conversation, contact, app, and channel."
+        },
+        {
+          "info": {
+            "name": "Get a Message",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/messages/:message_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "message_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique message identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific message."
+        },
+        {
+          "info": {
+            "name": "Delete a Message",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/messages/:message_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "message_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique message identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific message from the conversation history."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Contacts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Contacts",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/contacts",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of contacts per page"
+              },
+              {
+                "name": "page_token",
+                "value": "",
+                "type": "query",
+                "description": "Pagination token for the next page"
+              }
+            ]
+          },
+          "docs": "Returns a list of contacts in the project with pagination support."
+        },
+        {
+          "info": {
+            "name": "Create a Contact",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/contacts",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new contact with one or more channel identities."
+        },
+        {
+          "info": {
+            "name": "Get a Contact",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/contacts/:contact_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "contact_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique contact identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific contact."
+        },
+        {
+          "info": {
+            "name": "Update a Contact",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/contacts/:contact_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "contact_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique contact identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the properties of a specific contact."
+        },
+        {
+          "info": {
+            "name": "Delete a Contact",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/contacts/:contact_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "contact_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique contact identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific contact and all associated data."
+        },
+        {
+          "info": {
+            "name": "Merge Contacts",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/contacts:merge",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Merges two contacts into one, combining their channel identities and conversation history."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Conversations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Conversations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/conversations",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "only_active",
+                "value": "",
+                "type": "query",
+                "description": "Only return active conversations"
+              },
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter by app ID"
+              },
+              {
+                "name": "contact_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter by contact ID"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of conversations per page"
+              },
+              {
+                "name": "page_token",
+                "value": "",
+                "type": "query",
+                "description": "Pagination token for the next page"
+              }
+            ]
+          },
+          "docs": "Returns a list of conversations for a project with optional filtering."
+        },
+        {
+          "info": {
+            "name": "Create a Conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/conversations",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new conversation associated with a contact and app."
+        },
+        {
+          "info": {
+            "name": "Get a Conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/conversations/:conversation_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "conversation_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conversation identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific conversation."
+        },
+        {
+          "info": {
+            "name": "Update a Conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/conversations/:conversation_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "conversation_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conversation identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the properties of a specific conversation."
+        },
+        {
+          "info": {
+            "name": "Delete a Conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/conversations/:conversation_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "conversation_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conversation identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific conversation and optionally its messages."
+        },
+        {
+          "info": {
+            "name": "Stop a Conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/conversations/:conversation_id:stop",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "conversation_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conversation identifier"
+              }
+            ]
+          },
+          "docs": "Stops an active conversation, marking it as inactive."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Apps",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Apps",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/apps",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ]
+          },
+          "docs": "Returns a list of all Conversation API apps in the project."
+        },
+        {
+          "info": {
+            "name": "Create an App",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/apps",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new Conversation API app with channel credentials."
+        },
+        {
+          "info": {
+            "name": "Get an App",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/apps/:app_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique app identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific Conversation API app."
+        },
+        {
+          "info": {
+            "name": "Update an App",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/apps/:app_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique app identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the properties of a specific Conversation API app."
+        },
+        {
+          "info": {
+            "name": "Delete an App",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/apps/:app_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique app identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific Conversation API app."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Webhooks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Webhooks",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/apps/:app_id/webhooks",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique app identifier"
+              }
+            ]
+          },
+          "docs": "Returns the list of webhooks configured for a specific app. Up to 5 webhooks can be configured per app."
+        },
+        {
+          "info": {
+            "name": "Create a Webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/apps/:app_id/webhooks",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique app identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new webhook for the specified app with trigger subscriptions."
+        },
+        {
+          "info": {
+            "name": "Get a Webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/webhooks/:webhook_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "webhook_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique webhook identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific webhook."
+        },
+        {
+          "info": {
+            "name": "Update a Webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/webhooks/:webhook_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "webhook_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique webhook identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the properties of a specific webhook."
+        },
+        {
+          "info": {
+            "name": "Delete a Webhook",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/webhooks/:webhook_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "webhook_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique webhook identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific webhook."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Events",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Send an Event",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/events:send",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Sends an event such as a composing indicator to a contact on a specific channel."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Transcoding",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Transcode a Message",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/messages:transcode",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Transcodes a generic message format to a channel-specific format for preview purposes without sending the message."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Capability",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Query Channel Capability",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://us.conversation.api.sinch.com/v1/projects/:project_id/capability:query",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Queries the capability of a specific channel for a contact to determine if the channel can be used to reach them."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

@@ -1,0 +1,232 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Brands",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Brands",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/brands",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Number of results per page"
+              },
+              {
+                "name": "pageToken",
+                "value": "",
+                "type": "query",
+                "description": "Pagination token"
+              }
+            ]
+          },
+          "docs": "Returns a list of all brand profiles in the project with pagination support."
+        },
+        {
+          "info": {
+            "name": "Create a Brand",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/brands",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new brand profile with business identity information including name, address, industry, and contact details."
+        },
+        {
+          "info": {
+            "name": "Create and Submit a Brand",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/brands:submit",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new brand profile and immediately submits it for verification in a single operation."
+        },
+        {
+          "info": {
+            "name": "Get a Brand",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/brands/:brand_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "brand_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique brand identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific brand profile including its verification status."
+        },
+        {
+          "info": {
+            "name": "Update a Brand",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/brands/:brand_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "brand_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique brand identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the details of an existing brand profile."
+        },
+        {
+          "info": {
+            "name": "Delete a Brand",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/brands/:brand_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "brand_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique brand identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific brand profile from the project."
+        },
+        {
+          "info": {
+            "name": "Submit a Brand for Verification",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/brands/:brand_id:submit",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "brand_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique brand identifier"
+              }
+            ]
+          },
+          "docs": "Submits an existing brand profile for verification. Once submitted, the brand enters the review process."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Brand Metadata",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Brand Metadata",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/brand-metadata",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ]
+          },
+          "docs": "Returns metadata about brand configuration options including available industries, entity types, and required fields."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

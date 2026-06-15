@@ -1,0 +1,155 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Verification API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Verifications",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Start a Verification",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://verification.api.sinch.com/verification/v1/verifications",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Initiates a new verification request for a phone number. The method parameter determines which verification type is used: SMS sends a one-time code, flashcall triggers a call from a specific number, callout triggers a phone call with a spoken code, and seamless performs data verification."
+        },
+        {
+          "info": {
+            "name": "Report a Verification",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://verification.api.sinch.com/verification/v1/verifications/:type/:endpoint",
+            "params": [
+              {
+                "name": "type",
+                "value": "",
+                "type": "path",
+                "description": "The verification method type"
+              },
+              {
+                "name": "endpoint",
+                "value": "",
+                "type": "path",
+                "description": "The phone number being verified in E.164 format"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Reports the verification code or CLI received by the user back to Sinch to complete the verification process. The type parameter specifies the verification method and the endpoint is the phone number being verified."
+        },
+        {
+          "info": {
+            "name": "Report a Verification by Id",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://verification.api.sinch.com/verification/v1/verifications/id/:id",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The verification request identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Reports the verification result using the verification ID rather than the phone number and method type."
+        },
+        {
+          "info": {
+            "name": "Get Verification Status by Identity",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://verification.api.sinch.com/verification/v1/verifications/:type/:endpoint/status",
+            "params": [
+              {
+                "name": "type",
+                "value": "",
+                "type": "path",
+                "description": "The verification method type"
+              },
+              {
+                "name": "endpoint",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ]
+          },
+          "docs": "Returns the status of a verification request identified by the verification method type and phone number endpoint."
+        },
+        {
+          "info": {
+            "name": "Get Verification Status by Id",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://verification.api.sinch.com/verification/v1/verifications/id/:id/status",
+            "params": [
+              {
+                "name": "id",
+                "value": "",
+                "type": "path",
+                "description": "The verification request identifier"
+              }
+            ]
+          },
+          "docs": "Returns the status of a verification request identified by its unique verification ID."
+        },
+        {
+          "info": {
+            "name": "Get Verification Status by Reference",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://verification.api.sinch.com/verification/v1/verifications/reference/:reference/status",
+            "params": [
+              {
+                "name": "reference",
+                "value": "",
+                "type": "path",
+                "description": "The custom reference string"
+              }
+            ]
+          },
+          "docs": "Returns the status of a verification request identified by a custom reference string that was provided when the verification was started."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

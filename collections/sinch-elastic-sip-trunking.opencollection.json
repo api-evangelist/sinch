@@ -1,0 +1,573 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Elastic SIP Trunking API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "client_credentials",
+      "accessTokenUrl": "https://auth.sinch.com/oauth2/token",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "SIP Trunks",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Sip Trunks",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "The page number to retrieve"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "The number of trunks per page"
+              }
+            ]
+          },
+          "docs": "Returns a list of all SIP trunks in the project with pagination support."
+        },
+        {
+          "info": {
+            "name": "Create a Sip Trunk",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new SIP trunk for connecting your telephony infrastructure to the Sinch network."
+        },
+        {
+          "info": {
+            "name": "Get a Sip Trunk",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details and configuration of a specific SIP trunk."
+        },
+        {
+          "info": {
+            "name": "Update a Sip Trunk",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the configuration of an existing SIP trunk."
+        },
+        {
+          "info": {
+            "name": "Delete a Sip Trunk",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific SIP trunk and all its associated configuration."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "SIP Endpoints",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Sip Endpoints",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/sipEndpoints",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ]
+          },
+          "docs": "Returns a list of SIP endpoints associated with a specific trunk."
+        },
+        {
+          "info": {
+            "name": "Create a Sip Endpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/sipEndpoints",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new SIP endpoint representing your SIP infrastructure (PBX, contact center, etc.) and associates it with a trunk."
+        },
+        {
+          "info": {
+            "name": "Get a Sip Endpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/sipEndpoints/:endpoint_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              },
+              {
+                "name": "endpoint_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP endpoint identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific SIP endpoint."
+        },
+        {
+          "info": {
+            "name": "Update a Sip Endpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/sipEndpoints/:endpoint_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              },
+              {
+                "name": "endpoint_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP endpoint identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the configuration of a specific SIP endpoint."
+        },
+        {
+          "info": {
+            "name": "Delete a Sip Endpoint",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/sipEndpoints/:endpoint_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              },
+              {
+                "name": "endpoint_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP endpoint identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific SIP endpoint from the trunk."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Phone Numbers",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Phone Numbers for a Trunk",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/phoneNumbers",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ]
+          },
+          "docs": "Returns the list of phone numbers assigned to a specific SIP trunk."
+        },
+        {
+          "info": {
+            "name": "Add Phone Number to Trunk",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/phoneNumbers",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Assigns a phone number to a SIP trunk for inbound and outbound calling."
+        },
+        {
+          "info": {
+            "name": "Remove Phone Number from Trunk",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/phoneNumbers/:phone_number",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              },
+              {
+                "name": "phone_number",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ]
+          },
+          "docs": "Removes a phone number from a SIP trunk."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Access Control Lists",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Access Control Lists",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/accessControlLists",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ]
+          },
+          "docs": "Returns the access control lists configured for a specific SIP trunk."
+        },
+        {
+          "info": {
+            "name": "Create an Access Control List",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/accessControlLists",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new IP address access control list for a SIP trunk to restrict which IP addresses can connect."
+        },
+        {
+          "info": {
+            "name": "Get an Access Control List",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/accessControlLists/:acl_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              },
+              {
+                "name": "acl_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique access control list identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific access control list."
+        },
+        {
+          "info": {
+            "name": "Update an Access Control List",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/accessControlLists/:acl_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              },
+              {
+                "name": "acl_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique access control list identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the configuration of a specific access control list."
+        },
+        {
+          "info": {
+            "name": "Delete an Access Control List",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://elastic-trunking.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/accessControlLists/:acl_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              },
+              {
+                "name": "acl_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique access control list identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific access control list from the trunk."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

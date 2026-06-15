@@ -1,0 +1,312 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Voice API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "basic",
+      "username": "{{username}}",
+      "password": "{{password}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Callouts",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Make a Callout",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://calling.api.sinch.com/calling/v1/callouts",
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Makes a call to a phone number or app. The callout type determines the behavior of the call, including conference callouts, text-to-speech callouts, and custom callouts with SVAML control."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Calls",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Call Information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://calling.api.sinch.com/calling/v1/calls/id/:call_id",
+            "params": [
+              {
+                "name": "call_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique call identifier"
+              }
+            ]
+          },
+          "docs": "Returns information about a specific call identified by the call ID."
+        },
+        {
+          "info": {
+            "name": "Update a Call",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://calling.api.sinch.com/calling/v1/calls/id/:call_id",
+            "params": [
+              {
+                "name": "call_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique call identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates an ongoing call with SVAML instructions. Can be used to play prompts, connect calls, or hang up."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Conferences",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Conference Information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://calling.api.sinch.com/calling/v1/conferences/id/:conference_id",
+            "params": [
+              {
+                "name": "conference_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conference identifier"
+              }
+            ]
+          },
+          "docs": "Returns information about an ongoing conference including a list of participants."
+        },
+        {
+          "info": {
+            "name": "Kick All Participants from Conference",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://calling.api.sinch.com/calling/v1/conferences/id/:conference_id",
+            "params": [
+              {
+                "name": "conference_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conference identifier"
+              }
+            ]
+          },
+          "docs": "Removes all participants from an ongoing conference, effectively ending the conference."
+        },
+        {
+          "info": {
+            "name": "Manage Conference Participant",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://calling.api.sinch.com/calling/v1/conferences/id/:conference_id/:call_id",
+            "params": [
+              {
+                "name": "conference_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conference identifier"
+              },
+              {
+                "name": "call_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique call identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Manages a specific participant in a conference. Can mute, unmute, or put a participant on hold."
+        },
+        {
+          "info": {
+            "name": "Kick Participant from Conference",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://calling.api.sinch.com/calling/v1/conferences/id/:conference_id/:call_id",
+            "params": [
+              {
+                "name": "conference_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conference identifier"
+              },
+              {
+                "name": "call_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique call identifier"
+              }
+            ]
+          },
+          "docs": "Removes a specific participant from an ongoing conference."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Applications",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Numbers Assigned to Application",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://calling.api.sinch.com/calling/v1/configuration/numbers"
+          },
+          "docs": "Returns the list of phone numbers assigned to the Voice API application."
+        },
+        {
+          "info": {
+            "name": "Get Application Callback Urls",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://calling.api.sinch.com/calling/v1/configuration/callbacks/applications/:application_key",
+            "params": [
+              {
+                "name": "application_key",
+                "value": "",
+                "type": "path",
+                "description": "The application key"
+              }
+            ]
+          },
+          "docs": "Returns the callback URLs configured for a specific application."
+        },
+        {
+          "info": {
+            "name": "Update Application Callback Urls",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://calling.api.sinch.com/calling/v1/configuration/callbacks/applications/:application_key",
+            "params": [
+              {
+                "name": "application_key",
+                "value": "",
+                "type": "path",
+                "description": "The application key"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the callback URLs for a specific application."
+        },
+        {
+          "info": {
+            "name": "Get Number Configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://calling.api.sinch.com/calling/v1/configuration/numbers/:number",
+            "params": [
+              {
+                "name": "number",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ]
+          },
+          "docs": "Returns the configuration for a specific phone number."
+        },
+        {
+          "info": {
+            "name": "Update Number Configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://calling.api.sinch.com/calling/v1/configuration/numbers/:number",
+            "params": [
+              {
+                "name": "number",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the configuration for a specific phone number including the application key assignment and capability."
+        },
+        {
+          "info": {
+            "name": "Unassign a Number",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://calling.api.sinch.com/calling/v1/configuration/numbers/:number",
+            "params": [
+              {
+                "name": "number",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ]
+          },
+          "docs": "Unassigns a phone number from the application."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

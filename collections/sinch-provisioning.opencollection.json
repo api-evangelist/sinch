@@ -1,0 +1,325 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Provisioning API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "client_credentials",
+      "accessTokenUrl": "https://auth.sinch.com/oauth2/token",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "RCS Senders",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Rcs Senders",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/rcs/senders",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ]
+          },
+          "docs": "Returns a list of all RCS senders configured for the project."
+        },
+        {
+          "info": {
+            "name": "Create an Rcs Sender",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/rcs/senders",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new RCS sender identity with brand information and messaging agent configuration."
+        },
+        {
+          "info": {
+            "name": "Get an Rcs Sender",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/rcs/senders/:sender_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "sender_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique sender identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details and status of a specific RCS sender."
+        },
+        {
+          "info": {
+            "name": "Update an Rcs Sender",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/rcs/senders/:sender_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "sender_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique sender identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the configuration of a specific RCS sender."
+        },
+        {
+          "info": {
+            "name": "Delete an Rcs Sender",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/rcs/senders/:sender_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "sender_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique sender identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific RCS sender from the project."
+        },
+        {
+          "info": {
+            "name": "Launch an Rcs Sender",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/rcs/senders/:sender_id/launch",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "sender_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique sender identifier"
+              }
+            ]
+          },
+          "docs": "Submits an RCS sender for launch, initiating the approval process with carriers and Google."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "KakaoTalk Senders",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Kakaotalk Senders",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/kakaoTalk/senders",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ]
+          },
+          "docs": "Returns a list of all KakaoTalk senders configured for the project."
+        },
+        {
+          "info": {
+            "name": "Create a Kakaotalk Sender",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/kakaoTalk/senders",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new KakaoTalk sender for messaging through the Conversation API."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "LINE Senders",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Line Senders",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/line/senders",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ]
+          },
+          "docs": "Returns a list of all LINE senders configured for the project."
+        },
+        {
+          "info": {
+            "name": "Create a Line Sender",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/line/senders",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new LINE sender for messaging through the Conversation API."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Telegram Senders",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Telegram Senders",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/telegram/senders",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ]
+          },
+          "docs": "Returns a list of all Telegram bot senders configured for the project."
+        },
+        {
+          "info": {
+            "name": "Create a Telegram Sender",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://provisioning.api.sinch.com/v1/projects/:project_id/telegram/senders",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new Telegram bot sender for messaging through the Conversation API."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

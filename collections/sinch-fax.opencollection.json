@@ -1,0 +1,429 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Fax API",
+    "version": "3.0"
+  },
+  "request": {
+    "auth": {
+      "type": "oauth2",
+      "flow": "client_credentials",
+      "accessTokenUrl": "https://auth.sinch.com/oauth2/token",
+      "credentials": {
+        "clientId": "{{clientId}}",
+        "clientSecret": "{{clientSecret}}"
+      }
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Faxes",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Faxes",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/faxes",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "The page number to retrieve"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "The number of faxes per page"
+              },
+              {
+                "name": "direction",
+                "value": "",
+                "type": "query",
+                "description": "Filter by direction"
+              },
+              {
+                "name": "status",
+                "value": "",
+                "type": "query",
+                "description": "Filter by fax status"
+              },
+              {
+                "name": "createTime.gte",
+                "value": "",
+                "type": "query",
+                "description": "Filter faxes created after this time"
+              },
+              {
+                "name": "createTime.lte",
+                "value": "",
+                "type": "query",
+                "description": "Filter faxes created before this time"
+              }
+            ]
+          },
+          "docs": "Returns a list of sent and received faxes with pagination and filtering support."
+        },
+        {
+          "info": {
+            "name": "Send a Fax",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/faxes",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Sends a fax to one or more recipients. The fax content can be provided as a URL to a document or as a file upload. Supports PDF and TIFF formats."
+        },
+        {
+          "info": {
+            "name": "Get a Fax",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/faxes/:fax_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "fax_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique fax identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific fax including its status, page count, and content URL."
+        },
+        {
+          "info": {
+            "name": "Delete Fax Content",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/faxes/:fax_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "fax_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique fax identifier"
+              }
+            ]
+          },
+          "docs": "Deletes the content of a specific fax while retaining the metadata."
+        },
+        {
+          "info": {
+            "name": "Download Fax Content",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/faxes/:fax_id/file",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "fax_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique fax identifier"
+              }
+            ]
+          },
+          "docs": "Downloads the content of a received or sent fax as a PDF file."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Default",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Fax Services",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/services",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ]
+          },
+          "docs": "Returns a list of all fax services in the project."
+        },
+        {
+          "info": {
+            "name": "Create a Fax Service",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/services",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new fax service with configuration for sending and receiving faxes, including webhook URLs for incoming fax notifications."
+        },
+        {
+          "info": {
+            "name": "Get a Fax Service",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/services/:service_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique service identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific fax service."
+        },
+        {
+          "info": {
+            "name": "Update a Fax Service",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/services/:service_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique service identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the configuration of a specific fax service."
+        },
+        {
+          "info": {
+            "name": "Delete a Fax Service",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/services/:service_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique service identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific fax service."
+        },
+        {
+          "info": {
+            "name": "List Numbers for a Service",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/services/:service_id/numbers",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique service identifier"
+              }
+            ]
+          },
+          "docs": "Returns the list of phone numbers assigned to a fax service."
+        }
+      ]
+    },
+    {
+      "info": {
+        "name": "Fax to Email",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Fax-to-email Configurations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/services/:service_id/emails",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique service identifier"
+              }
+            ]
+          },
+          "docs": "Returns the list of email addresses configured for fax-to-email on a service."
+        },
+        {
+          "info": {
+            "name": "Create a Fax-to-email Configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/services/:service_id/emails",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique service identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Configures an email address to receive incoming faxes for a specific fax service."
+        },
+        {
+          "info": {
+            "name": "Delete a Fax-to-email Configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://fax.api.sinch.com/v3/projects/:project_id/services/:service_id/emails/:email",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique service identifier"
+              },
+              {
+                "name": "email",
+                "value": "",
+                "type": "path",
+                "description": "The email address to remove"
+              }
+            ]
+          },
+          "docs": "Removes an email address from the fax-to-email configuration."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
