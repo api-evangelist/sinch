@@ -1,0 +1,46 @@
+generated: '2026-07-11'
+method: derived
+source: openapi/sinch-brands-openapi.yml, openapi/sinch-conversation-openapi.yml, openapi/sinch-elastic-sip-trunking-openapi.yml,
+  openapi/sinch-fax-openapi.yml, openapi/sinch-numbers-openapi.yml, openapi/sinch-provisioning-openapi.yml,
+  openapi/sinch-registration-openapi.yml, openapi/sinch-sms-openapi.yml, openapi/sinch-verification-openapi.yml,
+  openapi/sinch-voice-openapi.yml
+summary:
+  types:
+  - http
+  - oauth2
+  oauth2_flows:
+  - clientCredentials
+schemes:
+- name: bearerAuth
+  type: http
+  scheme: bearer
+  description: Bearer token authentication.
+  sources:
+  - openapi/sinch-brands-openapi.yml
+  - openapi/sinch-sms-openapi.yml
+- name: oAuth2
+  type: oauth2
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+    scopes: 0
+  description: OAuth 2.0 client credentials flow using project key ID and secret.
+  sources:
+  - openapi/sinch-conversation-openapi.yml
+  - openapi/sinch-elastic-sip-trunking-openapi.yml
+  - openapi/sinch-fax-openapi.yml
+  - openapi/sinch-numbers-openapi.yml
+  - openapi/sinch-provisioning-openapi.yml
+  - openapi/sinch-registration-openapi.yml
+- name: basicAuth
+  type: http
+  scheme: basic
+  description: Key ID as username and key secret as password.
+  sources:
+  - openapi/sinch-conversation-openapi.yml
+  - openapi/sinch-elastic-sip-trunking-openapi.yml
+  - openapi/sinch-fax-openapi.yml
+  - openapi/sinch-numbers-openapi.yml
+  - openapi/sinch-provisioning-openapi.yml
+  - openapi/sinch-verification-openapi.yml
+  - openapi/sinch-voice-openapi.yml
