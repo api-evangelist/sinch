@@ -1,0 +1,189 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Transcoding API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Transcoding
+  description: Transcode generic message formats to channel-specific formats for preview purposes.
+paths:
+  /v1/projects/{project_id}/messages:transcode:
+    post:
+      operationId: transcodeMessage
+      summary: Transcode a Message
+      description: Transcodes a generic message format to a channel-specific format for preview purposes without sending the message.
+      tags:
+      - Transcoding
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TranscodeRequest'
+      responses:
+        '200':
+          description: Transcoded message
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TranscodeResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+components:
+  schemas:
+    TranscodeRequest:
+      type: object
+      required:
+      - app_id
+      - app_message
+      - channels
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        app_message:
+          $ref: '#/components/schemas/AppMessage'
+        channels:
+          type: array
+          description: Target channels for transcoding
+          items:
+            type: string
+    Choice:
+      type: object
+      properties:
+        text_message:
+          type: object
+          description: Text choice
+          properties:
+            text:
+              type: string
+              description: The choice text
+        postback_data:
+          type: string
+          description: Data sent back when the choice is selected
+    AppMessage:
+      type: object
+      properties:
+        text_message:
+          type: object
+          description: A text message
+          properties:
+            text:
+              type: string
+              description: The message text
+        media_message:
+          type: object
+          description: A media message
+          properties:
+            url:
+              type: string
+              format: uri
+              description: The media URL
+            thumbnail_url:
+              type: string
+              format: uri
+              description: The thumbnail URL
+        template_message:
+          type: object
+          description: A template message
+          properties:
+            omni_template:
+              type: object
+              description: The template reference
+              properties:
+                template_id:
+                  type: string
+                  description: The template identifier
+                version:
+                  type: string
+                  description: The template version
+                language_code:
+                  type: string
+                  description: The language code
+                parameters:
+                  type: object
+                  description: Template parameter values
+        card_message:
+          type: object
+          description: A card message with title, description, and media
+          properties:
+            title:
+              type: string
+              description: The card title
+            description:
+              type: string
+              description: The card description
+            media_message:
+              type: object
+              description: The card media
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  description: The media URL
+            choices:
+              type: array
+              description: Action choices on the card
+              items:
+                $ref: '#/components/schemas/Choice'
+        list_message:
+          type: object
+          description: A list message with sections
+          properties:
+            title:
+              type: string
+              description: The list title
+            description:
+              type: string
+              description: The list description
+            sections:
+              type: array
+              description: List sections
+              items:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: Section title
+                  items:
+                    type: array
+                    description: Section items
+                    items:
+                      $ref: '#/components/schemas/Choice'
+    TranscodeResponse:
+      type: object
+      properties:
+        transcoded_message:
+          type: object
+          description: Map of channel to transcoded message
+          additionalProperties:
+            type: string
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

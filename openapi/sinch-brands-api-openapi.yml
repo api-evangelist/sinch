@@ -1,58 +1,41 @@
 openapi: 3.1.0
 info:
-  title: Sinch Brands API
-  description: >-
-    The Sinch Brands API allows developers to create, update, and manage
-    customer brand profiles used across Sinch messaging products. Brands
-    represent the business identity associated with messaging campaigns and
-    sender registrations. The API provides endpoints for creating brand
-    records, updating brand details, listing brands, and deleting brands,
-    enabling programmatic management of the brand entities required for
-    compliant business messaging.
+  title: Sinch Access Control Lists Brands API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
   version: '1.0'
   contact:
     name: Sinch Support
     url: https://www.sinch.com/contact-us/
   termsOfService: https://www.sinch.com/terms-of-service/
-externalDocs:
-  description: Sinch Brands API Documentation
-  url: https://developers.sinch.com/docs/brands
 servers:
-  - url: https://brands.api.sinch.com
-    description: Global Production Server
-tags:
-  - name: Brand Metadata
-    description: >-
-      Retrieve metadata about brand configuration options and requirements.
-  - name: Brands
-    description: >-
-      Create, update, list, and delete customer brand profiles used for
-      messaging campaigns and sender registrations.
+- url: https://brands.api.sinch.com
+  description: Global Production Server
 security:
-  - bearerAuth: []
+- bearerAuth: []
+tags:
+- name: Brands
+  description: Create, update, list, and delete customer brand profiles used for messaging campaigns and sender registrations.
 paths:
   /v1/projects/{project_id}/brands:
     get:
       operationId: listBrands
       summary: List Brands
-      description: >-
-        Returns a list of all brand profiles in the project with pagination
-        support.
+      description: Returns a list of all brand profiles in the project with pagination support.
       tags:
-        - Brands
+      - Brands
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - name: pageSize
-          in: query
-          description: Number of results per page
-          schema:
-            type: integer
-            default: 20
-        - name: pageToken
-          in: query
-          description: Pagination token
-          schema:
-            type: string
+      - $ref: '#/components/parameters/ProjectId'
+      - name: pageSize
+        in: query
+        description: Number of results per page
+        schema:
+          type: integer
+          default: 20
+      - name: pageToken
+        in: query
+        description: Pagination token
+        schema:
+          type: string
       responses:
         '200':
           description: List of brands
@@ -65,13 +48,11 @@ paths:
     post:
       operationId: createBrand
       summary: Create a Brand
-      description: >-
-        Creates a new brand profile with business identity information
-        including name, address, industry, and contact details.
+      description: Creates a new brand profile with business identity information including name, address, industry, and contact details.
       tags:
-        - Brands
+      - Brands
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId'
       requestBody:
         required: true
         content:
@@ -93,13 +74,11 @@ paths:
     post:
       operationId: createAndSubmitBrand
       summary: Create and Submit a Brand
-      description: >-
-        Creates a new brand profile and immediately submits it for
-        verification in a single operation.
+      description: Creates a new brand profile and immediately submits it for verification in a single operation.
       tags:
-        - Brands
+      - Brands
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId'
       requestBody:
         required: true
         content:
@@ -121,14 +100,12 @@ paths:
     get:
       operationId: getBrand
       summary: Get a Brand
-      description: >-
-        Returns the details of a specific brand profile including its
-        verification status.
+      description: Returns the details of a specific brand profile including its verification status.
       tags:
-        - Brands
+      - Brands
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - $ref: '#/components/parameters/BrandId'
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/BrandId'
       responses:
         '200':
           description: Brand details
@@ -143,13 +120,12 @@ paths:
     put:
       operationId: updateBrand
       summary: Update a Brand
-      description: >-
-        Updates the details of an existing brand profile.
+      description: Updates the details of an existing brand profile.
       tags:
-        - Brands
+      - Brands
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - $ref: '#/components/parameters/BrandId'
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/BrandId'
       requestBody:
         required: true
         content:
@@ -170,13 +146,12 @@ paths:
     delete:
       operationId: deleteBrand
       summary: Delete a Brand
-      description: >-
-        Deletes a specific brand profile from the project.
+      description: Deletes a specific brand profile from the project.
       tags:
-        - Brands
+      - Brands
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - $ref: '#/components/parameters/BrandId'
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/BrandId'
       responses:
         '200':
           description: Brand deleted
@@ -188,14 +163,12 @@ paths:
     post:
       operationId: submitBrand
       summary: Submit a Brand for Verification
-      description: >-
-        Submits an existing brand profile for verification. Once submitted,
-        the brand enters the review process.
+      description: Submits an existing brand profile for verification. Once submitted, the brand enters the review process.
       tags:
-        - Brands
+      - Brands
       parameters:
-        - $ref: '#/components/parameters/ProjectId'
-        - $ref: '#/components/parameters/BrandId'
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/BrandId'
       responses:
         '200':
           description: Brand submitted
@@ -207,48 +180,7 @@ paths:
           description: Unauthorized
         '404':
           description: Brand not found
-  /v1/projects/{project_id}/brand-metadata:
-    get:
-      operationId: getBrandMetadata
-      summary: Get Brand Metadata
-      description: >-
-        Returns metadata about brand configuration options including
-        available industries, entity types, and required fields.
-      tags:
-        - Brand Metadata
-      parameters:
-        - $ref: '#/components/parameters/ProjectId'
-      responses:
-        '200':
-          description: Brand metadata
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/BrandMetadata'
-        '401':
-          description: Unauthorized
 components:
-  securitySchemes:
-    bearerAuth:
-      type: http
-      scheme: bearer
-      description: >-
-        Bearer token authentication.
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    BrandId:
-      name: brand_id
-      in: path
-      required: true
-      description: The unique brand identifier
-      schema:
-        type: string
   schemas:
     Brand:
       type: object
@@ -303,11 +235,11 @@ components:
         status:
           type: string
           enum:
-            - DRAFT
-            - SUBMITTED
-            - VERIFIED
-            - UNVERIFIED
-            - REJECTED
+          - DRAFT
+          - SUBMITTED
+          - VERIFIED
+          - UNVERIFIED
+          - REJECTED
           description: The current brand verification status
         identityStatus:
           type: string
@@ -320,26 +252,12 @@ components:
           type: string
           format: date-time
           description: When the brand was last updated
-    BrandList:
-      type: object
-      properties:
-        brands:
-          type: array
-          description: List of brands
-          items:
-            $ref: '#/components/schemas/Brand'
-        nextPageToken:
-          type: string
-          description: Pagination token
-        totalSize:
-          type: integer
-          description: Total number of brands
     CreateBrandRequest:
       type: object
       required:
-        - displayName
-        - companyName
-        - country
+      - displayName
+      - companyName
+      - country
       properties:
         displayName:
           type: string
@@ -382,6 +300,20 @@ components:
         contactPhone:
           type: string
           description: Contact phone
+    BrandList:
+      type: object
+      properties:
+        brands:
+          type: array
+          description: List of brands
+          items:
+            $ref: '#/components/schemas/Brand'
+        nextPageToken:
+          type: string
+          description: Pagination token
+        totalSize:
+          type: integer
+          description: Total number of brands
     UpdateBrandRequest:
       type: object
       properties:
@@ -426,26 +358,26 @@ components:
         contactPhone:
           type: string
           description: Updated contact phone
-    BrandMetadata:
-      type: object
-      properties:
-        entityTypes:
-          type: array
-          description: Available entity types
-          items:
-            type: string
-        verticalTypes:
-          type: array
-          description: Available business verticals
-          items:
-            type: string
-        requiredFields:
-          type: array
-          description: Required fields for brand creation
-          items:
-            type: string
-        countries:
-          type: array
-          description: Supported countries
-          items:
-            type: string
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    BrandId:
+      name: brand_id
+      in: path
+      required: true
+      description: The unique brand identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

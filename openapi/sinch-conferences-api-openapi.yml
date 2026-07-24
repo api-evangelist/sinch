@@ -1,0 +1,157 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Conferences API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Conferences
+  description: Manage ongoing conferences including retrieving conference info, muting or unmuting participants, and removing participants.
+paths:
+  /calling/v1/conferences/id/{conference_id}:
+    get:
+      operationId: getConference
+      summary: Get Conference Information
+      description: Returns information about an ongoing conference including a list of participants.
+      tags:
+      - Conferences
+      parameters:
+      - $ref: '#/components/parameters/ConferenceId'
+      responses:
+        '200':
+          description: Conference details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConferenceInfo'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conference not found
+    delete:
+      operationId: kickAllFromConference
+      summary: Kick All Participants from Conference
+      description: Removes all participants from an ongoing conference, effectively ending the conference.
+      tags:
+      - Conferences
+      parameters:
+      - $ref: '#/components/parameters/ConferenceId'
+      responses:
+        '200':
+          description: All participants removed
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conference not found
+  /calling/v1/conferences/id/{conference_id}/{call_id}:
+    patch:
+      operationId: manageConferenceParticipant
+      summary: Manage Conference Participant
+      description: Manages a specific participant in a conference. Can mute, unmute, or put a participant on hold.
+      tags:
+      - Conferences
+      parameters:
+      - $ref: '#/components/parameters/ConferenceId'
+      - $ref: '#/components/parameters/CallId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ManageParticipantRequest'
+      responses:
+        '200':
+          description: Participant updated
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conference or participant not found
+    delete:
+      operationId: kickParticipantFromConference
+      summary: Kick Participant from Conference
+      description: Removes a specific participant from an ongoing conference.
+      tags:
+      - Conferences
+      parameters:
+      - $ref: '#/components/parameters/ConferenceId'
+      - $ref: '#/components/parameters/CallId'
+      responses:
+        '200':
+          description: Participant removed
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conference or participant not found
+components:
+  schemas:
+    ManageParticipantRequest:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+          - mute
+          - unmute
+          - onhold
+          - resume
+          description: The command to execute on the participant
+    Participant:
+      type: object
+      properties:
+        cli:
+          type: string
+          description: The participant caller ID
+        callId:
+          type: string
+          description: The participant call ID
+        duration:
+          type: integer
+          description: Duration in conference in seconds
+        muted:
+          type: boolean
+          description: Whether the participant is muted
+        onhold:
+          type: boolean
+          description: Whether the participant is on hold
+    ConferenceInfo:
+      type: object
+      properties:
+        conferenceId:
+          type: string
+          description: The conference identifier
+        participants:
+          type: array
+          description: List of participants in the conference
+          items:
+            $ref: '#/components/schemas/Participant'
+  parameters:
+    CallId:
+      name: call_id
+      in: path
+      required: true
+      description: The unique call identifier
+      schema:
+        type: string
+    ConferenceId:
+      name: conference_id
+      in: path
+      required: true
+      description: The unique conference identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

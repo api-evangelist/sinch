@@ -1,0 +1,384 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Messages API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Messages
+  description: Send and retrieve messages across all supported channels using a normalized message format.
+paths:
+  /v1/projects/{project_id}/messages:send:
+    post:
+      operationId: sendMessage
+      summary: Send a Message
+      description: Sends a message to a contact on a specific channel or using the Conversation API intelligent channel selection. Supports text, media, template, and card messages in a normalized format.
+      tags:
+      - Messages
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendMessageRequest'
+      responses:
+        '200':
+          description: Message sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendMessageResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/messages:
+    get:
+      operationId: listMessages
+      summary: List Messages
+      description: Returns a list of messages in a project with optional filtering by conversation, contact, app, and channel.
+      tags:
+      - Messages
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: conversation_id
+        in: query
+        description: Filter by conversation ID
+        schema:
+          type: string
+      - name: contact_id
+        in: query
+        description: Filter by contact ID
+        schema:
+          type: string
+      - name: app_id
+        in: query
+        description: Filter by app ID
+        schema:
+          type: string
+      - name: channel
+        in: query
+        description: Filter by channel
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        description: The number of messages per page
+        schema:
+          type: integer
+          default: 10
+      - name: page_token
+        in: query
+        description: Pagination token for the next page
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MessageList'
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/messages/{message_id}:
+    get:
+      operationId: getMessage
+      summary: Get a Message
+      description: Returns the details of a specific message.
+      tags:
+      - Messages
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: message_id
+        in: path
+        required: true
+        description: The unique message identifier
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Message details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationMessage'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Message not found
+    delete:
+      operationId: deleteMessage
+      summary: Delete a Message
+      description: Deletes a specific message from the conversation history.
+      tags:
+      - Messages
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: message_id
+        in: path
+        required: true
+        description: The unique message identifier
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Message deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Message not found
+components:
+  schemas:
+    Choice:
+      type: object
+      properties:
+        text_message:
+          type: object
+          description: Text choice
+          properties:
+            text:
+              type: string
+              description: The choice text
+        postback_data:
+          type: string
+          description: Data sent back when the choice is selected
+    MessageList:
+      type: object
+      properties:
+        messages:
+          type: array
+          description: List of messages
+          items:
+            $ref: '#/components/schemas/ConversationMessage'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
+    AppMessage:
+      type: object
+      properties:
+        text_message:
+          type: object
+          description: A text message
+          properties:
+            text:
+              type: string
+              description: The message text
+        media_message:
+          type: object
+          description: A media message
+          properties:
+            url:
+              type: string
+              format: uri
+              description: The media URL
+            thumbnail_url:
+              type: string
+              format: uri
+              description: The thumbnail URL
+        template_message:
+          type: object
+          description: A template message
+          properties:
+            omni_template:
+              type: object
+              description: The template reference
+              properties:
+                template_id:
+                  type: string
+                  description: The template identifier
+                version:
+                  type: string
+                  description: The template version
+                language_code:
+                  type: string
+                  description: The language code
+                parameters:
+                  type: object
+                  description: Template parameter values
+        card_message:
+          type: object
+          description: A card message with title, description, and media
+          properties:
+            title:
+              type: string
+              description: The card title
+            description:
+              type: string
+              description: The card description
+            media_message:
+              type: object
+              description: The card media
+              properties:
+                url:
+                  type: string
+                  format: uri
+                  description: The media URL
+            choices:
+              type: array
+              description: Action choices on the card
+              items:
+                $ref: '#/components/schemas/Choice'
+        list_message:
+          type: object
+          description: A list message with sections
+          properties:
+            title:
+              type: string
+              description: The list title
+            description:
+              type: string
+              description: The list description
+            sections:
+              type: array
+              description: List sections
+              items:
+                type: object
+                properties:
+                  title:
+                    type: string
+                    description: Section title
+                  items:
+                    type: array
+                    description: Section items
+                    items:
+                      $ref: '#/components/schemas/Choice'
+    ChannelIdentity:
+      type: object
+      properties:
+        channel:
+          type: string
+          enum:
+          - SMS
+          - RCS
+          - WHATSAPP
+          - MESSENGER
+          - INSTAGRAM
+          - VIBER
+          - VIBERBM
+          - TELEGRAM
+          - KAKAOTALK
+          - LINE
+          - MMS
+          description: The channel type
+        identity:
+          type: string
+          description: The channel-specific identity
+        app_id:
+          type: string
+          description: The app ID for the channel
+    ConversationMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique message identifier
+        direction:
+          type: string
+          enum:
+          - TO_APP
+          - TO_CONTACT
+          description: The message direction
+        app_message:
+          $ref: '#/components/schemas/AppMessage'
+        contact_message:
+          type: object
+          description: The inbound contact message
+        channel_identity:
+          $ref: '#/components/schemas/ChannelIdentity'
+        conversation_id:
+          type: string
+          description: The conversation this message belongs to
+        contact_id:
+          type: string
+          description: The contact who sent or received the message
+        metadata:
+          type: string
+          description: Message metadata
+        accept_time:
+          type: string
+          format: date-time
+          description: When the message was accepted
+    SendMessageRequest:
+      type: object
+      required:
+      - app_id
+      - message
+      - recipient
+      properties:
+        app_id:
+          type: string
+          description: The ID of the Conversation API app
+        recipient:
+          type: object
+          description: The message recipient
+          properties:
+            contact_id:
+              type: string
+              description: The contact ID to send to
+            identified_by:
+              type: object
+              description: Channel identity to address
+              properties:
+                channel_identities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChannelIdentity'
+        message:
+          $ref: '#/components/schemas/AppMessage'
+        message_metadata:
+          type: string
+          description: Metadata to associate with the message
+        conversation_metadata:
+          type: string
+          description: Metadata to associate with the conversation
+        channel_priority_order:
+          type: array
+          description: Ordered list of channels to try
+          items:
+            type: string
+        queue:
+          type: string
+          enum:
+          - NORMAL_PRIORITY
+          - HIGH_PRIORITY
+          description: The message queue priority
+        ttl:
+          type: integer
+          description: Time-to-live in seconds for the message
+    SendMessageResponse:
+      type: object
+      properties:
+        message_id:
+          type: string
+          description: The unique message identifier
+        accepted_time:
+          type: string
+          format: date-time
+          description: When the message was accepted
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

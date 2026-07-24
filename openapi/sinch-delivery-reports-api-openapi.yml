@@ -1,0 +1,202 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Delivery Reports API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Delivery Reports
+  description: Delivery reports provide the status of sent messages. Reports can be retrieved via the API or delivered via webhook callbacks.
+paths:
+  /xms/v1/{service_plan_id}/batches/{batch_id}/delivery_report:
+    get:
+      operationId: getBatchDeliveryReport
+      summary: Retrieve a Batch Delivery Report
+      description: Returns the aggregate delivery report for a specific batch. The report contains status counts and details about message delivery.
+      tags:
+      - Delivery Reports
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
+      - name: type
+        in: query
+        description: The type of delivery report to retrieve
+        schema:
+          type: string
+          enum:
+          - summary
+          - full
+      responses:
+        '200':
+          description: Delivery report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryReport'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Batch not found
+  /xms/v1/{service_plan_id}/batches/{batch_id}/delivery_report/{recipient_msisdn}:
+    get:
+      operationId: getRecipientDeliveryReport
+      summary: Retrieve a Recipient Delivery Report
+      description: Returns the delivery report for a specific recipient in a batch.
+      tags:
+      - Delivery Reports
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
+      - name: recipient_msisdn
+        in: path
+        required: true
+        description: The phone number of the recipient
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Recipient delivery report
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RecipientDeliveryReport'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Report not found
+  /xms/v1/{service_plan_id}/delivery_reports:
+    get:
+      operationId: listDeliveryReports
+      summary: List Delivery Reports
+      description: Returns a list of delivery reports with pagination support.
+      tags:
+      - Delivery Reports
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - name: page
+        in: query
+        description: The page number to retrieve
+        schema:
+          type: integer
+          default: 0
+      - name: page_size
+        in: query
+        description: The number of reports per page
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+      responses:
+        '200':
+          description: List of delivery reports
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DeliveryReportList'
+        '401':
+          description: Unauthorized
+components:
+  schemas:
+    DeliveryReport:
+      type: object
+      properties:
+        batch_id:
+          type: string
+          description: The batch identifier
+        type:
+          type: string
+          description: The delivery report type
+        statuses:
+          type: array
+          description: List of status objects with counts
+          items:
+            type: object
+            properties:
+              code:
+                type: integer
+                description: The status code
+              status:
+                type: string
+                description: The delivery status
+              count:
+                type: integer
+                description: The number of recipients with this status
+              recipients:
+                type: array
+                description: List of recipient phone numbers
+                items:
+                  type: string
+        total_message_count:
+          type: integer
+          description: Total number of messages in the batch
+    DeliveryReportList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of delivery reports
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of reports per page
+        delivery_reports:
+          type: array
+          description: List of delivery report objects
+          items:
+            $ref: '#/components/schemas/DeliveryReport'
+    RecipientDeliveryReport:
+      type: object
+      properties:
+        batch_id:
+          type: string
+          description: The batch identifier
+        recipient:
+          type: string
+          description: The recipient phone number
+        code:
+          type: integer
+          description: The delivery status code
+        status:
+          type: string
+          description: The delivery status
+        at:
+          type: string
+          format: date-time
+          description: When the status was updated
+        operator_status_at:
+          type: string
+          format: date-time
+          description: When the operator reported the status
+  parameters:
+    BatchId:
+      name: batch_id
+      in: path
+      required: true
+      description: The unique identifier for the batch
+      schema:
+        type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

@@ -1,0 +1,85 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Available Regions API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Available Regions
+  description: List available regions and number types that can be provisioned.
+paths:
+  /v1/projects/{project_id}/availableRegions:
+    get:
+      operationId: listAvailableRegions
+      summary: List Available Regions
+      description: Returns a list of available regions and the types of phone numbers that can be provisioned in each region.
+      tags:
+      - Available Regions
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: types
+        in: query
+        description: Filter by number types
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - LOCAL
+            - MOBILE
+            - TOLL_FREE
+      responses:
+        '200':
+          description: List of available regions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableRegionList'
+        '401':
+          description: Unauthorized
+components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  schemas:
+    AvailableRegionList:
+      type: object
+      properties:
+        availableRegions:
+          type: array
+          description: List of available regions
+          items:
+            type: object
+            properties:
+              regionCode:
+                type: string
+                description: The ISO 3166-1 alpha-2 country code
+              regionName:
+                type: string
+                description: The region name
+              types:
+                type: array
+                description: Available number types in this region
+                items:
+                  type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

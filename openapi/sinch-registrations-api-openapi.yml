@@ -1,0 +1,282 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Registrations API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Registrations
+  description: Create, update, delete, and track sender ID registrations for compliance with local messaging regulations.
+paths:
+  /v1/projects/{project_id}/registrations:
+    get:
+      operationId: listRegistrations
+      summary: List Registrations
+      description: Returns a list of all sender ID registrations in the project with their current status and submission details.
+      tags:
+      - Registrations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: status
+        in: query
+        description: Filter by registration status
+        schema:
+          type: string
+      - name: pageSize
+        in: query
+        description: Number of results per page
+        schema:
+          type: integer
+          default: 20
+      - name: pageToken
+        in: query
+        description: Pagination token
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of registrations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RegistrationList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createRegistration
+      summary: Create a Registration
+      description: Creates a new sender ID registration for a specific market. The registration must include all required fields as defined by the market requirements.
+      tags:
+      - Registrations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateRegistrationRequest'
+      responses:
+        '200':
+          description: Registration created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/registrations/{registration_id}:
+    get:
+      operationId: getRegistration
+      summary: Get a Registration
+      description: Returns the details and current status of a specific sender ID registration.
+      tags:
+      - Registrations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/RegistrationId'
+      responses:
+        '200':
+          description: Registration details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Registration not found
+    patch:
+      operationId: updateRegistration
+      summary: Update a Registration
+      description: Updates a sender ID registration. Only registrations that have not yet been submitted for approval can be updated.
+      tags:
+      - Registrations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/RegistrationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateRegistrationRequest'
+      responses:
+        '200':
+          description: Registration updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Registration not found
+    delete:
+      operationId: deleteRegistration
+      summary: Delete a Registration
+      description: Deletes a specific sender ID registration.
+      tags:
+      - Registrations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/RegistrationId'
+      responses:
+        '200':
+          description: Registration deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Registration not found
+  /v1/projects/{project_id}/registrations/{registration_id}:submit:
+    post:
+      operationId: submitRegistration
+      summary: Submit a Registration
+      description: Submits a sender ID registration for approval. Once submitted, the registration enters the review process and cannot be modified.
+      tags:
+      - Registrations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/RegistrationId'
+      responses:
+        '200':
+          description: Registration submitted
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Registration not found
+components:
+  parameters:
+    RegistrationId:
+      name: registration_id
+      in: path
+      required: true
+      description: The unique registration identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  schemas:
+    CreateRegistrationRequest:
+      type: object
+      required:
+      - marketId
+      - senderId
+      properties:
+        marketId:
+          type: string
+          description: The target market
+        displayName:
+          type: string
+          description: Display name for the sender
+        senderId:
+          type: string
+          description: The sender ID to register
+        senderType:
+          type: string
+          description: The sender type
+        registrationDetails:
+          type: object
+          description: Market-specific registration details
+          additionalProperties: true
+    UpdateRegistrationRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Updated display name
+        registrationDetails:
+          type: object
+          description: Updated registration details
+          additionalProperties: true
+    Registration:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique registration identifier
+        projectId:
+          type: string
+          description: The project ID
+        marketId:
+          type: string
+          description: The market identifier
+        displayName:
+          type: string
+          description: The display name for the sender
+        senderId:
+          type: string
+          description: The sender ID being registered
+        senderType:
+          type: string
+          description: The sender type
+        status:
+          type: string
+          enum:
+          - DRAFT
+          - SUBMITTED
+          - UNDER_REVIEW
+          - APPROVED
+          - REJECTED
+          - REVOKED
+          description: The current registration status
+        rejectionReason:
+          type: string
+          description: Reason for rejection if applicable
+        registrationDetails:
+          type: object
+          description: Market-specific registration details
+          additionalProperties: true
+        createTime:
+          type: string
+          format: date-time
+          description: When the registration was created
+        updateTime:
+          type: string
+          format: date-time
+          description: When the registration was last updated
+        submitTime:
+          type: string
+          format: date-time
+          description: When the registration was submitted
+    RegistrationList:
+      type: object
+      properties:
+        registrations:
+          type: array
+          description: List of registrations
+          items:
+            $ref: '#/components/schemas/Registration'
+        nextPageToken:
+          type: string
+          description: Pagination token
+        totalSize:
+          type: integer
+          description: Total number of registrations
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

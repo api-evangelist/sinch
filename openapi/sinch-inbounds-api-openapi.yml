@@ -1,0 +1,155 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Inbounds API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Inbounds
+  description: Inbound messages (Mobile Originated) are incoming messages sent to your short codes or long numbers from mobile phones.
+paths:
+  /xms/v1/{service_plan_id}/inbounds:
+    get:
+      operationId: listInboundMessages
+      summary: List Inbound Messages
+      description: Returns a list of inbound (Mobile Originated) messages with pagination support. Messages can be filtered by start date and end date.
+      tags:
+      - Inbounds
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - name: page
+        in: query
+        description: The page number to retrieve
+        schema:
+          type: integer
+          default: 0
+      - name: page_size
+        in: query
+        description: The number of messages per page
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+      - name: to
+        in: query
+        description: Filter by destination number
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Filter messages received after this date
+        schema:
+          type: string
+          format: date-time
+      - name: end_date
+        in: query
+        description: Filter messages received before this date
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: List of inbound messages
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundMessageList'
+        '401':
+          description: Unauthorized
+  /xms/v1/{service_plan_id}/inbounds/{inbound_id}:
+    get:
+      operationId: getInboundMessage
+      summary: Get an Inbound Message
+      description: Returns the details of a specific inbound message.
+      tags:
+      - Inbounds
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - name: inbound_id
+        in: path
+        required: true
+        description: The unique identifier of the inbound message
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Inbound message details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InboundMessage'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Message not found
+components:
+  parameters:
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
+  schemas:
+    InboundMessage:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique inbound message identifier
+        from:
+          type: string
+          description: The sender phone number
+        to:
+          type: string
+          description: The destination number
+        body:
+          type: string
+          description: The message body
+        type:
+          type: string
+          description: The message type
+        received_at:
+          type: string
+          format: date-time
+          description: When the message was received
+        operator_id:
+          type: string
+          description: The mobile operator identifier
+        client_reference:
+          type: string
+          description: Client reference from the original batch
+    InboundMessageList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of inbound messages
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of messages per page
+        inbounds:
+          type: array
+          description: List of inbound message objects
+          items:
+            $ref: '#/components/schemas/InboundMessage'
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

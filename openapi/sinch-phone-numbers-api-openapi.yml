@@ -1,0 +1,130 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Phone Numbers API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Phone Numbers
+  description: Assign and remove phone numbers from SIP trunks for inbound and outbound calling.
+paths:
+  /v1/projects/{project_id}/trunks/{trunk_id}/phoneNumbers:
+    get:
+      operationId: listTrunkPhoneNumbers
+      summary: List Phone Numbers for a Trunk
+      description: Returns the list of phone numbers assigned to a specific SIP trunk.
+      tags:
+      - Phone Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: List of phone numbers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrunkPhoneNumberList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: addPhoneNumberToTrunk
+      summary: Add Phone Number to Trunk
+      description: Assigns a phone number to a SIP trunk for inbound and outbound calling.
+      tags:
+      - Phone Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddPhoneNumberRequest'
+      responses:
+        '200':
+          description: Phone number added
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/trunks/{trunk_id}/phoneNumbers/{phone_number}:
+    delete:
+      operationId: removePhoneNumberFromTrunk
+      summary: Remove Phone Number from Trunk
+      description: Removes a phone number from a SIP trunk.
+      tags:
+      - Phone Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      - name: phone_number
+        in: path
+        required: true
+        description: The phone number in E.164 format
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Phone number removed
+        '401':
+          description: Unauthorized
+        '404':
+          description: Phone number not found
+components:
+  schemas:
+    AddPhoneNumberRequest:
+      type: object
+      required:
+      - phoneNumber
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in E.164 format to assign
+    TrunkPhoneNumberList:
+      type: object
+      properties:
+        phoneNumbers:
+          type: array
+          description: List of phone numbers
+          items:
+            type: object
+            properties:
+              phoneNumber:
+                type: string
+                description: The phone number in E.164 format
+              trunkId:
+                type: string
+                description: The trunk ID
+  parameters:
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

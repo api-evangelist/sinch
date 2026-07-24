@@ -1,0 +1,265 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Groups API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Groups
+  description: Groups are sets of phone numbers (MSISDNs) that can be used as targets when sending SMS. A phone number can only occur once in a group.
+paths:
+  /xms/v1/{service_plan_id}/groups:
+    post:
+      operationId: createGroup
+      summary: Create a Group
+      description: Creates a new group of phone numbers that can be used as recipients when sending SMS batches.
+      tags:
+      - Groups
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGroupRequest'
+      responses:
+        '201':
+          description: Group created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+    get:
+      operationId: listGroups
+      summary: List Groups
+      description: Returns a list of groups with pagination support.
+      tags:
+      - Groups
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - name: page
+        in: query
+        description: The page number to retrieve
+        schema:
+          type: integer
+          default: 0
+      - name: page_size
+        in: query
+        description: The number of groups per page
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+      responses:
+        '200':
+          description: List of groups
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GroupList'
+        '401':
+          description: Unauthorized
+  /xms/v1/{service_plan_id}/groups/{group_id}:
+    get:
+      operationId: getGroup
+      summary: Get a Group
+      description: Returns the details of a specific group.
+      tags:
+      - Groups
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/GroupId'
+      responses:
+        '200':
+          description: Group details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Group not found
+    post:
+      operationId: updateGroup
+      summary: Update a Group
+      description: Updates an existing group by adding or removing members or changing the group name.
+      tags:
+      - Groups
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/GroupId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGroupRequest'
+      responses:
+        '200':
+          description: Group updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Group'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Group not found
+    delete:
+      operationId: deleteGroup
+      summary: Delete a Group
+      description: Deletes a group and all its members.
+      tags:
+      - Groups
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/GroupId'
+      responses:
+        '200':
+          description: Group deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Group not found
+  /xms/v1/{service_plan_id}/groups/{group_id}/members:
+    get:
+      operationId: getGroupMembers
+      summary: Get Group Members
+      description: Returns the list of phone numbers that are members of the specified group.
+      tags:
+      - Groups
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/GroupId'
+      responses:
+        '200':
+          description: List of group members
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: string
+        '401':
+          description: Unauthorized
+        '404':
+          description: Group not found
+components:
+  schemas:
+    GroupList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of groups
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of groups per page
+        groups:
+          type: array
+          description: List of group objects
+          items:
+            $ref: '#/components/schemas/Group'
+    UpdateGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Updated group name
+        add:
+          type: array
+          description: Phone numbers to add to the group
+          items:
+            type: string
+        remove:
+          type: array
+          description: Phone numbers to remove from the group
+          items:
+            type: string
+        add_from_group:
+          type: string
+          description: Add all members from another group
+        remove_from_group:
+          type: string
+          description: Remove all members that are in another group
+    CreateGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the group
+        members:
+          type: array
+          description: List of phone numbers to add as members
+          items:
+            type: string
+        child_groups:
+          type: array
+          description: List of child group IDs
+          items:
+            type: string
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique group identifier
+        name:
+          type: string
+          description: The group name
+        size:
+          type: integer
+          description: The number of members in the group
+        created_at:
+          type: string
+          format: date-time
+          description: When the group was created
+        modified_at:
+          type: string
+          format: date-time
+          description: When the group was last modified
+        child_groups:
+          type: array
+          description: List of child group IDs
+          items:
+            type: string
+  parameters:
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
+    GroupId:
+      name: group_id
+      in: path
+      required: true
+      description: The unique identifier for the group
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

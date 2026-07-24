@@ -1,0 +1,140 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Calls API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Calls
+  description: Manage ongoing calls or retrieve information about a call. Supports updating call properties and hanging up calls.
+paths:
+  /calling/v1/calls/id/{call_id}:
+    get:
+      operationId: getCall
+      summary: Get Call Information
+      description: Returns information about a specific call identified by the call ID.
+      tags:
+      - Calls
+      parameters:
+      - $ref: '#/components/parameters/CallId'
+      responses:
+        '200':
+          description: Call details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallInformation'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Call not found
+    patch:
+      operationId: updateCall
+      summary: Update a Call
+      description: Updates an ongoing call with SVAML instructions. Can be used to play prompts, connect calls, or hang up.
+      tags:
+      - Calls
+      parameters:
+      - $ref: '#/components/parameters/CallId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SVAMLControl'
+      responses:
+        '200':
+          description: Call updated
+        '401':
+          description: Unauthorized
+        '404':
+          description: Call not found
+components:
+  schemas:
+    Price:
+      type: object
+      properties:
+        currencyId:
+          type: string
+          description: The currency code
+        amount:
+          type: number
+          description: The amount
+    CallInformation:
+      type: object
+      properties:
+        from:
+          type: string
+          description: The caller number
+        to:
+          type: string
+          description: The callee number
+        domain:
+          type: string
+          description: The call domain
+        callId:
+          type: string
+          description: The unique call identifier
+        duration:
+          type: integer
+          description: The call duration in seconds
+        status:
+          type: string
+          description: The current call status
+        result:
+          type: string
+          description: The call result
+        reason:
+          type: string
+          description: The reason for call disconnection
+        timestamp:
+          type: string
+          format: date-time
+          description: When the call was initiated
+        userRate:
+          $ref: '#/components/schemas/Price'
+        debit:
+          $ref: '#/components/schemas/Price'
+    SVAMLControl:
+      type: object
+      properties:
+        action:
+          type: object
+          description: The SVAML action to execute
+          properties:
+            name:
+              type: string
+              description: The action name
+        instructions:
+          type: array
+          description: List of SVAML instructions
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The instruction name
+  parameters:
+    CallId:
+      name: call_id
+      in: path
+      required: true
+      description: The unique call identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

@@ -1,0 +1,366 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Batches API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Batches
+  description: Batches are sets of SMS messages. You can send a single message or many messages at once. Batches are queued and sent at the rate limit in first-in-first-out order.
+paths:
+  /xms/v1/{service_plan_id}/batches:
+    post:
+      operationId: sendBatch
+      summary: Send a Batch Message
+      description: Sends a batch of SMS messages. A batch can contain one or more messages to one or more recipients. The API supports scheduled delivery, parameterized messages, and delivery report configuration.
+      tags:
+      - Batches
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendBatchRequest'
+      responses:
+        '201':
+          description: Batch created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+    get:
+      operationId: listBatches
+      summary: List Batches
+      description: Returns a list of batches with pagination support. You can filter batches by various criteria including start date and end date.
+      tags:
+      - Batches
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - name: page
+        in: query
+        description: The page number to retrieve
+        schema:
+          type: integer
+          default: 0
+      - name: page_size
+        in: query
+        description: The number of batches per page
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+      - name: from
+        in: query
+        description: Filter batches sent from this date
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        description: Filter batches sent up to this date
+        schema:
+          type: string
+          format: date-time
+      responses:
+        '200':
+          description: List of batches
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchList'
+        '401':
+          description: Unauthorized
+  /xms/v1/{service_plan_id}/batches/{batch_id}:
+    get:
+      operationId: getBatch
+      summary: Get a Batch
+      description: Returns the details of a specific batch identified by the batch ID.
+      tags:
+      - Batches
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
+      responses:
+        '200':
+          description: Batch details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Batch not found
+    post:
+      operationId: updateBatch
+      summary: Update a Batch
+      description: Updates a batch message. Only batches that have not yet been delivered can be updated.
+      tags:
+      - Batches
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateBatchRequest'
+      responses:
+        '200':
+          description: Batch updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Batch not found
+  /xms/v1/{service_plan_id}/batches/{batch_id}/cancel:
+    put:
+      operationId: cancelBatch
+      summary: Cancel a Batch
+      description: Cancels a batch that has not yet been delivered. A batch can only be canceled if it has not yet started sending.
+      tags:
+      - Batches
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
+      responses:
+        '200':
+          description: Batch canceled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Batch'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Batch not found
+  /xms/v1/{service_plan_id}/batches/{batch_id}/dry_run:
+    post:
+      operationId: dryRunBatch
+      summary: Dry Run a Batch
+      description: Performs a dry run of a batch without actually sending messages. This can be used to validate the batch configuration and estimate the number of recipients.
+      tags:
+      - Batches
+      parameters:
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
+      responses:
+        '200':
+          description: Dry run result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DryRunResponse'
+        '401':
+          description: Unauthorized
+components:
+  schemas:
+    Batch:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique batch identifier
+        to:
+          type: array
+          description: List of recipients
+          items:
+            type: string
+        from:
+          type: string
+          description: The sender number
+        body:
+          type: string
+          description: The message body
+        type:
+          type: string
+          description: The batch type
+        created_at:
+          type: string
+          format: date-time
+          description: When the batch was created
+        modified_at:
+          type: string
+          format: date-time
+          description: When the batch was last modified
+        canceled:
+          type: boolean
+          description: Whether the batch has been canceled
+        delivery_report:
+          type: string
+          description: The delivery report type
+        send_at:
+          type: string
+          format: date-time
+          description: The scheduled send time
+        expire_at:
+          type: string
+          format: date-time
+          description: The expiration time
+    SendBatchRequest:
+      type: object
+      required:
+      - to
+      - from
+      - body
+      properties:
+        to:
+          type: array
+          description: List of recipient phone numbers in E.164 format or group IDs
+          items:
+            type: string
+        from:
+          type: string
+          description: The sender phone number in E.164 format or short code
+        body:
+          type: string
+          description: The message body text
+        type:
+          type: string
+          enum:
+          - mt_text
+          - mt_binary
+          description: The type of batch message
+        delivery_report:
+          type: string
+          enum:
+          - none
+          - summary
+          - full
+          - per_recipient
+          description: The type of delivery report requested
+        send_at:
+          type: string
+          format: date-time
+          description: Scheduled send time for the batch
+        expire_at:
+          type: string
+          format: date-time
+          description: Expiration time for undelivered messages
+        callback_url:
+          type: string
+          format: uri
+          description: URL to receive delivery report callbacks
+        flash_message:
+          type: boolean
+          description: Whether to send as a flash message
+          default: false
+        parameters:
+          type: object
+          description: Parameterized message substitution values
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: string
+    BatchList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of batches
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of batches per page
+        batches:
+          type: array
+          description: List of batch objects
+          items:
+            $ref: '#/components/schemas/Batch'
+    UpdateBatchRequest:
+      type: object
+      properties:
+        to_add:
+          type: array
+          description: Phone numbers to add to the batch
+          items:
+            type: string
+        to_remove:
+          type: array
+          description: Phone numbers to remove from the batch
+          items:
+            type: string
+        from:
+          type: string
+          description: Updated sender number
+        body:
+          type: string
+          description: Updated message body
+        delivery_report:
+          type: string
+          enum:
+          - none
+          - summary
+          - full
+          - per_recipient
+          description: Updated delivery report type
+    DryRunResponse:
+      type: object
+      properties:
+        number_of_recipients:
+          type: integer
+          description: The estimated number of recipients
+        number_of_messages:
+          type: integer
+          description: The estimated number of messages
+        per_recipient:
+          type: array
+          description: Per-recipient details
+          items:
+            type: object
+            properties:
+              recipient:
+                type: string
+                description: The recipient phone number
+              number_of_parts:
+                type: integer
+                description: The number of message parts
+              body:
+                type: string
+                description: The rendered message body
+              encoding:
+                type: string
+                description: The message encoding
+  parameters:
+    BatchId:
+      name: batch_id
+      in: path
+      required: true
+      description: The unique identifier for the batch
+      schema:
+        type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

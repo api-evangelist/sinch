@@ -1,0 +1,148 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Fax to Email API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Fax to Email
+  description: Configure fax-to-email forwarding for incoming faxes on a service.
+paths:
+  /v3/projects/{project_id}/services/{service_id}/emails:
+    post:
+      operationId: createFaxToEmail
+      summary: Create a Fax-to-email Configuration
+      description: Configures an email address to receive incoming faxes for a specific fax service.
+      tags:
+      - Fax to Email
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ServiceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FaxToEmailRequest'
+      responses:
+        '200':
+          description: Fax-to-email configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaxToEmail'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+    get:
+      operationId: listFaxToEmails
+      summary: List Fax-to-email Configurations
+      description: Returns the list of email addresses configured for fax-to-email on a service.
+      tags:
+      - Fax to Email
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ServiceId'
+      responses:
+        '200':
+          description: List of fax-to-email configurations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaxToEmailList'
+        '401':
+          description: Unauthorized
+  /v3/projects/{project_id}/services/{service_id}/emails/{email}:
+    delete:
+      operationId: deleteFaxToEmail
+      summary: Delete a Fax-to-email Configuration
+      description: Removes an email address from the fax-to-email configuration.
+      tags:
+      - Fax to Email
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ServiceId'
+      - name: email
+        in: path
+        required: true
+        description: The email address to remove
+        schema:
+          type: string
+          format: email
+      responses:
+        '200':
+          description: Fax-to-email configuration removed
+        '401':
+          description: Unauthorized
+        '404':
+          description: Configuration not found
+components:
+  parameters:
+    ServiceId:
+      name: service_id
+      in: path
+      required: true
+      description: The unique service identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  schemas:
+    FaxToEmailList:
+      type: object
+      properties:
+        emails:
+          type: array
+          description: List of fax-to-email configurations
+          items:
+            $ref: '#/components/schemas/FaxToEmail'
+    FaxToEmailRequest:
+      type: object
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          format: email
+          description: The email address for fax-to-email
+        phoneNumber:
+          type: string
+          description: Specific phone number to associate
+    FaxToEmail:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: The configured email address
+        phoneNumber:
+          type: string
+          description: The associated phone number
+        serviceId:
+          type: string
+          description: The service ID
+        projectId:
+          type: string
+          description: The project ID
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

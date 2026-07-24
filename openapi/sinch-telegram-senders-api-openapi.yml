@@ -1,0 +1,117 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Telegram Senders API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Telegram Senders
+  description: Manage Telegram bot sender identities for messaging through the Conversation API.
+paths:
+  /v1/projects/{project_id}/telegram/senders:
+    get:
+      operationId: listTelegramSenders
+      summary: List Telegram Senders
+      description: Returns a list of all Telegram bot senders configured for the project.
+      tags:
+      - Telegram Senders
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: List of Telegram senders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SenderList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createTelegramSender
+      summary: Create a Telegram Sender
+      description: Creates a new Telegram bot sender for messaging through the Conversation API.
+      tags:
+      - Telegram Senders
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSenderRequest'
+      responses:
+        '200':
+          description: Sender created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+components:
+  schemas:
+    Sender:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique sender identifier
+        name:
+          type: string
+          description: The sender name
+        status:
+          type: string
+          description: The sender status
+        channelCredentials:
+          type: object
+          description: Channel-specific credentials
+        createTime:
+          type: string
+          format: date-time
+          description: When the sender was created
+    SenderList:
+      type: object
+      properties:
+        senders:
+          type: array
+          description: List of senders
+          items:
+            $ref: '#/components/schemas/Sender'
+    CreateSenderRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The sender name
+        channelCredentials:
+          type: object
+          description: Channel-specific credentials and configuration
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

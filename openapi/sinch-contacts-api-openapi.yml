@@ -1,0 +1,306 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Contacts API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Contacts
+  description: Manage contacts and their channel identities. Contacts group together underlying connected channel recipient identities.
+paths:
+  /v1/projects/{project_id}/contacts:
+    post:
+      operationId: createContact
+      summary: Create a Contact
+      description: Creates a new contact with one or more channel identities.
+      tags:
+      - Contacts
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateContactRequest'
+      responses:
+        '200':
+          description: Contact created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+    get:
+      operationId: listContacts
+      summary: List Contacts
+      description: Returns a list of contacts in the project with pagination support.
+      tags:
+      - Contacts
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: page_size
+        in: query
+        description: The number of contacts per page
+        schema:
+          type: integer
+          default: 10
+      - name: page_token
+        in: query
+        description: Pagination token for the next page
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of contacts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ContactList'
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/contacts/{contact_id}:
+    get:
+      operationId: getContact
+      summary: Get a Contact
+      description: Returns the details of a specific contact.
+      tags:
+      - Contacts
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ContactId'
+      responses:
+        '200':
+          description: Contact details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Contact not found
+    patch:
+      operationId: updateContact
+      summary: Update a Contact
+      description: Updates the properties of a specific contact.
+      tags:
+      - Contacts
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ContactId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateContactRequest'
+      responses:
+        '200':
+          description: Contact updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Contact not found
+    delete:
+      operationId: deleteContact
+      summary: Delete a Contact
+      description: Deletes a specific contact and all associated data.
+      tags:
+      - Contacts
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ContactId'
+      responses:
+        '200':
+          description: Contact deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Contact not found
+  /v1/projects/{project_id}/contacts:merge:
+    post:
+      operationId: mergeContacts
+      summary: Merge Contacts
+      description: Merges two contacts into one, combining their channel identities and conversation history.
+      tags:
+      - Contacts
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - destination_id
+              - source_id
+              properties:
+                destination_id:
+                  type: string
+                  description: The contact ID to merge into
+                source_id:
+                  type: string
+                  description: The contact ID to merge from
+      responses:
+        '200':
+          description: Contacts merged
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Contact'
+        '401':
+          description: Unauthorized
+components:
+  schemas:
+    UpdateContactRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+          description: Updated display name
+        email:
+          type: string
+          format: email
+          description: Updated email address
+        external_id:
+          type: string
+          description: Updated external identifier
+        language:
+          type: string
+          description: Updated preferred language
+        metadata:
+          type: string
+          description: Updated metadata
+        channel_identities:
+          type: array
+          description: Updated channel identities
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
+    CreateContactRequest:
+      type: object
+      required:
+      - channel_identities
+      properties:
+        display_name:
+          type: string
+          description: The display name
+        email:
+          type: string
+          format: email
+          description: The email address
+        external_id:
+          type: string
+          description: An external identifier
+        language:
+          type: string
+          description: The preferred language
+        metadata:
+          type: string
+          description: Contact metadata
+        channel_identities:
+          type: array
+          description: Channel identities
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
+    ChannelIdentity:
+      type: object
+      properties:
+        channel:
+          type: string
+          enum:
+          - SMS
+          - RCS
+          - WHATSAPP
+          - MESSENGER
+          - INSTAGRAM
+          - VIBER
+          - VIBERBM
+          - TELEGRAM
+          - KAKAOTALK
+          - LINE
+          - MMS
+          description: The channel type
+        identity:
+          type: string
+          description: The channel-specific identity
+        app_id:
+          type: string
+          description: The app ID for the channel
+    ContactList:
+      type: object
+      properties:
+        contacts:
+          type: array
+          description: List of contacts
+          items:
+            $ref: '#/components/schemas/Contact'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique contact identifier
+        display_name:
+          type: string
+          description: The display name of the contact
+        email:
+          type: string
+          format: email
+          description: The contact email address
+        external_id:
+          type: string
+          description: An external identifier for the contact
+        language:
+          type: string
+          description: The preferred language of the contact
+        metadata:
+          type: string
+          description: Contact metadata
+        channel_identities:
+          type: array
+          description: The channel identities for the contact
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
+  parameters:
+    ContactId:
+      name: contact_id
+      in: path
+      required: true
+      description: The unique contact identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

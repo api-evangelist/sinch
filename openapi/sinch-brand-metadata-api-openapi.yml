@@ -1,0 +1,77 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Brand Metadata API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Brand Metadata
+  description: Retrieve metadata about brand configuration options and requirements.
+paths:
+  /v1/projects/{project_id}/brand-metadata:
+    get:
+      operationId: getBrandMetadata
+      summary: Get Brand Metadata
+      description: Returns metadata about brand configuration options including available industries, entity types, and required fields.
+      tags:
+      - Brand Metadata
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: Brand metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandMetadata'
+        '401':
+          description: Unauthorized
+components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  schemas:
+    BrandMetadata:
+      type: object
+      properties:
+        entityTypes:
+          type: array
+          description: Available entity types
+          items:
+            type: string
+        verticalTypes:
+          type: array
+          description: Available business verticals
+          items:
+            type: string
+        requiredFields:
+          type: array
+          description: Required fields for brand creation
+          items:
+            type: string
+        countries:
+          type: array
+          description: Supported countries
+          items:
+            type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

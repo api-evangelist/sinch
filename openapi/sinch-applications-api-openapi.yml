@@ -1,0 +1,202 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Applications API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Applications
+  description: Manage Voice API applications including retrieving application configuration, updating settings, and managing assigned numbers.
+paths:
+  /calling/v1/configuration/numbers:
+    get:
+      operationId: getNumbers
+      summary: Get Numbers Assigned to Application
+      description: Returns the list of phone numbers assigned to the Voice API application.
+      tags:
+      - Applications
+      responses:
+        '200':
+          description: List of numbers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NumberList'
+        '401':
+          description: Unauthorized
+  /calling/v1/configuration/callbacks/applications/{application_key}:
+    get:
+      operationId: getApplicationCallbacks
+      summary: Get Application Callback Urls
+      description: Returns the callback URLs configured for a specific application.
+      tags:
+      - Applications
+      parameters:
+      - $ref: '#/components/parameters/ApplicationKey'
+      responses:
+        '200':
+          description: Application callback configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApplicationCallbacks'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Application not found
+    post:
+      operationId: updateApplicationCallbacks
+      summary: Update Application Callback Urls
+      description: Updates the callback URLs for a specific application.
+      tags:
+      - Applications
+      parameters:
+      - $ref: '#/components/parameters/ApplicationKey'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ApplicationCallbacks'
+      responses:
+        '200':
+          description: Callbacks updated
+        '401':
+          description: Unauthorized
+        '404':
+          description: Application not found
+  /calling/v1/configuration/numbers/{number}:
+    get:
+      operationId: getNumberConfiguration
+      summary: Get Number Configuration
+      description: Returns the configuration for a specific phone number.
+      tags:
+      - Applications
+      parameters:
+      - name: number
+        in: path
+        required: true
+        description: The phone number in E.164 format
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Number configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NumberConfiguration'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Number not found
+    post:
+      operationId: updateNumberConfiguration
+      summary: Update Number Configuration
+      description: Updates the configuration for a specific phone number including the application key assignment and capability.
+      tags:
+      - Applications
+      parameters:
+      - name: number
+        in: path
+        required: true
+        description: The phone number in E.164 format
+        schema:
+          type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NumberConfiguration'
+      responses:
+        '200':
+          description: Number configuration updated
+        '401':
+          description: Unauthorized
+        '404':
+          description: Number not found
+    delete:
+      operationId: unassignNumber
+      summary: Unassign a Number
+      description: Unassigns a phone number from the application.
+      tags:
+      - Applications
+      parameters:
+      - name: number
+        in: path
+        required: true
+        description: The phone number in E.164 format
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Number unassigned
+        '401':
+          description: Unauthorized
+        '404':
+          description: Number not found
+components:
+  schemas:
+    NumberList:
+      type: object
+      properties:
+        numbers:
+          type: array
+          description: List of phone numbers
+          items:
+            $ref: '#/components/schemas/NumberConfiguration'
+    ApplicationCallbacks:
+      type: object
+      properties:
+        url:
+          type: object
+          description: Callback URL configuration
+          properties:
+            primary:
+              type: string
+              format: uri
+              description: The primary callback URL
+            fallback:
+              type: string
+              format: uri
+              description: The fallback callback URL
+    NumberConfiguration:
+      type: object
+      properties:
+        number:
+          type: string
+          description: The phone number in E.164 format
+        applicationKey:
+          type: string
+          description: The application key the number is assigned to
+        capability:
+          type: string
+          enum:
+          - voice
+          - sms
+          description: The number capability
+  parameters:
+    ApplicationKey:
+      name: application_key
+      in: path
+      required: true
+      description: The application key
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

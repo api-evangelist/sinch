@@ -1,0 +1,96 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Events API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Events
+  description: Send and receive events such as composing indicators across supported channels.
+paths:
+  /v1/projects/{project_id}/events:send:
+    post:
+      operationId: sendEvent
+      summary: Send an Event
+      description: Sends an event such as a composing indicator to a contact on a specific channel.
+      tags:
+      - Events
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEventRequest'
+      responses:
+        '200':
+          description: Event sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEventResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  schemas:
+    SendEventRequest:
+      type: object
+      required:
+      - app_id
+      - recipient
+      - event
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        recipient:
+          type: object
+          description: The event recipient
+          properties:
+            contact_id:
+              type: string
+              description: The contact ID
+        event:
+          type: object
+          description: The event to send
+          properties:
+            composing_event:
+              type: object
+              description: Composing indicator event
+    SendEventResponse:
+      type: object
+      properties:
+        event_id:
+          type: string
+          description: The unique event identifier
+        accepted_time:
+          type: string
+          format: date-time
+          description: When the event was accepted
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

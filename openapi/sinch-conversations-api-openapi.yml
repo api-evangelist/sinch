@@ -1,0 +1,261 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Conversations API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Conversations
+  description: Manage conversations which are collections of messages tied to a specific app and contact.
+paths:
+  /v1/projects/{project_id}/conversations:
+    get:
+      operationId: listConversations
+      summary: List Conversations
+      description: Returns a list of conversations for a project with optional filtering.
+      tags:
+      - Conversations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: only_active
+        in: query
+        description: Only return active conversations
+        schema:
+          type: boolean
+      - name: app_id
+        in: query
+        description: Filter by app ID
+        schema:
+          type: string
+      - name: contact_id
+        in: query
+        description: Filter by contact ID
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        description: The number of conversations per page
+        schema:
+          type: integer
+          default: 10
+      - name: page_token
+        in: query
+        description: Pagination token for the next page
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of conversations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createConversation
+      summary: Create a Conversation
+      description: Creates a new conversation associated with a contact and app.
+      tags:
+      - Conversations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateConversationRequest'
+      responses:
+        '200':
+          description: Conversation created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/conversations/{conversation_id}:
+    get:
+      operationId: getConversation
+      summary: Get a Conversation
+      description: Returns the details of a specific conversation.
+      tags:
+      - Conversations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ConversationId'
+      responses:
+        '200':
+          description: Conversation details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conversation not found
+    patch:
+      operationId: updateConversation
+      summary: Update a Conversation
+      description: Updates the properties of a specific conversation.
+      tags:
+      - Conversations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ConversationId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateConversationRequest'
+      responses:
+        '200':
+          description: Conversation updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Conversation'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conversation not found
+    delete:
+      operationId: deleteConversation
+      summary: Delete a Conversation
+      description: Deletes a specific conversation and optionally its messages.
+      tags:
+      - Conversations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ConversationId'
+      responses:
+        '200':
+          description: Conversation deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conversation not found
+  /v1/projects/{project_id}/conversations/{conversation_id}:stop:
+    post:
+      operationId: stopConversation
+      summary: Stop a Conversation
+      description: Stops an active conversation, marking it as inactive.
+      tags:
+      - Conversations
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ConversationId'
+      responses:
+        '200':
+          description: Conversation stopped
+        '401':
+          description: Unauthorized
+        '404':
+          description: Conversation not found
+components:
+  schemas:
+    ConversationList:
+      type: object
+      properties:
+        conversations:
+          type: array
+          description: List of conversations
+          items:
+            $ref: '#/components/schemas/Conversation'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
+    Conversation:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique conversation identifier
+        app_id:
+          type: string
+          description: The app ID
+        contact_id:
+          type: string
+          description: The contact ID
+        active:
+          type: boolean
+          description: Whether the conversation is active
+        active_channel:
+          type: string
+          description: The currently active channel
+        metadata:
+          type: string
+          description: Conversation metadata
+        metadata_json:
+          type: object
+          description: Structured conversation metadata
+    UpdateConversationRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: Updated active status
+        active_channel:
+          type: string
+          description: Updated active channel
+        metadata:
+          type: string
+          description: Updated metadata
+    CreateConversationRequest:
+      type: object
+      required:
+      - app_id
+      - contact_id
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        contact_id:
+          type: string
+          description: The contact ID
+        active:
+          type: boolean
+          description: Whether the conversation is active
+          default: true
+        active_channel:
+          type: string
+          description: The active channel
+        metadata:
+          type: string
+          description: Conversation metadata
+  parameters:
+    ConversationId:
+      name: conversation_id
+      in: path
+      required: true
+      description: The unique conversation identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

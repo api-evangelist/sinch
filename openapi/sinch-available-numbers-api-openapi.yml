@@ -1,0 +1,296 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Available Numbers API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Available Numbers
+  description: Search for available phone numbers by country, type, and capabilities.
+paths:
+  /v1/projects/{project_id}/availableNumbers:
+    get:
+      operationId: listAvailableNumbers
+      summary: List Available Numbers
+      description: Searches for available phone numbers that can be purchased. Results can be filtered by country, type, capabilities, number pattern, and region.
+      tags:
+      - Available Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: regionCode
+        in: query
+        required: true
+        description: The ISO 3166-1 alpha-2 country code
+        schema:
+          type: string
+          minLength: 2
+          maxLength: 2
+      - name: type
+        in: query
+        required: true
+        description: The number type to search for
+        schema:
+          type: string
+          enum:
+          - LOCAL
+          - MOBILE
+          - TOLL_FREE
+      - name: numberPattern.pattern
+        in: query
+        description: Pattern to search for in the phone number
+        schema:
+          type: string
+      - name: numberPattern.searchPattern
+        in: query
+        description: Where in the number to search for the pattern
+        schema:
+          type: string
+          enum:
+          - START
+          - CONTAINS
+          - END
+      - name: capabilities
+        in: query
+        description: Filter by capabilities
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - SMS
+            - VOICE
+      - name: size
+        in: query
+        description: The maximum number of results to return
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+      responses:
+        '200':
+          description: List of available numbers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableNumberList'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/availableNumbers/{phone_number}:
+    get:
+      operationId: getAvailableNumber
+      summary: Get an Available Number
+      description: Returns the details of a specific available phone number including its type, capabilities, and pricing.
+      tags:
+      - Available Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/PhoneNumber'
+      responses:
+        '200':
+          description: Available number details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableNumber'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Number not found
+  /v1/projects/{project_id}/availableNumbers/{phone_number}:rent:
+    post:
+      operationId: rentNumber
+      summary: Rent a Number
+      description: Activates a phone number by renting it for use with Sinch services. The number will be assigned to your project and can be configured for SMS, Voice, or other services.
+      tags:
+      - Available Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/PhoneNumber'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RentNumberRequest'
+      responses:
+        '200':
+          description: Number rented successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActiveNumber'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+        '404':
+          description: Number not available
+components:
+  schemas:
+    RentNumberRequest:
+      type: object
+      properties:
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/VoiceConfiguration'
+        callbackUrl:
+          type: string
+          format: uri
+          description: Callback URL for the number
+    Money:
+      type: object
+      properties:
+        currencyCode:
+          type: string
+          description: The ISO 4217 currency code
+        amount:
+          type: string
+          description: The monetary amount as a string
+    AvailableNumber:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in E.164 format
+        regionCode:
+          type: string
+          description: The ISO 3166-1 alpha-2 country code
+        type:
+          type: string
+          description: The number type
+        capability:
+          type: array
+          description: The number capabilities
+          items:
+            type: string
+        setupPrice:
+          $ref: '#/components/schemas/Money'
+        monthlyPrice:
+          $ref: '#/components/schemas/Money'
+        paymentIntervalMonths:
+          type: integer
+          description: The billing interval in months
+    SmsConfiguration:
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: The SMS service plan ID to associate
+        campaignId:
+          type: string
+          description: The campaign ID for 10DLC
+        scheduledProvisioning:
+          type: object
+          description: Scheduled provisioning details
+          properties:
+            servicePlanId:
+              type: string
+              description: Target service plan ID
+            campaignId:
+              type: string
+              description: Target campaign ID
+            status:
+              type: string
+              description: Provisioning status
+    VoiceConfiguration:
+      type: object
+      properties:
+        appId:
+          type: string
+          description: The Voice API app ID to associate
+        scheduledVoiceProvisioning:
+          type: object
+          description: Scheduled voice provisioning details
+          properties:
+            appId:
+              type: string
+              description: Target app ID
+            status:
+              type: string
+              description: Provisioning status
+    ActiveNumber:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in E.164 format
+        projectId:
+          type: string
+          description: The project ID
+        displayName:
+          type: string
+          description: A display name for the number
+        regionCode:
+          type: string
+          description: The ISO 3166-1 alpha-2 country code
+        type:
+          type: string
+          description: The number type
+        capability:
+          type: array
+          description: The number capabilities
+          items:
+            type: string
+        money:
+          $ref: '#/components/schemas/Money'
+        paymentIntervalMonths:
+          type: integer
+          description: The billing interval in months
+        nextChargeDate:
+          type: string
+          format: date-time
+          description: The next billing date
+        expireAt:
+          type: string
+          format: date-time
+          description: When the number rental expires
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/VoiceConfiguration'
+        callbackUrl:
+          type: string
+          format: uri
+          description: The callback URL for the number
+    AvailableNumberList:
+      type: object
+      properties:
+        availableNumbers:
+          type: array
+          description: List of available numbers
+          items:
+            $ref: '#/components/schemas/AvailableNumber'
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    PhoneNumber:
+      name: phone_number
+      in: path
+      required: true
+      description: The phone number in E.164 format
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

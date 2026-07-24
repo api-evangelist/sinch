@@ -1,45 +1,28 @@
 openapi: 3.1.0
 info:
-  title: Sinch Verification API
-  description: >-
-    The Sinch Verification API provides phone number verification through
-    multiple methods including SMS, flashcalls, phone calls, and data
-    verification. It enables developers to verify user identity by sending
-    one-time codes or initiating automated verification flows. The API can be
-    consumed directly via REST endpoints or through the Sinch Verification
-    SDKs, and supports configurable verification workflows to optimize cost
-    and conversion rates.
+  title: Sinch Brands Access Control Lists Verifications API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
   version: '1.0'
   contact:
     name: Sinch Support
     url: https://www.sinch.com/contact-us/
   termsOfService: https://www.sinch.com/terms-of-service/
-externalDocs:
-  description: Sinch Verification API Documentation
-  url: https://developers.sinch.com/docs/verification
 servers:
-  - url: https://verification.api.sinch.com
-    description: Global Production Server
-tags:
-  - name: Verifications
-    description: >-
-      Start, report, and query the status of phone number verifications using
-      SMS, flashcall, phone call, or data verification methods.
+- url: https://brands.api.sinch.com
+  description: Global Production Server
 security:
-  - basicAuth: []
+- bearerAuth: []
+tags:
+- name: Verifications
+  description: Start, report, and query the status of phone number verifications using SMS, flashcall, phone call, or data verification methods.
 paths:
   /verification/v1/verifications:
     post:
       operationId: startVerification
       summary: Start a Verification
-      description: >-
-        Initiates a new verification request for a phone number. The method
-        parameter determines which verification type is used: SMS sends a
-        one-time code, flashcall triggers a call from a specific number,
-        callout triggers a phone call with a spoken code, and seamless
-        performs data verification.
+      description: 'Initiates a new verification request for a phone number. The method parameter determines which verification type is used: SMS sends a one-time code, flashcall triggers a call from a specific number, callout triggers a phone call with a spoken code, and seamless performs data verification.'
       tags:
-        - Verifications
+      - Verifications
       requestBody:
         required: true
         content:
@@ -61,30 +44,26 @@ paths:
     put:
       operationId: reportVerification
       summary: Report a Verification
-      description: >-
-        Reports the verification code or CLI received by the user back to
-        Sinch to complete the verification process. The type parameter
-        specifies the verification method and the endpoint is the phone
-        number being verified.
+      description: Reports the verification code or CLI received by the user back to Sinch to complete the verification process. The type parameter specifies the verification method and the endpoint is the phone number being verified.
       tags:
-        - Verifications
+      - Verifications
       parameters:
-        - name: type
-          in: path
-          required: true
-          description: The verification method type
-          schema:
-            type: string
-            enum:
-              - sms
-              - flashcall
-              - callout
-        - name: endpoint
-          in: path
-          required: true
-          description: The phone number being verified in E.164 format
-          schema:
-            type: string
+      - name: type
+        in: path
+        required: true
+        description: The verification method type
+        schema:
+          type: string
+          enum:
+          - sms
+          - flashcall
+          - callout
+      - name: endpoint
+        in: path
+        required: true
+        description: The phone number being verified in E.164 format
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -108,18 +87,16 @@ paths:
     put:
       operationId: reportVerificationById
       summary: Report a Verification by Id
-      description: >-
-        Reports the verification result using the verification ID rather
-        than the phone number and method type.
+      description: Reports the verification result using the verification ID rather than the phone number and method type.
       tags:
-        - Verifications
+      - Verifications
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The verification request identifier
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        description: The verification request identifier
+        schema:
+          type: string
       requestBody:
         required: true
         content:
@@ -141,28 +118,26 @@ paths:
     get:
       operationId: getVerificationStatusByIdentity
       summary: Get Verification Status by Identity
-      description: >-
-        Returns the status of a verification request identified by the
-        verification method type and phone number endpoint.
+      description: Returns the status of a verification request identified by the verification method type and phone number endpoint.
       tags:
-        - Verifications
+      - Verifications
       parameters:
-        - name: type
-          in: path
-          required: true
-          description: The verification method type
-          schema:
-            type: string
-            enum:
-              - sms
-              - flashcall
-              - callout
-        - name: endpoint
-          in: path
-          required: true
-          description: The phone number in E.164 format
-          schema:
-            type: string
+      - name: type
+        in: path
+        required: true
+        description: The verification method type
+        schema:
+          type: string
+          enum:
+          - sms
+          - flashcall
+          - callout
+      - name: endpoint
+        in: path
+        required: true
+        description: The phone number in E.164 format
+        schema:
+          type: string
       responses:
         '200':
           description: Verification status
@@ -178,18 +153,16 @@ paths:
     get:
       operationId: getVerificationStatusById
       summary: Get Verification Status by Id
-      description: >-
-        Returns the status of a verification request identified by its
-        unique verification ID.
+      description: Returns the status of a verification request identified by its unique verification ID.
       tags:
-        - Verifications
+      - Verifications
       parameters:
-        - name: id
-          in: path
-          required: true
-          description: The verification request identifier
-          schema:
-            type: string
+      - name: id
+        in: path
+        required: true
+        description: The verification request identifier
+        schema:
+          type: string
       responses:
         '200':
           description: Verification status
@@ -205,18 +178,16 @@ paths:
     get:
       operationId: getVerificationStatusByReference
       summary: Get Verification Status by Reference
-      description: >-
-        Returns the status of a verification request identified by a custom
-        reference string that was provided when the verification was started.
+      description: Returns the status of a verification request identified by a custom reference string that was provided when the verification was started.
       tags:
-        - Verifications
+      - Verifications
       parameters:
-        - name: reference
-          in: path
-          required: true
-          description: The custom reference string
-          schema:
-            type: string
+      - name: reference
+        in: path
+        required: true
+        description: The custom reference string
+        schema:
+          type: string
       responses:
         '200':
           description: Verification status
@@ -229,51 +200,31 @@ paths:
         '404':
           description: Verification not found
 components:
-  securitySchemes:
-    basicAuth:
-      type: http
-      scheme: basic
-      description: >-
-        Application key and secret used for HTTP basic authentication.
   schemas:
-    StartVerificationRequest:
+    ReportVerificationRequest:
       type: object
-      required:
-        - identity
-        - method
       properties:
-        identity:
-          type: object
-          required:
-            - type
-            - endpoint
-          description: The identity to verify
-          properties:
-            type:
-              type: string
-              enum:
-                - number
-              description: The identity type
-            endpoint:
-              type: string
-              description: The phone number in E.164 format
         method:
           type: string
           enum:
-            - sms
-            - flashcall
-            - callout
-            - seamless
-          description: The verification method to use
-        reference:
-          type: string
-          description: A custom reference string for tracking the verification
-        custom:
-          type: string
-          description: Custom data to pass to callbacks
-        metadata:
+          - sms
+          - flashcall
+          - callout
+          description: The verification method
+        sms:
           type: object
-          description: Additional metadata for the verification request
+          description: SMS verification report data
+          properties:
+            code:
+              type: string
+              description: The OTP code received by the user
+        flashcall:
+          type: object
+          description: Flashcall verification report data
+          properties:
+            cli:
+              type: string
+              description: The CLI of the flashcall received
     StartVerificationResponse:
       type: object
       properties:
@@ -314,30 +265,6 @@ components:
               type: string
               format: uri
               description: The target URI for data verification
-    ReportVerificationRequest:
-      type: object
-      properties:
-        method:
-          type: string
-          enum:
-            - sms
-            - flashcall
-            - callout
-          description: The verification method
-        sms:
-          type: object
-          description: SMS verification report data
-          properties:
-            code:
-              type: string
-              description: The OTP code received by the user
-        flashcall:
-          type: object
-          description: Flashcall verification report data
-          properties:
-            cli:
-              type: string
-              description: The CLI of the flashcall received
     ReportVerificationResponse:
       type: object
       properties:
@@ -350,11 +277,11 @@ components:
         status:
           type: string
           enum:
-            - SUCCESSFUL
-            - FAIL
-            - DENIED
-            - ERROR
-            - PENDING
+          - SUCCESSFUL
+          - FAIL
+          - DENIED
+          - ERROR
+          - PENDING
           description: The verification result status
         reason:
           type: string
@@ -371,11 +298,11 @@ components:
         status:
           type: string
           enum:
-            - PENDING
-            - SUCCESSFUL
-            - FAIL
-            - DENIED
-            - ERROR
+          - PENDING
+          - SUCCESSFUL
+          - FAIL
+          - DENIED
+          - ERROR
           description: The current verification status
         reason:
           type: string
@@ -403,3 +330,49 @@ components:
             amount:
               type: number
               description: The price amount
+    StartVerificationRequest:
+      type: object
+      required:
+      - identity
+      - method
+      properties:
+        identity:
+          type: object
+          required:
+          - type
+          - endpoint
+          description: The identity to verify
+          properties:
+            type:
+              type: string
+              enum:
+              - number
+              description: The identity type
+            endpoint:
+              type: string
+              description: The phone number in E.164 format
+        method:
+          type: string
+          enum:
+          - sms
+          - flashcall
+          - callout
+          - seamless
+          description: The verification method to use
+        reference:
+          type: string
+          description: A custom reference string for tracking the verification
+        custom:
+          type: string
+          description: Custom data to pass to callbacks
+        metadata:
+          type: object
+          description: Additional metadata for the verification request
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

@@ -1,0 +1,224 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Apps API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Apps
+  description: Manage Conversation API applications including channel credentials and webhook configurations.
+paths:
+  /v1/projects/{project_id}/apps:
+    get:
+      operationId: listApps
+      summary: List Apps
+      description: Returns a list of all Conversation API apps in the project.
+      tags:
+      - Apps
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: List of apps
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AppList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createApp
+      summary: Create an App
+      description: Creates a new Conversation API app with channel credentials.
+      tags:
+      - Apps
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAppRequest'
+      responses:
+        '200':
+          description: App created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/apps/{app_id}:
+    get:
+      operationId: getApp
+      summary: Get an App
+      description: Returns the details of a specific Conversation API app.
+      tags:
+      - Apps
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/AppId'
+      responses:
+        '200':
+          description: App details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '401':
+          description: Unauthorized
+        '404':
+          description: App not found
+    patch:
+      operationId: updateApp
+      summary: Update an App
+      description: Updates the properties of a specific Conversation API app.
+      tags:
+      - Apps
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/AppId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAppRequest'
+      responses:
+        '200':
+          description: App updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/App'
+        '401':
+          description: Unauthorized
+        '404':
+          description: App not found
+    delete:
+      operationId: deleteApp
+      summary: Delete an App
+      description: Deletes a specific Conversation API app.
+      tags:
+      - Apps
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/AppId'
+      responses:
+        '200':
+          description: App deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: App not found
+components:
+  schemas:
+    ChannelCredential:
+      type: object
+      properties:
+        channel:
+          type: string
+          description: The channel type
+        static_bearer:
+          type: object
+          description: Static bearer token credential
+          properties:
+            claimed_identity:
+              type: string
+              description: The claimed identity
+            token:
+              type: string
+              description: The bearer token
+        static_token:
+          type: object
+          description: Static token credential
+          properties:
+            token:
+              type: string
+              description: The token value
+        callback_secret:
+          type: string
+          description: Secret for validating callbacks from the channel
+    UpdateAppRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+          description: Updated display name
+        channel_credentials:
+          type: array
+          description: Updated channel credentials
+          items:
+            $ref: '#/components/schemas/ChannelCredential'
+    CreateAppRequest:
+      type: object
+      required:
+      - display_name
+      properties:
+        display_name:
+          type: string
+          description: The app display name
+        channel_credentials:
+          type: array
+          description: Channel credential configurations
+          items:
+            $ref: '#/components/schemas/ChannelCredential'
+    App:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique app identifier
+        display_name:
+          type: string
+          description: The app display name
+        channel_credentials:
+          type: array
+          description: Channel credential configurations
+          items:
+            $ref: '#/components/schemas/ChannelCredential'
+        conversation_metadata_report_view:
+          type: string
+          description: Metadata report configuration
+    AppList:
+      type: object
+      properties:
+        apps:
+          type: array
+          description: List of apps
+          items:
+            $ref: '#/components/schemas/App'
+  parameters:
+    AppId:
+      name: app_id
+      in: path
+      required: true
+      description: The unique app identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

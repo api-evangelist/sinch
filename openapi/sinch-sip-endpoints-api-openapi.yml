@@ -1,0 +1,219 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists SIP Endpoints API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: SIP Endpoints
+  description: Manage SIP endpoints that represent your SIP infrastructure such as PBX systems and contact centers.
+paths:
+  /v1/projects/{project_id}/trunks/{trunk_id}/sipEndpoints:
+    get:
+      operationId: listSipEndpoints
+      summary: List Sip Endpoints
+      description: Returns a list of SIP endpoints associated with a specific trunk.
+      tags:
+      - SIP Endpoints
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: List of SIP endpoints
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpointList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createSipEndpoint
+      summary: Create a Sip Endpoint
+      description: Creates a new SIP endpoint representing your SIP infrastructure (PBX, contact center, etc.) and associates it with a trunk.
+      tags:
+      - SIP Endpoints
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSipEndpointRequest'
+      responses:
+        '200':
+          description: SIP endpoint created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpoint'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/trunks/{trunk_id}/sipEndpoints/{endpoint_id}:
+    get:
+      operationId: getSipEndpoint
+      summary: Get a Sip Endpoint
+      description: Returns the details of a specific SIP endpoint.
+      tags:
+      - SIP Endpoints
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      - $ref: '#/components/parameters/EndpointId'
+      responses:
+        '200':
+          description: SIP endpoint details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpoint'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Endpoint not found
+    patch:
+      operationId: updateSipEndpoint
+      summary: Update a Sip Endpoint
+      description: Updates the configuration of a specific SIP endpoint.
+      tags:
+      - SIP Endpoints
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      - $ref: '#/components/parameters/EndpointId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSipEndpointRequest'
+      responses:
+        '200':
+          description: SIP endpoint updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpoint'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Endpoint not found
+    delete:
+      operationId: deleteSipEndpoint
+      summary: Delete a Sip Endpoint
+      description: Deletes a specific SIP endpoint from the trunk.
+      tags:
+      - SIP Endpoints
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      - $ref: '#/components/parameters/EndpointId'
+      responses:
+        '200':
+          description: SIP endpoint deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Endpoint not found
+components:
+  schemas:
+    SipEndpoint:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique endpoint identifier
+        sipAddress:
+          type: string
+          description: The SIP address of the endpoint
+        priority:
+          type: integer
+          description: The endpoint priority for routing
+        enabled:
+          type: boolean
+          description: Whether the endpoint is enabled
+        createTime:
+          type: string
+          format: date-time
+          description: When the endpoint was created
+        updateTime:
+          type: string
+          format: date-time
+          description: When the endpoint was last updated
+    UpdateSipEndpointRequest:
+      type: object
+      properties:
+        sipAddress:
+          type: string
+          description: Updated SIP address
+        priority:
+          type: integer
+          description: Updated priority
+        enabled:
+          type: boolean
+          description: Updated enabled status
+    CreateSipEndpointRequest:
+      type: object
+      required:
+      - sipAddress
+      properties:
+        sipAddress:
+          type: string
+          description: The SIP address for the endpoint
+        priority:
+          type: integer
+          description: Routing priority
+        enabled:
+          type: boolean
+          description: Whether the endpoint is enabled
+          default: true
+    SipEndpointList:
+      type: object
+      properties:
+        sipEndpoints:
+          type: array
+          description: List of SIP endpoints
+          items:
+            $ref: '#/components/schemas/SipEndpoint'
+  parameters:
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    EndpointId:
+      name: endpoint_id
+      in: path
+      required: true
+      description: The unique SIP endpoint identifier
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands

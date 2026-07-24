@@ -1,0 +1,291 @@
+openapi: 3.1.0
+info:
+  title: Sinch Brands Access Control Lists Active Numbers API
+  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://brands.api.sinch.com
+  description: Global Production Server
+security:
+- bearerAuth: []
+tags:
+- name: Active Numbers
+  description: Manage phone numbers that have been purchased and are active in your project, including updating configurations and releasing numbers.
+paths:
+  /v1/projects/{project_id}/activeNumbers:
+    get:
+      operationId: listActiveNumbers
+      summary: List Active Numbers
+      description: Returns a list of all active phone numbers in the project with pagination support. Results can be filtered by country, type, and capabilities.
+      tags:
+      - Active Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: regionCode
+        in: query
+        required: true
+        description: The ISO 3166-1 alpha-2 country code
+        schema:
+          type: string
+      - name: type
+        in: query
+        required: true
+        description: The number type
+        schema:
+          type: string
+          enum:
+          - LOCAL
+          - MOBILE
+          - TOLL_FREE
+      - name: numberPattern.pattern
+        in: query
+        description: Pattern to search for
+        schema:
+          type: string
+      - name: capabilities
+        in: query
+        description: Filter by capabilities
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - SMS
+            - VOICE
+      - name: pageSize
+        in: query
+        description: Number of results per page
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+      - name: pageToken
+        in: query
+        description: Pagination token for the next page
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of active numbers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActiveNumberList'
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/activeNumbers/{phone_number}:
+    get:
+      operationId: getActiveNumber
+      summary: Get an Active Number
+      description: Returns the configuration and details of a specific active number.
+      tags:
+      - Active Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/PhoneNumber'
+      responses:
+        '200':
+          description: Active number details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActiveNumber'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Number not found
+    patch:
+      operationId: updateActiveNumber
+      summary: Update an Active Number
+      description: Updates the configuration of an active number including its display name, SMS and voice configurations, and callback URL.
+      tags:
+      - Active Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/PhoneNumber'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateActiveNumberRequest'
+      responses:
+        '200':
+          description: Number updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActiveNumber'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Number not found
+  /v1/projects/{project_id}/activeNumbers/{phone_number}:release:
+    post:
+      operationId: releaseNumber
+      summary: Release an Active Number
+      description: Releases an active number, removing it from your project. The number will no longer be available for use with Sinch services.
+      tags:
+      - Active Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/PhoneNumber'
+      responses:
+        '200':
+          description: Number released
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ActiveNumber'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Number not found
+components:
+  schemas:
+    Money:
+      type: object
+      properties:
+        currencyCode:
+          type: string
+          description: The ISO 4217 currency code
+        amount:
+          type: string
+          description: The monetary amount as a string
+    UpdateActiveNumberRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Updated display name
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/VoiceConfiguration'
+        callbackUrl:
+          type: string
+          format: uri
+          description: Updated callback URL
+    SmsConfiguration:
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: The SMS service plan ID to associate
+        campaignId:
+          type: string
+          description: The campaign ID for 10DLC
+        scheduledProvisioning:
+          type: object
+          description: Scheduled provisioning details
+          properties:
+            servicePlanId:
+              type: string
+              description: Target service plan ID
+            campaignId:
+              type: string
+              description: Target campaign ID
+            status:
+              type: string
+              description: Provisioning status
+    ActiveNumberList:
+      type: object
+      properties:
+        activeNumbers:
+          type: array
+          description: List of active numbers
+          items:
+            $ref: '#/components/schemas/ActiveNumber'
+        nextPageToken:
+          type: string
+          description: Pagination token for the next page
+        totalSize:
+          type: integer
+          description: Total number of active numbers
+    VoiceConfiguration:
+      type: object
+      properties:
+        appId:
+          type: string
+          description: The Voice API app ID to associate
+        scheduledVoiceProvisioning:
+          type: object
+          description: Scheduled voice provisioning details
+          properties:
+            appId:
+              type: string
+              description: Target app ID
+            status:
+              type: string
+              description: Provisioning status
+    ActiveNumber:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in E.164 format
+        projectId:
+          type: string
+          description: The project ID
+        displayName:
+          type: string
+          description: A display name for the number
+        regionCode:
+          type: string
+          description: The ISO 3166-1 alpha-2 country code
+        type:
+          type: string
+          description: The number type
+        capability:
+          type: array
+          description: The number capabilities
+          items:
+            type: string
+        money:
+          $ref: '#/components/schemas/Money'
+        paymentIntervalMonths:
+          type: integer
+          description: The billing interval in months
+        nextChargeDate:
+          type: string
+          format: date-time
+          description: The next billing date
+        expireAt:
+          type: string
+          format: date-time
+          description: When the number rental expires
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/VoiceConfiguration'
+        callbackUrl:
+          type: string
+          format: uri
+          description: The callback URL for the number
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    PhoneNumber:
+      name: phone_number
+      in: path
+      required: true
+      description: The phone number in E.164 format
+      schema:
+        type: string
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: Bearer token authentication.
+externalDocs:
+  description: Sinch Brands API Documentation
+  url: https://developers.sinch.com/docs/brands
