@@ -1,0 +1,225 @@
+{
+  "info": {
+    "_postman_id": "685a5789-6ad2-48b7-b531-edbd67b63590",
+    "name": "Sinch Brands Access Control Lists Available Regions API",
+    "description": "The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.\n\nContact Support:\n Name: Sinch Support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "createdAt": "2026-07-28T02:54:51.000Z",
+    "updatedAt": "2026-07-28T02:54:51.000Z",
+    "lastUpdatedBy": "35240",
+    "uid": "35240-685a5789-6ad2-48b7-b531-edbd67b63590"
+  },
+  "item": [
+    {
+      "name": "v1",
+      "item": [
+        {
+          "name": "projects",
+          "item": [
+            {
+              "name": "{project_id}",
+              "item": [
+                {
+                  "name": "availableRegions",
+                  "item": [
+                    {
+                      "name": "List Available Regions",
+                      "id": "1be407cd-cad1-4f9c-85dd-2b0743f62827",
+                      "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                      },
+                      "request": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/projects/:project_id/availableRegions?types=TOLL_FREE&types=MOBILE",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "projects",
+                            ":project_id",
+                            "availableRegions"
+                          ],
+                          "query": [
+                            {
+                              "description": "Filter by number types",
+                              "key": "types",
+                              "value": "TOLL_FREE"
+                            },
+                            {
+                              "description": "Filter by number types",
+                              "key": "types",
+                              "value": "MOBILE"
+                            }
+                          ],
+                          "variable": [
+                            {
+                              "id": "b8325689-bdb5-4c4c-b3be-6eb6ac3c11a2",
+                              "key": "project_id",
+                              "value": "<string>",
+                              "description": "(Required) The unique project identifier"
+                            }
+                          ]
+                        },
+                        "description": "Returns a list of available regions and the types of phone numbers that can be provisioned in each region."
+                      },
+                      "response": [
+                        {
+                          "id": "be063c34-d483-4038-bee0-36354500b27a",
+                          "name": "List of available regions",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/availableRegions?types=MOBILE",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "availableRegions"
+                              ],
+                              "query": [
+                                {
+                                  "description": "Filter by number types",
+                                  "key": "types",
+                                  "value": "MOBILE"
+                                }
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": "{\n  \"availableRegions\": [\n    {\n      \"regionCode\": \"<string>\",\n      \"regionName\": \"<string>\",\n      \"types\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    },\n    {\n      \"regionCode\": \"<string>\",\n      \"regionName\": \"<string>\",\n      \"types\": [\n        \"<string>\",\n        \"<string>\"\n      ]\n    }\n  ]\n}",
+                          "createdAt": "2026-07-28T02:54:51.000Z",
+                          "updatedAt": "2026-07-28T02:54:51.000Z",
+                          "uid": "35240-be063c34-d483-4038-bee0-36354500b27a"
+                        },
+                        {
+                          "id": "d6afaafc-937b-4190-88b9-c15619f8b5a8",
+                          "name": "Unauthorized",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/availableRegions?types=MOBILE",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "availableRegions"
+                              ],
+                              "query": [
+                                {
+                                  "description": "Filter by number types",
+                                  "key": "types",
+                                  "value": "MOBILE"
+                                }
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Unauthorized",
+                          "code": 401,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": null,
+                          "createdAt": "2026-07-28T02:54:51.000Z",
+                          "updatedAt": "2026-07-28T02:54:51.000Z",
+                          "uid": "35240-d6afaafc-937b-4190-88b9-c15619f8b5a8"
+                        }
+                      ],
+                      "createdAt": "2026-07-28T02:54:51.000Z",
+                      "updatedAt": "2026-07-28T02:54:51.000Z",
+                      "uid": "35240-1be407cd-cad1-4f9c-85dd-2b0743f62827"
+                    }
+                  ],
+                  "id": "e513dcec-49de-4271-9431-fee66b18b917",
+                  "createdAt": "2026-07-28T02:54:51.000Z",
+                  "updatedAt": "2026-07-28T02:54:51.000Z",
+                  "uid": "35240-e513dcec-49de-4271-9431-fee66b18b917"
+                }
+              ],
+              "id": "645e1256-fe9d-4415-bbcb-439f766bc2af",
+              "createdAt": "2026-07-28T02:54:51.000Z",
+              "updatedAt": "2026-07-28T02:54:51.000Z",
+              "uid": "35240-645e1256-fe9d-4415-bbcb-439f766bc2af"
+            }
+          ],
+          "id": "aebd0e56-7d70-4eeb-ad74-f6c2201682d4",
+          "createdAt": "2026-07-28T02:54:51.000Z",
+          "updatedAt": "2026-07-28T02:54:51.000Z",
+          "uid": "35240-aebd0e56-7d70-4eeb-ad74-f6c2201682d4"
+        }
+      ],
+      "id": "c9e3312a-86f5-44ac-8960-f0db293787e3",
+      "createdAt": "2026-07-28T02:54:51.000Z",
+      "updatedAt": "2026-07-28T02:54:51.000Z",
+      "uid": "35240-c9e3312a-86f5-44ac-8960-f0db293787e3"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://brands.api.sinch.com"
+    }
+  ]
+}

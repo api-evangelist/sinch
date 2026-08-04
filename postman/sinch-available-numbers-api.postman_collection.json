@@ -1,0 +1,878 @@
+{
+  "info": {
+    "_postman_id": "053a9808-eeac-40d8-bc1d-7ca3adfc36ab",
+    "name": "Sinch Brands Access Control Lists Available Numbers API",
+    "description": "The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.\n\nContact Support:\n Name: Sinch Support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "createdAt": "2026-07-28T02:54:50.000Z",
+    "updatedAt": "2026-07-28T02:54:50.000Z",
+    "lastUpdatedBy": "35240",
+    "uid": "35240-053a9808-eeac-40d8-bc1d-7ca3adfc36ab"
+  },
+  "item": [
+    {
+      "name": "v1",
+      "item": [
+        {
+          "name": "projects",
+          "item": [
+            {
+              "name": "{project_id}",
+              "item": [
+                {
+                  "name": "availableNumbers",
+                  "item": [
+                    {
+                      "name": "{phone_number}",
+                      "item": [
+                        {
+                          "name": "Get an Available Number",
+                          "id": "11dfb8c5-8309-41e3-8ede-9ab774ea65ce",
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          },
+                          "request": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers/:phone_number",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "availableNumbers",
+                                ":phone_number"
+                              ],
+                              "variable": [
+                                {
+                                  "id": "a81f0910-ff4e-4e42-b609-63507c95d751",
+                                  "key": "project_id",
+                                  "value": "<string>",
+                                  "description": "(Required) The unique project identifier"
+                                },
+                                {
+                                  "id": "04825382-379d-48a3-8f77-25a05d0d3c02",
+                                  "key": "phone_number",
+                                  "value": "<string>",
+                                  "description": "(Required) The phone number in E.164 format"
+                                }
+                              ]
+                            },
+                            "description": "Returns the details of a specific available phone number including its type, capabilities, and pricing."
+                          },
+                          "response": [
+                            {
+                              "id": "95b3ae7f-3df6-4916-827a-dd37518bfd2e",
+                              "name": "Available number details",
+                              "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "key": "Accept",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers/:phone_number",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "availableNumbers",
+                                    ":phone_number"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    },
+                                    {
+                                      "key": "phone_number"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "json",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "application/json"
+                                }
+                              ],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": "{\n  \"phoneNumber\": \"<string>\",\n  \"regionCode\": \"<string>\",\n  \"type\": \"<string>\",\n  \"capability\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"setupPrice\": {\n    \"currencyCode\": \"<string>\",\n    \"amount\": \"<string>\"\n  },\n  \"monthlyPrice\": {\n    \"currencyCode\": \"<string>\",\n    \"amount\": \"<string>\"\n  },\n  \"paymentIntervalMonths\": \"<integer>\"\n}",
+                              "createdAt": "2026-07-28T02:54:50.000Z",
+                              "updatedAt": "2026-07-28T02:54:50.000Z",
+                              "uid": "35240-95b3ae7f-3df6-4916-827a-dd37518bfd2e"
+                            },
+                            {
+                              "id": "bc165bee-644c-4974-b397-939f7eb05198",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers/:phone_number",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "availableNumbers",
+                                    ":phone_number"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    },
+                                    {
+                                      "key": "phone_number"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:54:50.000Z",
+                              "updatedAt": "2026-07-28T02:54:50.000Z",
+                              "uid": "35240-bc165bee-644c-4974-b397-939f7eb05198"
+                            },
+                            {
+                              "id": "b5719591-cb50-4479-8bb5-847a3d25ec23",
+                              "name": "Number not found",
+                              "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers/:phone_number",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "availableNumbers",
+                                    ":phone_number"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    },
+                                    {
+                                      "key": "phone_number"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Not Found",
+                              "code": 404,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:54:50.000Z",
+                              "updatedAt": "2026-07-28T02:54:50.000Z",
+                              "uid": "35240-b5719591-cb50-4479-8bb5-847a3d25ec23"
+                            }
+                          ],
+                          "createdAt": "2026-07-28T02:54:50.000Z",
+                          "updatedAt": "2026-07-28T02:54:50.000Z",
+                          "uid": "35240-11dfb8c5-8309-41e3-8ede-9ab774ea65ce"
+                        }
+                      ],
+                      "id": "d19e57ef-9028-4162-8dad-aa9753305eb9",
+                      "createdAt": "2026-07-28T02:54:50.000Z",
+                      "updatedAt": "2026-07-28T02:54:50.000Z",
+                      "uid": "35240-d19e57ef-9028-4162-8dad-aa9753305eb9"
+                    },
+                    {
+                      "name": "{phone_number}:rent",
+                      "item": [
+                        {
+                          "name": "Rent a Number",
+                          "id": "892f88e5-ffec-4559-8170-7128212c1e45",
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          },
+                          "request": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"<string>\",\n    \"campaignId\": \"<string>\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"<string>\",\n      \"campaignId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"<string>\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers/{{phone_number}}:rent",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "availableNumbers",
+                                "{{phone_number}}:rent"
+                              ],
+                              "variable": [
+                                {
+                                  "id": "6262b2aa-2676-421a-a11c-4f468fc52704",
+                                  "key": "project_id",
+                                  "value": "<string>",
+                                  "description": "(Required) The unique project identifier"
+                                }
+                              ]
+                            },
+                            "description": "Activates a phone number by renting it for use with Sinch services. The number will be assigned to your project and can be configured for SMS, Voice, or other services."
+                          },
+                          "response": [
+                            {
+                              "id": "4baab2bc-8447-43a2-b3a6-bdd0f2afd905",
+                              "name": "Number rented successfully",
+                              "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"<string>\",\n    \"campaignId\": \"<string>\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"<string>\",\n      \"campaignId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"<string>\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers/{{phone_number}}:rent",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "availableNumbers",
+                                    "{{phone_number}}:rent"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "json",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "application/json"
+                                }
+                              ],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": "{\n  \"phoneNumber\": \"<string>\",\n  \"projectId\": \"<string>\",\n  \"displayName\": \"<string>\",\n  \"regionCode\": \"<string>\",\n  \"type\": \"<string>\",\n  \"capability\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"money\": {\n    \"currencyCode\": \"<string>\",\n    \"amount\": \"<string>\"\n  },\n  \"paymentIntervalMonths\": \"<integer>\",\n  \"nextChargeDate\": \"<dateTime>\",\n  \"expireAt\": \"<dateTime>\",\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"<string>\",\n    \"campaignId\": \"<string>\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"<string>\",\n      \"campaignId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"<string>\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+                              "createdAt": "2026-07-28T02:54:50.000Z",
+                              "updatedAt": "2026-07-28T02:54:50.000Z",
+                              "uid": "35240-4baab2bc-8447-43a2-b3a6-bdd0f2afd905"
+                            },
+                            {
+                              "id": "56efbb0b-dec5-4cee-8bcd-6f57b6f0ccc7",
+                              "name": "Invalid request",
+                              "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"<string>\",\n    \"campaignId\": \"<string>\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"<string>\",\n      \"campaignId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"<string>\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers/{{phone_number}}:rent",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "availableNumbers",
+                                    "{{phone_number}}:rent"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Bad Request",
+                              "code": 400,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:54:50.000Z",
+                              "updatedAt": "2026-07-28T02:54:50.000Z",
+                              "uid": "35240-56efbb0b-dec5-4cee-8bcd-6f57b6f0ccc7"
+                            },
+                            {
+                              "id": "8cb3b214-ec5f-4f1b-add0-c1b54ca49f40",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"<string>\",\n    \"campaignId\": \"<string>\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"<string>\",\n      \"campaignId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"<string>\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers/{{phone_number}}:rent",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "availableNumbers",
+                                    "{{phone_number}}:rent"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:54:50.000Z",
+                              "updatedAt": "2026-07-28T02:54:50.000Z",
+                              "uid": "35240-8cb3b214-ec5f-4f1b-add0-c1b54ca49f40"
+                            },
+                            {
+                              "id": "b24dc629-0ee1-40dd-b667-7ac2447c6363",
+                              "name": "Number not available",
+                              "originalRequest": {
+                                "method": "POST",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"<string>\",\n    \"campaignId\": \"<string>\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"<string>\",\n      \"campaignId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"<string>\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers/{{phone_number}}:rent",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "availableNumbers",
+                                    "{{phone_number}}:rent"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Not Found",
+                              "code": 404,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:54:50.000Z",
+                              "updatedAt": "2026-07-28T02:54:50.000Z",
+                              "uid": "35240-b24dc629-0ee1-40dd-b667-7ac2447c6363"
+                            }
+                          ],
+                          "createdAt": "2026-07-28T02:54:50.000Z",
+                          "updatedAt": "2026-07-28T02:54:50.000Z",
+                          "uid": "35240-892f88e5-ffec-4559-8170-7128212c1e45"
+                        }
+                      ],
+                      "id": "9438882d-c240-4848-be0e-ac50e9559be0",
+                      "createdAt": "2026-07-28T02:54:50.000Z",
+                      "updatedAt": "2026-07-28T02:54:50.000Z",
+                      "uid": "35240-9438882d-c240-4848-be0e-ac50e9559be0"
+                    },
+                    {
+                      "name": "List Available Numbers",
+                      "id": "d636ad8f-ba63-4c2e-a6e2-b65f696b6806",
+                      "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                      },
+                      "request": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers?regionCode=<string>&type=TOLL_FREE&numberPattern.pattern=<string>&numberPattern.searchPattern=END&capabilities=SMS&capabilities=VOICE&size=30",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "projects",
+                            ":project_id",
+                            "availableNumbers"
+                          ],
+                          "query": [
+                            {
+                              "description": "(Required) The ISO 3166-1 alpha-2 country code",
+                              "key": "regionCode",
+                              "value": "<string>"
+                            },
+                            {
+                              "description": "(Required) The number type to search for",
+                              "key": "type",
+                              "value": "TOLL_FREE"
+                            },
+                            {
+                              "description": "Pattern to search for in the phone number",
+                              "key": "numberPattern.pattern",
+                              "value": "<string>"
+                            },
+                            {
+                              "description": "Where in the number to search for the pattern",
+                              "key": "numberPattern.searchPattern",
+                              "value": "END"
+                            },
+                            {
+                              "description": "Filter by capabilities",
+                              "key": "capabilities",
+                              "value": "SMS"
+                            },
+                            {
+                              "description": "Filter by capabilities",
+                              "key": "capabilities",
+                              "value": "VOICE"
+                            },
+                            {
+                              "description": "The maximum number of results to return",
+                              "key": "size",
+                              "value": "30"
+                            }
+                          ],
+                          "variable": [
+                            {
+                              "id": "a3164e09-c7ec-4b56-aaf9-491745d55bd0",
+                              "key": "project_id",
+                              "value": "<string>",
+                              "description": "(Required) The unique project identifier"
+                            }
+                          ]
+                        },
+                        "description": "Searches for available phone numbers that can be purchased. Results can be filtered by country, type, capabilities, number pattern, and region."
+                      },
+                      "response": [
+                        {
+                          "id": "c4cbd4f1-66b8-4122-9f88-a9700f0a0022",
+                          "name": "List of available numbers",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers?regionCode=<string>&type=TOLL_FREE&numberPattern.pattern=<string>&numberPattern.searchPattern=END&capabilities=VOICE&size=30",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "availableNumbers"
+                              ],
+                              "query": [
+                                {
+                                  "description": "(Required) The ISO 3166-1 alpha-2 country code",
+                                  "key": "regionCode",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "(Required) The number type to search for",
+                                  "key": "type",
+                                  "value": "TOLL_FREE"
+                                },
+                                {
+                                  "description": "Pattern to search for in the phone number",
+                                  "key": "numberPattern.pattern",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "Where in the number to search for the pattern",
+                                  "key": "numberPattern.searchPattern",
+                                  "value": "END"
+                                },
+                                {
+                                  "description": "Filter by capabilities",
+                                  "key": "capabilities",
+                                  "value": "VOICE"
+                                },
+                                {
+                                  "description": "The maximum number of results to return",
+                                  "key": "size",
+                                  "value": "30"
+                                }
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": "{\n  \"availableNumbers\": [\n    {\n      \"phoneNumber\": \"<string>\",\n      \"regionCode\": \"<string>\",\n      \"type\": \"<string>\",\n      \"capability\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"setupPrice\": {\n        \"currencyCode\": \"<string>\",\n        \"amount\": \"<string>\"\n      },\n      \"monthlyPrice\": {\n        \"currencyCode\": \"<string>\",\n        \"amount\": \"<string>\"\n      },\n      \"paymentIntervalMonths\": \"<integer>\"\n    },\n    {\n      \"phoneNumber\": \"<string>\",\n      \"regionCode\": \"<string>\",\n      \"type\": \"<string>\",\n      \"capability\": [\n        \"<string>\",\n        \"<string>\"\n      ],\n      \"setupPrice\": {\n        \"currencyCode\": \"<string>\",\n        \"amount\": \"<string>\"\n      },\n      \"monthlyPrice\": {\n        \"currencyCode\": \"<string>\",\n        \"amount\": \"<string>\"\n      },\n      \"paymentIntervalMonths\": \"<integer>\"\n    }\n  ]\n}",
+                          "createdAt": "2026-07-28T02:54:50.000Z",
+                          "updatedAt": "2026-07-28T02:54:50.000Z",
+                          "uid": "35240-c4cbd4f1-66b8-4122-9f88-a9700f0a0022"
+                        },
+                        {
+                          "id": "4871c617-d521-45eb-ac8a-a3957264e2ee",
+                          "name": "Invalid request",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers?regionCode=<string>&type=TOLL_FREE&numberPattern.pattern=<string>&numberPattern.searchPattern=END&capabilities=VOICE&size=30",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "availableNumbers"
+                              ],
+                              "query": [
+                                {
+                                  "description": "(Required) The ISO 3166-1 alpha-2 country code",
+                                  "key": "regionCode",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "(Required) The number type to search for",
+                                  "key": "type",
+                                  "value": "TOLL_FREE"
+                                },
+                                {
+                                  "description": "Pattern to search for in the phone number",
+                                  "key": "numberPattern.pattern",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "Where in the number to search for the pattern",
+                                  "key": "numberPattern.searchPattern",
+                                  "value": "END"
+                                },
+                                {
+                                  "description": "Filter by capabilities",
+                                  "key": "capabilities",
+                                  "value": "VOICE"
+                                },
+                                {
+                                  "description": "The maximum number of results to return",
+                                  "key": "size",
+                                  "value": "30"
+                                }
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": null,
+                          "createdAt": "2026-07-28T02:54:50.000Z",
+                          "updatedAt": "2026-07-28T02:54:50.000Z",
+                          "uid": "35240-4871c617-d521-45eb-ac8a-a3957264e2ee"
+                        },
+                        {
+                          "id": "5f0910e1-e1de-460f-a85c-e855d31b5b74",
+                          "name": "Unauthorized",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/availableNumbers?regionCode=<string>&type=TOLL_FREE&numberPattern.pattern=<string>&numberPattern.searchPattern=END&capabilities=VOICE&size=30",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "availableNumbers"
+                              ],
+                              "query": [
+                                {
+                                  "description": "(Required) The ISO 3166-1 alpha-2 country code",
+                                  "key": "regionCode",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "(Required) The number type to search for",
+                                  "key": "type",
+                                  "value": "TOLL_FREE"
+                                },
+                                {
+                                  "description": "Pattern to search for in the phone number",
+                                  "key": "numberPattern.pattern",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "Where in the number to search for the pattern",
+                                  "key": "numberPattern.searchPattern",
+                                  "value": "END"
+                                },
+                                {
+                                  "description": "Filter by capabilities",
+                                  "key": "capabilities",
+                                  "value": "VOICE"
+                                },
+                                {
+                                  "description": "The maximum number of results to return",
+                                  "key": "size",
+                                  "value": "30"
+                                }
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Unauthorized",
+                          "code": 401,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": null,
+                          "createdAt": "2026-07-28T02:54:50.000Z",
+                          "updatedAt": "2026-07-28T02:54:50.000Z",
+                          "uid": "35240-5f0910e1-e1de-460f-a85c-e855d31b5b74"
+                        }
+                      ],
+                      "createdAt": "2026-07-28T02:54:50.000Z",
+                      "updatedAt": "2026-07-28T02:54:50.000Z",
+                      "uid": "35240-d636ad8f-ba63-4c2e-a6e2-b65f696b6806"
+                    }
+                  ],
+                  "id": "68cdca02-d51d-444a-9989-6519a14ad406",
+                  "createdAt": "2026-07-28T02:54:50.000Z",
+                  "updatedAt": "2026-07-28T02:54:50.000Z",
+                  "uid": "35240-68cdca02-d51d-444a-9989-6519a14ad406"
+                }
+              ],
+              "id": "a35d87f6-da1c-4962-b1f8-ba883660d6ac",
+              "createdAt": "2026-07-28T02:54:50.000Z",
+              "updatedAt": "2026-07-28T02:54:50.000Z",
+              "uid": "35240-a35d87f6-da1c-4962-b1f8-ba883660d6ac"
+            }
+          ],
+          "id": "87bd9f13-e64a-4480-808c-6bb6668f69d9",
+          "createdAt": "2026-07-28T02:54:50.000Z",
+          "updatedAt": "2026-07-28T02:54:50.000Z",
+          "uid": "35240-87bd9f13-e64a-4480-808c-6bb6668f69d9"
+        }
+      ],
+      "id": "defdf72b-21bf-4afc-b51d-68b1656fa04b",
+      "createdAt": "2026-07-28T02:54:50.000Z",
+      "updatedAt": "2026-07-28T02:54:50.000Z",
+      "uid": "35240-defdf72b-21bf-4afc-b51d-68b1656fa04b"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://brands.api.sinch.com"
+    },
+    {
+      "key": "phone_number",
+      "value": "<string>"
+    }
+  ]
+}

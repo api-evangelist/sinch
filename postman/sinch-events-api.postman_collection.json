@@ -1,0 +1,296 @@
+{
+  "info": {
+    "_postman_id": "c9d0723e-d652-4076-b3b8-0a8484f11159",
+    "name": "Sinch Brands Access Control Lists Events API",
+    "description": "The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.\n\nContact Support:\n Name: Sinch Support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "createdAt": "2026-07-28T02:56:33.000Z",
+    "updatedAt": "2026-07-28T02:56:34.000Z",
+    "lastUpdatedBy": "35240",
+    "uid": "35240-c9d0723e-d652-4076-b3b8-0a8484f11159"
+  },
+  "item": [
+    {
+      "name": "v1",
+      "item": [
+        {
+          "name": "projects",
+          "item": [
+            {
+              "name": "{project_id}",
+              "item": [
+                {
+                  "name": "events:send",
+                  "item": [
+                    {
+                      "name": "Send an Event",
+                      "id": "1ba5cda4-644c-438c-b70c-f0c9de80b1b4",
+                      "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                      },
+                      "request": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"app_id\": \"<string>\",\n  \"recipient\": {\n    \"contact_id\": \"<string>\"\n  },\n  \"event\": {\n    \"composing_event\": {}\n  }\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/projects/:project_id/events:send",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "projects",
+                            ":project_id",
+                            "events:send"
+                          ],
+                          "variable": [
+                            {
+                              "id": "3e912a3e-aac1-41a6-b628-bafd1e047027",
+                              "key": "project_id",
+                              "value": "<string>",
+                              "description": "(Required) The unique project identifier"
+                            }
+                          ]
+                        },
+                        "description": "Sends an event such as a composing indicator to a contact on a specific channel."
+                      },
+                      "response": [
+                        {
+                          "id": "088fac81-79c7-4ae8-a0fd-26389c57efa8",
+                          "name": "Event sent",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"app_id\": \"<string>\",\n  \"recipient\": {\n    \"contact_id\": \"<string>\"\n  },\n  \"event\": {\n    \"composing_event\": {}\n  }\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/events:send",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "events:send"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": "{\n  \"event_id\": \"<string>\",\n  \"accepted_time\": \"<dateTime>\"\n}",
+                          "createdAt": "2026-07-28T02:56:34.000Z",
+                          "updatedAt": "2026-07-28T02:56:34.000Z",
+                          "uid": "35240-088fac81-79c7-4ae8-a0fd-26389c57efa8"
+                        },
+                        {
+                          "id": "efee8f4a-a4b6-4955-bbae-a2df11583bb0",
+                          "name": "Invalid request",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"app_id\": \"<string>\",\n  \"recipient\": {\n    \"contact_id\": \"<string>\"\n  },\n  \"event\": {\n    \"composing_event\": {}\n  }\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/events:send",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "events:send"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": null,
+                          "createdAt": "2026-07-28T02:56:34.000Z",
+                          "updatedAt": "2026-07-28T02:56:34.000Z",
+                          "uid": "35240-efee8f4a-a4b6-4955-bbae-a2df11583bb0"
+                        },
+                        {
+                          "id": "1c852b2f-72f1-425c-8258-cbd267eb4c9c",
+                          "name": "Unauthorized",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"app_id\": \"<string>\",\n  \"recipient\": {\n    \"contact_id\": \"<string>\"\n  },\n  \"event\": {\n    \"composing_event\": {}\n  }\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/events:send",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "events:send"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Unauthorized",
+                          "code": 401,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": null,
+                          "createdAt": "2026-07-28T02:56:34.000Z",
+                          "updatedAt": "2026-07-28T02:56:34.000Z",
+                          "uid": "35240-1c852b2f-72f1-425c-8258-cbd267eb4c9c"
+                        }
+                      ],
+                      "createdAt": "2026-07-28T02:56:34.000Z",
+                      "updatedAt": "2026-07-28T02:56:34.000Z",
+                      "uid": "35240-1ba5cda4-644c-438c-b70c-f0c9de80b1b4"
+                    }
+                  ],
+                  "id": "23a5ab03-dc2b-4456-9874-563f55196b5b",
+                  "createdAt": "2026-07-28T02:56:34.000Z",
+                  "updatedAt": "2026-07-28T02:56:34.000Z",
+                  "uid": "35240-23a5ab03-dc2b-4456-9874-563f55196b5b"
+                }
+              ],
+              "id": "68e33aeb-491a-4b93-aa2d-c6274febac90",
+              "createdAt": "2026-07-28T02:56:34.000Z",
+              "updatedAt": "2026-07-28T02:56:34.000Z",
+              "uid": "35240-68e33aeb-491a-4b93-aa2d-c6274febac90"
+            }
+          ],
+          "id": "a188a366-8fc9-4650-9cbf-c6cc7656580e",
+          "createdAt": "2026-07-28T02:56:34.000Z",
+          "updatedAt": "2026-07-28T02:56:34.000Z",
+          "uid": "35240-a188a366-8fc9-4650-9cbf-c6cc7656580e"
+        }
+      ],
+      "id": "6a995177-c0ff-47a2-b242-209c8927c129",
+      "createdAt": "2026-07-28T02:56:34.000Z",
+      "updatedAt": "2026-07-28T02:56:34.000Z",
+      "uid": "35240-6a995177-c0ff-47a2-b242-209c8927c129"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://brands.api.sinch.com"
+    }
+  ]
+}

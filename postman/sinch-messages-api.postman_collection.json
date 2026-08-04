@@ -1,0 +1,915 @@
+{
+  "info": {
+    "_postman_id": "b129f602-42d6-4113-9129-c9bf69a8c72d",
+    "name": "Sinch Brands Access Control Lists Messages API",
+    "description": "The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.\n\nContact Support:\n Name: Sinch Support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "createdAt": "2026-07-28T02:56:43.000Z",
+    "updatedAt": "2026-07-28T02:56:44.000Z",
+    "lastUpdatedBy": "35240",
+    "uid": "35240-b129f602-42d6-4113-9129-c9bf69a8c72d"
+  },
+  "item": [
+    {
+      "name": "v1",
+      "item": [
+        {
+          "name": "projects",
+          "item": [
+            {
+              "name": "{project_id}",
+              "item": [
+                {
+                  "name": "messages:send",
+                  "item": [
+                    {
+                      "name": "Send a Message",
+                      "id": "70030c88-52f9-4b80-aab3-bf4f011c9b85",
+                      "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                      },
+                      "request": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"app_id\": \"<string>\",\n  \"message\": {\n    \"text_message\": {\n      \"text\": \"<string>\"\n    },\n    \"media_message\": {\n      \"url\": \"<uri>\",\n      \"thumbnail_url\": \"<uri>\"\n    },\n    \"template_message\": {\n      \"omni_template\": {\n        \"template_id\": \"<string>\",\n        \"version\": \"<string>\",\n        \"language_code\": \"<string>\",\n        \"parameters\": {}\n      }\n    },\n    \"card_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"media_message\": {\n        \"url\": \"<uri>\"\n      },\n      \"choices\": [\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        },\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        }\n      ]\n    },\n    \"list_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"sections\": [\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        },\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        }\n      ]\n    }\n  },\n  \"recipient\": {\n    \"contact_id\": \"<string>\",\n    \"identified_by\": {\n      \"channel_identities\": [\n        {\n          \"channel\": \"INSTAGRAM\",\n          \"identity\": \"<string>\",\n          \"app_id\": \"<string>\"\n        },\n        {\n          \"channel\": \"SMS\",\n          \"identity\": \"<string>\",\n          \"app_id\": \"<string>\"\n        }\n      ]\n    }\n  },\n  \"message_metadata\": \"<string>\",\n  \"conversation_metadata\": \"<string>\",\n  \"channel_priority_order\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"queue\": \"NORMAL_PRIORITY\",\n  \"ttl\": \"<integer>\"\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/projects/:project_id/messages:send",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "projects",
+                            ":project_id",
+                            "messages:send"
+                          ],
+                          "variable": [
+                            {
+                              "id": "186bfb78-3b49-498b-8670-d2635a2c65c8",
+                              "key": "project_id",
+                              "value": "<string>",
+                              "description": "(Required) The unique project identifier"
+                            }
+                          ]
+                        },
+                        "description": "Sends a message to a contact on a specific channel or using the Conversation API intelligent channel selection. Supports text, media, template, and card messages in a normalized format."
+                      },
+                      "response": [
+                        {
+                          "id": "04351f86-e032-4518-a3cd-37235e44fdaa",
+                          "name": "Message sent",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"app_id\": \"<string>\",\n  \"message\": {\n    \"text_message\": {\n      \"text\": \"<string>\"\n    },\n    \"media_message\": {\n      \"url\": \"<uri>\",\n      \"thumbnail_url\": \"<uri>\"\n    },\n    \"template_message\": {\n      \"omni_template\": {\n        \"template_id\": \"<string>\",\n        \"version\": \"<string>\",\n        \"language_code\": \"<string>\",\n        \"parameters\": {}\n      }\n    },\n    \"card_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"media_message\": {\n        \"url\": \"<uri>\"\n      },\n      \"choices\": [\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        },\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        }\n      ]\n    },\n    \"list_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"sections\": [\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        },\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        }\n      ]\n    }\n  },\n  \"recipient\": {\n    \"contact_id\": \"<string>\",\n    \"identified_by\": {\n      \"channel_identities\": [\n        {\n          \"channel\": \"INSTAGRAM\",\n          \"identity\": \"<string>\",\n          \"app_id\": \"<string>\"\n        },\n        {\n          \"channel\": \"SMS\",\n          \"identity\": \"<string>\",\n          \"app_id\": \"<string>\"\n        }\n      ]\n    }\n  },\n  \"message_metadata\": \"<string>\",\n  \"conversation_metadata\": \"<string>\",\n  \"channel_priority_order\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"queue\": \"NORMAL_PRIORITY\",\n  \"ttl\": \"<integer>\"\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/messages:send",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "messages:send"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": "{\n  \"message_id\": \"<string>\",\n  \"accepted_time\": \"<dateTime>\"\n}",
+                          "createdAt": "2026-07-28T02:56:44.000Z",
+                          "updatedAt": "2026-07-28T02:56:44.000Z",
+                          "uid": "35240-04351f86-e032-4518-a3cd-37235e44fdaa"
+                        },
+                        {
+                          "id": "8c8bf56e-0def-48c6-8a5d-6bea659d57c4",
+                          "name": "Invalid request",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"app_id\": \"<string>\",\n  \"message\": {\n    \"text_message\": {\n      \"text\": \"<string>\"\n    },\n    \"media_message\": {\n      \"url\": \"<uri>\",\n      \"thumbnail_url\": \"<uri>\"\n    },\n    \"template_message\": {\n      \"omni_template\": {\n        \"template_id\": \"<string>\",\n        \"version\": \"<string>\",\n        \"language_code\": \"<string>\",\n        \"parameters\": {}\n      }\n    },\n    \"card_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"media_message\": {\n        \"url\": \"<uri>\"\n      },\n      \"choices\": [\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        },\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        }\n      ]\n    },\n    \"list_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"sections\": [\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        },\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        }\n      ]\n    }\n  },\n  \"recipient\": {\n    \"contact_id\": \"<string>\",\n    \"identified_by\": {\n      \"channel_identities\": [\n        {\n          \"channel\": \"INSTAGRAM\",\n          \"identity\": \"<string>\",\n          \"app_id\": \"<string>\"\n        },\n        {\n          \"channel\": \"SMS\",\n          \"identity\": \"<string>\",\n          \"app_id\": \"<string>\"\n        }\n      ]\n    }\n  },\n  \"message_metadata\": \"<string>\",\n  \"conversation_metadata\": \"<string>\",\n  \"channel_priority_order\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"queue\": \"NORMAL_PRIORITY\",\n  \"ttl\": \"<integer>\"\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/messages:send",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "messages:send"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Bad Request",
+                          "code": 400,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": null,
+                          "createdAt": "2026-07-28T02:56:44.000Z",
+                          "updatedAt": "2026-07-28T02:56:44.000Z",
+                          "uid": "35240-8c8bf56e-0def-48c6-8a5d-6bea659d57c4"
+                        },
+                        {
+                          "id": "92091b36-6f2b-4e7f-8a8d-d464cceedad0",
+                          "name": "Unauthorized",
+                          "originalRequest": {
+                            "method": "POST",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"app_id\": \"<string>\",\n  \"message\": {\n    \"text_message\": {\n      \"text\": \"<string>\"\n    },\n    \"media_message\": {\n      \"url\": \"<uri>\",\n      \"thumbnail_url\": \"<uri>\"\n    },\n    \"template_message\": {\n      \"omni_template\": {\n        \"template_id\": \"<string>\",\n        \"version\": \"<string>\",\n        \"language_code\": \"<string>\",\n        \"parameters\": {}\n      }\n    },\n    \"card_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"media_message\": {\n        \"url\": \"<uri>\"\n      },\n      \"choices\": [\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        },\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        }\n      ]\n    },\n    \"list_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"sections\": [\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        },\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        }\n      ]\n    }\n  },\n  \"recipient\": {\n    \"contact_id\": \"<string>\",\n    \"identified_by\": {\n      \"channel_identities\": [\n        {\n          \"channel\": \"INSTAGRAM\",\n          \"identity\": \"<string>\",\n          \"app_id\": \"<string>\"\n        },\n        {\n          \"channel\": \"SMS\",\n          \"identity\": \"<string>\",\n          \"app_id\": \"<string>\"\n        }\n      ]\n    }\n  },\n  \"message_metadata\": \"<string>\",\n  \"conversation_metadata\": \"<string>\",\n  \"channel_priority_order\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"queue\": \"NORMAL_PRIORITY\",\n  \"ttl\": \"<integer>\"\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/messages:send",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "messages:send"
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Unauthorized",
+                          "code": 401,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": null,
+                          "createdAt": "2026-07-28T02:56:44.000Z",
+                          "updatedAt": "2026-07-28T02:56:44.000Z",
+                          "uid": "35240-92091b36-6f2b-4e7f-8a8d-d464cceedad0"
+                        }
+                      ],
+                      "createdAt": "2026-07-28T02:56:44.000Z",
+                      "updatedAt": "2026-07-28T02:56:44.000Z",
+                      "uid": "35240-70030c88-52f9-4b80-aab3-bf4f011c9b85"
+                    }
+                  ],
+                  "id": "66f3f3b5-4639-488a-ae9f-d9ef24731a37",
+                  "createdAt": "2026-07-28T02:56:44.000Z",
+                  "updatedAt": "2026-07-28T02:56:44.000Z",
+                  "uid": "35240-66f3f3b5-4639-488a-ae9f-d9ef24731a37"
+                },
+                {
+                  "name": "messages",
+                  "item": [
+                    {
+                      "name": "{message_id}",
+                      "item": [
+                        {
+                          "name": "Get a Message",
+                          "id": "9e2b04ad-5b2f-4bbf-9196-38c76590845e",
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          },
+                          "request": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/messages/:message_id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "messages",
+                                ":message_id"
+                              ],
+                              "variable": [
+                                {
+                                  "id": "55481606-e165-44f2-8ab6-9e1b634f29d9",
+                                  "key": "project_id",
+                                  "value": "<string>",
+                                  "description": "(Required) The unique project identifier"
+                                },
+                                {
+                                  "id": "50dc54a7-bb36-4783-b91e-5508f08f547d",
+                                  "key": "message_id",
+                                  "value": "<string>",
+                                  "description": "(Required) The unique message identifier"
+                                }
+                              ]
+                            },
+                            "description": "Returns the details of a specific message."
+                          },
+                          "response": [
+                            {
+                              "id": "dbdf15d0-c229-4aa1-82c0-7ab4b7573915",
+                              "name": "Message details",
+                              "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "key": "Accept",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/messages/:message_id",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "messages",
+                                    ":message_id"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    },
+                                    {
+                                      "key": "message_id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "json",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "application/json"
+                                }
+                              ],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": "{\n  \"id\": \"<string>\",\n  \"direction\": \"TO_APP\",\n  \"app_message\": {\n    \"text_message\": {\n      \"text\": \"<string>\"\n    },\n    \"media_message\": {\n      \"url\": \"<uri>\",\n      \"thumbnail_url\": \"<uri>\"\n    },\n    \"template_message\": {\n      \"omni_template\": {\n        \"template_id\": \"<string>\",\n        \"version\": \"<string>\",\n        \"language_code\": \"<string>\",\n        \"parameters\": {}\n      }\n    },\n    \"card_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"media_message\": {\n        \"url\": \"<uri>\"\n      },\n      \"choices\": [\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        },\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        }\n      ]\n    },\n    \"list_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"sections\": [\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        },\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        }\n      ]\n    }\n  },\n  \"contact_message\": {},\n  \"channel_identity\": {\n    \"channel\": \"LINE\",\n    \"identity\": \"<string>\",\n    \"app_id\": \"<string>\"\n  },\n  \"conversation_id\": \"<string>\",\n  \"contact_id\": \"<string>\",\n  \"metadata\": \"<string>\",\n  \"accept_time\": \"<dateTime>\"\n}",
+                              "createdAt": "2026-07-28T02:56:44.000Z",
+                              "updatedAt": "2026-07-28T02:56:44.000Z",
+                              "uid": "35240-dbdf15d0-c229-4aa1-82c0-7ab4b7573915"
+                            },
+                            {
+                              "id": "59ac9c70-0342-4809-9194-2a62048ea6cc",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/messages/:message_id",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "messages",
+                                    ":message_id"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    },
+                                    {
+                                      "key": "message_id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:56:44.000Z",
+                              "updatedAt": "2026-07-28T02:56:44.000Z",
+                              "uid": "35240-59ac9c70-0342-4809-9194-2a62048ea6cc"
+                            },
+                            {
+                              "id": "d6a58b66-0bea-49df-bc80-5bb6af5c4dcc",
+                              "name": "Message not found",
+                              "originalRequest": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/messages/:message_id",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "messages",
+                                    ":message_id"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    },
+                                    {
+                                      "key": "message_id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Not Found",
+                              "code": 404,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:56:44.000Z",
+                              "updatedAt": "2026-07-28T02:56:44.000Z",
+                              "uid": "35240-d6a58b66-0bea-49df-bc80-5bb6af5c4dcc"
+                            }
+                          ],
+                          "createdAt": "2026-07-28T02:56:44.000Z",
+                          "updatedAt": "2026-07-28T02:56:44.000Z",
+                          "uid": "35240-9e2b04ad-5b2f-4bbf-9196-38c76590845e"
+                        },
+                        {
+                          "name": "Delete a Message",
+                          "id": "a3d335f3-bf30-4736-917d-4a9bfb044878",
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          },
+                          "request": {
+                            "method": "DELETE",
+                            "header": [],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/messages/:message_id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "messages",
+                                ":message_id"
+                              ],
+                              "variable": [
+                                {
+                                  "id": "03216b75-7f6b-4c05-89e5-e391eed94e9a",
+                                  "key": "project_id",
+                                  "value": "<string>",
+                                  "description": "(Required) The unique project identifier"
+                                },
+                                {
+                                  "id": "bf117615-8ee2-41f6-955b-192db6419e6b",
+                                  "key": "message_id",
+                                  "value": "<string>",
+                                  "description": "(Required) The unique message identifier"
+                                }
+                              ]
+                            },
+                            "description": "Deletes a specific message from the conversation history."
+                          },
+                          "response": [
+                            {
+                              "id": "92772449-7c8d-4619-8ddb-c426d72bb557",
+                              "name": "Message deleted",
+                              "originalRequest": {
+                                "method": "DELETE",
+                                "header": [
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/messages/:message_id",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "messages",
+                                    ":message_id"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    },
+                                    {
+                                      "key": "message_id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:56:44.000Z",
+                              "updatedAt": "2026-07-28T02:56:44.000Z",
+                              "uid": "35240-92772449-7c8d-4619-8ddb-c426d72bb557"
+                            },
+                            {
+                              "id": "e5429caa-7c96-4196-a4c3-447c458c44ed",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "method": "DELETE",
+                                "header": [
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/messages/:message_id",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "messages",
+                                    ":message_id"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    },
+                                    {
+                                      "key": "message_id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:56:44.000Z",
+                              "updatedAt": "2026-07-28T02:56:44.000Z",
+                              "uid": "35240-e5429caa-7c96-4196-a4c3-447c458c44ed"
+                            },
+                            {
+                              "id": "62e61f72-85a3-473b-ac62-d1d481b04f07",
+                              "name": "Message not found",
+                              "originalRequest": {
+                                "method": "DELETE",
+                                "header": [
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/v1/projects/:project_id/messages/:message_id",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "v1",
+                                    "projects",
+                                    ":project_id",
+                                    "messages",
+                                    ":message_id"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "project_id"
+                                    },
+                                    {
+                                      "key": "message_id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Not Found",
+                              "code": 404,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:56:44.000Z",
+                              "updatedAt": "2026-07-28T02:56:44.000Z",
+                              "uid": "35240-62e61f72-85a3-473b-ac62-d1d481b04f07"
+                            }
+                          ],
+                          "createdAt": "2026-07-28T02:56:44.000Z",
+                          "updatedAt": "2026-07-28T02:56:44.000Z",
+                          "uid": "35240-a3d335f3-bf30-4736-917d-4a9bfb044878"
+                        }
+                      ],
+                      "id": "d905c26a-780d-4f39-ad43-6066ff96a2c2",
+                      "createdAt": "2026-07-28T02:56:44.000Z",
+                      "updatedAt": "2026-07-28T02:56:44.000Z",
+                      "uid": "35240-d905c26a-780d-4f39-ad43-6066ff96a2c2"
+                    },
+                    {
+                      "name": "List Messages",
+                      "id": "295431f7-a748-4c08-8c6a-fbabba8654fd",
+                      "protocolProfileBehavior": {
+                        "disableBodyPruning": true
+                      },
+                      "request": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/projects/:project_id/messages?conversation_id=<string>&contact_id=<string>&app_id=<string>&channel=<string>&page_size=10&page_token=<string>",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "projects",
+                            ":project_id",
+                            "messages"
+                          ],
+                          "query": [
+                            {
+                              "description": "Filter by conversation ID",
+                              "key": "conversation_id",
+                              "value": "<string>"
+                            },
+                            {
+                              "description": "Filter by contact ID",
+                              "key": "contact_id",
+                              "value": "<string>"
+                            },
+                            {
+                              "description": "Filter by app ID",
+                              "key": "app_id",
+                              "value": "<string>"
+                            },
+                            {
+                              "description": "Filter by channel",
+                              "key": "channel",
+                              "value": "<string>"
+                            },
+                            {
+                              "description": "The number of messages per page",
+                              "key": "page_size",
+                              "value": "10"
+                            },
+                            {
+                              "description": "Pagination token for the next page",
+                              "key": "page_token",
+                              "value": "<string>"
+                            }
+                          ],
+                          "variable": [
+                            {
+                              "id": "a6599108-6863-495f-8990-0f1461607652",
+                              "key": "project_id",
+                              "value": "<string>",
+                              "description": "(Required) The unique project identifier"
+                            }
+                          ]
+                        },
+                        "description": "Returns a list of messages in a project with optional filtering by conversation, contact, app, and channel."
+                      },
+                      "response": [
+                        {
+                          "id": "55b3a5b2-b981-420d-a33a-8b8ded2f4f3a",
+                          "name": "List of messages",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              },
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/messages?conversation_id=<string>&contact_id=<string>&app_id=<string>&channel=<string>&page_size=10&page_token=<string>",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "messages"
+                              ],
+                              "query": [
+                                {
+                                  "description": "Filter by conversation ID",
+                                  "key": "conversation_id",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "Filter by contact ID",
+                                  "key": "contact_id",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "Filter by app ID",
+                                  "key": "app_id",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "Filter by channel",
+                                  "key": "channel",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "The number of messages per page",
+                                  "key": "page_size",
+                                  "value": "10"
+                                },
+                                {
+                                  "description": "Pagination token for the next page",
+                                  "key": "page_token",
+                                  "value": "<string>"
+                                }
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "OK",
+                          "code": 200,
+                          "_postman_previewlanguage": "json",
+                          "header": [
+                            {
+                              "key": "Content-Type",
+                              "value": "application/json"
+                            }
+                          ],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": "{\n  \"messages\": [\n    {\n      \"id\": \"<string>\",\n      \"direction\": \"TO_CONTACT\",\n      \"app_message\": {\n        \"text_message\": {\n          \"text\": \"<string>\"\n        },\n        \"media_message\": {\n          \"url\": \"<uri>\",\n          \"thumbnail_url\": \"<uri>\"\n        },\n        \"template_message\": {\n          \"omni_template\": {\n            \"template_id\": \"<string>\",\n            \"version\": \"<string>\",\n            \"language_code\": \"<string>\",\n            \"parameters\": {}\n          }\n        },\n        \"card_message\": {\n          \"title\": \"<string>\",\n          \"description\": \"<string>\",\n          \"media_message\": {\n            \"url\": \"<uri>\"\n          },\n          \"choices\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        },\n        \"list_message\": {\n          \"title\": \"<string>\",\n          \"description\": \"<string>\",\n          \"sections\": [\n            {\n              \"title\": \"<string>\",\n              \"items\": [\n                {\n                  \"text_message\": {\n                    \"text\": \"<string>\"\n                  },\n                  \"postback_data\": \"<string>\"\n                },\n                {\n                  \"text_message\": {\n                    \"text\": \"<string>\"\n                  },\n                  \"postback_data\": \"<string>\"\n                }\n              ]\n            },\n            {\n              \"title\": \"<string>\",\n              \"items\": [\n                {\n                  \"text_message\": {\n                    \"text\": \"<string>\"\n                  },\n                  \"postback_data\": \"<string>\"\n                },\n                {\n                  \"text_message\": {\n                    \"text\": \"<string>\"\n                  },\n                  \"postback_data\": \"<string>\"\n                }\n              ]\n            }\n          ]\n        }\n      },\n      \"contact_message\": {},\n      \"channel_identity\": {\n        \"channel\": \"VIBERBM\",\n        \"identity\": \"<string>\",\n        \"app_id\": \"<string>\"\n      },\n      \"conversation_id\": \"<string>\",\n      \"contact_id\": \"<string>\",\n      \"metadata\": \"<string>\",\n      \"accept_time\": \"<dateTime>\"\n    },\n    {\n      \"id\": \"<string>\",\n      \"direction\": \"TO_APP\",\n      \"app_message\": {\n        \"text_message\": {\n          \"text\": \"<string>\"\n        },\n        \"media_message\": {\n          \"url\": \"<uri>\",\n          \"thumbnail_url\": \"<uri>\"\n        },\n        \"template_message\": {\n          \"omni_template\": {\n            \"template_id\": \"<string>\",\n            \"version\": \"<string>\",\n            \"language_code\": \"<string>\",\n            \"parameters\": {}\n          }\n        },\n        \"card_message\": {\n          \"title\": \"<string>\",\n          \"description\": \"<string>\",\n          \"media_message\": {\n            \"url\": \"<uri>\"\n          },\n          \"choices\": [\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": \"<string>\"\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        },\n        \"list_message\": {\n          \"title\": \"<string>\",\n          \"description\": \"<string>\",\n          \"sections\": [\n            {\n              \"title\": \"<string>\",\n              \"items\": [\n                {\n                  \"text_message\": {\n                    \"text\": \"<string>\"\n                  },\n                  \"postback_data\": \"<string>\"\n                },\n                {\n                  \"text_message\": {\n                    \"text\": \"<string>\"\n                  },\n                  \"postback_data\": \"<string>\"\n                }\n              ]\n            },\n            {\n              \"title\": \"<string>\",\n              \"items\": [\n                {\n                  \"text_message\": {\n                    \"text\": \"<string>\"\n                  },\n                  \"postback_data\": \"<string>\"\n                },\n                {\n                  \"text_message\": {\n                    \"text\": \"<string>\"\n                  },\n                  \"postback_data\": \"<string>\"\n                }\n              ]\n            }\n          ]\n        }\n      },\n      \"contact_message\": {},\n      \"channel_identity\": {\n        \"channel\": \"TELEGRAM\",\n        \"identity\": \"<string>\",\n        \"app_id\": \"<string>\"\n      },\n      \"conversation_id\": \"<string>\",\n      \"contact_id\": \"<string>\",\n      \"metadata\": \"<string>\",\n      \"accept_time\": \"<dateTime>\"\n    }\n  ],\n  \"next_page_token\": \"<string>\"\n}",
+                          "createdAt": "2026-07-28T02:56:44.000Z",
+                          "updatedAt": "2026-07-28T02:56:44.000Z",
+                          "uid": "35240-55b3a5b2-b981-420d-a33a-8b8ded2f4f3a"
+                        },
+                        {
+                          "id": "29d76c25-4141-46b8-8443-702e483149eb",
+                          "name": "Unauthorized",
+                          "originalRequest": {
+                            "method": "GET",
+                            "header": [
+                              {
+                                "description": "Added as a part of security scheme: bearer",
+                                "key": "Authorization",
+                                "value": "Bearer <token>"
+                              }
+                            ],
+                            "url": {
+                              "raw": "{{baseUrl}}/v1/projects/:project_id/messages?conversation_id=<string>&contact_id=<string>&app_id=<string>&channel=<string>&page_size=10&page_token=<string>",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "v1",
+                                "projects",
+                                ":project_id",
+                                "messages"
+                              ],
+                              "query": [
+                                {
+                                  "description": "Filter by conversation ID",
+                                  "key": "conversation_id",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "Filter by contact ID",
+                                  "key": "contact_id",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "Filter by app ID",
+                                  "key": "app_id",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "Filter by channel",
+                                  "key": "channel",
+                                  "value": "<string>"
+                                },
+                                {
+                                  "description": "The number of messages per page",
+                                  "key": "page_size",
+                                  "value": "10"
+                                },
+                                {
+                                  "description": "Pagination token for the next page",
+                                  "key": "page_token",
+                                  "value": "<string>"
+                                }
+                              ],
+                              "variable": [
+                                {
+                                  "key": "project_id"
+                                }
+                              ]
+                            }
+                          },
+                          "status": "Unauthorized",
+                          "code": 401,
+                          "_postman_previewlanguage": "text",
+                          "header": [],
+                          "cookie": [],
+                          "responseTime": null,
+                          "body": null,
+                          "createdAt": "2026-07-28T02:56:44.000Z",
+                          "updatedAt": "2026-07-28T02:56:44.000Z",
+                          "uid": "35240-29d76c25-4141-46b8-8443-702e483149eb"
+                        }
+                      ],
+                      "createdAt": "2026-07-28T02:56:44.000Z",
+                      "updatedAt": "2026-07-28T02:56:44.000Z",
+                      "uid": "35240-295431f7-a748-4c08-8c6a-fbabba8654fd"
+                    }
+                  ],
+                  "id": "29bad6f2-d256-4fd6-8be0-b99bfaa01426",
+                  "createdAt": "2026-07-28T02:56:44.000Z",
+                  "updatedAt": "2026-07-28T02:56:44.000Z",
+                  "uid": "35240-29bad6f2-d256-4fd6-8be0-b99bfaa01426"
+                }
+              ],
+              "id": "18b44696-bda9-4ed9-8be7-3040a78f5a29",
+              "createdAt": "2026-07-28T02:56:44.000Z",
+              "updatedAt": "2026-07-28T02:56:44.000Z",
+              "uid": "35240-18b44696-bda9-4ed9-8be7-3040a78f5a29"
+            }
+          ],
+          "id": "9f1d5728-5610-4fa3-939c-bb088f64cbdd",
+          "createdAt": "2026-07-28T02:56:44.000Z",
+          "updatedAt": "2026-07-28T02:56:44.000Z",
+          "uid": "35240-9f1d5728-5610-4fa3-939c-bb088f64cbdd"
+        }
+      ],
+      "id": "cec4ce0b-27e9-49ab-a937-7ca911396c9f",
+      "createdAt": "2026-07-28T02:56:44.000Z",
+      "updatedAt": "2026-07-28T02:56:44.000Z",
+      "uid": "35240-cec4ce0b-27e9-49ab-a937-7ca911396c9f"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://brands.api.sinch.com"
+    }
+  ]
+}

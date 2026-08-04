@@ -1,0 +1,1444 @@
+{
+  "info": {
+    "_postman_id": "02f7c218-89f8-402e-8bdc-8aef8b391e72",
+    "name": "Sinch Brands Access Control Lists Verifications API",
+    "description": "The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.\n\nContact Support:\n Name: Sinch Support",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "createdAt": "2026-07-28T02:57:15.000Z",
+    "updatedAt": "2026-07-28T02:57:15.000Z",
+    "lastUpdatedBy": "35240",
+    "uid": "35240-02f7c218-89f8-402e-8bdc-8aef8b391e72"
+  },
+  "item": [
+    {
+      "name": "verification",
+      "item": [
+        {
+          "name": "v1",
+          "item": [
+            {
+              "name": "verifications",
+              "item": [
+                {
+                  "name": "{type}",
+                  "item": [
+                    {
+                      "name": "{endpoint}",
+                      "item": [
+                        {
+                          "name": "status",
+                          "item": [
+                            {
+                              "name": "Get Verification Status by Identity",
+                              "id": "b6311059-7051-400b-96f7-78c7ef9372df",
+                              "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                              },
+                              "request": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "key": "Accept",
+                                    "value": "application/json"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/verification/v1/verifications/:type/:endpoint/status",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "verification",
+                                    "v1",
+                                    "verifications",
+                                    ":type",
+                                    ":endpoint",
+                                    "status"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "id": "4a3b8526-9b3d-4bdd-aa6b-70ac456f4d13",
+                                      "key": "type",
+                                      "value": "sms",
+                                      "description": "(Required) The verification method type"
+                                    },
+                                    {
+                                      "id": "76999577-8d41-4a9a-900a-afe116b74c80",
+                                      "key": "endpoint",
+                                      "value": "<string>",
+                                      "description": "(Required) The phone number in E.164 format"
+                                    }
+                                  ]
+                                },
+                                "description": "Returns the status of a verification request identified by the verification method type and phone number endpoint."
+                              },
+                              "response": [
+                                {
+                                  "id": "8191f434-fdc9-488b-8de3-254835f47d4a",
+                                  "name": "Verification status",
+                                  "originalRequest": {
+                                    "method": "GET",
+                                    "header": [
+                                      {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                      },
+                                      {
+                                        "description": "Added as a part of security scheme: bearer",
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "url": {
+                                      "raw": "{{baseUrl}}/verification/v1/verifications/:type/:endpoint/status",
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "path": [
+                                        "verification",
+                                        "v1",
+                                        "verifications",
+                                        ":type",
+                                        ":endpoint",
+                                        "status"
+                                      ],
+                                      "variable": [
+                                        {
+                                          "key": "type"
+                                        },
+                                        {
+                                          "key": "endpoint"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "status": "OK",
+                                  "code": 200,
+                                  "_postman_previewlanguage": "json",
+                                  "header": [
+                                    {
+                                      "key": "Content-Type",
+                                      "value": "application/json"
+                                    }
+                                  ],
+                                  "cookie": [],
+                                  "responseTime": null,
+                                  "body": "{\n  \"id\": \"<string>\",\n  \"method\": \"<string>\",\n  \"status\": \"SUCCESSFUL\",\n  \"reason\": \"<string>\",\n  \"reference\": \"<string>\",\n  \"identity\": {\n    \"type\": \"<string>\",\n    \"endpoint\": \"<string>\"\n  },\n  \"price\": {\n    \"currencyId\": \"<string>\",\n    \"amount\": \"<number>\"\n  }\n}",
+                                  "createdAt": "2026-07-28T02:57:15.000Z",
+                                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                                  "uid": "35240-8191f434-fdc9-488b-8de3-254835f47d4a"
+                                },
+                                {
+                                  "id": "79c15450-0fb1-400e-97f9-fee12a6d822e",
+                                  "name": "Unauthorized",
+                                  "originalRequest": {
+                                    "method": "GET",
+                                    "header": [
+                                      {
+                                        "description": "Added as a part of security scheme: bearer",
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "url": {
+                                      "raw": "{{baseUrl}}/verification/v1/verifications/:type/:endpoint/status",
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "path": [
+                                        "verification",
+                                        "v1",
+                                        "verifications",
+                                        ":type",
+                                        ":endpoint",
+                                        "status"
+                                      ],
+                                      "variable": [
+                                        {
+                                          "key": "type"
+                                        },
+                                        {
+                                          "key": "endpoint"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "status": "Unauthorized",
+                                  "code": 401,
+                                  "_postman_previewlanguage": "text",
+                                  "header": [],
+                                  "cookie": [],
+                                  "responseTime": null,
+                                  "body": null,
+                                  "createdAt": "2026-07-28T02:57:15.000Z",
+                                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                                  "uid": "35240-79c15450-0fb1-400e-97f9-fee12a6d822e"
+                                },
+                                {
+                                  "id": "5809bc8b-9d8e-44eb-8d8a-c9a16c2b0b3a",
+                                  "name": "Verification not found",
+                                  "originalRequest": {
+                                    "method": "GET",
+                                    "header": [
+                                      {
+                                        "description": "Added as a part of security scheme: bearer",
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "url": {
+                                      "raw": "{{baseUrl}}/verification/v1/verifications/:type/:endpoint/status",
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "path": [
+                                        "verification",
+                                        "v1",
+                                        "verifications",
+                                        ":type",
+                                        ":endpoint",
+                                        "status"
+                                      ],
+                                      "variable": [
+                                        {
+                                          "key": "type"
+                                        },
+                                        {
+                                          "key": "endpoint"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "status": "Not Found",
+                                  "code": 404,
+                                  "_postman_previewlanguage": "text",
+                                  "header": [],
+                                  "cookie": [],
+                                  "responseTime": null,
+                                  "body": null,
+                                  "createdAt": "2026-07-28T02:57:15.000Z",
+                                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                                  "uid": "35240-5809bc8b-9d8e-44eb-8d8a-c9a16c2b0b3a"
+                                }
+                              ],
+                              "createdAt": "2026-07-28T02:57:15.000Z",
+                              "updatedAt": "2026-07-28T02:57:15.000Z",
+                              "uid": "35240-b6311059-7051-400b-96f7-78c7ef9372df"
+                            }
+                          ],
+                          "id": "12c0aeff-eb28-47e7-aaa0-f509501d0ce5",
+                          "createdAt": "2026-07-28T02:57:15.000Z",
+                          "updatedAt": "2026-07-28T02:57:15.000Z",
+                          "uid": "35240-12c0aeff-eb28-47e7-aaa0-f509501d0ce5"
+                        },
+                        {
+                          "name": "Report a Verification",
+                          "id": "230e0823-6e1e-4a4b-987f-5b270d5a9dc4",
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          },
+                          "request": {
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"method\": \"callout\",\n  \"sms\": {\n    \"code\": \"<string>\"\n  },\n  \"flashcall\": {\n    \"cli\": \"<string>\"\n  }\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/verification/v1/verifications/:type/:endpoint",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "verification",
+                                "v1",
+                                "verifications",
+                                ":type",
+                                ":endpoint"
+                              ],
+                              "variable": [
+                                {
+                                  "id": "d874eedd-c4d4-46ad-a072-ad047e1f1cd4",
+                                  "key": "type",
+                                  "value": "sms",
+                                  "description": "(Required) The verification method type"
+                                },
+                                {
+                                  "id": "9bc69b2c-c7dd-4514-822a-88606a59f3e0",
+                                  "key": "endpoint",
+                                  "value": "<string>",
+                                  "description": "(Required) The phone number being verified in E.164 format"
+                                }
+                              ]
+                            },
+                            "description": "Reports the verification code or CLI received by the user back to Sinch to complete the verification process. The type parameter specifies the verification method and the endpoint is the phone number being verified."
+                          },
+                          "response": [
+                            {
+                              "id": "3d46f9db-121c-4d69-adeb-be52edcc7f91",
+                              "name": "Verification reported",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"method\": \"callout\",\n  \"sms\": {\n    \"code\": \"<string>\"\n  },\n  \"flashcall\": {\n    \"cli\": \"<string>\"\n  }\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/verification/v1/verifications/:type/:endpoint",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "verification",
+                                    "v1",
+                                    "verifications",
+                                    ":type",
+                                    ":endpoint"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "type"
+                                    },
+                                    {
+                                      "key": "endpoint"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "json",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "application/json"
+                                }
+                              ],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": "{\n  \"id\": \"<string>\",\n  \"method\": \"<string>\",\n  \"status\": \"DENIED\",\n  \"reason\": \"<string>\"\n}",
+                              "createdAt": "2026-07-28T02:57:15.000Z",
+                              "updatedAt": "2026-07-28T02:57:15.000Z",
+                              "uid": "35240-3d46f9db-121c-4d69-adeb-be52edcc7f91"
+                            },
+                            {
+                              "id": "ba357804-e648-434b-9867-8cf29a637e8b",
+                              "name": "Invalid request",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"method\": \"callout\",\n  \"sms\": {\n    \"code\": \"<string>\"\n  },\n  \"flashcall\": {\n    \"cli\": \"<string>\"\n  }\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/verification/v1/verifications/:type/:endpoint",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "verification",
+                                    "v1",
+                                    "verifications",
+                                    ":type",
+                                    ":endpoint"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "type"
+                                    },
+                                    {
+                                      "key": "endpoint"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Bad Request",
+                              "code": 400,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:57:15.000Z",
+                              "updatedAt": "2026-07-28T02:57:15.000Z",
+                              "uid": "35240-ba357804-e648-434b-9867-8cf29a637e8b"
+                            },
+                            {
+                              "id": "c062ccda-32d3-414f-a447-cec2758c9278",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"method\": \"callout\",\n  \"sms\": {\n    \"code\": \"<string>\"\n  },\n  \"flashcall\": {\n    \"cli\": \"<string>\"\n  }\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/verification/v1/verifications/:type/:endpoint",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "verification",
+                                    "v1",
+                                    "verifications",
+                                    ":type",
+                                    ":endpoint"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "type"
+                                    },
+                                    {
+                                      "key": "endpoint"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:57:15.000Z",
+                              "updatedAt": "2026-07-28T02:57:15.000Z",
+                              "uid": "35240-c062ccda-32d3-414f-a447-cec2758c9278"
+                            },
+                            {
+                              "id": "f5e48efd-aee2-4e14-8c57-bcce85620a6d",
+                              "name": "Verification not found",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"method\": \"callout\",\n  \"sms\": {\n    \"code\": \"<string>\"\n  },\n  \"flashcall\": {\n    \"cli\": \"<string>\"\n  }\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/verification/v1/verifications/:type/:endpoint",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "verification",
+                                    "v1",
+                                    "verifications",
+                                    ":type",
+                                    ":endpoint"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "type"
+                                    },
+                                    {
+                                      "key": "endpoint"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Not Found",
+                              "code": 404,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:57:15.000Z",
+                              "updatedAt": "2026-07-28T02:57:15.000Z",
+                              "uid": "35240-f5e48efd-aee2-4e14-8c57-bcce85620a6d"
+                            }
+                          ],
+                          "createdAt": "2026-07-28T02:57:15.000Z",
+                          "updatedAt": "2026-07-28T02:57:15.000Z",
+                          "uid": "35240-230e0823-6e1e-4a4b-987f-5b270d5a9dc4"
+                        }
+                      ],
+                      "id": "83a3a5d8-7d3f-4f1f-ae56-6e25b695b4ea",
+                      "createdAt": "2026-07-28T02:57:15.000Z",
+                      "updatedAt": "2026-07-28T02:57:15.000Z",
+                      "uid": "35240-83a3a5d8-7d3f-4f1f-ae56-6e25b695b4ea"
+                    }
+                  ],
+                  "id": "ce24b5f7-3459-4606-a0b5-3862da4d8cb9",
+                  "createdAt": "2026-07-28T02:57:15.000Z",
+                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                  "uid": "35240-ce24b5f7-3459-4606-a0b5-3862da4d8cb9"
+                },
+                {
+                  "name": "id",
+                  "item": [
+                    {
+                      "name": "{id}",
+                      "item": [
+                        {
+                          "name": "status",
+                          "item": [
+                            {
+                              "name": "Get Verification Status by Id",
+                              "id": "36c7ac8c-a93a-421b-8548-91f60775e75a",
+                              "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                              },
+                              "request": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "key": "Accept",
+                                    "value": "application/json"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/verification/v1/verifications/id/:id/status",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "verification",
+                                    "v1",
+                                    "verifications",
+                                    "id",
+                                    ":id",
+                                    "status"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "id": "1823d472-70da-4034-8391-0d165450cc6d",
+                                      "key": "id",
+                                      "value": "<string>",
+                                      "description": "(Required) The verification request identifier"
+                                    }
+                                  ]
+                                },
+                                "description": "Returns the status of a verification request identified by its unique verification ID."
+                              },
+                              "response": [
+                                {
+                                  "id": "98388ae0-fe6f-4fc3-b656-48fcabd28428",
+                                  "name": "Verification status",
+                                  "originalRequest": {
+                                    "method": "GET",
+                                    "header": [
+                                      {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                      },
+                                      {
+                                        "description": "Added as a part of security scheme: bearer",
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "url": {
+                                      "raw": "{{baseUrl}}/verification/v1/verifications/id/:id/status",
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "path": [
+                                        "verification",
+                                        "v1",
+                                        "verifications",
+                                        "id",
+                                        ":id",
+                                        "status"
+                                      ],
+                                      "variable": [
+                                        {
+                                          "key": "id"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "status": "OK",
+                                  "code": 200,
+                                  "_postman_previewlanguage": "json",
+                                  "header": [
+                                    {
+                                      "key": "Content-Type",
+                                      "value": "application/json"
+                                    }
+                                  ],
+                                  "cookie": [],
+                                  "responseTime": null,
+                                  "body": "{\n  \"id\": \"<string>\",\n  \"method\": \"<string>\",\n  \"status\": \"SUCCESSFUL\",\n  \"reason\": \"<string>\",\n  \"reference\": \"<string>\",\n  \"identity\": {\n    \"type\": \"<string>\",\n    \"endpoint\": \"<string>\"\n  },\n  \"price\": {\n    \"currencyId\": \"<string>\",\n    \"amount\": \"<number>\"\n  }\n}",
+                                  "createdAt": "2026-07-28T02:57:15.000Z",
+                                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                                  "uid": "35240-98388ae0-fe6f-4fc3-b656-48fcabd28428"
+                                },
+                                {
+                                  "id": "082dc419-e210-4af7-8b8d-29030cdd4fe0",
+                                  "name": "Unauthorized",
+                                  "originalRequest": {
+                                    "method": "GET",
+                                    "header": [
+                                      {
+                                        "description": "Added as a part of security scheme: bearer",
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "url": {
+                                      "raw": "{{baseUrl}}/verification/v1/verifications/id/:id/status",
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "path": [
+                                        "verification",
+                                        "v1",
+                                        "verifications",
+                                        "id",
+                                        ":id",
+                                        "status"
+                                      ],
+                                      "variable": [
+                                        {
+                                          "key": "id"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "status": "Unauthorized",
+                                  "code": 401,
+                                  "_postman_previewlanguage": "text",
+                                  "header": [],
+                                  "cookie": [],
+                                  "responseTime": null,
+                                  "body": null,
+                                  "createdAt": "2026-07-28T02:57:15.000Z",
+                                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                                  "uid": "35240-082dc419-e210-4af7-8b8d-29030cdd4fe0"
+                                },
+                                {
+                                  "id": "cdc036c2-f5d6-47df-bccb-92a726326149",
+                                  "name": "Verification not found",
+                                  "originalRequest": {
+                                    "method": "GET",
+                                    "header": [
+                                      {
+                                        "description": "Added as a part of security scheme: bearer",
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "url": {
+                                      "raw": "{{baseUrl}}/verification/v1/verifications/id/:id/status",
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "path": [
+                                        "verification",
+                                        "v1",
+                                        "verifications",
+                                        "id",
+                                        ":id",
+                                        "status"
+                                      ],
+                                      "variable": [
+                                        {
+                                          "key": "id"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "status": "Not Found",
+                                  "code": 404,
+                                  "_postman_previewlanguage": "text",
+                                  "header": [],
+                                  "cookie": [],
+                                  "responseTime": null,
+                                  "body": null,
+                                  "createdAt": "2026-07-28T02:57:15.000Z",
+                                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                                  "uid": "35240-cdc036c2-f5d6-47df-bccb-92a726326149"
+                                }
+                              ],
+                              "createdAt": "2026-07-28T02:57:15.000Z",
+                              "updatedAt": "2026-07-28T02:57:15.000Z",
+                              "uid": "35240-36c7ac8c-a93a-421b-8548-91f60775e75a"
+                            }
+                          ],
+                          "id": "807045a6-5c4a-4083-b282-94cce43d5fae",
+                          "createdAt": "2026-07-28T02:57:15.000Z",
+                          "updatedAt": "2026-07-28T02:57:15.000Z",
+                          "uid": "35240-807045a6-5c4a-4083-b282-94cce43d5fae"
+                        },
+                        {
+                          "name": "Report a Verification by Id",
+                          "id": "4e46ba40-4d4a-40f9-9a04-7686ca00fbbf",
+                          "protocolProfileBehavior": {
+                            "disableBodyPruning": true
+                          },
+                          "request": {
+                            "method": "PUT",
+                            "header": [
+                              {
+                                "key": "Content-Type",
+                                "value": "application/json"
+                              },
+                              {
+                                "key": "Accept",
+                                "value": "application/json"
+                              }
+                            ],
+                            "body": {
+                              "mode": "raw",
+                              "raw": "{\n  \"method\": \"callout\",\n  \"sms\": {\n    \"code\": \"<string>\"\n  },\n  \"flashcall\": {\n    \"cli\": \"<string>\"\n  }\n}",
+                              "options": {
+                                "raw": {
+                                  "headerFamily": "json",
+                                  "language": "json"
+                                }
+                              }
+                            },
+                            "url": {
+                              "raw": "{{baseUrl}}/verification/v1/verifications/id/:id",
+                              "host": [
+                                "{{baseUrl}}"
+                              ],
+                              "path": [
+                                "verification",
+                                "v1",
+                                "verifications",
+                                "id",
+                                ":id"
+                              ],
+                              "variable": [
+                                {
+                                  "id": "23a75fed-cb9f-4ebd-b703-eed48f4812d7",
+                                  "key": "id",
+                                  "value": "<string>",
+                                  "description": "(Required) The verification request identifier"
+                                }
+                              ]
+                            },
+                            "description": "Reports the verification result using the verification ID rather than the phone number and method type."
+                          },
+                          "response": [
+                            {
+                              "id": "268ac24e-187f-4598-b092-8ce603997017",
+                              "name": "Verification reported",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "key": "Accept",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"method\": \"callout\",\n  \"sms\": {\n    \"code\": \"<string>\"\n  },\n  \"flashcall\": {\n    \"cli\": \"<string>\"\n  }\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/verification/v1/verifications/id/:id",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "verification",
+                                    "v1",
+                                    "verifications",
+                                    "id",
+                                    ":id"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "OK",
+                              "code": 200,
+                              "_postman_previewlanguage": "json",
+                              "header": [
+                                {
+                                  "key": "Content-Type",
+                                  "value": "application/json"
+                                }
+                              ],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": "{\n  \"id\": \"<string>\",\n  \"method\": \"<string>\",\n  \"status\": \"DENIED\",\n  \"reason\": \"<string>\"\n}",
+                              "createdAt": "2026-07-28T02:57:15.000Z",
+                              "updatedAt": "2026-07-28T02:57:15.000Z",
+                              "uid": "35240-268ac24e-187f-4598-b092-8ce603997017"
+                            },
+                            {
+                              "id": "23729378-394d-4c58-96d9-ba2df98965df",
+                              "name": "Unauthorized",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"method\": \"callout\",\n  \"sms\": {\n    \"code\": \"<string>\"\n  },\n  \"flashcall\": {\n    \"cli\": \"<string>\"\n  }\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/verification/v1/verifications/id/:id",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "verification",
+                                    "v1",
+                                    "verifications",
+                                    "id",
+                                    ":id"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Unauthorized",
+                              "code": 401,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:57:15.000Z",
+                              "updatedAt": "2026-07-28T02:57:15.000Z",
+                              "uid": "35240-23729378-394d-4c58-96d9-ba2df98965df"
+                            },
+                            {
+                              "id": "fe47232f-c5ff-4dcf-8d99-87d3c10af55f",
+                              "name": "Verification not found",
+                              "originalRequest": {
+                                "method": "PUT",
+                                "header": [
+                                  {
+                                    "key": "Content-Type",
+                                    "value": "application/json"
+                                  },
+                                  {
+                                    "description": "Added as a part of security scheme: bearer",
+                                    "key": "Authorization",
+                                    "value": "Bearer <token>"
+                                  }
+                                ],
+                                "body": {
+                                  "mode": "raw",
+                                  "raw": "{\n  \"method\": \"callout\",\n  \"sms\": {\n    \"code\": \"<string>\"\n  },\n  \"flashcall\": {\n    \"cli\": \"<string>\"\n  }\n}",
+                                  "options": {
+                                    "raw": {
+                                      "headerFamily": "json",
+                                      "language": "json"
+                                    }
+                                  }
+                                },
+                                "url": {
+                                  "raw": "{{baseUrl}}/verification/v1/verifications/id/:id",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "verification",
+                                    "v1",
+                                    "verifications",
+                                    "id",
+                                    ":id"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "key": "id"
+                                    }
+                                  ]
+                                }
+                              },
+                              "status": "Not Found",
+                              "code": 404,
+                              "_postman_previewlanguage": "text",
+                              "header": [],
+                              "cookie": [],
+                              "responseTime": null,
+                              "body": null,
+                              "createdAt": "2026-07-28T02:57:15.000Z",
+                              "updatedAt": "2026-07-28T02:57:15.000Z",
+                              "uid": "35240-fe47232f-c5ff-4dcf-8d99-87d3c10af55f"
+                            }
+                          ],
+                          "createdAt": "2026-07-28T02:57:15.000Z",
+                          "updatedAt": "2026-07-28T02:57:15.000Z",
+                          "uid": "35240-4e46ba40-4d4a-40f9-9a04-7686ca00fbbf"
+                        }
+                      ],
+                      "id": "31afb7dd-310a-4651-bb6c-d0c384e443cf",
+                      "createdAt": "2026-07-28T02:57:15.000Z",
+                      "updatedAt": "2026-07-28T02:57:15.000Z",
+                      "uid": "35240-31afb7dd-310a-4651-bb6c-d0c384e443cf"
+                    }
+                  ],
+                  "id": "408e709d-d3a1-4a35-9f9f-88c977a2fd86",
+                  "createdAt": "2026-07-28T02:57:15.000Z",
+                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                  "uid": "35240-408e709d-d3a1-4a35-9f9f-88c977a2fd86"
+                },
+                {
+                  "name": "reference",
+                  "item": [
+                    {
+                      "name": "{reference}",
+                      "item": [
+                        {
+                          "name": "status",
+                          "item": [
+                            {
+                              "name": "Get Verification Status by Reference",
+                              "id": "525aabde-2849-45c4-8318-19b74ed5f4c5",
+                              "protocolProfileBehavior": {
+                                "disableBodyPruning": true
+                              },
+                              "request": {
+                                "method": "GET",
+                                "header": [
+                                  {
+                                    "key": "Accept",
+                                    "value": "application/json"
+                                  }
+                                ],
+                                "url": {
+                                  "raw": "{{baseUrl}}/verification/v1/verifications/reference/:reference/status",
+                                  "host": [
+                                    "{{baseUrl}}"
+                                  ],
+                                  "path": [
+                                    "verification",
+                                    "v1",
+                                    "verifications",
+                                    "reference",
+                                    ":reference",
+                                    "status"
+                                  ],
+                                  "variable": [
+                                    {
+                                      "id": "2abd8741-5e1e-448f-8a0b-c91301530d65",
+                                      "key": "reference",
+                                      "value": "<string>",
+                                      "description": "(Required) The custom reference string"
+                                    }
+                                  ]
+                                },
+                                "description": "Returns the status of a verification request identified by a custom reference string that was provided when the verification was started."
+                              },
+                              "response": [
+                                {
+                                  "id": "5039af76-32bf-426c-82b3-c78ce8418eca",
+                                  "name": "Verification status",
+                                  "originalRequest": {
+                                    "method": "GET",
+                                    "header": [
+                                      {
+                                        "key": "Accept",
+                                        "value": "application/json"
+                                      },
+                                      {
+                                        "description": "Added as a part of security scheme: bearer",
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "url": {
+                                      "raw": "{{baseUrl}}/verification/v1/verifications/reference/:reference/status",
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "path": [
+                                        "verification",
+                                        "v1",
+                                        "verifications",
+                                        "reference",
+                                        ":reference",
+                                        "status"
+                                      ],
+                                      "variable": [
+                                        {
+                                          "key": "reference"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "status": "OK",
+                                  "code": 200,
+                                  "_postman_previewlanguage": "json",
+                                  "header": [
+                                    {
+                                      "key": "Content-Type",
+                                      "value": "application/json"
+                                    }
+                                  ],
+                                  "cookie": [],
+                                  "responseTime": null,
+                                  "body": "{\n  \"id\": \"<string>\",\n  \"method\": \"<string>\",\n  \"status\": \"SUCCESSFUL\",\n  \"reason\": \"<string>\",\n  \"reference\": \"<string>\",\n  \"identity\": {\n    \"type\": \"<string>\",\n    \"endpoint\": \"<string>\"\n  },\n  \"price\": {\n    \"currencyId\": \"<string>\",\n    \"amount\": \"<number>\"\n  }\n}",
+                                  "createdAt": "2026-07-28T02:57:15.000Z",
+                                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                                  "uid": "35240-5039af76-32bf-426c-82b3-c78ce8418eca"
+                                },
+                                {
+                                  "id": "383d1aca-db2f-4241-9f85-1235cab5fc5d",
+                                  "name": "Unauthorized",
+                                  "originalRequest": {
+                                    "method": "GET",
+                                    "header": [
+                                      {
+                                        "description": "Added as a part of security scheme: bearer",
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "url": {
+                                      "raw": "{{baseUrl}}/verification/v1/verifications/reference/:reference/status",
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "path": [
+                                        "verification",
+                                        "v1",
+                                        "verifications",
+                                        "reference",
+                                        ":reference",
+                                        "status"
+                                      ],
+                                      "variable": [
+                                        {
+                                          "key": "reference"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "status": "Unauthorized",
+                                  "code": 401,
+                                  "_postman_previewlanguage": "text",
+                                  "header": [],
+                                  "cookie": [],
+                                  "responseTime": null,
+                                  "body": null,
+                                  "createdAt": "2026-07-28T02:57:15.000Z",
+                                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                                  "uid": "35240-383d1aca-db2f-4241-9f85-1235cab5fc5d"
+                                },
+                                {
+                                  "id": "6e577983-1d47-457e-b5b4-aec8f8372a7e",
+                                  "name": "Verification not found",
+                                  "originalRequest": {
+                                    "method": "GET",
+                                    "header": [
+                                      {
+                                        "description": "Added as a part of security scheme: bearer",
+                                        "key": "Authorization",
+                                        "value": "Bearer <token>"
+                                      }
+                                    ],
+                                    "url": {
+                                      "raw": "{{baseUrl}}/verification/v1/verifications/reference/:reference/status",
+                                      "host": [
+                                        "{{baseUrl}}"
+                                      ],
+                                      "path": [
+                                        "verification",
+                                        "v1",
+                                        "verifications",
+                                        "reference",
+                                        ":reference",
+                                        "status"
+                                      ],
+                                      "variable": [
+                                        {
+                                          "key": "reference"
+                                        }
+                                      ]
+                                    }
+                                  },
+                                  "status": "Not Found",
+                                  "code": 404,
+                                  "_postman_previewlanguage": "text",
+                                  "header": [],
+                                  "cookie": [],
+                                  "responseTime": null,
+                                  "body": null,
+                                  "createdAt": "2026-07-28T02:57:15.000Z",
+                                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                                  "uid": "35240-6e577983-1d47-457e-b5b4-aec8f8372a7e"
+                                }
+                              ],
+                              "createdAt": "2026-07-28T02:57:15.000Z",
+                              "updatedAt": "2026-07-28T02:57:15.000Z",
+                              "uid": "35240-525aabde-2849-45c4-8318-19b74ed5f4c5"
+                            }
+                          ],
+                          "id": "ca261837-8089-400d-8e22-b4a26f55be97",
+                          "createdAt": "2026-07-28T02:57:15.000Z",
+                          "updatedAt": "2026-07-28T02:57:15.000Z",
+                          "uid": "35240-ca261837-8089-400d-8e22-b4a26f55be97"
+                        }
+                      ],
+                      "id": "f2d194e5-00c2-4966-a74a-0e7c98f90f51",
+                      "createdAt": "2026-07-28T02:57:15.000Z",
+                      "updatedAt": "2026-07-28T02:57:15.000Z",
+                      "uid": "35240-f2d194e5-00c2-4966-a74a-0e7c98f90f51"
+                    }
+                  ],
+                  "id": "e96033e6-e806-47fc-95a4-8285f5590561",
+                  "createdAt": "2026-07-28T02:57:15.000Z",
+                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                  "uid": "35240-e96033e6-e806-47fc-95a4-8285f5590561"
+                },
+                {
+                  "name": "Start a Verification",
+                  "id": "edb76203-715f-45b5-8ce0-e9903cb350fb",
+                  "protocolProfileBehavior": {
+                    "disableBodyPruning": true
+                  },
+                  "request": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                      },
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"identity\": {\n    \"type\": \"number\",\n    \"endpoint\": \"<string>\"\n  },\n  \"method\": \"callout\",\n  \"reference\": \"<string>\",\n  \"custom\": \"<string>\",\n  \"metadata\": {}\n}",
+                      "options": {
+                        "raw": {
+                          "headerFamily": "json",
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/verification/v1/verifications",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "verification",
+                        "v1",
+                        "verifications"
+                      ]
+                    },
+                    "description": "Initiates a new verification request for a phone number. The method parameter determines which verification type is used: SMS sends a one-time code, flashcall triggers a call from a specific number, callout triggers a phone call with a spoken code, and seamless performs data verification."
+                  },
+                  "response": [
+                    {
+                      "id": "3020e70b-7ebe-4385-a0c1-4c87fe888aae",
+                      "name": "Verification initiated",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "key": "Accept",
+                            "value": "application/json"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"identity\": {\n    \"type\": \"number\",\n    \"endpoint\": \"<string>\"\n  },\n  \"method\": \"callout\",\n  \"reference\": \"<string>\",\n  \"custom\": \"<string>\",\n  \"metadata\": {}\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/verification/v1/verifications",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "verification",
+                            "v1",
+                            "verifications"
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "responseTime": null,
+                      "body": "{\n  \"id\": \"<string>\",\n  \"method\": \"<string>\",\n  \"sms\": {\n    \"template\": \"<string>\",\n    \"interceptionTimeout\": \"<integer>\"\n  },\n  \"flashcall\": {\n    \"cliFilter\": \"<string>\",\n    \"interceptionTimeout\": \"<integer>\"\n  },\n  \"callout\": {},\n  \"seamless\": {\n    \"targetUri\": \"<uri>\"\n  }\n}",
+                      "createdAt": "2026-07-28T02:57:15.000Z",
+                      "updatedAt": "2026-07-28T02:57:15.000Z",
+                      "uid": "35240-3020e70b-7ebe-4385-a0c1-4c87fe888aae"
+                    },
+                    {
+                      "id": "31a217b9-c907-4df5-a192-96cecea3cb10",
+                      "name": "Invalid request",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"identity\": {\n    \"type\": \"number\",\n    \"endpoint\": \"<string>\"\n  },\n  \"method\": \"callout\",\n  \"reference\": \"<string>\",\n  \"custom\": \"<string>\",\n  \"metadata\": {}\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/verification/v1/verifications",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "verification",
+                            "v1",
+                            "verifications"
+                          ]
+                        }
+                      },
+                      "status": "Bad Request",
+                      "code": 400,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "responseTime": null,
+                      "body": null,
+                      "createdAt": "2026-07-28T02:57:15.000Z",
+                      "updatedAt": "2026-07-28T02:57:15.000Z",
+                      "uid": "35240-31a217b9-c907-4df5-a192-96cecea3cb10"
+                    },
+                    {
+                      "id": "94f3842a-9c81-42c0-bea7-f60e1794e08d",
+                      "name": "Unauthorized",
+                      "originalRequest": {
+                        "method": "POST",
+                        "header": [
+                          {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                          },
+                          {
+                            "description": "Added as a part of security scheme: bearer",
+                            "key": "Authorization",
+                            "value": "Bearer <token>"
+                          }
+                        ],
+                        "body": {
+                          "mode": "raw",
+                          "raw": "{\n  \"identity\": {\n    \"type\": \"number\",\n    \"endpoint\": \"<string>\"\n  },\n  \"method\": \"callout\",\n  \"reference\": \"<string>\",\n  \"custom\": \"<string>\",\n  \"metadata\": {}\n}",
+                          "options": {
+                            "raw": {
+                              "headerFamily": "json",
+                              "language": "json"
+                            }
+                          }
+                        },
+                        "url": {
+                          "raw": "{{baseUrl}}/verification/v1/verifications",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "verification",
+                            "v1",
+                            "verifications"
+                          ]
+                        }
+                      },
+                      "status": "Unauthorized",
+                      "code": 401,
+                      "_postman_previewlanguage": "text",
+                      "header": [],
+                      "cookie": [],
+                      "responseTime": null,
+                      "body": null,
+                      "createdAt": "2026-07-28T02:57:15.000Z",
+                      "updatedAt": "2026-07-28T02:57:15.000Z",
+                      "uid": "35240-94f3842a-9c81-42c0-bea7-f60e1794e08d"
+                    }
+                  ],
+                  "createdAt": "2026-07-28T02:57:15.000Z",
+                  "updatedAt": "2026-07-28T02:57:15.000Z",
+                  "uid": "35240-edb76203-715f-45b5-8ce0-e9903cb350fb"
+                }
+              ],
+              "id": "43f9bbc8-5f02-4414-baf8-d6c42960d394",
+              "createdAt": "2026-07-28T02:57:15.000Z",
+              "updatedAt": "2026-07-28T02:57:15.000Z",
+              "uid": "35240-43f9bbc8-5f02-4414-baf8-d6c42960d394"
+            }
+          ],
+          "id": "03508d97-a2c5-41b8-beb1-7f9f10578dd3",
+          "createdAt": "2026-07-28T02:57:15.000Z",
+          "updatedAt": "2026-07-28T02:57:15.000Z",
+          "uid": "35240-03508d97-a2c5-41b8-beb1-7f9f10578dd3"
+        }
+      ],
+      "id": "824b2742-651c-4966-ad4b-73ecf79198e8",
+      "createdAt": "2026-07-28T02:57:15.000Z",
+      "updatedAt": "2026-07-28T02:57:15.000Z",
+      "uid": "35240-824b2742-651c-4966-ad4b-73ecf79198e8"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://brands.api.sinch.com"
+    }
+  ]
+}
