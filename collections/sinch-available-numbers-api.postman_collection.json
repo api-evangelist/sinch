@@ -1,0 +1,913 @@
+{
+  "item": [
+    {
+      "id": "0747b40e-5bf7-4652-9834-290d3852a9e4",
+      "name": "Available Numbers",
+      "description": {
+        "content": "Search for available phone numbers by country, type, and capabilities.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "79cd08f5-5c60-464d-bd31-910885a3ed96",
+          "name": "List Available Numbers",
+          "request": {
+            "name": "List Available Numbers",
+            "description": {
+              "content": "Searches for available phone numbers that can be purchased. Results can be filtered by country, type, capabilities, number pattern, and region.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "projects",
+                ":project_id",
+                "availableNumbers"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "regionCode",
+                  "value": "<string>",
+                  "description": "(Required) The ISO 3166-1 alpha-2 country code"
+                },
+                {
+                  "disabled": false,
+                  "key": "type",
+                  "value": "<string>",
+                  "description": "(Required) The number type to search for"
+                },
+                {
+                  "disabled": false,
+                  "key": "numberPattern.pattern",
+                  "value": "<string>",
+                  "description": "Pattern to search for in the phone number"
+                },
+                {
+                  "disabled": false,
+                  "key": "numberPattern.searchPattern",
+                  "value": "<string>",
+                  "description": "Where in the number to search for the pattern"
+                },
+                {
+                  "disabled": false,
+                  "key": "capabilities",
+                  "value": "<string>",
+                  "description": "Filter by capabilities"
+                },
+                {
+                  "disabled": false,
+                  "key": "capabilities",
+                  "value": "<string>",
+                  "description": "Filter by capabilities"
+                },
+                {
+                  "disabled": false,
+                  "key": "size",
+                  "value": "30",
+                  "description": "The maximum number of results to return"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "project_id",
+                  "description": "(Required) The unique project identifier"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "a13445ae-484b-416b-89e7-dd1afd551c26",
+              "name": "List of available numbers",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "availableNumbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "regionCode",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "type",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "numberPattern.pattern",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "numberPattern.searchPattern",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "capabilities",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "capabilities",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "size",
+                      "value": "30"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"availableNumbers\": [\n    {\n      \"phoneNumber\": \"string\",\n      \"regionCode\": \"string\",\n      \"type\": \"string\",\n      \"capability\": [\n        \"string\",\n        \"string\"\n      ],\n      \"setupPrice\": {\n        \"currencyCode\": \"string\",\n        \"amount\": \"string\"\n      },\n      \"monthlyPrice\": {\n        \"currencyCode\": \"string\",\n        \"amount\": \"string\"\n      },\n      \"paymentIntervalMonths\": 5102\n    },\n    {\n      \"phoneNumber\": \"string\",\n      \"regionCode\": \"string\",\n      \"type\": \"string\",\n      \"capability\": [\n        \"string\",\n        \"string\"\n      ],\n      \"setupPrice\": {\n        \"currencyCode\": \"string\",\n        \"amount\": \"string\"\n      },\n      \"monthlyPrice\": {\n        \"currencyCode\": \"string\",\n        \"amount\": \"string\"\n      },\n      \"paymentIntervalMonths\": 2572\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "f12661e9-06e1-4fa4-8dfb-cb68496c452d",
+              "name": "Invalid request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "availableNumbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "regionCode",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "type",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "numberPattern.pattern",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "numberPattern.searchPattern",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "capabilities",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "capabilities",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "size",
+                      "value": "30"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "98ec2b70-a2f9-4085-bae5-e2e929b3ef42",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "availableNumbers"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "regionCode",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "type",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "numberPattern.pattern",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "numberPattern.searchPattern",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "capabilities",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "capabilities",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "size",
+                      "value": "30"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "c20ec6f3-dd5a-418a-a0ca-780eb5ebb261",
+          "name": "Get an Available Number",
+          "request": {
+            "name": "Get an Available Number",
+            "description": {
+              "content": "Returns the details of a specific available phone number including its type, capabilities, and pricing.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "projects",
+                ":project_id",
+                "availableNumbers",
+                ":phone_number"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "project_id",
+                  "description": "(Required) The unique project identifier"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "phone_number",
+                  "description": "(Required) The phone number in E.164 format"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "fa15c0f5-f00b-4511-a885-ed0955ed711e",
+              "name": "Available number details",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "availableNumbers",
+                    ":phone_number"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "phone_number",
+                      "description": "(Required) The phone number in E.164 format"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"phoneNumber\": \"string\",\n  \"regionCode\": \"string\",\n  \"type\": \"string\",\n  \"capability\": [\n    \"string\",\n    \"string\"\n  ],\n  \"setupPrice\": {\n    \"currencyCode\": \"string\",\n    \"amount\": \"string\"\n  },\n  \"monthlyPrice\": {\n    \"currencyCode\": \"string\",\n    \"amount\": \"string\"\n  },\n  \"paymentIntervalMonths\": 4827\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "52aa22fc-49d7-4f2d-9cb2-1d47da2935a4",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "availableNumbers",
+                    ":phone_number"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "phone_number",
+                      "description": "(Required) The phone number in E.164 format"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "4858ffb9-0bfb-4d3d-8a9d-fe035027198b",
+              "name": "Number not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "availableNumbers",
+                    ":phone_number"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "phone_number",
+                      "description": "(Required) The phone number in E.164 format"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "705eeaf3-cd52-4b8d-86ee-1ad97c49be38",
+          "name": "Rent a Number",
+          "request": {
+            "name": "Rent a Number",
+            "description": {
+              "content": "Activates a phone number by renting it for use with Sinch services. The number will be assigned to your project and can be configured for SMS, Voice, or other services.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "projects",
+                ":project_id",
+                "availableNumbers",
+                "{{phone_number}}:rent"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "project_id",
+                  "description": "(Required) The unique project identifier"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"<string>\",\n    \"campaignId\": \"<string>\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"<string>\",\n      \"campaignId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"<string>\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"<string>\",\n      \"status\": \"<string>\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "6a09929c-aff5-4be9-8bdc-e4da3ec3e183",
+              "name": "Number rented successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "availableNumbers",
+                    "{{phone_number}}:rent"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"string\",\n    \"campaignId\": \"string\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"string\",\n      \"campaignId\": \"string\",\n      \"status\": \"string\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"string\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"string\",\n      \"status\": \"string\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"phoneNumber\": \"string\",\n  \"projectId\": \"string\",\n  \"displayName\": \"string\",\n  \"regionCode\": \"string\",\n  \"type\": \"string\",\n  \"capability\": [\n    \"string\",\n    \"string\"\n  ],\n  \"money\": {\n    \"currencyCode\": \"string\",\n    \"amount\": \"string\"\n  },\n  \"paymentIntervalMonths\": 1826,\n  \"nextChargeDate\": \"1993-04-08T15:21:12.095Z\",\n  \"expireAt\": \"1987-10-18T17:24:32.870Z\",\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"string\",\n    \"campaignId\": \"string\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"string\",\n      \"campaignId\": \"string\",\n      \"status\": \"string\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"string\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"string\",\n      \"status\": \"string\"\n    }\n  },\n  \"callbackUrl\": \"https://LoOSxtvkAusXCvawuTmWYTSuByJFdW.kbuPzKmXIWLFm1NEWnQTyimWsNGhm,c2pNP++M5MR0O\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "90f69afe-6b06-46bb-b737-226ddc2798d6",
+              "name": "Invalid request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "availableNumbers",
+                    "{{phone_number}}:rent"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"string\",\n    \"campaignId\": \"string\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"string\",\n      \"campaignId\": \"string\",\n      \"status\": \"string\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"string\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"string\",\n      \"status\": \"string\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "72a930b4-5d5b-4d56-9e59-15dd6cdb87b0",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "availableNumbers",
+                    "{{phone_number}}:rent"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"string\",\n    \"campaignId\": \"string\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"string\",\n      \"campaignId\": \"string\",\n      \"status\": \"string\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"string\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"string\",\n      \"status\": \"string\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "0b8f50fb-0ce8-4e7f-a35d-ef240c2cb2fe",
+              "name": "Number not available",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "availableNumbers",
+                    "{{phone_number}}:rent"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"smsConfiguration\": {\n    \"servicePlanId\": \"string\",\n    \"campaignId\": \"string\",\n    \"scheduledProvisioning\": {\n      \"servicePlanId\": \"string\",\n      \"campaignId\": \"string\",\n      \"status\": \"string\"\n    }\n  },\n  \"voiceConfiguration\": {\n    \"appId\": \"string\",\n    \"scheduledVoiceProvisioning\": {\n      \"appId\": \"string\",\n      \"status\": \"string\"\n    }\n  },\n  \"callbackUrl\": \"<uri>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://brands.api.sinch.com",
+      "key": "baseUrl"
+    },
+    {
+      "disabled": false,
+      "description": {
+        "content": "(Required) The phone number in E.164 format",
+        "type": "text/plain"
+      },
+      "type": "any",
+      "value": "<string>",
+      "key": "phone_number"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "6bdd4f5e-f2ed-48d6-b55a-1341a3114539",
+    "name": "Sinch Brands Access Control Lists Available Numbers API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.\n\nContact Support:\n Name: Sinch Support",
+      "type": "text/plain"
+    }
+  }
+}

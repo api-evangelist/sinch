@@ -1,0 +1,109 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Phone Numbers API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Phone Numbers",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Phone Numbers for a Trunk",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/phoneNumbers",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ]
+          },
+          "docs": "Returns the list of phone numbers assigned to a specific SIP trunk."
+        },
+        {
+          "info": {
+            "name": "Add Phone Number to Trunk",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/phoneNumbers",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Assigns a phone number to a SIP trunk for inbound and outbound calling."
+        },
+        {
+          "info": {
+            "name": "Remove Phone Number from Trunk",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/trunks/:trunk_id/phoneNumbers/:phone_number",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "trunk_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique SIP trunk identifier"
+              },
+              {
+                "name": "phone_number",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ]
+          },
+          "docs": "Removes a phone number from a SIP trunk."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

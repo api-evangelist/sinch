@@ -1,0 +1,200 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Conversations API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Conversations",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Conversations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/conversations",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "only_active",
+                "value": "",
+                "type": "query",
+                "description": "Only return active conversations"
+              },
+              {
+                "name": "app_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter by app ID"
+              },
+              {
+                "name": "contact_id",
+                "value": "",
+                "type": "query",
+                "description": "Filter by contact ID"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of conversations per page"
+              },
+              {
+                "name": "page_token",
+                "value": "",
+                "type": "query",
+                "description": "Pagination token for the next page"
+              }
+            ]
+          },
+          "docs": "Returns a list of conversations for a project with optional filtering."
+        },
+        {
+          "info": {
+            "name": "Create a Conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/conversations",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new conversation associated with a contact and app."
+        },
+        {
+          "info": {
+            "name": "Get a Conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/conversations/:conversation_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "conversation_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conversation identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific conversation."
+        },
+        {
+          "info": {
+            "name": "Update a Conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/conversations/:conversation_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "conversation_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conversation identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the properties of a specific conversation."
+        },
+        {
+          "info": {
+            "name": "Delete a Conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/conversations/:conversation_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "conversation_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conversation identifier"
+              }
+            ]
+          },
+          "docs": "Deletes a specific conversation and optionally its messages."
+        },
+        {
+          "info": {
+            "name": "Stop a Conversation",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/conversations/:conversation_id:stop",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "conversation_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conversation identifier"
+              }
+            ]
+          },
+          "docs": "Stops an active conversation, marking it as inactive."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

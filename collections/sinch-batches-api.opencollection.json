@@ -1,0 +1,194 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Batches API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Batches",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Batches",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/batches",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "The page number to retrieve"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of batches per page"
+              },
+              {
+                "name": "from",
+                "value": "",
+                "type": "query",
+                "description": "Filter batches sent from this date"
+              },
+              {
+                "name": "to",
+                "value": "",
+                "type": "query",
+                "description": "Filter batches sent up to this date"
+              }
+            ]
+          },
+          "docs": "Returns a list of batches with pagination support. You can filter batches by various criteria including start date and end date."
+        },
+        {
+          "info": {
+            "name": "Send a Batch Message",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/batches",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Sends a batch of SMS messages. A batch can contain one or more messages to one or more recipients. The API supports scheduled delivery, parameterized messages, and delivery report configuration."
+        },
+        {
+          "info": {
+            "name": "Get a Batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific batch identified by the batch ID."
+        },
+        {
+          "info": {
+            "name": "Update a Batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates a batch message. Only batches that have not yet been delivered can be updated."
+        },
+        {
+          "info": {
+            "name": "Cancel a Batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "PUT",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id/cancel",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              }
+            ]
+          },
+          "docs": "Cancels a batch that has not yet been delivered. A batch can only be canceled if it has not yet started sending."
+        },
+        {
+          "info": {
+            "name": "Dry Run a Batch",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id/dry_run",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              }
+            ]
+          },
+          "docs": "Performs a dry run of a batch without actually sending messages. This can be used to validate the batch configuration and estimate the number of recipients."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

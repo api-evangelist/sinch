@@ -1,0 +1,68 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Market Requirements API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Market Requirements",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Markets",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/markets",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ]
+          },
+          "docs": "Returns a list of available markets with their sender ID registration requirements and supported sender types."
+        },
+        {
+          "info": {
+            "name": "Get Market Requirements",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/markets/:market_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "market_id",
+                "value": "",
+                "type": "path",
+                "description": "The market identifier"
+              }
+            ]
+          },
+          "docs": "Returns the detailed registration requirements for a specific market including required fields, supported sender types, and approval timelines."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

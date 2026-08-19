@@ -1,0 +1,177 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Faxes API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Faxes",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Faxes",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v3/projects/:project_id/faxes",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "The page number to retrieve"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "The number of faxes per page"
+              },
+              {
+                "name": "direction",
+                "value": "",
+                "type": "query",
+                "description": "Filter by direction"
+              },
+              {
+                "name": "status",
+                "value": "",
+                "type": "query",
+                "description": "Filter by fax status"
+              },
+              {
+                "name": "createTime.gte",
+                "value": "",
+                "type": "query",
+                "description": "Filter faxes created after this time"
+              },
+              {
+                "name": "createTime.lte",
+                "value": "",
+                "type": "query",
+                "description": "Filter faxes created before this time"
+              }
+            ]
+          },
+          "docs": "Returns a list of sent and received faxes with pagination and filtering support."
+        },
+        {
+          "info": {
+            "name": "Send a Fax",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/v3/projects/:project_id/faxes",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Sends a fax to one or more recipients. The fax content can be provided as a URL to a document or as a file upload. Supports PDF and TIFF formats."
+        },
+        {
+          "info": {
+            "name": "Get a Fax",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v3/projects/:project_id/faxes/:fax_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "fax_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique fax identifier"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific fax including its status, page count, and content URL."
+        },
+        {
+          "info": {
+            "name": "Delete Fax Content",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://brands.api.sinch.com/v3/projects/:project_id/faxes/:fax_id",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "fax_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique fax identifier"
+              }
+            ]
+          },
+          "docs": "Deletes the content of a specific fax while retaining the metadata."
+        },
+        {
+          "info": {
+            "name": "Download Fax Content",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v3/projects/:project_id/faxes/:fax_id/file",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "fax_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique fax identifier"
+              }
+            ]
+          },
+          "docs": "Downloads the content of a received or sent fax as a PDF file."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

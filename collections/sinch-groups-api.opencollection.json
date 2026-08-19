@@ -1,0 +1,182 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Groups API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Groups",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Groups",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/groups",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "The page number to retrieve"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of groups per page"
+              }
+            ]
+          },
+          "docs": "Returns a list of groups with pagination support."
+        },
+        {
+          "info": {
+            "name": "Create a Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/groups",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Creates a new group of phone numbers that can be used as recipients when sending SMS batches."
+        },
+        {
+          "info": {
+            "name": "Get a Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/groups/:group_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the group"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific group."
+        },
+        {
+          "info": {
+            "name": "Update a Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/groups/:group_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the group"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates an existing group by adding or removing members or changing the group name."
+        },
+        {
+          "info": {
+            "name": "Delete a Group",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/groups/:group_id",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the group"
+              }
+            ]
+          },
+          "docs": "Deletes a group and all its members."
+        },
+        {
+          "info": {
+            "name": "Get Group Members",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/groups/:group_id/members",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "group_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the group"
+              }
+            ]
+          },
+          "docs": "Returns the list of phone numbers that are members of the specified group."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

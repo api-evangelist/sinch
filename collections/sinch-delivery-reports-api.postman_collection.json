@@ -1,0 +1,748 @@
+{
+  "item": [
+    {
+      "id": "793eeb0b-8998-4a43-ba36-19f509de759e",
+      "name": "Delivery Reports",
+      "description": {
+        "content": "Delivery reports provide the status of sent messages. Reports can be retrieved via the API or delivered via webhook callbacks.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "6ac508b5-79cb-4024-aded-f74bdea26a8b",
+          "name": "Retrieve a Batch Delivery Report",
+          "request": {
+            "name": "Retrieve a Batch Delivery Report",
+            "description": {
+              "content": "Returns the aggregate delivery report for a specific batch. The report contains status counts and details about message delivery.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "xms",
+                "v1",
+                ":service_plan_id",
+                "batches",
+                ":batch_id",
+                "delivery_report"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "type",
+                  "value": "<string>",
+                  "description": "The type of delivery report to retrieve"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "service_plan_id",
+                  "description": "(Required) The unique identifier for the service plan"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "batch_id",
+                  "description": "(Required) The unique identifier for the batch"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "bb6aebfe-fe4d-48d8-a01a-4f2493fd9e31",
+              "name": "Delivery report",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "xms",
+                    "v1",
+                    ":service_plan_id",
+                    "batches",
+                    ":batch_id",
+                    "delivery_report"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "service_plan_id",
+                      "description": "(Required) The unique identifier for the service plan"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "batch_id",
+                      "description": "(Required) The unique identifier for the batch"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"batch_id\": \"string\",\n  \"type\": \"string\",\n  \"statuses\": [\n    {\n      \"code\": 3387,\n      \"status\": \"string\",\n      \"count\": 3711,\n      \"recipients\": [\n        \"string\",\n        \"string\"\n      ]\n    },\n    {\n      \"code\": 8357,\n      \"status\": \"string\",\n      \"count\": 6614,\n      \"recipients\": [\n        \"string\",\n        \"string\"\n      ]\n    }\n  ],\n  \"total_message_count\": 3200\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a4953cf5-c114-4e8a-8ba0-18d7ad90c262",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "xms",
+                    "v1",
+                    ":service_plan_id",
+                    "batches",
+                    ":batch_id",
+                    "delivery_report"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "service_plan_id",
+                      "description": "(Required) The unique identifier for the service plan"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "batch_id",
+                      "description": "(Required) The unique identifier for the batch"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "97fcedad-017a-4ffc-8bb5-b8f5f96e9f32",
+              "name": "Batch not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "xms",
+                    "v1",
+                    ":service_plan_id",
+                    "batches",
+                    ":batch_id",
+                    "delivery_report"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "type",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "service_plan_id",
+                      "description": "(Required) The unique identifier for the service plan"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "batch_id",
+                      "description": "(Required) The unique identifier for the batch"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "258c2c66-e5d1-484d-a0ad-6c11a6329448",
+          "name": "Retrieve a Recipient Delivery Report",
+          "request": {
+            "name": "Retrieve a Recipient Delivery Report",
+            "description": {
+              "content": "Returns the delivery report for a specific recipient in a batch.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "xms",
+                "v1",
+                ":service_plan_id",
+                "batches",
+                ":batch_id",
+                "delivery_report",
+                ":recipient_msisdn"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "service_plan_id",
+                  "description": "(Required) The unique identifier for the service plan"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "batch_id",
+                  "description": "(Required) The unique identifier for the batch"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "recipient_msisdn",
+                  "description": "(Required) The phone number of the recipient"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "81988bc0-6f73-4447-8ea2-1a772afa3c17",
+              "name": "Recipient delivery report",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "xms",
+                    "v1",
+                    ":service_plan_id",
+                    "batches",
+                    ":batch_id",
+                    "delivery_report",
+                    ":recipient_msisdn"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "service_plan_id",
+                      "description": "(Required) The unique identifier for the service plan"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "batch_id",
+                      "description": "(Required) The unique identifier for the batch"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "recipient_msisdn",
+                      "description": "(Required) The phone number of the recipient"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"batch_id\": \"string\",\n  \"recipient\": \"string\",\n  \"code\": 2868,\n  \"status\": \"string\",\n  \"at\": \"1978-10-07T20:55:09.517Z\",\n  \"operator_status_at\": \"1989-10-25T04:22:17.253Z\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "6fdcc804-9dbb-4f32-99ce-7632472c5bb6",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "xms",
+                    "v1",
+                    ":service_plan_id",
+                    "batches",
+                    ":batch_id",
+                    "delivery_report",
+                    ":recipient_msisdn"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "service_plan_id",
+                      "description": "(Required) The unique identifier for the service plan"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "batch_id",
+                      "description": "(Required) The unique identifier for the batch"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "recipient_msisdn",
+                      "description": "(Required) The phone number of the recipient"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "d4f634c8-7449-469e-ac29-11f5391b1e7e",
+              "name": "Report not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "xms",
+                    "v1",
+                    ":service_plan_id",
+                    "batches",
+                    ":batch_id",
+                    "delivery_report",
+                    ":recipient_msisdn"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "service_plan_id",
+                      "description": "(Required) The unique identifier for the service plan"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "batch_id",
+                      "description": "(Required) The unique identifier for the batch"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "recipient_msisdn",
+                      "description": "(Required) The phone number of the recipient"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "ad298ff7-9683-4b37-aed4-6681a2668001",
+          "name": "List Delivery Reports",
+          "request": {
+            "name": "List Delivery Reports",
+            "description": {
+              "content": "Returns a list of delivery reports with pagination support.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "xms",
+                "v1",
+                ":service_plan_id",
+                "delivery_reports"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "page",
+                  "value": "0",
+                  "description": "The page number to retrieve"
+                },
+                {
+                  "disabled": false,
+                  "key": "page_size",
+                  "value": "30",
+                  "description": "The number of reports per page"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "service_plan_id",
+                  "description": "(Required) The unique identifier for the service plan"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "9d6802d7-1c41-4e44-8fc5-e05463eba6d9",
+              "name": "List of delivery reports",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "xms",
+                    "v1",
+                    ":service_plan_id",
+                    "delivery_reports"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "30"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "service_plan_id",
+                      "description": "(Required) The unique identifier for the service plan"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"count\": 6733,\n  \"page\": 4021,\n  \"page_size\": 2884,\n  \"delivery_reports\": [\n    {\n      \"batch_id\": \"string\",\n      \"type\": \"string\",\n      \"statuses\": [\n        {\n          \"code\": 8455,\n          \"status\": \"string\",\n          \"count\": 5995,\n          \"recipients\": [\n            \"string\",\n            \"string\"\n          ]\n        },\n        {\n          \"code\": 497,\n          \"status\": \"string\",\n          \"count\": 8187,\n          \"recipients\": [\n            \"string\",\n            \"string\"\n          ]\n        }\n      ],\n      \"total_message_count\": 3799\n    },\n    {\n      \"batch_id\": \"string\",\n      \"type\": \"string\",\n      \"statuses\": [\n        {\n          \"code\": 7967,\n          \"status\": \"string\",\n          \"count\": 959,\n          \"recipients\": [\n            \"string\",\n            \"string\"\n          ]\n        },\n        {\n          \"code\": 3768,\n          \"status\": \"string\",\n          \"count\": 7953,\n          \"recipients\": [\n            \"string\",\n            \"string\"\n          ]\n        }\n      ],\n      \"total_message_count\": 6598\n    }\n  ]\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ba542c1b-8e40-4b95-915c-ae369f397abb",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "xms",
+                    "v1",
+                    ":service_plan_id",
+                    "delivery_reports"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "0"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "30"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "service_plan_id",
+                      "description": "(Required) The unique identifier for the service plan"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://brands.api.sinch.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "4b5dd4fa-8334-42a0-86c2-41254718d777",
+    "name": "Sinch Brands Access Control Lists Delivery Reports API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.\n\nContact Support:\n Name: Sinch Support",
+      "type": "text/plain"
+    }
+  }
+}

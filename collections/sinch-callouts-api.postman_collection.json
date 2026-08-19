@@ -1,0 +1,242 @@
+{
+  "item": [
+    {
+      "id": "dabd4ef8-50ff-4024-9d62-28fab250d933",
+      "name": "Callouts",
+      "description": {
+        "content": "Callouts are calls made to a phone number or app using the API. Supported types include conference callouts, text-to-speech callouts, and custom callouts.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "60031f5b-56d9-4636-955c-e34041f7ccd8",
+          "name": "Make a Callout",
+          "request": {
+            "name": "Make a Callout",
+            "description": {
+              "content": "Makes a call to a phone number or app. The callout type determines the behavior of the call, including conference callouts, text-to-speech callouts, and custom callouts with SVAML control.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "calling",
+                "v1",
+                "callouts"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": []
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"method\": \"<string>\",\n  \"conferenceCallout\": {\n    \"cli\": \"<string>\",\n    \"destination\": {\n      \"type\": \"<string>\",\n      \"endpoint\": \"<string>\"\n    },\n    \"conferenceId\": \"<string>\",\n    \"dtmf\": \"<string>\",\n    \"maxDuration\": \"<integer>\",\n    \"enableAce\": \"<boolean>\",\n    \"enableDice\": \"<boolean>\",\n    \"enablePie\": \"<boolean>\",\n    \"locale\": \"<string>\",\n    \"greeting\": \"<string>\",\n    \"mohClass\": \"<string>\"\n  },\n  \"ttsCallout\": {\n    \"cli\": \"<string>\",\n    \"destination\": {\n      \"type\": \"<string>\",\n      \"endpoint\": \"<string>\"\n    },\n    \"text\": \"<string>\",\n    \"locale\": \"<string>\",\n    \"enableAce\": \"<boolean>\",\n    \"enableDice\": \"<boolean>\"\n  },\n  \"customCallout\": {\n    \"cli\": \"<string>\",\n    \"destination\": {\n      \"type\": \"<string>\",\n      \"endpoint\": \"<string>\"\n    },\n    \"ice\": \"<string>\",\n    \"ace\": \"<string>\",\n    \"pie\": \"<string>\"\n  }\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "fce0d45d-59e5-48cc-98a1-e7b1456e66e9",
+              "name": "Callout initiated successfully",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "calling",
+                    "v1",
+                    "callouts"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"method\": \"<string>\",\n  \"conferenceCallout\": {\n    \"cli\": \"string\",\n    \"destination\": {\n      \"type\": \"number\",\n      \"endpoint\": \"string\"\n    },\n    \"conferenceId\": \"string\",\n    \"dtmf\": \"string\",\n    \"maxDuration\": 3881,\n    \"enableAce\": false,\n    \"enableDice\": true,\n    \"enablePie\": true,\n    \"locale\": \"string\",\n    \"greeting\": \"string\",\n    \"mohClass\": \"string\"\n  },\n  \"ttsCallout\": {\n    \"cli\": \"string\",\n    \"destination\": {\n      \"type\": \"sip\",\n      \"endpoint\": \"string\"\n    },\n    \"text\": \"string\",\n    \"locale\": \"string\",\n    \"enableAce\": true,\n    \"enableDice\": true\n  },\n  \"customCallout\": {\n    \"cli\": \"string\",\n    \"destination\": {\n      \"type\": \"sip\",\n      \"endpoint\": \"string\"\n    },\n    \"ice\": \"string\",\n    \"ace\": \"string\",\n    \"pie\": \"string\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"callId\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "a9d79a3f-0cd0-49fa-ab61-06c673f35f5a",
+              "name": "Invalid request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "calling",
+                    "v1",
+                    "callouts"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"method\": \"<string>\",\n  \"conferenceCallout\": {\n    \"cli\": \"string\",\n    \"destination\": {\n      \"type\": \"number\",\n      \"endpoint\": \"string\"\n    },\n    \"conferenceId\": \"string\",\n    \"dtmf\": \"string\",\n    \"maxDuration\": 3881,\n    \"enableAce\": false,\n    \"enableDice\": true,\n    \"enablePie\": true,\n    \"locale\": \"string\",\n    \"greeting\": \"string\",\n    \"mohClass\": \"string\"\n  },\n  \"ttsCallout\": {\n    \"cli\": \"string\",\n    \"destination\": {\n      \"type\": \"sip\",\n      \"endpoint\": \"string\"\n    },\n    \"text\": \"string\",\n    \"locale\": \"string\",\n    \"enableAce\": true,\n    \"enableDice\": true\n  },\n  \"customCallout\": {\n    \"cli\": \"string\",\n    \"destination\": {\n      \"type\": \"sip\",\n      \"endpoint\": \"string\"\n    },\n    \"ice\": \"string\",\n    \"ace\": \"string\",\n    \"pie\": \"string\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "3365f738-a5ca-470c-bff1-ce774668867e",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "calling",
+                    "v1",
+                    "callouts"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": []
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"method\": \"<string>\",\n  \"conferenceCallout\": {\n    \"cli\": \"string\",\n    \"destination\": {\n      \"type\": \"number\",\n      \"endpoint\": \"string\"\n    },\n    \"conferenceId\": \"string\",\n    \"dtmf\": \"string\",\n    \"maxDuration\": 3881,\n    \"enableAce\": false,\n    \"enableDice\": true,\n    \"enablePie\": true,\n    \"locale\": \"string\",\n    \"greeting\": \"string\",\n    \"mohClass\": \"string\"\n  },\n  \"ttsCallout\": {\n    \"cli\": \"string\",\n    \"destination\": {\n      \"type\": \"sip\",\n      \"endpoint\": \"string\"\n    },\n    \"text\": \"string\",\n    \"locale\": \"string\",\n    \"enableAce\": true,\n    \"enableDice\": true\n  },\n  \"customCallout\": {\n    \"cli\": \"string\",\n    \"destination\": {\n      \"type\": \"sip\",\n      \"endpoint\": \"string\"\n    },\n    \"ice\": \"string\",\n    \"ace\": \"string\",\n    \"pie\": \"string\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://brands.api.sinch.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "4a08ddf6-ea2c-43eb-bfad-4817287331b2",
+    "name": "Sinch Brands Access Control Lists Callouts API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.\n\nContact Support:\n Name: Sinch Support",
+      "type": "text/plain"
+    }
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Conferences API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Conferences",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Get Conference Information",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/calling/v1/conferences/id/:conference_id",
+            "params": [
+              {
+                "name": "conference_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conference identifier"
+              }
+            ]
+          },
+          "docs": "Returns information about an ongoing conference including a list of participants."
+        },
+        {
+          "info": {
+            "name": "Kick All Participants from Conference",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://brands.api.sinch.com/calling/v1/conferences/id/:conference_id",
+            "params": [
+              {
+                "name": "conference_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conference identifier"
+              }
+            ]
+          },
+          "docs": "Removes all participants from an ongoing conference, effectively ending the conference."
+        },
+        {
+          "info": {
+            "name": "Manage Conference Participant",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://brands.api.sinch.com/calling/v1/conferences/id/:conference_id/:call_id",
+            "params": [
+              {
+                "name": "conference_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conference identifier"
+              },
+              {
+                "name": "call_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique call identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Manages a specific participant in a conference. Can mute, unmute, or put a participant on hold."
+        },
+        {
+          "info": {
+            "name": "Kick Participant from Conference",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://brands.api.sinch.com/calling/v1/conferences/id/:conference_id/:call_id",
+            "params": [
+              {
+                "name": "conference_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique conference identifier"
+              },
+              {
+                "name": "call_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique call identifier"
+              }
+            ]
+          },
+          "docs": "Removes a specific participant from an ongoing conference."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

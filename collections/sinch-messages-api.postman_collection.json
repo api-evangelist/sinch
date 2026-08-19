@@ -1,0 +1,969 @@
+{
+  "item": [
+    {
+      "id": "7efbd4d1-0bdd-40a7-8409-9958bfdd12e9",
+      "name": "Messages",
+      "description": {
+        "content": "Send and retrieve messages across all supported channels using a normalized message format.",
+        "type": "text/plain"
+      },
+      "item": [
+        {
+          "id": "24bf6f62-e66e-44d1-8a38-dcc7b91c9100",
+          "name": "Send a Message",
+          "request": {
+            "name": "Send a Message",
+            "description": {
+              "content": "Sends a message to a contact on a specific channel or using the Conversation API intelligent channel selection. Supports text, media, template, and card messages in a normalized format.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "projects",
+                ":project_id",
+                "messages:send"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "project_id",
+                  "description": "(Required) The unique project identifier"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "POST",
+            "auth": null,
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"app_id\": \"<string>\",\n  \"message\": {\n    \"text_message\": {\n      \"text\": \"<string>\"\n    },\n    \"media_message\": {\n      \"url\": \"<uri>\",\n      \"thumbnail_url\": \"<uri>\"\n    },\n    \"template_message\": {\n      \"omni_template\": {\n        \"template_id\": \"<string>\",\n        \"version\": \"<string>\",\n        \"language_code\": \"<string>\",\n        \"parameters\": \"<object>\"\n      }\n    },\n    \"card_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"media_message\": {\n        \"url\": \"<uri>\"\n      },\n      \"choices\": [\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        },\n        {\n          \"text_message\": {\n            \"text\": \"<string>\"\n          },\n          \"postback_data\": \"<string>\"\n        }\n      ]\n    },\n    \"list_message\": {\n      \"title\": \"<string>\",\n      \"description\": \"<string>\",\n      \"sections\": [\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        },\n        {\n          \"title\": \"<string>\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"<string>\"\n            },\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"<string>\"\n            }\n          ]\n        }\n      ]\n    }\n  },\n  \"recipient\": {\n    \"contact_id\": \"<string>\",\n    \"identified_by\": {\n      \"channel_identities\": [\n        {\n          \"channel\": \"<string>\",\n          \"identity\": \"<string>\",\n          \"app_id\": \"<string>\"\n        },\n        {\n          \"channel\": \"<string>\",\n          \"identity\": \"<string>\",\n          \"app_id\": \"<string>\"\n        }\n      ]\n    }\n  },\n  \"message_metadata\": \"<string>\",\n  \"conversation_metadata\": \"<string>\",\n  \"channel_priority_order\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"queue\": \"<string>\",\n  \"ttl\": \"<integer>\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          },
+          "response": [
+            {
+              "id": "cb9dd4a9-1347-4e37-b572-8e778143aefd",
+              "name": "Message sent",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages:send"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"app_id\": \"<string>\",\n  \"message\": {\n    \"text_message\": {\n      \"text\": \"string\"\n    },\n    \"media_message\": {\n      \"url\": \"https://eHNpAjzPCYuiG.fterOLnrZzBLHvxkPNpDrxvnBWdfHlFxhnVvOgdYac8j,\",\n      \"thumbnail_url\": \"http://p.gtmsqOpBIEAj1rEmalUAsqlA39yx8bY\"\n    },\n    \"template_message\": {\n      \"omni_template\": {\n        \"template_id\": \"string\",\n        \"version\": \"string\",\n        \"language_code\": \"string\",\n        \"parameters\": {}\n      }\n    },\n    \"card_message\": {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"media_message\": {\n        \"url\": \"https://yiwcjRmRIVMdanmccstmzfmnbJYt.agtoOO7,kxaCR19LmivL,XbS2n12DdU9,FtEubtN0cTWeGO.unzh7AVLnC\"\n      },\n      \"choices\": [\n        {\n          \"text_message\": {\n            \"text\": \"string\"\n          },\n          \"postback_data\": \"string\"\n        },\n        {\n          \"text_message\": {\n            \"text\": \"string\"\n          },\n          \"postback_data\": \"string\"\n        }\n      ]\n    },\n    \"list_message\": {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"sections\": [\n        {\n          \"title\": \"string\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            },\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            }\n          ]\n        },\n        {\n          \"title\": \"string\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            },\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            }\n          ]\n        }\n      ]\n    }\n  },\n  \"recipient\": {\n    \"contact_id\": \"<string>\",\n    \"identified_by\": {\n      \"channel_identities\": [\n        {\n          \"channel\": \"TELEGRAM\",\n          \"identity\": \"string\",\n          \"app_id\": \"string\"\n        },\n        {\n          \"channel\": \"KAKAOTALK\",\n          \"identity\": \"string\",\n          \"app_id\": \"string\"\n        }\n      ]\n    }\n  },\n  \"message_metadata\": \"<string>\",\n  \"conversation_metadata\": \"<string>\",\n  \"channel_priority_order\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"queue\": \"<string>\",\n  \"ttl\": \"<integer>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"message_id\": \"string\",\n  \"accepted_time\": \"1973-02-26T01:50:38.578Z\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "eb1c9809-ad83-4400-aa4d-62f185c31a1c",
+              "name": "Invalid request",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages:send"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"app_id\": \"<string>\",\n  \"message\": {\n    \"text_message\": {\n      \"text\": \"string\"\n    },\n    \"media_message\": {\n      \"url\": \"https://eHNpAjzPCYuiG.fterOLnrZzBLHvxkPNpDrxvnBWdfHlFxhnVvOgdYac8j,\",\n      \"thumbnail_url\": \"http://p.gtmsqOpBIEAj1rEmalUAsqlA39yx8bY\"\n    },\n    \"template_message\": {\n      \"omni_template\": {\n        \"template_id\": \"string\",\n        \"version\": \"string\",\n        \"language_code\": \"string\",\n        \"parameters\": {}\n      }\n    },\n    \"card_message\": {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"media_message\": {\n        \"url\": \"https://yiwcjRmRIVMdanmccstmzfmnbJYt.agtoOO7,kxaCR19LmivL,XbS2n12DdU9,FtEubtN0cTWeGO.unzh7AVLnC\"\n      },\n      \"choices\": [\n        {\n          \"text_message\": {\n            \"text\": \"string\"\n          },\n          \"postback_data\": \"string\"\n        },\n        {\n          \"text_message\": {\n            \"text\": \"string\"\n          },\n          \"postback_data\": \"string\"\n        }\n      ]\n    },\n    \"list_message\": {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"sections\": [\n        {\n          \"title\": \"string\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            },\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            }\n          ]\n        },\n        {\n          \"title\": \"string\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            },\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            }\n          ]\n        }\n      ]\n    }\n  },\n  \"recipient\": {\n    \"contact_id\": \"<string>\",\n    \"identified_by\": {\n      \"channel_identities\": [\n        {\n          \"channel\": \"TELEGRAM\",\n          \"identity\": \"string\",\n          \"app_id\": \"string\"\n        },\n        {\n          \"channel\": \"KAKAOTALK\",\n          \"identity\": \"string\",\n          \"app_id\": \"string\"\n        }\n      ]\n    }\n  },\n  \"message_metadata\": \"<string>\",\n  \"conversation_metadata\": \"<string>\",\n  \"channel_priority_order\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"queue\": \"<string>\",\n  \"ttl\": \"<integer>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Bad Request",
+              "code": 400,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "3363cbbd-95b0-419f-8d02-631988c9154b",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages:send"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "POST",
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"app_id\": \"<string>\",\n  \"message\": {\n    \"text_message\": {\n      \"text\": \"string\"\n    },\n    \"media_message\": {\n      \"url\": \"https://eHNpAjzPCYuiG.fterOLnrZzBLHvxkPNpDrxvnBWdfHlFxhnVvOgdYac8j,\",\n      \"thumbnail_url\": \"http://p.gtmsqOpBIEAj1rEmalUAsqlA39yx8bY\"\n    },\n    \"template_message\": {\n      \"omni_template\": {\n        \"template_id\": \"string\",\n        \"version\": \"string\",\n        \"language_code\": \"string\",\n        \"parameters\": {}\n      }\n    },\n    \"card_message\": {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"media_message\": {\n        \"url\": \"https://yiwcjRmRIVMdanmccstmzfmnbJYt.agtoOO7,kxaCR19LmivL,XbS2n12DdU9,FtEubtN0cTWeGO.unzh7AVLnC\"\n      },\n      \"choices\": [\n        {\n          \"text_message\": {\n            \"text\": \"string\"\n          },\n          \"postback_data\": \"string\"\n        },\n        {\n          \"text_message\": {\n            \"text\": \"string\"\n          },\n          \"postback_data\": \"string\"\n        }\n      ]\n    },\n    \"list_message\": {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"sections\": [\n        {\n          \"title\": \"string\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            },\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            }\n          ]\n        },\n        {\n          \"title\": \"string\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            },\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            }\n          ]\n        }\n      ]\n    }\n  },\n  \"recipient\": {\n    \"contact_id\": \"<string>\",\n    \"identified_by\": {\n      \"channel_identities\": [\n        {\n          \"channel\": \"TELEGRAM\",\n          \"identity\": \"string\",\n          \"app_id\": \"string\"\n        },\n        {\n          \"channel\": \"KAKAOTALK\",\n          \"identity\": \"string\",\n          \"app_id\": \"string\"\n        }\n      ]\n    }\n  },\n  \"message_metadata\": \"<string>\",\n  \"conversation_metadata\": \"<string>\",\n  \"channel_priority_order\": [\n    \"<string>\",\n    \"<string>\"\n  ],\n  \"queue\": \"<string>\",\n  \"ttl\": \"<integer>\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "9c34a711-4678-4df8-9070-905814e7c020",
+          "name": "List Messages",
+          "request": {
+            "name": "List Messages",
+            "description": {
+              "content": "Returns a list of messages in a project with optional filtering by conversation, contact, app, and channel.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "projects",
+                ":project_id",
+                "messages"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [
+                {
+                  "disabled": false,
+                  "key": "conversation_id",
+                  "value": "<string>",
+                  "description": "Filter by conversation ID"
+                },
+                {
+                  "disabled": false,
+                  "key": "contact_id",
+                  "value": "<string>",
+                  "description": "Filter by contact ID"
+                },
+                {
+                  "disabled": false,
+                  "key": "app_id",
+                  "value": "<string>",
+                  "description": "Filter by app ID"
+                },
+                {
+                  "disabled": false,
+                  "key": "channel",
+                  "value": "<string>",
+                  "description": "Filter by channel"
+                },
+                {
+                  "disabled": false,
+                  "key": "page_size",
+                  "value": "10",
+                  "description": "The number of messages per page"
+                },
+                {
+                  "disabled": false,
+                  "key": "page_token",
+                  "value": "<string>",
+                  "description": "Pagination token for the next page"
+                }
+              ],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "project_id",
+                  "description": "(Required) The unique project identifier"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "b3d9ab86-d887-405a-9910-ce4e2b2e51fd",
+              "name": "List of messages",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "conversation_id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "contact_id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "app_id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "channel",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10"
+                    },
+                    {
+                      "key": "page_token",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"messages\": [\n    {\n      \"id\": \"string\",\n      \"direction\": \"TO_APP\",\n      \"app_message\": {\n        \"text_message\": {\n          \"text\": \"string\"\n        },\n        \"media_message\": {\n          \"url\": \"http://uMWGi.bkuZEZpflsTy+H\",\n          \"thumbnail_url\": \"https://xLAvkNbanlXPtFTLu.drnixSxCxYyk.GkA9Iy+1x6fV3QyiVSTk02qjPHOevURog8j3B2iFH0I5GUoa\"\n        },\n        \"template_message\": {\n          \"omni_template\": {\n            \"template_id\": \"string\",\n            \"version\": \"string\",\n            \"language_code\": \"string\",\n            \"parameters\": {}\n          }\n        },\n        \"card_message\": {\n          \"title\": \"string\",\n          \"description\": \"string\",\n          \"media_message\": {\n            \"url\": \"https://ZKbybiMcygbOBShxKVldc.vfflymEg7WpQuytrt-nzPDj.Fz1\"\n          },\n          \"choices\": [\n            {\n              \"text_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"postback_data\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            },\n            {\n              \"text_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"postback_data\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            }\n          ]\n        },\n        \"list_message\": {\n          \"title\": \"string\",\n          \"description\": \"string\",\n          \"sections\": [\n            {\n              \"title\": \"string\",\n              \"items\": [\n                {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                },\n                {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              ]\n            },\n            {\n              \"title\": \"string\",\n              \"items\": [\n                {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                },\n                {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              ]\n            }\n          ]\n        }\n      },\n      \"contact_message\": {},\n      \"channel_identity\": {\n        \"channel\": \"SMS\",\n        \"identity\": \"string\",\n        \"app_id\": \"string\"\n      },\n      \"conversation_id\": \"string\",\n      \"contact_id\": \"string\",\n      \"metadata\": \"string\",\n      \"accept_time\": \"1978-08-27T08:58:28.002Z\"\n    },\n    {\n      \"id\": \"string\",\n      \"direction\": \"TO_APP\",\n      \"app_message\": {\n        \"text_message\": {\n          \"text\": \"string\"\n        },\n        \"media_message\": {\n          \"url\": \"https://ykjvyRjnsLFGFOWFbZaQzmbkuXEadlSty.qejzyeAHKYKc6vDLsMaoXRVTZgOVHky.0uI7\",\n          \"thumbnail_url\": \"https://ZwBHQwQOhnXzbcTDOCGjQIEtgTHmsA.wbmpi4vucl7asCimkt4biKOfsUC+9-DQmfyFmIBjcQqHSm5Osl.e5TAg\"\n        },\n        \"template_message\": {\n          \"omni_template\": {\n            \"template_id\": \"string\",\n            \"version\": \"string\",\n            \"language_code\": \"string\",\n            \"parameters\": {}\n          }\n        },\n        \"card_message\": {\n          \"title\": \"string\",\n          \"description\": \"string\",\n          \"media_message\": {\n            \"url\": \"http://lCFmAMLofYQdEOpLh.edoa\"\n          },\n          \"choices\": [\n            {\n              \"text_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"postback_data\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            },\n            {\n              \"text_message\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              },\n              \"postback_data\": {\n                \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n              }\n            }\n          ]\n        },\n        \"list_message\": {\n          \"title\": \"string\",\n          \"description\": \"string\",\n          \"sections\": [\n            {\n              \"title\": \"string\",\n              \"items\": [\n                {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                },\n                {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              ]\n            },\n            {\n              \"title\": \"string\",\n              \"items\": [\n                {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                },\n                {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              ]\n            }\n          ]\n        }\n      },\n      \"contact_message\": {},\n      \"channel_identity\": {\n        \"channel\": \"LINE\",\n        \"identity\": \"string\",\n        \"app_id\": \"string\"\n      },\n      \"conversation_id\": \"string\",\n      \"contact_id\": \"string\",\n      \"metadata\": \"string\",\n      \"accept_time\": \"1980-03-07T10:54:42.463Z\"\n    }\n  ],\n  \"next_page_token\": \"string\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "ff2ae12e-d7dc-4845-9310-a27fc67604c6",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [
+                    {
+                      "key": "conversation_id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "contact_id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "app_id",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "channel",
+                      "value": "<string>"
+                    },
+                    {
+                      "key": "page_size",
+                      "value": "10"
+                    },
+                    {
+                      "key": "page_token",
+                      "value": "<string>"
+                    }
+                  ],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "45915def-6f2b-4db6-ad35-c62df46e4f9b",
+          "name": "Get a Message",
+          "request": {
+            "name": "Get a Message",
+            "description": {
+              "content": "Returns the details of a specific message.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "projects",
+                ":project_id",
+                "messages",
+                ":message_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "project_id",
+                  "description": "(Required) The unique project identifier"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "message_id",
+                  "description": "(Required) The unique message identifier"
+                }
+              ]
+            },
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "method": "GET",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "078cc561-9e4f-4c13-9290-b203eaef297c",
+              "name": "Message details",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages",
+                    ":message_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "message_id",
+                      "description": "(Required) The unique message identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "body": "{\n  \"id\": \"string\",\n  \"direction\": \"TO_APP\",\n  \"app_message\": {\n    \"text_message\": {\n      \"text\": \"string\"\n    },\n    \"media_message\": {\n      \"url\": \"https://elcNsAWTCQzgRbgXWwGKexv.dpnnsCaDZPahKeROBR7j3ZUh4t2WZ+hCjV8Zt1qQTJUnP3Tr+KA8pKeLDq\",\n      \"thumbnail_url\": \"https://MEpvjBAYPMBkpLkriYZCLnesythpMt.zyTR-AQoQjcsH\"\n    },\n    \"template_message\": {\n      \"omni_template\": {\n        \"template_id\": \"string\",\n        \"version\": \"string\",\n        \"language_code\": \"string\",\n        \"parameters\": {}\n      }\n    },\n    \"card_message\": {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"media_message\": {\n        \"url\": \"http://YT.zwkXe18kYfLWVNXSnl9yqVu4g4FA-3BpOSMtTts7Ifp3vuE,CRdOT7+\"\n      },\n      \"choices\": [\n        {\n          \"text_message\": {\n            \"text\": \"string\"\n          },\n          \"postback_data\": \"string\"\n        },\n        {\n          \"text_message\": {\n            \"text\": \"string\"\n          },\n          \"postback_data\": \"string\"\n        }\n      ]\n    },\n    \"list_message\": {\n      \"title\": \"string\",\n      \"description\": \"string\",\n      \"sections\": [\n        {\n          \"title\": \"string\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            },\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            }\n          ]\n        },\n        {\n          \"title\": \"string\",\n          \"items\": [\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            },\n            {\n              \"text_message\": {\n                \"text\": {\n                  \"value\": \"<Error: Too many levels of nesting to fake this schema>\"\n                }\n              },\n              \"postback_data\": \"string\"\n            }\n          ]\n        }\n      ]\n    }\n  },\n  \"contact_message\": {},\n  \"channel_identity\": {\n    \"channel\": \"LINE\",\n    \"identity\": \"string\",\n    \"app_id\": \"string\"\n  },\n  \"conversation_id\": \"string\",\n  \"contact_id\": \"string\",\n  \"metadata\": \"string\",\n  \"accept_time\": \"1994-11-25T10:12:34.736Z\"\n}",
+              "cookie": [],
+              "_postman_previewlanguage": "json"
+            },
+            {
+              "id": "c1069eea-3ac7-4394-a51e-b7950f4c160f",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages",
+                    ":message_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "message_id",
+                      "description": "(Required) The unique message identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "fa79867e-010b-4fc1-ad9f-4958cf054262",
+              "name": "Message not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages",
+                    ":message_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "message_id",
+                      "description": "(Required) The unique message identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "GET",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        },
+        {
+          "id": "ecfa1910-6694-4541-b9fc-45b01523627a",
+          "name": "Delete a Message",
+          "request": {
+            "name": "Delete a Message",
+            "description": {
+              "content": "Deletes a specific message from the conversation history.",
+              "type": "text/plain"
+            },
+            "url": {
+              "path": [
+                "v1",
+                "projects",
+                ":project_id",
+                "messages",
+                ":message_id"
+              ],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "query": [],
+              "variable": [
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "project_id",
+                  "description": "(Required) The unique project identifier"
+                },
+                {
+                  "disabled": false,
+                  "type": "any",
+                  "value": "<string>",
+                  "key": "message_id",
+                  "description": "(Required) The unique message identifier"
+                }
+              ]
+            },
+            "method": "DELETE",
+            "auth": null
+          },
+          "response": [
+            {
+              "id": "6e61f621-87e7-4636-8a65-492be0b23df0",
+              "name": "Message deleted",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages",
+                    ":message_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "message_id",
+                      "description": "(Required) The unique message identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "OK",
+              "code": 200,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "3d9c142f-2205-4ec9-80e1-c1f51ce92c3c",
+              "name": "Unauthorized",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages",
+                    ":message_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "message_id",
+                      "description": "(Required) The unique message identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            },
+            {
+              "id": "1cbf7e45-9c0d-45e2-b5c8-425c515bee06",
+              "name": "Message not found",
+              "originalRequest": {
+                "url": {
+                  "path": [
+                    "v1",
+                    "projects",
+                    ":project_id",
+                    "messages",
+                    ":message_id"
+                  ],
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "query": [],
+                  "variable": [
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "project_id",
+                      "description": "(Required) The unique project identifier"
+                    },
+                    {
+                      "disabled": false,
+                      "type": "any",
+                      "value": "<string>",
+                      "key": "message_id",
+                      "description": "(Required) The unique message identifier"
+                    }
+                  ]
+                },
+                "header": [
+                  {
+                    "description": {
+                      "content": "Added as a part of security scheme: bearer",
+                      "type": "text/plain"
+                    },
+                    "key": "Authorization",
+                    "value": "Bearer <token>"
+                  }
+                ],
+                "method": "DELETE",
+                "body": {}
+              },
+              "status": "Not Found",
+              "code": 404,
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "body": "",
+              "cookie": [],
+              "_postman_previewlanguage": "text"
+            }
+          ],
+          "event": [],
+          "protocolProfileBehavior": {
+            "disableBodyPruning": true
+          }
+        }
+      ],
+      "event": []
+    }
+  ],
+  "event": [],
+  "variable": [
+    {
+      "type": "string",
+      "value": "https://brands.api.sinch.com",
+      "key": "baseUrl"
+    }
+  ],
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{bearerToken}}"
+      }
+    ]
+  },
+  "info": {
+    "_postman_id": "5f7058ed-d2f8-425f-83c6-88234a69cbb3",
+    "name": "Sinch Brands Access Control Lists Messages API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "description": {
+      "content": "The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.\n\nContact Support:\n Name: Sinch Support",
+      "type": "text/plain"
+    }
+  }
+}

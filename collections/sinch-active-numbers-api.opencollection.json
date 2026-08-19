@@ -1,0 +1,158 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Active Numbers API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Active Numbers",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Active Numbers",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/activeNumbers",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "regionCode",
+                "value": "",
+                "type": "query",
+                "description": "The ISO 3166-1 alpha-2 country code"
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "The number type"
+              },
+              {
+                "name": "numberPattern.pattern",
+                "value": "",
+                "type": "query",
+                "description": "Pattern to search for"
+              },
+              {
+                "name": "capabilities",
+                "value": "",
+                "type": "query",
+                "description": "Filter by capabilities"
+              },
+              {
+                "name": "pageSize",
+                "value": "",
+                "type": "query",
+                "description": "Number of results per page"
+              },
+              {
+                "name": "pageToken",
+                "value": "",
+                "type": "query",
+                "description": "Pagination token for the next page"
+              }
+            ]
+          },
+          "docs": "Returns a list of all active phone numbers in the project with pagination support. Results can be filtered by country, type, and capabilities."
+        },
+        {
+          "info": {
+            "name": "Get an Active Number",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/activeNumbers/:phone_number",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "phone_number",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ]
+          },
+          "docs": "Returns the configuration and details of a specific active number."
+        },
+        {
+          "info": {
+            "name": "Update an Active Number",
+            "type": "http"
+          },
+          "http": {
+            "method": "PATCH",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/activeNumbers/:phone_number",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "phone_number",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Updates the configuration of an active number including its display name, SMS and voice configurations, and callback URL."
+        },
+        {
+          "info": {
+            "name": "Release an Active Number",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/activeNumbers/:phone_number:release",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "phone_number",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ]
+          },
+          "docs": "Releases an active number, removing it from your project. The number will no longer be available for use with Sinch services."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

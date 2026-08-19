@@ -1,0 +1,117 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Delivery Reports API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Delivery Reports",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "Retrieve a Batch Delivery Report",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id/delivery_report",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "The type of delivery report to retrieve"
+              }
+            ]
+          },
+          "docs": "Returns the aggregate delivery report for a specific batch. The report contains status counts and details about message delivery."
+        },
+        {
+          "info": {
+            "name": "Retrieve a Recipient Delivery Report",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/batches/:batch_id/delivery_report/:recipient_msisdn",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "batch_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the batch"
+              },
+              {
+                "name": "recipient_msisdn",
+                "value": "",
+                "type": "path",
+                "description": "The phone number of the recipient"
+              }
+            ]
+          },
+          "docs": "Returns the delivery report for a specific recipient in a batch."
+        },
+        {
+          "info": {
+            "name": "List Delivery Reports",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/xms/v1/:service_plan_id/delivery_reports",
+            "params": [
+              {
+                "name": "service_plan_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique identifier for the service plan"
+              },
+              {
+                "name": "page",
+                "value": "",
+                "type": "query",
+                "description": "The page number to retrieve"
+              },
+              {
+                "name": "page_size",
+                "value": "",
+                "type": "query",
+                "description": "The number of reports per page"
+              }
+            ]
+          },
+          "docs": "Returns a list of delivery reports with pagination support."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

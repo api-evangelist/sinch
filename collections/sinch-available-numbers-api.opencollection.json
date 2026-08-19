@@ -1,0 +1,133 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Available Numbers API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Available Numbers",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Available Numbers",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/availableNumbers",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "regionCode",
+                "value": "",
+                "type": "query",
+                "description": "The ISO 3166-1 alpha-2 country code"
+              },
+              {
+                "name": "type",
+                "value": "",
+                "type": "query",
+                "description": "The number type to search for"
+              },
+              {
+                "name": "numberPattern.pattern",
+                "value": "",
+                "type": "query",
+                "description": "Pattern to search for in the phone number"
+              },
+              {
+                "name": "numberPattern.searchPattern",
+                "value": "",
+                "type": "query",
+                "description": "Where in the number to search for the pattern"
+              },
+              {
+                "name": "capabilities",
+                "value": "",
+                "type": "query",
+                "description": "Filter by capabilities"
+              },
+              {
+                "name": "size",
+                "value": "",
+                "type": "query",
+                "description": "The maximum number of results to return"
+              }
+            ]
+          },
+          "docs": "Searches for available phone numbers that can be purchased. Results can be filtered by country, type, capabilities, number pattern, and region."
+        },
+        {
+          "info": {
+            "name": "Get an Available Number",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/availableNumbers/:phone_number",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "phone_number",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ]
+          },
+          "docs": "Returns the details of a specific available phone number including its type, capabilities, and pricing."
+        },
+        {
+          "info": {
+            "name": "Rent a Number",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/v1/projects/:project_id/availableNumbers/:phone_number:rent",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "phone_number",
+                "value": "",
+                "type": "path",
+                "description": "The phone number in E.164 format"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Activates a phone number by renting it for use with Sinch services. The number will be assigned to your project and can be configured for SMS, Voice, or other services."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}

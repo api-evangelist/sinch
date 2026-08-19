@@ -1,0 +1,109 @@
+{
+  "opencollection": "1.0.0",
+  "info": {
+    "name": "Sinch Brands Access Control Lists Fax to Email API",
+    "version": "1.0"
+  },
+  "request": {
+    "auth": {
+      "type": "bearer",
+      "token": "{{bearerToken}}"
+    }
+  },
+  "items": [
+    {
+      "info": {
+        "name": "Fax to Email",
+        "type": "folder"
+      },
+      "items": [
+        {
+          "info": {
+            "name": "List Fax-to-email Configurations",
+            "type": "http"
+          },
+          "http": {
+            "method": "GET",
+            "url": "https://brands.api.sinch.com/v3/projects/:project_id/services/:service_id/emails",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique service identifier"
+              }
+            ]
+          },
+          "docs": "Returns the list of email addresses configured for fax-to-email on a service."
+        },
+        {
+          "info": {
+            "name": "Create a Fax-to-email Configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "POST",
+            "url": "https://brands.api.sinch.com/v3/projects/:project_id/services/:service_id/emails",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique service identifier"
+              }
+            ],
+            "body": {
+              "type": "json",
+              "data": "{}"
+            }
+          },
+          "docs": "Configures an email address to receive incoming faxes for a specific fax service."
+        },
+        {
+          "info": {
+            "name": "Delete a Fax-to-email Configuration",
+            "type": "http"
+          },
+          "http": {
+            "method": "DELETE",
+            "url": "https://brands.api.sinch.com/v3/projects/:project_id/services/:service_id/emails/:email",
+            "params": [
+              {
+                "name": "project_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique project identifier"
+              },
+              {
+                "name": "service_id",
+                "value": "",
+                "type": "path",
+                "description": "The unique service identifier"
+              },
+              {
+                "name": "email",
+                "value": "",
+                "type": "path",
+                "description": "The email address to remove"
+              }
+            ]
+          },
+          "docs": "Removes an email address from the fax-to-email configuration."
+        }
+      ]
+    }
+  ],
+  "bundled": true
+}
