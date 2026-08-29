@@ -1,17 +1,18 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Sinch Brands Access Control Lists API
-  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  title: Sinch Elastic SIP Trunking Access Control Lists API
+  description: The Sinch Elastic SIP Trunking (EST) API enables developers to programmatically create and manage SIP trunks for connecting existing telephony infrastructure to the Sinch network. It provides endpoints for managing SIP endpoints, trunk configurations, and access control lists. The API supports elastic scaling of voice capacity without requiring fixed-capacity commitments, allowing businesses to connect their PBX systems, contact centers, or communication platforms to global PSTN connectivity.
   version: '1.0'
   contact:
     name: Sinch Support
     url: https://www.sinch.com/contact-us/
   termsOfService: https://www.sinch.com/terms-of-service/
 servers:
-- url: https://brands.api.sinch.com
+- url: https://elastic-trunking.api.sinch.com
   description: Global Production Server
 security:
-- bearerAuth: []
+- oAuth2: []
+- basicAuth: []
 tags:
 - name: Access Control Lists
   description: Manage IP address access control lists for securing SIP trunk access.
@@ -128,19 +129,52 @@ paths:
         '404':
           description: ACL not found
 components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    AclId:
+      name: acl_id
+      in: path
+      required: true
+      description: The unique access control list identifier
+      schema:
+        type: string
   schemas:
-    UpdateAclRequest:
+    AclList:
       type: object
+      properties:
+        accessControlLists:
+          type: array
+          description: List of access control lists
+          items:
+            $ref: '#/components/schemas/Acl'
+    CreateAclRequest:
+      type: object
+      required:
+      - name
       properties:
         name:
           type: string
-          description: Updated ACL name
+          description: The ACL name
         enabled:
           type: boolean
-          description: Updated enabled status
+          description: Whether the ACL is active
+          default: true
         entries:
           type: array
-          description: Updated IP entries
+          description: IP address entries
           items:
             $ref: '#/components/schemas/AclEntry'
     Acl:
@@ -168,29 +202,18 @@ components:
           type: string
           format: date-time
           description: When the ACL was last updated
-    AclList:
+    UpdateAclRequest:
       type: object
-      properties:
-        accessControlLists:
-          type: array
-          description: List of access control lists
-          items:
-            $ref: '#/components/schemas/Acl'
-    CreateAclRequest:
-      type: object
-      required:
-      - name
       properties:
         name:
           type: string
-          description: The ACL name
+          description: Updated ACL name
         enabled:
           type: boolean
-          description: Whether the ACL is active
-          default: true
+          description: Updated enabled status
         entries:
           type: array
-          description: IP address entries
+          description: Updated IP entries
           items:
             $ref: '#/components/schemas/AclEntry'
     AclEntry:
@@ -202,33 +225,18 @@ components:
         description:
           type: string
           description: A description of this entry
-  parameters:
-    AclId:
-      name: acl_id
-      in: path
-      required: true
-      description: The unique access control list identifier
-      schema:
-        type: string
-    TrunkId:
-      name: trunk_id
-      in: path
-      required: true
-      description: The unique SIP trunk identifier
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   securitySchemes:
-    bearerAuth:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
       type: http
-      scheme: bearer
-      description: Bearer token authentication.
+      scheme: basic
+      description: Key ID as username and key secret as password.
 externalDocs:
-  description: Sinch Brands API Documentation
-  url: https://developers.sinch.com/docs/brands
+  description: Sinch Elastic SIP Trunking API Documentation
+  url: https://developers.sinch.com/docs/est

@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Sinch Access Control Lists Brands API
+  title: Sinch Brands API
   description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
   version: '1.0'
   contact:
@@ -181,7 +181,114 @@ paths:
         '404':
           description: Brand not found
 components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    BrandId:
+      name: brand_id
+      in: path
+      required: true
+      description: The unique brand identifier
+      schema:
+        type: string
   schemas:
+    UpdateBrandRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Updated display name
+        companyName:
+          type: string
+          description: Updated company name
+        entityType:
+          type: string
+          description: Updated entity type
+        ein:
+          type: string
+          description: Updated EIN
+        country:
+          type: string
+          description: Updated country
+        street:
+          type: string
+          description: Updated street
+        city:
+          type: string
+          description: Updated city
+        state:
+          type: string
+          description: Updated state
+        postalCode:
+          type: string
+          description: Updated postal code
+        website:
+          type: string
+          format: uri
+          description: Updated website
+        verticalType:
+          type: string
+          description: Updated vertical
+        contactEmail:
+          type: string
+          format: email
+          description: Updated contact email
+        contactPhone:
+          type: string
+          description: Updated contact phone
+    CreateBrandRequest:
+      type: object
+      required:
+      - displayName
+      - companyName
+      - country
+      properties:
+        displayName:
+          type: string
+          description: The brand display name
+        companyName:
+          type: string
+          description: The legal company name
+        entityType:
+          type: string
+          description: Business entity type
+        ein:
+          type: string
+          description: Employer Identification Number
+        country:
+          type: string
+          description: Country of incorporation
+        street:
+          type: string
+          description: Street address
+        city:
+          type: string
+          description: City
+        state:
+          type: string
+          description: State or province
+        postalCode:
+          type: string
+          description: Postal code
+        website:
+          type: string
+          format: uri
+          description: Brand website
+        verticalType:
+          type: string
+          description: Business vertical
+        contactEmail:
+          type: string
+          format: email
+          description: Contact email
+        contactPhone:
+          type: string
+          description: Contact phone
     Brand:
       type: object
       properties:
@@ -252,54 +359,6 @@ components:
           type: string
           format: date-time
           description: When the brand was last updated
-    CreateBrandRequest:
-      type: object
-      required:
-      - displayName
-      - companyName
-      - country
-      properties:
-        displayName:
-          type: string
-          description: The brand display name
-        companyName:
-          type: string
-          description: The legal company name
-        entityType:
-          type: string
-          description: Business entity type
-        ein:
-          type: string
-          description: Employer Identification Number
-        country:
-          type: string
-          description: Country of incorporation
-        street:
-          type: string
-          description: Street address
-        city:
-          type: string
-          description: City
-        state:
-          type: string
-          description: State or province
-        postalCode:
-          type: string
-          description: Postal code
-        website:
-          type: string
-          format: uri
-          description: Brand website
-        verticalType:
-          type: string
-          description: Business vertical
-        contactEmail:
-          type: string
-          format: email
-          description: Contact email
-        contactPhone:
-          type: string
-          description: Contact phone
     BrandList:
       type: object
       properties:
@@ -314,65 +373,6 @@ components:
         totalSize:
           type: integer
           description: Total number of brands
-    UpdateBrandRequest:
-      type: object
-      properties:
-        displayName:
-          type: string
-          description: Updated display name
-        companyName:
-          type: string
-          description: Updated company name
-        entityType:
-          type: string
-          description: Updated entity type
-        ein:
-          type: string
-          description: Updated EIN
-        country:
-          type: string
-          description: Updated country
-        street:
-          type: string
-          description: Updated street
-        city:
-          type: string
-          description: Updated city
-        state:
-          type: string
-          description: Updated state
-        postalCode:
-          type: string
-          description: Updated postal code
-        website:
-          type: string
-          format: uri
-          description: Updated website
-        verticalType:
-          type: string
-          description: Updated vertical
-        contactEmail:
-          type: string
-          format: email
-          description: Updated contact email
-        contactPhone:
-          type: string
-          description: Updated contact phone
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    BrandId:
-      name: brand_id
-      in: path
-      required: true
-      description: The unique brand identifier
-      schema:
-        type: string
   securitySchemes:
     bearerAuth:
       type: http

@@ -1,17 +1,22 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Sinch Brands Access Control Lists Conversations API
-  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  title: Sinch Conversation Conversations API
+  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API. It provides contact management, conversation tracking, message templating, and webhook callbacks for real-time event handling. The API normalizes message formats across channels, allowing developers to build multichannel messaging experiences without channel-specific integrations.
   version: '1.0'
   contact:
     name: Sinch Support
     url: https://www.sinch.com/contact-us/
   termsOfService: https://www.sinch.com/terms-of-service/
 servers:
-- url: https://brands.api.sinch.com
-  description: Global Production Server
+- url: https://us.conversation.api.sinch.com
+  description: US Production Server
+- url: https://eu.conversation.api.sinch.com
+  description: EU Production Server
+- url: https://br.conversation.api.sinch.com
+  description: Brazil Production Server
 security:
-- bearerAuth: []
+- oAuth2: []
+- basicAuth: []
 tags:
 - name: Conversations
   description: Manage conversations which are collections of messages tied to a specific app and contact.
@@ -167,17 +172,18 @@ paths:
           description: Conversation not found
 components:
   schemas:
-    ConversationList:
+    UpdateConversationRequest:
       type: object
       properties:
-        conversations:
-          type: array
-          description: List of conversations
-          items:
-            $ref: '#/components/schemas/Conversation'
-        next_page_token:
+        active:
+          type: boolean
+          description: Updated active status
+        active_channel:
           type: string
-          description: Pagination token for the next page
+          description: Updated active channel
+        metadata:
+          type: string
+          description: Updated metadata
     Conversation:
       type: object
       properties:
@@ -202,18 +208,6 @@ components:
         metadata_json:
           type: object
           description: Structured conversation metadata
-    UpdateConversationRequest:
-      type: object
-      properties:
-        active:
-          type: boolean
-          description: Updated active status
-        active_channel:
-          type: string
-          description: Updated active channel
-        metadata:
-          type: string
-          description: Updated metadata
     CreateConversationRequest:
       type: object
       required:
@@ -236,14 +230,18 @@ components:
         metadata:
           type: string
           description: Conversation metadata
+    ConversationList:
+      type: object
+      properties:
+        conversations:
+          type: array
+          description: List of conversations
+          items:
+            $ref: '#/components/schemas/Conversation'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
   parameters:
-    ConversationId:
-      name: conversation_id
-      in: path
-      required: true
-      description: The unique conversation identifier
-      schema:
-        type: string
     ProjectId:
       name: project_id
       in: path
@@ -251,11 +249,25 @@ components:
       description: The unique project identifier
       schema:
         type: string
+    ConversationId:
+      name: conversation_id
+      in: path
+      required: true
+      description: The unique conversation identifier
+      schema:
+        type: string
   securitySchemes:
-    bearerAuth:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow using project key ID and secret.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
       type: http
-      scheme: bearer
-      description: Bearer token authentication.
+      scheme: basic
+      description: Key ID as username and key secret as password.
 externalDocs:
-  description: Sinch Brands API Documentation
-  url: https://developers.sinch.com/docs/brands
+  description: Sinch Conversation API Documentation
+  url: https://developers.sinch.com/docs/conversation

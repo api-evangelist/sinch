@@ -1,15 +1,23 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Sinch Brands Access Control Lists Groups API
-  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  title: Sinch SMS Groups API
+  description: The Sinch SMS API enables developers to send and receive SMS messages globally at scale. It supports batch messaging with scheduled delivery, message templates, delivery reports, and inbound message handling via webhooks. The API provides group management for organizing recipients, automatic message encoding optimization, and supports both transactional and marketing use cases across carriers worldwide.
   version: '1.0'
   contact:
     name: Sinch Support
     url: https://www.sinch.com/contact-us/
   termsOfService: https://www.sinch.com/terms-of-service/
 servers:
-- url: https://brands.api.sinch.com
-  description: Global Production Server
+- url: https://us.sms.api.sinch.com
+  description: US Production Server
+- url: https://eu.sms.api.sinch.com
+  description: EU Production Server
+- url: https://au.sms.api.sinch.com
+  description: Australia Production Server
+- url: https://br.sms.api.sinch.com
+  description: Brazil Production Server
+- url: https://ca.sms.api.sinch.com
+  description: Canada Production Server
 security:
 - bearerAuth: []
 tags:
@@ -159,6 +167,21 @@ paths:
         '404':
           description: Group not found
 components:
+  parameters:
+    GroupId:
+      name: group_id
+      in: path
+      required: true
+      description: The unique identifier for the group
+      schema:
+        type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
   schemas:
     GroupList:
       type: object
@@ -240,26 +263,11 @@ components:
           description: List of child group IDs
           items:
             type: string
-  parameters:
-    ServicePlanId:
-      name: service_plan_id
-      in: path
-      required: true
-      description: The unique identifier for the service plan
-      schema:
-        type: string
-    GroupId:
-      name: group_id
-      in: path
-      required: true
-      description: The unique identifier for the group
-      schema:
-        type: string
   securitySchemes:
     bearerAuth:
       type: http
       scheme: bearer
-      description: Bearer token authentication.
+      description: API token sent in the Authorization header preceded by Bearer.
 externalDocs:
-  description: Sinch Brands API Documentation
-  url: https://developers.sinch.com/docs/brands
+  description: Sinch SMS API Documentation
+  url: https://developers.sinch.com/docs/sms

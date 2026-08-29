@@ -1,17 +1,22 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Sinch Brands Access Control Lists Capability API
-  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  title: Sinch Conversation Capability API
+  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API. It provides contact management, conversation tracking, message templating, and webhook callbacks for real-time event handling. The API normalizes message formats across channels, allowing developers to build multichannel messaging experiences without channel-specific integrations.
   version: '1.0'
   contact:
     name: Sinch Support
     url: https://www.sinch.com/contact-us/
   termsOfService: https://www.sinch.com/terms-of-service/
 servers:
-- url: https://brands.api.sinch.com
-  description: Global Production Server
+- url: https://us.conversation.api.sinch.com
+  description: US Production Server
+- url: https://eu.conversation.api.sinch.com
+  description: EU Production Server
+- url: https://br.conversation.api.sinch.com
+  description: Brazil Production Server
 security:
-- bearerAuth: []
+- oAuth2: []
+- basicAuth: []
 tags:
 - name: Capability
   description: Query channel capabilities for specific contacts to determine which channels can be used to reach them.
@@ -43,14 +48,6 @@ paths:
         '401':
           description: Unauthorized
 components:
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
     CapabilityQueryResponse:
       type: object
@@ -64,30 +61,6 @@ components:
         request_id:
           type: string
           description: The capability query request ID
-    ChannelIdentity:
-      type: object
-      properties:
-        channel:
-          type: string
-          enum:
-          - SMS
-          - RCS
-          - WHATSAPP
-          - MESSENGER
-          - INSTAGRAM
-          - VIBER
-          - VIBERBM
-          - TELEGRAM
-          - KAKAOTALK
-          - LINE
-          - MMS
-          description: The channel type
-        identity:
-          type: string
-          description: The channel-specific identity
-        app_id:
-          type: string
-          description: The app ID for the channel
     CapabilityQueryRequest:
       type: object
       required:
@@ -112,11 +85,50 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/ChannelIdentity'
+    ChannelIdentity:
+      type: object
+      properties:
+        channel:
+          type: string
+          enum:
+          - SMS
+          - RCS
+          - WHATSAPP
+          - MESSENGER
+          - INSTAGRAM
+          - VIBER
+          - VIBERBM
+          - TELEGRAM
+          - KAKAOTALK
+          - LINE
+          - MMS
+          description: The channel type
+        identity:
+          type: string
+          description: The channel-specific identity
+        app_id:
+          type: string
+          description: The app ID for the channel
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
-    bearerAuth:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow using project key ID and secret.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
       type: http
-      scheme: bearer
-      description: Bearer token authentication.
+      scheme: basic
+      description: Key ID as username and key secret as password.
 externalDocs:
-  description: Sinch Brands API Documentation
-  url: https://developers.sinch.com/docs/brands
+  description: Sinch Conversation API Documentation
+  url: https://developers.sinch.com/docs/conversation

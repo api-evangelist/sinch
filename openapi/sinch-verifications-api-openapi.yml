@@ -1,17 +1,17 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Sinch Brands Access Control Lists Verifications API
-  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  title: Sinch Verification Verifications API
+  description: The Sinch Verification API provides phone number verification through multiple methods including SMS, flashcalls, phone calls, and data verification. It enables developers to verify user identity by sending one-time codes or initiating automated verification flows. The API can be consumed directly via REST endpoints or through the Sinch Verification SDKs, and supports configurable verification workflows to optimize cost and conversion rates.
   version: '1.0'
   contact:
     name: Sinch Support
     url: https://www.sinch.com/contact-us/
   termsOfService: https://www.sinch.com/terms-of-service/
 servers:
-- url: https://brands.api.sinch.com
+- url: https://verification.api.sinch.com
   description: Global Production Server
 security:
-- bearerAuth: []
+- basicAuth: []
 tags:
 - name: Verifications
   description: Start, report, and query the status of phone number verifications using SMS, flashcall, phone call, or data verification methods.
@@ -201,30 +201,44 @@ paths:
           description: Verification not found
 components:
   schemas:
-    ReportVerificationRequest:
+    StartVerificationRequest:
       type: object
+      required:
+      - identity
+      - method
       properties:
+        identity:
+          type: object
+          required:
+          - type
+          - endpoint
+          description: The identity to verify
+          properties:
+            type:
+              type: string
+              enum:
+              - number
+              description: The identity type
+            endpoint:
+              type: string
+              description: The phone number in E.164 format
         method:
           type: string
           enum:
           - sms
           - flashcall
           - callout
-          description: The verification method
-        sms:
+          - seamless
+          description: The verification method to use
+        reference:
+          type: string
+          description: A custom reference string for tracking the verification
+        custom:
+          type: string
+          description: Custom data to pass to callbacks
+        metadata:
           type: object
-          description: SMS verification report data
-          properties:
-            code:
-              type: string
-              description: The OTP code received by the user
-        flashcall:
-          type: object
-          description: Flashcall verification report data
-          properties:
-            cli:
-              type: string
-              description: The CLI of the flashcall received
+          description: Additional metadata for the verification request
     StartVerificationResponse:
       type: object
       properties:
@@ -286,6 +300,30 @@ components:
         reason:
           type: string
           description: The reason for the status if not successful
+    ReportVerificationRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          enum:
+          - sms
+          - flashcall
+          - callout
+          description: The verification method
+        sms:
+          type: object
+          description: SMS verification report data
+          properties:
+            code:
+              type: string
+              description: The OTP code received by the user
+        flashcall:
+          type: object
+          description: Flashcall verification report data
+          properties:
+            cli:
+              type: string
+              description: The CLI of the flashcall received
     VerificationStatus:
       type: object
       properties:
@@ -330,49 +368,11 @@ components:
             amount:
               type: number
               description: The price amount
-    StartVerificationRequest:
-      type: object
-      required:
-      - identity
-      - method
-      properties:
-        identity:
-          type: object
-          required:
-          - type
-          - endpoint
-          description: The identity to verify
-          properties:
-            type:
-              type: string
-              enum:
-              - number
-              description: The identity type
-            endpoint:
-              type: string
-              description: The phone number in E.164 format
-        method:
-          type: string
-          enum:
-          - sms
-          - flashcall
-          - callout
-          - seamless
-          description: The verification method to use
-        reference:
-          type: string
-          description: A custom reference string for tracking the verification
-        custom:
-          type: string
-          description: Custom data to pass to callbacks
-        metadata:
-          type: object
-          description: Additional metadata for the verification request
   securitySchemes:
-    bearerAuth:
+    basicAuth:
       type: http
-      scheme: bearer
-      description: Bearer token authentication.
+      scheme: basic
+      description: Application key and secret used for HTTP basic authentication.
 externalDocs:
-  description: Sinch Brands API Documentation
-  url: https://developers.sinch.com/docs/brands
+  description: Sinch Verification API Documentation
+  url: https://developers.sinch.com/docs/verification

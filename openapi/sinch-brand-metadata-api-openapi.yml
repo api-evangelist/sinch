@@ -1,6 +1,6 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Sinch Brands Access Control Lists Brand Metadata API
+  title: Sinch Brands Brand Metadata API
   description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
   version: '1.0'
   contact:
@@ -35,14 +35,6 @@ paths:
         '401':
           description: Unauthorized
 components:
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
     BrandMetadata:
       type: object
@@ -67,6 +59,14 @@ components:
           description: Supported countries
           items:
             type: string
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
     bearerAuth:
       type: http

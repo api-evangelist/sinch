@@ -1,15 +1,23 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Sinch Brands Access Control Lists Delivery Reports API
-  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  title: Sinch SMS Delivery Reports API
+  description: The Sinch SMS API enables developers to send and receive SMS messages globally at scale. It supports batch messaging with scheduled delivery, message templates, delivery reports, and inbound message handling via webhooks. The API provides group management for organizing recipients, automatic message encoding optimization, and supports both transactional and marketing use cases across carriers worldwide.
   version: '1.0'
   contact:
     name: Sinch Support
     url: https://www.sinch.com/contact-us/
   termsOfService: https://www.sinch.com/terms-of-service/
 servers:
-- url: https://brands.api.sinch.com
-  description: Global Production Server
+- url: https://us.sms.api.sinch.com
+  description: US Production Server
+- url: https://eu.sms.api.sinch.com
+  description: EU Production Server
+- url: https://au.sms.api.sinch.com
+  description: Australia Production Server
+- url: https://br.sms.api.sinch.com
+  description: Brazil Production Server
+- url: https://ca.sms.api.sinch.com
+  description: Canada Production Server
 security:
 - bearerAuth: []
 tags:
@@ -105,6 +113,46 @@ paths:
           description: Unauthorized
 components:
   schemas:
+    RecipientDeliveryReport:
+      type: object
+      properties:
+        batch_id:
+          type: string
+          description: The batch identifier
+        recipient:
+          type: string
+          description: The recipient phone number
+        code:
+          type: integer
+          description: The delivery status code
+        status:
+          type: string
+          description: The delivery status
+        at:
+          type: string
+          format: date-time
+          description: When the status was updated
+        operator_status_at:
+          type: string
+          format: date-time
+          description: When the operator reported the status
+    DeliveryReportList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of delivery reports
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of reports per page
+        delivery_reports:
+          type: array
+          description: List of delivery report objects
+          items:
+            $ref: '#/components/schemas/DeliveryReport'
     DeliveryReport:
       type: object
       properties:
@@ -137,46 +185,6 @@ components:
         total_message_count:
           type: integer
           description: Total number of messages in the batch
-    DeliveryReportList:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: Total number of delivery reports
-        page:
-          type: integer
-          description: Current page number
-        page_size:
-          type: integer
-          description: Number of reports per page
-        delivery_reports:
-          type: array
-          description: List of delivery report objects
-          items:
-            $ref: '#/components/schemas/DeliveryReport'
-    RecipientDeliveryReport:
-      type: object
-      properties:
-        batch_id:
-          type: string
-          description: The batch identifier
-        recipient:
-          type: string
-          description: The recipient phone number
-        code:
-          type: integer
-          description: The delivery status code
-        status:
-          type: string
-          description: The delivery status
-        at:
-          type: string
-          format: date-time
-          description: When the status was updated
-        operator_status_at:
-          type: string
-          format: date-time
-          description: When the operator reported the status
   parameters:
     BatchId:
       name: batch_id
@@ -196,7 +204,7 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      description: Bearer token authentication.
+      description: API token sent in the Authorization header preceded by Bearer.
 externalDocs:
-  description: Sinch Brands API Documentation
-  url: https://developers.sinch.com/docs/brands
+  description: Sinch SMS API Documentation
+  url: https://developers.sinch.com/docs/sms

@@ -1,17 +1,18 @@
-openapi: 3.1.0
+openapi: 3.2.0
 info:
-  title: Sinch Brands Access Control Lists Available Regions API
-  description: The Sinch Brands API allows developers to create, update, and manage customer brand profiles used across Sinch messaging products. Brands represent the business identity associated with messaging campaigns and sender registrations. The API provides endpoints for creating brand records, updating brand details, listing brands, and deleting brands, enabling programmatic management of the brand entities required for compliant business messaging.
+  title: Sinch Numbers Available Regions API
+  description: The Sinch Numbers API enables developers to programmatically search for, purchase, configure, and manage phone numbers across multiple countries. It supports local, national, mobile, and toll-free number types that can be used with Sinch SMS, Voice, and Conversation APIs. The API provides endpoints for listing available numbers by region and type, activating numbers, updating number configurations, and releasing numbers when they are no longer needed.
   version: '1.0'
   contact:
     name: Sinch Support
     url: https://www.sinch.com/contact-us/
   termsOfService: https://www.sinch.com/terms-of-service/
 servers:
-- url: https://brands.api.sinch.com
+- url: https://numbers.api.sinch.com
   description: Global Production Server
 security:
-- bearerAuth: []
+- oAuth2: []
+- basicAuth: []
 tags:
 - name: Available Regions
   description: List available regions and number types that can be provisioned.
@@ -46,14 +47,6 @@ paths:
         '401':
           description: Unauthorized
 components:
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
     AvailableRegionList:
       type: object
@@ -75,11 +68,26 @@ components:
                 description: Available number types in this region
                 items:
                   type: string
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
-    bearerAuth:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
       type: http
-      scheme: bearer
-      description: Bearer token authentication.
+      scheme: basic
+      description: Key ID as username and key secret as password.
 externalDocs:
-  description: Sinch Brands API Documentation
-  url: https://developers.sinch.com/docs/brands
+  description: Sinch Numbers API Documentation
+  url: https://developers.sinch.com/docs/numbers
