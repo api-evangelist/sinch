@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   title: Sinch Conversation Contacts API
-  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API. It provides contact management, conversation tracking, message templating, and webhook callbacks for real-time event handling. The API normalizes message formats across channels, allowing developers to build multichannel messaging experiences without channel-specific integrations.
+  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
   version: '1.0'
   contact:
     name: Sinch Support
@@ -174,33 +174,6 @@ paths:
           description: Unauthorized
 components:
   schemas:
-    Contact:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique contact identifier
-        display_name:
-          type: string
-          description: The display name of the contact
-        email:
-          type: string
-          format: email
-          description: The contact email address
-        external_id:
-          type: string
-          description: An external identifier for the contact
-        language:
-          type: string
-          description: The preferred language of the contact
-        metadata:
-          type: string
-          description: Contact metadata
-        channel_identities:
-          type: array
-          description: The channel identities for the contact
-          items:
-            $ref: '#/components/schemas/ChannelIdentity'
     ChannelIdentity:
       type: object
       properties:
@@ -249,17 +222,6 @@ components:
           description: Updated channel identities
           items:
             $ref: '#/components/schemas/ChannelIdentity'
-    ContactList:
-      type: object
-      properties:
-        contacts:
-          type: array
-          description: List of contacts
-          items:
-            $ref: '#/components/schemas/Contact'
-        next_page_token:
-          type: string
-          description: Pagination token for the next page
     CreateContactRequest:
       type: object
       required:
@@ -286,19 +248,57 @@ components:
           description: Channel identities
           items:
             $ref: '#/components/schemas/ChannelIdentity'
+    ContactList:
+      type: object
+      properties:
+        contacts:
+          type: array
+          description: List of contacts
+          items:
+            $ref: '#/components/schemas/Contact'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
+    Contact:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique contact identifier
+        display_name:
+          type: string
+          description: The display name of the contact
+        email:
+          type: string
+          format: email
+          description: The contact email address
+        external_id:
+          type: string
+          description: An external identifier for the contact
+        language:
+          type: string
+          description: The preferred language of the contact
+        metadata:
+          type: string
+          description: Contact metadata
+        channel_identities:
+          type: array
+          description: The channel identities for the contact
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
   parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
     ContactId:
       name: contact_id
       in: path
       required: true
       description: The unique contact identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
       schema:
         type: string
   securitySchemes:

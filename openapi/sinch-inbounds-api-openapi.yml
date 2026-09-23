@@ -99,24 +99,15 @@ paths:
         '404':
           description: Message not found
 components:
+  parameters:
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
   schemas:
-    InboundMessageList:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: Total number of inbound messages
-        page:
-          type: integer
-          description: Current page number
-        page_size:
-          type: integer
-          description: Number of messages per page
-        inbounds:
-          type: array
-          description: List of inbound message objects
-          items:
-            $ref: '#/components/schemas/InboundMessage'
     InboundMessage:
       type: object
       properties:
@@ -145,14 +136,23 @@ components:
         client_reference:
           type: string
           description: Client reference from the original batch
-  parameters:
-    ServicePlanId:
-      name: service_plan_id
-      in: path
-      required: true
-      description: The unique identifier for the service plan
-      schema:
-        type: string
+    InboundMessageList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of inbound messages
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of messages per page
+        inbounds:
+          type: array
+          description: List of inbound message objects
+          items:
+            $ref: '#/components/schemas/InboundMessage'
   securitySchemes:
     bearerAuth:
       type: http

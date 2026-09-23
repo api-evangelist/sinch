@@ -146,6 +146,51 @@ paths:
           description: Sender not found
 components:
   schemas:
+    RcsSenderList:
+      type: object
+      properties:
+        senders:
+          type: array
+          description: List of RCS senders
+          items:
+            $ref: '#/components/schemas/RcsSender'
+    CreateRcsSenderRequest:
+      type: object
+      required:
+      - displayName
+      properties:
+        displayName:
+          type: string
+          description: The display name
+        description:
+          type: string
+          description: The sender description
+        logoUrl:
+          type: string
+          format: uri
+          description: Logo URL
+        heroImageUrl:
+          type: string
+          format: uri
+          description: Hero image URL
+        phoneNumber:
+          type: string
+          description: Associated phone number
+        color:
+          type: string
+          description: Brand color
+        website:
+          type: string
+          format: uri
+          description: Website URL
+        privacyPolicy:
+          type: string
+          format: uri
+          description: Privacy policy URL
+        termsOfService:
+          type: string
+          format: uri
+          description: Terms of service URL
     RcsSender:
       type: object
       properties:
@@ -195,43 +240,6 @@ components:
           type: string
           format: date-time
           description: When the sender was last updated
-    CreateRcsSenderRequest:
-      type: object
-      required:
-      - displayName
-      properties:
-        displayName:
-          type: string
-          description: The display name
-        description:
-          type: string
-          description: The sender description
-        logoUrl:
-          type: string
-          format: uri
-          description: Logo URL
-        heroImageUrl:
-          type: string
-          format: uri
-          description: Hero image URL
-        phoneNumber:
-          type: string
-          description: Associated phone number
-        color:
-          type: string
-          description: Brand color
-        website:
-          type: string
-          format: uri
-          description: Website URL
-        privacyPolicy:
-          type: string
-          format: uri
-          description: Privacy policy URL
-        termsOfService:
-          type: string
-          format: uri
-          description: Terms of service URL
     UpdateRcsSenderRequest:
       type: object
       properties:
@@ -249,14 +257,6 @@ components:
           type: string
           format: uri
           description: Updated hero image URL
-    RcsSenderList:
-      type: object
-      properties:
-        senders:
-          type: array
-          description: List of RCS senders
-          items:
-            $ref: '#/components/schemas/RcsSender'
   parameters:
     ProjectId:
       name: project_id

@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   title: Sinch Conversation Conversations API
-  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API. It provides contact management, conversation tracking, message templating, and webhook callbacks for real-time event handling. The API normalizes message formats across channels, allowing developers to build multichannel messaging experiences without channel-specific integrations.
+  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
   version: '1.0'
   contact:
     name: Sinch Support
@@ -172,18 +172,17 @@ paths:
           description: Conversation not found
 components:
   schemas:
-    UpdateConversationRequest:
+    ConversationList:
       type: object
       properties:
-        active:
-          type: boolean
-          description: Updated active status
-        active_channel:
+        conversations:
+          type: array
+          description: List of conversations
+          items:
+            $ref: '#/components/schemas/Conversation'
+        next_page_token:
           type: string
-          description: Updated active channel
-        metadata:
-          type: string
-          description: Updated metadata
+          description: Pagination token for the next page
     Conversation:
       type: object
       properties:
@@ -208,6 +207,18 @@ components:
         metadata_json:
           type: object
           description: Structured conversation metadata
+    UpdateConversationRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: Updated active status
+        active_channel:
+          type: string
+          description: Updated active channel
+        metadata:
+          type: string
+          description: Updated metadata
     CreateConversationRequest:
       type: object
       required:
@@ -230,30 +241,19 @@ components:
         metadata:
           type: string
           description: Conversation metadata
-    ConversationList:
-      type: object
-      properties:
-        conversations:
-          type: array
-          description: List of conversations
-          items:
-            $ref: '#/components/schemas/Conversation'
-        next_page_token:
-          type: string
-          description: Pagination token for the next page
   parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
     ConversationId:
       name: conversation_id
       in: path
       required: true
       description: The unique conversation identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
       schema:
         type: string
   securitySchemes:

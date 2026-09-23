@@ -137,88 +137,7 @@ paths:
         '404':
           description: Number not available
 components:
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    PhoneNumber:
-      name: phone_number
-      in: path
-      required: true
-      description: The phone number in E.164 format
-      schema:
-        type: string
   schemas:
-    RentNumberRequest:
-      type: object
-      properties:
-        smsConfiguration:
-          $ref: '#/components/schemas/SmsConfiguration'
-        voiceConfiguration:
-          $ref: '#/components/schemas/VoiceConfiguration'
-        callbackUrl:
-          type: string
-          format: uri
-          description: Callback URL for the number
-    AvailableNumberList:
-      type: object
-      properties:
-        availableNumbers:
-          type: array
-          description: List of available numbers
-          items:
-            $ref: '#/components/schemas/AvailableNumber'
-    SmsConfiguration:
-      type: object
-      properties:
-        servicePlanId:
-          type: string
-          description: The SMS service plan ID to associate
-        campaignId:
-          type: string
-          description: The campaign ID for 10DLC
-        scheduledProvisioning:
-          type: object
-          description: Scheduled provisioning details
-          properties:
-            servicePlanId:
-              type: string
-              description: Target service plan ID
-            campaignId:
-              type: string
-              description: Target campaign ID
-            status:
-              type: string
-              description: Provisioning status
-    Money:
-      type: object
-      properties:
-        currencyCode:
-          type: string
-          description: The ISO 4217 currency code
-        amount:
-          type: string
-          description: The monetary amount as a string
-    VoiceConfiguration:
-      type: object
-      properties:
-        appId:
-          type: string
-          description: The Voice API app ID to associate
-        scheduledVoiceProvisioning:
-          type: object
-          description: Scheduled voice provisioning details
-          properties:
-            appId:
-              type: string
-              description: Target app ID
-            status:
-              type: string
-              description: Provisioning status
     ActiveNumber:
       type: object
       properties:
@@ -287,6 +206,87 @@ components:
         paymentIntervalMonths:
           type: integer
           description: The billing interval in months
+    SmsConfiguration:
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: The SMS service plan ID to associate
+        campaignId:
+          type: string
+          description: The campaign ID for 10DLC
+        scheduledProvisioning:
+          type: object
+          description: Scheduled provisioning details
+          properties:
+            servicePlanId:
+              type: string
+              description: Target service plan ID
+            campaignId:
+              type: string
+              description: Target campaign ID
+            status:
+              type: string
+              description: Provisioning status
+    Money:
+      type: object
+      properties:
+        currencyCode:
+          type: string
+          description: The ISO 4217 currency code
+        amount:
+          type: string
+          description: The monetary amount as a string
+    RentNumberRequest:
+      type: object
+      properties:
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/VoiceConfiguration'
+        callbackUrl:
+          type: string
+          format: uri
+          description: Callback URL for the number
+    AvailableNumberList:
+      type: object
+      properties:
+        availableNumbers:
+          type: array
+          description: List of available numbers
+          items:
+            $ref: '#/components/schemas/AvailableNumber'
+    VoiceConfiguration:
+      type: object
+      properties:
+        appId:
+          type: string
+          description: The Voice API app ID to associate
+        scheduledVoiceProvisioning:
+          type: object
+          description: Scheduled voice provisioning details
+          properties:
+            appId:
+              type: string
+              description: Target app ID
+            status:
+              type: string
+              description: Provisioning status
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    PhoneNumber:
+      name: phone_number
+      in: path
+      required: true
+      description: The phone number in E.164 format
+      schema:
+        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

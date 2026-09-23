@@ -162,6 +162,42 @@ paths:
           description: Fax not found
 components:
   schemas:
+    SendFaxMultipartRequest:
+      type: object
+      required:
+      - to
+      - file
+      properties:
+        to:
+          type: string
+          description: The recipient fax number in E.164 format
+        from:
+          type: string
+          description: The sender fax number
+        file:
+          type: string
+          format: binary
+          description: The document file to fax
+        serviceId:
+          type: string
+          description: The fax service to use
+    FaxList:
+      type: object
+      properties:
+        faxes:
+          type: array
+          description: List of faxes
+          items:
+            $ref: '#/components/schemas/Fax'
+        page:
+          type: integer
+          description: Current page number
+        pageSize:
+          type: integer
+          description: Number of faxes per page
+        totalItems:
+          type: integer
+          description: Total number of faxes
     Fax:
       type: object
       properties:
@@ -207,25 +243,6 @@ components:
         headerText:
           type: string
           description: The header text on the fax
-    SendFaxMultipartRequest:
-      type: object
-      required:
-      - to
-      - file
-      properties:
-        to:
-          type: string
-          description: The recipient fax number in E.164 format
-        from:
-          type: string
-          description: The sender fax number
-        file:
-          type: string
-          format: binary
-          description: The document file to fax
-        serviceId:
-          type: string
-          description: The fax service to use
     SendFaxRequest:
       type: object
       required:
@@ -256,23 +273,6 @@ components:
           - HALFTONE
           - MONOCHROME
           description: Image conversion method for the fax
-    FaxList:
-      type: object
-      properties:
-        faxes:
-          type: array
-          description: List of faxes
-          items:
-            $ref: '#/components/schemas/Fax'
-        page:
-          type: integer
-          description: Current page number
-        pageSize:
-          type: integer
-          description: Number of faxes per page
-        totalItems:
-          type: integer
-          description: Total number of faxes
   parameters:
     ProjectId:
       name: project_id

@@ -62,25 +62,6 @@ paths:
           description: Unauthorized
 components:
   schemas:
-    SenderList:
-      type: object
-      properties:
-        senders:
-          type: array
-          description: List of senders
-          items:
-            $ref: '#/components/schemas/Sender'
-    CreateSenderRequest:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          description: The sender name
-        channelCredentials:
-          type: object
-          description: Channel-specific credentials and configuration
     Sender:
       type: object
       properties:
@@ -100,6 +81,25 @@ components:
           type: string
           format: date-time
           description: When the sender was created
+    SenderList:
+      type: object
+      properties:
+        senders:
+          type: array
+          description: List of senders
+          items:
+            $ref: '#/components/schemas/Sender'
+    CreateSenderRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The sender name
+        channelCredentials:
+          type: object
+          description: Channel-specific credentials and configuration
   parameters:
     ProjectId:
       name: project_id

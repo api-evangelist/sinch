@@ -130,18 +130,18 @@ paths:
           description: ACL not found
 components:
   parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
     TrunkId:
       name: trunk_id
       in: path
       required: true
       description: The unique SIP trunk identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
       schema:
         type: string
     AclId:
@@ -160,23 +160,6 @@ components:
           description: List of access control lists
           items:
             $ref: '#/components/schemas/Acl'
-    CreateAclRequest:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          description: The ACL name
-        enabled:
-          type: boolean
-          description: Whether the ACL is active
-          default: true
-        entries:
-          type: array
-          description: IP address entries
-          items:
-            $ref: '#/components/schemas/AclEntry'
     Acl:
       type: object
       properties:
@@ -214,6 +197,23 @@ components:
         entries:
           type: array
           description: Updated IP entries
+          items:
+            $ref: '#/components/schemas/AclEntry'
+    CreateAclRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The ACL name
+        enabled:
+          type: boolean
+          description: Whether the ACL is active
+          default: true
+        entries:
+          type: array
+          description: IP address entries
           items:
             $ref: '#/components/schemas/AclEntry'
     AclEntry:

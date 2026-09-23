@@ -181,33 +181,75 @@ paths:
           description: Unauthorized
 components:
   schemas:
-    DryRunResponse:
+    UpdateBatchRequest:
       type: object
       properties:
-        number_of_recipients:
-          type: integer
-          description: The estimated number of recipients
-        number_of_messages:
-          type: integer
-          description: The estimated number of messages
-        per_recipient:
+        to_add:
           type: array
-          description: Per-recipient details
+          description: Phone numbers to add to the batch
           items:
-            type: object
-            properties:
-              recipient:
-                type: string
-                description: The recipient phone number
-              number_of_parts:
-                type: integer
-                description: The number of message parts
-              body:
-                type: string
-                description: The rendered message body
-              encoding:
-                type: string
-                description: The message encoding
+            type: string
+        to_remove:
+          type: array
+          description: Phone numbers to remove from the batch
+          items:
+            type: string
+        from:
+          type: string
+          description: Updated sender number
+        body:
+          type: string
+          description: Updated message body
+        delivery_report:
+          type: string
+          enum:
+          - none
+          - summary
+          - full
+          - per_recipient
+          description: Updated delivery report type
+    Batch:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique batch identifier
+        to:
+          type: array
+          description: List of recipients
+          items:
+            type: string
+        from:
+          type: string
+          description: The sender number
+        body:
+          type: string
+          description: The message body
+        type:
+          type: string
+          description: The batch type
+        created_at:
+          type: string
+          format: date-time
+          description: When the batch was created
+        modified_at:
+          type: string
+          format: date-time
+          description: When the batch was last modified
+        canceled:
+          type: boolean
+          description: Whether the batch has been canceled
+        delivery_report:
+          type: string
+          description: The delivery report type
+        send_at:
+          type: string
+          format: date-time
+          description: The scheduled send time
+        expire_at:
+          type: string
+          format: date-time
+          description: The expiration time
     SendBatchRequest:
       type: object
       required:
@@ -263,33 +305,33 @@ components:
             type: object
             additionalProperties:
               type: string
-    UpdateBatchRequest:
+    DryRunResponse:
       type: object
       properties:
-        to_add:
+        number_of_recipients:
+          type: integer
+          description: The estimated number of recipients
+        number_of_messages:
+          type: integer
+          description: The estimated number of messages
+        per_recipient:
           type: array
-          description: Phone numbers to add to the batch
+          description: Per-recipient details
           items:
-            type: string
-        to_remove:
-          type: array
-          description: Phone numbers to remove from the batch
-          items:
-            type: string
-        from:
-          type: string
-          description: Updated sender number
-        body:
-          type: string
-          description: Updated message body
-        delivery_report:
-          type: string
-          enum:
-          - none
-          - summary
-          - full
-          - per_recipient
-          description: Updated delivery report type
+            type: object
+            properties:
+              recipient:
+                type: string
+                description: The recipient phone number
+              number_of_parts:
+                type: integer
+                description: The number of message parts
+              body:
+                type: string
+                description: The rendered message body
+              encoding:
+                type: string
+                description: The message encoding
     BatchList:
       type: object
       properties:
@@ -307,48 +349,6 @@ components:
           description: List of batch objects
           items:
             $ref: '#/components/schemas/Batch'
-    Batch:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique batch identifier
-        to:
-          type: array
-          description: List of recipients
-          items:
-            type: string
-        from:
-          type: string
-          description: The sender number
-        body:
-          type: string
-          description: The message body
-        type:
-          type: string
-          description: The batch type
-        created_at:
-          type: string
-          format: date-time
-          description: When the batch was created
-        modified_at:
-          type: string
-          format: date-time
-          description: When the batch was last modified
-        canceled:
-          type: boolean
-          description: Whether the batch has been canceled
-        delivery_report:
-          type: string
-          description: The delivery report type
-        send_at:
-          type: string
-          format: date-time
-          description: The scheduled send time
-        expire_at:
-          type: string
-          format: date-time
-          description: The expiration time
   parameters:
     BatchId:
       name: batch_id

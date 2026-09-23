@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   title: Sinch Conversation Messages API
-  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API. It provides contact management, conversation tracking, message templating, and webhook callbacks for real-time event handling. The API normalizes message formats across channels, allowing developers to build multichannel messaging experiences without channel-specific integrations.
+  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
   version: '1.0'
   contact:
     name: Sinch Support
@@ -144,14 +144,6 @@ paths:
         '404':
           description: Message not found
 components:
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
     ChannelIdentity:
       type: object
@@ -177,17 +169,63 @@ components:
         app_id:
           type: string
           description: The app ID for the channel
-    MessageList:
+    SendMessageRequest:
+      type: object
+      required:
+      - app_id
+      - message
+      - recipient
+      properties:
+        app_id:
+          type: string
+          description: The ID of the Conversation API app
+        recipient:
+          type: object
+          description: The message recipient
+          properties:
+            contact_id:
+              type: string
+              description: The contact ID to send to
+            identified_by:
+              type: object
+              description: Channel identity to address
+              properties:
+                channel_identities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChannelIdentity'
+        message:
+          $ref: '#/components/schemas/AppMessage'
+        message_metadata:
+          type: string
+          description: Metadata to associate with the message
+        conversation_metadata:
+          type: string
+          description: Metadata to associate with the conversation
+        channel_priority_order:
+          type: array
+          description: Ordered list of channels to try
+          items:
+            type: string
+        queue:
+          type: string
+          enum:
+          - NORMAL_PRIORITY
+          - HIGH_PRIORITY
+          description: The message queue priority
+        ttl:
+          type: integer
+          description: Time-to-live in seconds for the message
+    SendMessageResponse:
       type: object
       properties:
-        messages:
-          type: array
-          description: List of messages
-          items:
-            $ref: '#/components/schemas/ConversationMessage'
-        next_page_token:
+        message_id:
           type: string
-          description: Pagination token for the next page
+          description: The unique message identifier
+        accepted_time:
+          type: string
+          format: date-time
+          description: When the message was accepted
     ConversationMessage:
       type: object
       properties:
@@ -220,6 +258,30 @@ components:
           type: string
           format: date-time
           description: When the message was accepted
+    Choice:
+      type: object
+      properties:
+        text_message:
+          type: object
+          description: Text choice
+          properties:
+            text:
+              type: string
+              description: The choice text
+        postback_data:
+          type: string
+          description: Data sent back when the choice is selected
+    MessageList:
+      type: object
+      properties:
+        messages:
+          type: array
+          description: List of messages
+          items:
+            $ref: '#/components/schemas/ConversationMessage'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
     AppMessage:
       type: object
       properties:
@@ -309,76 +371,14 @@ components:
                     description: Section items
                     items:
                       $ref: '#/components/schemas/Choice'
-    Choice:
-      type: object
-      properties:
-        text_message:
-          type: object
-          description: Text choice
-          properties:
-            text:
-              type: string
-              description: The choice text
-        postback_data:
-          type: string
-          description: Data sent back when the choice is selected
-    SendMessageResponse:
-      type: object
-      properties:
-        message_id:
-          type: string
-          description: The unique message identifier
-        accepted_time:
-          type: string
-          format: date-time
-          description: When the message was accepted
-    SendMessageRequest:
-      type: object
-      required:
-      - app_id
-      - message
-      - recipient
-      properties:
-        app_id:
-          type: string
-          description: The ID of the Conversation API app
-        recipient:
-          type: object
-          description: The message recipient
-          properties:
-            contact_id:
-              type: string
-              description: The contact ID to send to
-            identified_by:
-              type: object
-              description: Channel identity to address
-              properties:
-                channel_identities:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/ChannelIdentity'
-        message:
-          $ref: '#/components/schemas/AppMessage'
-        message_metadata:
-          type: string
-          description: Metadata to associate with the message
-        conversation_metadata:
-          type: string
-          description: Metadata to associate with the conversation
-        channel_priority_order:
-          type: array
-          description: Ordered list of channels to try
-          items:
-            type: string
-        queue:
-          type: string
-          enum:
-          - NORMAL_PRIORITY
-          - HIGH_PRIORITY
-          description: The message queue priority
-        ttl:
-          type: integer
-          description: Time-to-live in seconds for the message
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

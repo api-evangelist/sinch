@@ -60,6 +60,33 @@ components:
           $ref: '#/components/schemas/TtsCallout'
         customCallout:
           $ref: '#/components/schemas/CustomCallout'
+    CalloutResponse:
+      type: object
+      properties:
+        callId:
+          type: string
+          description: The unique call identifier for the initiated call
+    CustomCallout:
+      type: object
+      required:
+      - cli
+      - destination
+      - ice
+      properties:
+        cli:
+          type: string
+          description: The caller ID to display
+        destination:
+          $ref: '#/components/schemas/Destination'
+        ice:
+          type: string
+          description: SVAML ICE response in JSON format
+        ace:
+          type: string
+          description: SVAML ACE response in JSON format
+        pie:
+          type: string
+          description: SVAML PIE response in JSON format
     Destination:
       type: object
       required:
@@ -116,27 +143,6 @@ components:
         mohClass:
           type: string
           description: Music on hold class
-    CustomCallout:
-      type: object
-      required:
-      - cli
-      - destination
-      - ice
-      properties:
-        cli:
-          type: string
-          description: The caller ID to display
-        destination:
-          $ref: '#/components/schemas/Destination'
-        ice:
-          type: string
-          description: SVAML ICE response in JSON format
-        ace:
-          type: string
-          description: SVAML ACE response in JSON format
-        pie:
-          type: string
-          description: SVAML PIE response in JSON format
     TtsCallout:
       type: object
       required:
@@ -161,12 +167,6 @@ components:
         enableDice:
           type: boolean
           description: Enable Disconnected Call Event callback
-    CalloutResponse:
-      type: object
-      properties:
-        callId:
-          type: string
-          description: The unique call identifier for the initiated call
   securitySchemes:
     basicAuth:
       type: http

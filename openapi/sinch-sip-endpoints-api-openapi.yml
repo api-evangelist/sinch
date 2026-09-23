@@ -129,7 +129,37 @@ paths:
         '404':
           description: Endpoint not found
 components:
+  parameters:
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    EndpointId:
+      name: endpoint_id
+      in: path
+      required: true
+      description: The unique SIP endpoint identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   schemas:
+    SipEndpointList:
+      type: object
+      properties:
+        sipEndpoints:
+          type: array
+          description: List of SIP endpoints
+          items:
+            $ref: '#/components/schemas/SipEndpoint'
     CreateSipEndpointRequest:
       type: object
       required:
@@ -145,14 +175,6 @@ components:
           type: boolean
           description: Whether the endpoint is enabled
           default: true
-    SipEndpointList:
-      type: object
-      properties:
-        sipEndpoints:
-          type: array
-          description: List of SIP endpoints
-          items:
-            $ref: '#/components/schemas/SipEndpoint'
     UpdateSipEndpointRequest:
       type: object
       properties:
@@ -188,28 +210,6 @@ components:
           type: string
           format: date-time
           description: When the endpoint was last updated
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    TrunkId:
-      name: trunk_id
-      in: path
-      required: true
-      description: The unique SIP trunk identifier
-      schema:
-        type: string
-    EndpointId:
-      name: endpoint_id
-      in: path
-      required: true
-      description: The unique SIP endpoint identifier
-      schema:
-        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

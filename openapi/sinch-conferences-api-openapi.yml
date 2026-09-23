@@ -91,21 +91,6 @@ paths:
         '404':
           description: Conference or participant not found
 components:
-  parameters:
-    CallId:
-      name: call_id
-      in: path
-      required: true
-      description: The unique call identifier
-      schema:
-        type: string
-    ConferenceId:
-      name: conference_id
-      in: path
-      required: true
-      description: The unique conference identifier
-      schema:
-        type: string
   schemas:
     Participant:
       type: object
@@ -125,17 +110,6 @@ components:
         onhold:
           type: boolean
           description: Whether the participant is on hold
-    ConferenceInfo:
-      type: object
-      properties:
-        conferenceId:
-          type: string
-          description: The conference identifier
-        participants:
-          type: array
-          description: List of participants in the conference
-          items:
-            $ref: '#/components/schemas/Participant'
     ManageParticipantRequest:
       type: object
       properties:
@@ -147,6 +121,32 @@ components:
           - onhold
           - resume
           description: The command to execute on the participant
+    ConferenceInfo:
+      type: object
+      properties:
+        conferenceId:
+          type: string
+          description: The conference identifier
+        participants:
+          type: array
+          description: List of participants in the conference
+          items:
+            $ref: '#/components/schemas/Participant'
+  parameters:
+    CallId:
+      name: call_id
+      in: path
+      required: true
+      description: The unique call identifier
+      schema:
+        type: string
+    ConferenceId:
+      name: conference_id
+      in: path
+      required: true
+      description: The unique conference identifier
+      schema:
+        type: string
   securitySchemes:
     basicAuth:
       type: http

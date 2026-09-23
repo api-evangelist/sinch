@@ -135,29 +135,22 @@ paths:
         '404':
           description: Trunk not found
 components:
+  parameters:
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   schemas:
-    TrunkList:
-      type: object
-      properties:
-        trunks:
-          type: array
-          description: List of SIP trunks
-          items:
-            $ref: '#/components/schemas/Trunk'
-        totalSize:
-          type: integer
-          description: Total number of trunks
-    CreateTrunkRequest:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          description: The trunk name
-        hostName:
-          type: string
-          description: The Sinch SIP hostname
     UpdateTrunkRequest:
       type: object
       properties:
@@ -196,21 +189,28 @@ components:
           type: string
           format: date-time
           description: When the trunk was last updated
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    TrunkId:
-      name: trunk_id
-      in: path
-      required: true
-      description: The unique SIP trunk identifier
-      schema:
-        type: string
+    CreateTrunkRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The trunk name
+        hostName:
+          type: string
+          description: The Sinch SIP hostname
+    TrunkList:
+      type: object
+      properties:
+        trunks:
+          type: array
+          description: List of SIP trunks
+          items:
+            $ref: '#/components/schemas/Trunk'
+        totalSize:
+          type: integer
+          description: Total number of trunks
   securitySchemes:
     oAuth2:
       type: oauth2

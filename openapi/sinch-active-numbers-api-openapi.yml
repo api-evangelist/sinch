@@ -148,65 +148,6 @@ paths:
           description: Number not found
 components:
   schemas:
-    ActiveNumberList:
-      type: object
-      properties:
-        activeNumbers:
-          type: array
-          description: List of active numbers
-          items:
-            $ref: '#/components/schemas/ActiveNumber'
-        nextPageToken:
-          type: string
-          description: Pagination token for the next page
-        totalSize:
-          type: integer
-          description: Total number of active numbers
-    UpdateActiveNumberRequest:
-      type: object
-      properties:
-        displayName:
-          type: string
-          description: Updated display name
-        smsConfiguration:
-          $ref: '#/components/schemas/SmsConfiguration'
-        voiceConfiguration:
-          $ref: '#/components/schemas/VoiceConfiguration'
-        callbackUrl:
-          type: string
-          format: uri
-          description: Updated callback URL
-    SmsConfiguration:
-      type: object
-      properties:
-        servicePlanId:
-          type: string
-          description: The SMS service plan ID to associate
-        campaignId:
-          type: string
-          description: The campaign ID for 10DLC
-        scheduledProvisioning:
-          type: object
-          description: Scheduled provisioning details
-          properties:
-            servicePlanId:
-              type: string
-              description: Target service plan ID
-            campaignId:
-              type: string
-              description: Target campaign ID
-            status:
-              type: string
-              description: Provisioning status
-    Money:
-      type: object
-      properties:
-        currencyCode:
-          type: string
-          description: The ISO 4217 currency code
-        amount:
-          type: string
-          description: The monetary amount as a string
     ActiveNumber:
       type: object
       properties:
@@ -251,6 +192,51 @@ components:
           type: string
           format: uri
           description: The callback URL for the number
+    ActiveNumberList:
+      type: object
+      properties:
+        activeNumbers:
+          type: array
+          description: List of active numbers
+          items:
+            $ref: '#/components/schemas/ActiveNumber'
+        nextPageToken:
+          type: string
+          description: Pagination token for the next page
+        totalSize:
+          type: integer
+          description: Total number of active numbers
+    SmsConfiguration:
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: The SMS service plan ID to associate
+        campaignId:
+          type: string
+          description: The campaign ID for 10DLC
+        scheduledProvisioning:
+          type: object
+          description: Scheduled provisioning details
+          properties:
+            servicePlanId:
+              type: string
+              description: Target service plan ID
+            campaignId:
+              type: string
+              description: Target campaign ID
+            status:
+              type: string
+              description: Provisioning status
+    Money:
+      type: object
+      properties:
+        currencyCode:
+          type: string
+          description: The ISO 4217 currency code
+        amount:
+          type: string
+          description: The monetary amount as a string
     VoiceConfiguration:
       type: object
       properties:
@@ -267,6 +253,20 @@ components:
             status:
               type: string
               description: Provisioning status
+    UpdateActiveNumberRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Updated display name
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/VoiceConfiguration'
+        callbackUrl:
+          type: string
+          format: uri
+          description: Updated callback URL
   parameters:
     ProjectId:
       name: project_id

@@ -167,77 +167,7 @@ paths:
         '404':
           description: Group not found
 components:
-  parameters:
-    GroupId:
-      name: group_id
-      in: path
-      required: true
-      description: The unique identifier for the group
-      schema:
-        type: string
-    ServicePlanId:
-      name: service_plan_id
-      in: path
-      required: true
-      description: The unique identifier for the service plan
-      schema:
-        type: string
   schemas:
-    GroupList:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: Total number of groups
-        page:
-          type: integer
-          description: Current page number
-        page_size:
-          type: integer
-          description: Number of groups per page
-        groups:
-          type: array
-          description: List of group objects
-          items:
-            $ref: '#/components/schemas/Group'
-    UpdateGroupRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Updated group name
-        add:
-          type: array
-          description: Phone numbers to add to the group
-          items:
-            type: string
-        remove:
-          type: array
-          description: Phone numbers to remove from the group
-          items:
-            type: string
-        add_from_group:
-          type: string
-          description: Add all members from another group
-        remove_from_group:
-          type: string
-          description: Remove all members that are in another group
-    CreateGroupRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          description: The name of the group
-        members:
-          type: array
-          description: List of phone numbers to add as members
-          items:
-            type: string
-        child_groups:
-          type: array
-          description: List of child group IDs
-          items:
-            type: string
     Group:
       type: object
       properties:
@@ -263,6 +193,76 @@ components:
           description: List of child group IDs
           items:
             type: string
+    GroupList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of groups
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of groups per page
+        groups:
+          type: array
+          description: List of group objects
+          items:
+            $ref: '#/components/schemas/Group'
+    CreateGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the group
+        members:
+          type: array
+          description: List of phone numbers to add as members
+          items:
+            type: string
+        child_groups:
+          type: array
+          description: List of child group IDs
+          items:
+            type: string
+    UpdateGroupRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Updated group name
+        add:
+          type: array
+          description: Phone numbers to add to the group
+          items:
+            type: string
+        remove:
+          type: array
+          description: Phone numbers to remove from the group
+          items:
+            type: string
+        add_from_group:
+          type: string
+          description: Add all members from another group
+        remove_from_group:
+          type: string
+          description: Remove all members that are in another group
+  parameters:
+    GroupId:
+      name: group_id
+      in: path
+      required: true
+      description: The unique identifier for the group
+      schema:
+        type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
   securitySchemes:
     bearerAuth:
       type: http

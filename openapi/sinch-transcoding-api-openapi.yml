@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   title: Sinch Conversation Transcoding API
-  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API. It provides contact management, conversation tracking, message templating, and webhook callbacks for real-time event handling. The API normalizes message formats across channels, allowing developers to build multichannel messaging experiences without channel-specific integrations.
+  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
   version: '1.0'
   contact:
     name: Sinch Support
@@ -48,15 +48,15 @@ paths:
         '401':
           description: Unauthorized
 components:
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
+    TranscodeResponse:
+      type: object
+      properties:
+        transcoded_message:
+          type: object
+          description: Map of channel to transcoded message
+          additionalProperties:
+            type: string
     TranscodeRequest:
       type: object
       required:
@@ -74,14 +74,19 @@ components:
           description: Target channels for transcoding
           items:
             type: string
-    TranscodeResponse:
+    Choice:
       type: object
       properties:
-        transcoded_message:
+        text_message:
           type: object
-          description: Map of channel to transcoded message
-          additionalProperties:
-            type: string
+          description: Text choice
+          properties:
+            text:
+              type: string
+              description: The choice text
+        postback_data:
+          type: string
+          description: Data sent back when the choice is selected
     AppMessage:
       type: object
       properties:
@@ -171,19 +176,14 @@ components:
                     description: Section items
                     items:
                       $ref: '#/components/schemas/Choice'
-    Choice:
-      type: object
-      properties:
-        text_message:
-          type: object
-          description: Text choice
-          properties:
-            text:
-              type: string
-              description: The choice text
-        postback_data:
-          type: string
-          description: Data sent back when the choice is selected
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

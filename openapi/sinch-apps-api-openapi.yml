@@ -1,7 +1,7 @@
 openapi: 3.2.0
 info:
   title: Sinch Conversation Apps API
-  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API. It provides contact management, conversation tracking, message templating, and webhook callbacks for real-time event handling. The API normalizes message formats across channels, allowing developers to build multichannel messaging experiences without channel-specific integrations.
+  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
   version: '1.0'
   contact:
     name: Sinch Support
@@ -129,17 +129,6 @@ paths:
           description: App not found
 components:
   schemas:
-    UpdateAppRequest:
-      type: object
-      properties:
-        display_name:
-          type: string
-          description: Updated display name
-        channel_credentials:
-          type: array
-          description: Updated channel credentials
-          items:
-            $ref: '#/components/schemas/ChannelCredential'
     App:
       type: object
       properties:
@@ -191,6 +180,17 @@ components:
           description: List of apps
           items:
             $ref: '#/components/schemas/App'
+    UpdateAppRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+          description: Updated display name
+        channel_credentials:
+          type: array
+          description: Updated channel credentials
+          items:
+            $ref: '#/components/schemas/ChannelCredential'
     CreateAppRequest:
       type: object
       required:
