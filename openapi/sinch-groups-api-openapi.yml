@@ -193,23 +193,6 @@ components:
           description: List of child group IDs
           items:
             type: string
-    GroupList:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: Total number of groups
-        page:
-          type: integer
-          description: Current page number
-        page_size:
-          type: integer
-          description: Number of groups per page
-        groups:
-          type: array
-          description: List of group objects
-          items:
-            $ref: '#/components/schemas/Group'
     CreateGroupRequest:
       type: object
       properties:
@@ -248,19 +231,36 @@ components:
         remove_from_group:
           type: string
           description: Remove all members that are in another group
+    GroupList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of groups
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of groups per page
+        groups:
+          type: array
+          description: List of group objects
+          items:
+            $ref: '#/components/schemas/Group'
   parameters:
-    GroupId:
-      name: group_id
-      in: path
-      required: true
-      description: The unique identifier for the group
-      schema:
-        type: string
     ServicePlanId:
       name: service_plan_id
       in: path
       required: true
       description: The unique identifier for the service plan
+      schema:
+        type: string
+    GroupId:
+      name: group_id
+      in: path
+      required: true
+      description: The unique identifier for the group
       schema:
         type: string
   securitySchemes:

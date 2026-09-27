@@ -128,13 +128,27 @@ paths:
         '404':
           description: App not found
 components:
+  parameters:
+    AppId:
+      name: app_id
+      in: path
+      required: true
+      description: The unique app identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   schemas:
-    App:
+    CreateAppRequest:
       type: object
+      required:
+      - display_name
       properties:
-        id:
-          type: string
-          description: The unique app identifier
         display_name:
           type: string
           description: The app display name
@@ -143,9 +157,6 @@ components:
           description: Channel credential configurations
           items:
             $ref: '#/components/schemas/ChannelCredential'
-        conversation_metadata_report_view:
-          type: string
-          description: Metadata report configuration
     ChannelCredential:
       type: object
       properties:
@@ -172,14 +183,6 @@ components:
         callback_secret:
           type: string
           description: Secret for validating callbacks from the channel
-    AppList:
-      type: object
-      properties:
-        apps:
-          type: array
-          description: List of apps
-          items:
-            $ref: '#/components/schemas/App'
     UpdateAppRequest:
       type: object
       properties:
@@ -191,11 +194,12 @@ components:
           description: Updated channel credentials
           items:
             $ref: '#/components/schemas/ChannelCredential'
-    CreateAppRequest:
+    App:
       type: object
-      required:
-      - display_name
       properties:
+        id:
+          type: string
+          description: The unique app identifier
         display_name:
           type: string
           description: The app display name
@@ -204,21 +208,17 @@ components:
           description: Channel credential configurations
           items:
             $ref: '#/components/schemas/ChannelCredential'
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    AppId:
-      name: app_id
-      in: path
-      required: true
-      description: The unique app identifier
-      schema:
-        type: string
+        conversation_metadata_report_view:
+          type: string
+          description: Metadata report configuration
+    AppList:
+      type: object
+      properties:
+        apps:
+          type: array
+          description: List of apps
+          items:
+            $ref: '#/components/schemas/App'
   securitySchemes:
     oAuth2:
       type: oauth2

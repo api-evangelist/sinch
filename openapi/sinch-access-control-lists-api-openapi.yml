@@ -129,37 +129,7 @@ paths:
         '404':
           description: ACL not found
 components:
-  parameters:
-    TrunkId:
-      name: trunk_id
-      in: path
-      required: true
-      description: The unique SIP trunk identifier
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    AclId:
-      name: acl_id
-      in: path
-      required: true
-      description: The unique access control list identifier
-      schema:
-        type: string
   schemas:
-    AclList:
-      type: object
-      properties:
-        accessControlLists:
-          type: array
-          description: List of access control lists
-          items:
-            $ref: '#/components/schemas/Acl'
     Acl:
       type: object
       properties:
@@ -216,6 +186,14 @@ components:
           description: IP address entries
           items:
             $ref: '#/components/schemas/AclEntry'
+    AclList:
+      type: object
+      properties:
+        accessControlLists:
+          type: array
+          description: List of access control lists
+          items:
+            $ref: '#/components/schemas/Acl'
     AclEntry:
       type: object
       properties:
@@ -225,6 +203,28 @@ components:
         description:
           type: string
           description: A description of this entry
+  parameters:
+    AclId:
+      name: acl_id
+      in: path
+      required: true
+      description: The unique access control list identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

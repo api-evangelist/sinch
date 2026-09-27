@@ -129,37 +129,19 @@ paths:
         '404':
           description: Endpoint not found
 components:
-  parameters:
-    TrunkId:
-      name: trunk_id
-      in: path
-      required: true
-      description: The unique SIP trunk identifier
-      schema:
-        type: string
-    EndpointId:
-      name: endpoint_id
-      in: path
-      required: true
-      description: The unique SIP endpoint identifier
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
-    SipEndpointList:
+    UpdateSipEndpointRequest:
       type: object
       properties:
-        sipEndpoints:
-          type: array
-          description: List of SIP endpoints
-          items:
-            $ref: '#/components/schemas/SipEndpoint'
+        sipAddress:
+          type: string
+          description: Updated SIP address
+        priority:
+          type: integer
+          description: Updated priority
+        enabled:
+          type: boolean
+          description: Updated enabled status
     CreateSipEndpointRequest:
       type: object
       required:
@@ -175,18 +157,14 @@ components:
           type: boolean
           description: Whether the endpoint is enabled
           default: true
-    UpdateSipEndpointRequest:
+    SipEndpointList:
       type: object
       properties:
-        sipAddress:
-          type: string
-          description: Updated SIP address
-        priority:
-          type: integer
-          description: Updated priority
-        enabled:
-          type: boolean
-          description: Updated enabled status
+        sipEndpoints:
+          type: array
+          description: List of SIP endpoints
+          items:
+            $ref: '#/components/schemas/SipEndpoint'
     SipEndpoint:
       type: object
       properties:
@@ -210,6 +188,28 @@ components:
           type: string
           format: date-time
           description: When the endpoint was last updated
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    EndpointId:
+      name: endpoint_id
+      in: path
+      required: true
+      description: The unique SIP endpoint identifier
+      schema:
+        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

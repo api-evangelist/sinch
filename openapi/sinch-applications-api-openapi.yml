@@ -145,14 +145,6 @@ paths:
         '404':
           description: Number not found
 components:
-  parameters:
-    ApplicationKey:
-      name: application_key
-      in: path
-      required: true
-      description: The application key
-      schema:
-        type: string
   schemas:
     NumberList:
       type: object
@@ -162,21 +154,6 @@ components:
           description: List of phone numbers
           items:
             $ref: '#/components/schemas/NumberConfiguration'
-    ApplicationCallbacks:
-      type: object
-      properties:
-        url:
-          type: object
-          description: Callback URL configuration
-          properties:
-            primary:
-              type: string
-              format: uri
-              description: The primary callback URL
-            fallback:
-              type: string
-              format: uri
-              description: The fallback callback URL
     NumberConfiguration:
       type: object
       properties:
@@ -192,6 +169,29 @@ components:
           - voice
           - sms
           description: The number capability
+    ApplicationCallbacks:
+      type: object
+      properties:
+        url:
+          type: object
+          description: Callback URL configuration
+          properties:
+            primary:
+              type: string
+              format: uri
+              description: The primary callback URL
+            fallback:
+              type: string
+              format: uri
+              description: The fallback callback URL
+  parameters:
+    ApplicationKey:
+      name: application_key
+      in: path
+      required: true
+      description: The application key
+      schema:
+        type: string
   securitySchemes:
     basicAuth:
       type: http

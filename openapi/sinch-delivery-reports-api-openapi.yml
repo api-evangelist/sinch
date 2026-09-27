@@ -112,6 +112,21 @@ paths:
         '401':
           description: Unauthorized
 components:
+  parameters:
+    BatchId:
+      name: batch_id
+      in: path
+      required: true
+      description: The unique identifier for the batch
+      schema:
+        type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
   schemas:
     DeliveryReportList:
       type: object
@@ -130,29 +145,6 @@ components:
           description: List of delivery report objects
           items:
             $ref: '#/components/schemas/DeliveryReport'
-    RecipientDeliveryReport:
-      type: object
-      properties:
-        batch_id:
-          type: string
-          description: The batch identifier
-        recipient:
-          type: string
-          description: The recipient phone number
-        code:
-          type: integer
-          description: The delivery status code
-        status:
-          type: string
-          description: The delivery status
-        at:
-          type: string
-          format: date-time
-          description: When the status was updated
-        operator_status_at:
-          type: string
-          format: date-time
-          description: When the operator reported the status
     DeliveryReport:
       type: object
       properties:
@@ -185,21 +177,29 @@ components:
         total_message_count:
           type: integer
           description: Total number of messages in the batch
-  parameters:
-    BatchId:
-      name: batch_id
-      in: path
-      required: true
-      description: The unique identifier for the batch
-      schema:
-        type: string
-    ServicePlanId:
-      name: service_plan_id
-      in: path
-      required: true
-      description: The unique identifier for the service plan
-      schema:
-        type: string
+    RecipientDeliveryReport:
+      type: object
+      properties:
+        batch_id:
+          type: string
+          description: The batch identifier
+        recipient:
+          type: string
+          description: The recipient phone number
+        code:
+          type: integer
+          description: The delivery status code
+        status:
+          type: string
+          description: The delivery status
+        at:
+          type: string
+          format: date-time
+          description: When the status was updated
+        operator_status_at:
+          type: string
+          format: date-time
+          description: When the operator reported the status
   securitySchemes:
     bearerAuth:
       type: http

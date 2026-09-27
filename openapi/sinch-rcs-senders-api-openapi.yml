@@ -154,6 +154,23 @@ components:
           description: List of RCS senders
           items:
             $ref: '#/components/schemas/RcsSender'
+    UpdateRcsSenderRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Updated display name
+        description:
+          type: string
+          description: Updated description
+        logoUrl:
+          type: string
+          format: uri
+          description: Updated logo URL
+        heroImageUrl:
+          type: string
+          format: uri
+          description: Updated hero image URL
     CreateRcsSenderRequest:
       type: object
       required:
@@ -240,36 +257,19 @@ components:
           type: string
           format: date-time
           description: When the sender was last updated
-    UpdateRcsSenderRequest:
-      type: object
-      properties:
-        displayName:
-          type: string
-          description: Updated display name
-        description:
-          type: string
-          description: Updated description
-        logoUrl:
-          type: string
-          format: uri
-          description: Updated logo URL
-        heroImageUrl:
-          type: string
-          format: uri
-          description: Updated hero image URL
   parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
     SenderId:
       name: sender_id
       in: path
       required: true
       description: The unique sender identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
       schema:
         type: string
   securitySchemes:

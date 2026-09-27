@@ -180,7 +180,121 @@ paths:
         '401':
           description: Unauthorized
 components:
+  parameters:
+    BatchId:
+      name: batch_id
+      in: path
+      required: true
+      description: The unique identifier for the batch
+      schema:
+        type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
   schemas:
+    DryRunResponse:
+      type: object
+      properties:
+        number_of_recipients:
+          type: integer
+          description: The estimated number of recipients
+        number_of_messages:
+          type: integer
+          description: The estimated number of messages
+        per_recipient:
+          type: array
+          description: Per-recipient details
+          items:
+            type: object
+            properties:
+              recipient:
+                type: string
+                description: The recipient phone number
+              number_of_parts:
+                type: integer
+                description: The number of message parts
+              body:
+                type: string
+                description: The rendered message body
+              encoding:
+                type: string
+                description: The message encoding
+    SendBatchRequest:
+      type: object
+      required:
+      - to
+      - from
+      - body
+      properties:
+        to:
+          type: array
+          description: List of recipient phone numbers in E.164 format or group IDs
+          items:
+            type: string
+        from:
+          type: string
+          description: The sender phone number in E.164 format or short code
+        body:
+          type: string
+          description: The message body text
+        type:
+          type: string
+          enum:
+          - mt_text
+          - mt_binary
+          description: The type of batch message
+        delivery_report:
+          type: string
+          enum:
+          - none
+          - summary
+          - full
+          - per_recipient
+          description: The type of delivery report requested
+        send_at:
+          type: string
+          format: date-time
+          description: Scheduled send time for the batch
+        expire_at:
+          type: string
+          format: date-time
+          description: Expiration time for undelivered messages
+        callback_url:
+          type: string
+          format: uri
+          description: URL to receive delivery report callbacks
+        flash_message:
+          type: boolean
+          description: Whether to send as a flash message
+          default: false
+        parameters:
+          type: object
+          description: Parameterized message substitution values
+          additionalProperties:
+            type: object
+            additionalProperties:
+              type: string
+    BatchList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of batches
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of batches per page
+        batches:
+          type: array
+          description: List of batch objects
+          items:
+            $ref: '#/components/schemas/Batch'
     UpdateBatchRequest:
       type: object
       properties:
@@ -250,120 +364,6 @@ components:
           type: string
           format: date-time
           description: The expiration time
-    SendBatchRequest:
-      type: object
-      required:
-      - to
-      - from
-      - body
-      properties:
-        to:
-          type: array
-          description: List of recipient phone numbers in E.164 format or group IDs
-          items:
-            type: string
-        from:
-          type: string
-          description: The sender phone number in E.164 format or short code
-        body:
-          type: string
-          description: The message body text
-        type:
-          type: string
-          enum:
-          - mt_text
-          - mt_binary
-          description: The type of batch message
-        delivery_report:
-          type: string
-          enum:
-          - none
-          - summary
-          - full
-          - per_recipient
-          description: The type of delivery report requested
-        send_at:
-          type: string
-          format: date-time
-          description: Scheduled send time for the batch
-        expire_at:
-          type: string
-          format: date-time
-          description: Expiration time for undelivered messages
-        callback_url:
-          type: string
-          format: uri
-          description: URL to receive delivery report callbacks
-        flash_message:
-          type: boolean
-          description: Whether to send as a flash message
-          default: false
-        parameters:
-          type: object
-          description: Parameterized message substitution values
-          additionalProperties:
-            type: object
-            additionalProperties:
-              type: string
-    DryRunResponse:
-      type: object
-      properties:
-        number_of_recipients:
-          type: integer
-          description: The estimated number of recipients
-        number_of_messages:
-          type: integer
-          description: The estimated number of messages
-        per_recipient:
-          type: array
-          description: Per-recipient details
-          items:
-            type: object
-            properties:
-              recipient:
-                type: string
-                description: The recipient phone number
-              number_of_parts:
-                type: integer
-                description: The number of message parts
-              body:
-                type: string
-                description: The rendered message body
-              encoding:
-                type: string
-                description: The message encoding
-    BatchList:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: Total number of batches
-        page:
-          type: integer
-          description: Current page number
-        page_size:
-          type: integer
-          description: Number of batches per page
-        batches:
-          type: array
-          description: List of batch objects
-          items:
-            $ref: '#/components/schemas/Batch'
-  parameters:
-    BatchId:
-      name: batch_id
-      in: path
-      required: true
-      description: The unique identifier for the batch
-      schema:
-        type: string
-    ServicePlanId:
-      name: service_plan_id
-      in: path
-      required: true
-      description: The unique identifier for the service plan
-      schema:
-        type: string
   securitySchemes:
     bearerAuth:
       type: http

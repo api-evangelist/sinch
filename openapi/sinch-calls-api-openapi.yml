@@ -68,6 +68,25 @@ components:
         amount:
           type: number
           description: The amount
+    SVAMLControl:
+      type: object
+      properties:
+        action:
+          type: object
+          description: The SVAML action to execute
+          properties:
+            name:
+              type: string
+              description: The action name
+        instructions:
+          type: array
+          description: List of SVAML instructions
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The instruction name
     CallInformation:
       type: object
       properties:
@@ -103,25 +122,6 @@ components:
           $ref: '#/components/schemas/Price'
         debit:
           $ref: '#/components/schemas/Price'
-    SVAMLControl:
-      type: object
-      properties:
-        action:
-          type: object
-          description: The SVAML action to execute
-          properties:
-            name:
-              type: string
-              description: The action name
-        instructions:
-          type: array
-          description: List of SVAML instructions
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-                description: The instruction name
   parameters:
     CallId:
       name: call_id

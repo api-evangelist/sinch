@@ -148,6 +148,51 @@ paths:
           description: Number not found
 components:
   schemas:
+    Money:
+      type: object
+      properties:
+        currencyCode:
+          type: string
+          description: The ISO 4217 currency code
+        amount:
+          type: string
+          description: The monetary amount as a string
+    UpdateActiveNumberRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Updated display name
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/VoiceConfiguration'
+        callbackUrl:
+          type: string
+          format: uri
+          description: Updated callback URL
+    SmsConfiguration:
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: The SMS service plan ID to associate
+        campaignId:
+          type: string
+          description: The campaign ID for 10DLC
+        scheduledProvisioning:
+          type: object
+          description: Scheduled provisioning details
+          properties:
+            servicePlanId:
+              type: string
+              description: Target service plan ID
+            campaignId:
+              type: string
+              description: Target campaign ID
+            status:
+              type: string
+              description: Provisioning status
     ActiveNumber:
       type: object
       properties:
@@ -206,37 +251,6 @@ components:
         totalSize:
           type: integer
           description: Total number of active numbers
-    SmsConfiguration:
-      type: object
-      properties:
-        servicePlanId:
-          type: string
-          description: The SMS service plan ID to associate
-        campaignId:
-          type: string
-          description: The campaign ID for 10DLC
-        scheduledProvisioning:
-          type: object
-          description: Scheduled provisioning details
-          properties:
-            servicePlanId:
-              type: string
-              description: Target service plan ID
-            campaignId:
-              type: string
-              description: Target campaign ID
-            status:
-              type: string
-              description: Provisioning status
-    Money:
-      type: object
-      properties:
-        currencyCode:
-          type: string
-          description: The ISO 4217 currency code
-        amount:
-          type: string
-          description: The monetary amount as a string
     VoiceConfiguration:
       type: object
       properties:
@@ -253,33 +267,19 @@ components:
             status:
               type: string
               description: Provisioning status
-    UpdateActiveNumberRequest:
-      type: object
-      properties:
-        displayName:
-          type: string
-          description: Updated display name
-        smsConfiguration:
-          $ref: '#/components/schemas/SmsConfiguration'
-        voiceConfiguration:
-          $ref: '#/components/schemas/VoiceConfiguration'
-        callbackUrl:
-          type: string
-          format: uri
-          description: Updated callback URL
   parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
     PhoneNumber:
       name: phone_number
       in: path
       required: true
       description: The phone number in E.164 format
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
       schema:
         type: string
   securitySchemes:

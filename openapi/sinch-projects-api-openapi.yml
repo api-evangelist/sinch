@@ -144,6 +144,21 @@ paths:
         '404':
           description: Service not found
 components:
+  parameters:
+    ServiceId:
+      name: service_id
+      in: path
+      required: true
+      description: The unique service identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   schemas:
     UpdateServiceRequest:
       type: object
@@ -176,41 +191,6 @@ components:
               projectId:
                 type: string
                 description: The project ID
-    CreateServiceRequest:
-      type: object
-      required:
-      - name
-      properties:
-        name:
-          type: string
-          description: The service name
-        incomingWebhookUrl:
-          type: string
-          format: uri
-          description: Webhook URL for incoming faxes
-        defaultForProject:
-          type: boolean
-          description: Whether this is the default service
-        imageConversionMethod:
-          type: string
-          enum:
-          - HALFTONE
-          - MONOCHROME
-          description: Image conversion method
-        saveOutboundFaxDocuments:
-          type: boolean
-          description: Save outbound documents
-        saveInboundFaxDocuments:
-          type: boolean
-          description: Save inbound documents
-    ServiceList:
-      type: object
-      properties:
-        services:
-          type: array
-          description: List of services
-          items:
-            $ref: '#/components/schemas/Service'
     Service:
       type: object
       properties:
@@ -249,21 +229,41 @@ components:
         saveInboundFaxDocuments:
           type: boolean
           description: Whether to save inbound fax documents
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    ServiceId:
-      name: service_id
-      in: path
-      required: true
-      description: The unique service identifier
-      schema:
-        type: string
+    ServiceList:
+      type: object
+      properties:
+        services:
+          type: array
+          description: List of services
+          items:
+            $ref: '#/components/schemas/Service'
+    CreateServiceRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The service name
+        incomingWebhookUrl:
+          type: string
+          format: uri
+          description: Webhook URL for incoming faxes
+        defaultForProject:
+          type: boolean
+          description: Whether this is the default service
+        imageConversionMethod:
+          type: string
+          enum:
+          - HALFTONE
+          - MONOCHROME
+          description: Image conversion method
+        saveOutboundFaxDocuments:
+          type: boolean
+          description: Save outbound documents
+        saveInboundFaxDocuments:
+          type: boolean
+          description: Save inbound documents
   securitySchemes:
     oAuth2:
       type: oauth2

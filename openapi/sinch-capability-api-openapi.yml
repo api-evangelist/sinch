@@ -49,30 +49,18 @@ paths:
           description: Unauthorized
 components:
   schemas:
-    ChannelIdentity:
+    CapabilityQueryResponse:
       type: object
       properties:
-        channel:
-          type: string
-          enum:
-          - SMS
-          - RCS
-          - WHATSAPP
-          - MESSENGER
-          - INSTAGRAM
-          - VIBER
-          - VIBERBM
-          - TELEGRAM
-          - KAKAOTALK
-          - LINE
-          - MMS
-          description: The channel type
-        identity:
-          type: string
-          description: The channel-specific identity
         app_id:
           type: string
-          description: The app ID for the channel
+          description: The app ID
+        recipient:
+          type: object
+          description: The queried recipient
+        request_id:
+          type: string
+          description: The capability query request ID
     CapabilityQueryRequest:
       type: object
       required:
@@ -97,18 +85,30 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/ChannelIdentity'
-    CapabilityQueryResponse:
+    ChannelIdentity:
       type: object
       properties:
+        channel:
+          type: string
+          enum:
+          - SMS
+          - RCS
+          - WHATSAPP
+          - MESSENGER
+          - INSTAGRAM
+          - VIBER
+          - VIBERBM
+          - TELEGRAM
+          - KAKAOTALK
+          - LINE
+          - MMS
+          description: The channel type
+        identity:
+          type: string
+          description: The channel-specific identity
         app_id:
           type: string
-          description: The app ID
-        recipient:
-          type: object
-          description: The queried recipient
-        request_id:
-          type: string
-          description: The capability query request ID
+          description: The app ID for the channel
   parameters:
     ProjectId:
       name: project_id

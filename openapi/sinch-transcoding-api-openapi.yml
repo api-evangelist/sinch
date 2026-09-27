@@ -49,14 +49,19 @@ paths:
           description: Unauthorized
 components:
   schemas:
-    TranscodeResponse:
+    Choice:
       type: object
       properties:
-        transcoded_message:
+        text_message:
           type: object
-          description: Map of channel to transcoded message
-          additionalProperties:
-            type: string
+          description: Text choice
+          properties:
+            text:
+              type: string
+              description: The choice text
+        postback_data:
+          type: string
+          description: Data sent back when the choice is selected
     TranscodeRequest:
       type: object
       required:
@@ -74,19 +79,6 @@ components:
           description: Target channels for transcoding
           items:
             type: string
-    Choice:
-      type: object
-      properties:
-        text_message:
-          type: object
-          description: Text choice
-          properties:
-            text:
-              type: string
-              description: The choice text
-        postback_data:
-          type: string
-          description: Data sent back when the choice is selected
     AppMessage:
       type: object
       properties:
@@ -176,6 +168,14 @@ components:
                     description: Section items
                     items:
                       $ref: '#/components/schemas/Choice'
+    TranscodeResponse:
+      type: object
+      properties:
+        transcoded_message:
+          type: object
+          description: Map of channel to transcoded message
+          additionalProperties:
+            type: string
   parameters:
     ProjectId:
       name: project_id
