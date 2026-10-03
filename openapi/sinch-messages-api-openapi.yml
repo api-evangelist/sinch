@@ -145,43 +145,6 @@ paths:
           description: Message not found
 components:
   schemas:
-    ChannelIdentity:
-      type: object
-      properties:
-        channel:
-          type: string
-          enum:
-          - SMS
-          - RCS
-          - WHATSAPP
-          - MESSENGER
-          - INSTAGRAM
-          - VIBER
-          - VIBERBM
-          - TELEGRAM
-          - KAKAOTALK
-          - LINE
-          - MMS
-          description: The channel type
-        identity:
-          type: string
-          description: The channel-specific identity
-        app_id:
-          type: string
-          description: The app ID for the channel
-    Choice:
-      type: object
-      properties:
-        text_message:
-          type: object
-          description: Text choice
-          properties:
-            text:
-              type: string
-              description: The choice text
-        postback_data:
-          type: string
-          description: Data sent back when the choice is selected
     SendMessageResponse:
       type: object
       properties:
@@ -192,6 +155,64 @@ components:
           type: string
           format: date-time
           description: When the message was accepted
+    SendMessageRequest:
+      type: object
+      required:
+      - app_id
+      - message
+      - recipient
+      properties:
+        app_id:
+          type: string
+          description: The ID of the Conversation API app
+        recipient:
+          type: object
+          description: The message recipient
+          properties:
+            contact_id:
+              type: string
+              description: The contact ID to send to
+            identified_by:
+              type: object
+              description: Channel identity to address
+              properties:
+                channel_identities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChannelIdentity'
+        message:
+          $ref: '#/components/schemas/AppMessage'
+        message_metadata:
+          type: string
+          description: Metadata to associate with the message
+        conversation_metadata:
+          type: string
+          description: Metadata to associate with the conversation
+        channel_priority_order:
+          type: array
+          description: Ordered list of channels to try
+          items:
+            type: string
+        queue:
+          type: string
+          enum:
+          - NORMAL_PRIORITY
+          - HIGH_PRIORITY
+          description: The message queue priority
+        ttl:
+          type: integer
+          description: Time-to-live in seconds for the message
+    MessageList:
+      type: object
+      properties:
+        messages:
+          type: array
+          description: List of messages
+          items:
+            $ref: '#/components/schemas/ConversationMessage'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
     AppMessage:
       type: object
       properties:
@@ -313,64 +334,43 @@ components:
           type: string
           format: date-time
           description: When the message was accepted
-    SendMessageRequest:
+    ChannelIdentity:
       type: object
-      required:
-      - app_id
-      - message
-      - recipient
       properties:
-        app_id:
-          type: string
-          description: The ID of the Conversation API app
-        recipient:
-          type: object
-          description: The message recipient
-          properties:
-            contact_id:
-              type: string
-              description: The contact ID to send to
-            identified_by:
-              type: object
-              description: Channel identity to address
-              properties:
-                channel_identities:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/ChannelIdentity'
-        message:
-          $ref: '#/components/schemas/AppMessage'
-        message_metadata:
-          type: string
-          description: Metadata to associate with the message
-        conversation_metadata:
-          type: string
-          description: Metadata to associate with the conversation
-        channel_priority_order:
-          type: array
-          description: Ordered list of channels to try
-          items:
-            type: string
-        queue:
+        channel:
           type: string
           enum:
-          - NORMAL_PRIORITY
-          - HIGH_PRIORITY
-          description: The message queue priority
-        ttl:
-          type: integer
-          description: Time-to-live in seconds for the message
-    MessageList:
+          - SMS
+          - RCS
+          - WHATSAPP
+          - MESSENGER
+          - INSTAGRAM
+          - VIBER
+          - VIBERBM
+          - TELEGRAM
+          - KAKAOTALK
+          - LINE
+          - MMS
+          description: The channel type
+        identity:
+          type: string
+          description: The channel-specific identity
+        app_id:
+          type: string
+          description: The app ID for the channel
+    Choice:
       type: object
       properties:
-        messages:
-          type: array
-          description: List of messages
-          items:
-            $ref: '#/components/schemas/ConversationMessage'
-        next_page_token:
+        text_message:
+          type: object
+          description: Text choice
+          properties:
+            text:
+              type: string
+              description: The choice text
+        postback_data:
           type: string
-          description: Pagination token for the next page
+          description: Data sent back when the choice is selected
   parameters:
     ProjectId:
       name: project_id

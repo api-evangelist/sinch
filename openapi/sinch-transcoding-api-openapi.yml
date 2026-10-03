@@ -48,37 +48,15 @@ paths:
         '401':
           description: Unauthorized
 components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   schemas:
-    Choice:
-      type: object
-      properties:
-        text_message:
-          type: object
-          description: Text choice
-          properties:
-            text:
-              type: string
-              description: The choice text
-        postback_data:
-          type: string
-          description: Data sent back when the choice is selected
-    TranscodeRequest:
-      type: object
-      required:
-      - app_id
-      - app_message
-      - channels
-      properties:
-        app_id:
-          type: string
-          description: The app ID
-        app_message:
-          $ref: '#/components/schemas/AppMessage'
-        channels:
-          type: array
-          description: Target channels for transcoding
-          items:
-            type: string
     AppMessage:
       type: object
       properties:
@@ -168,6 +146,23 @@ components:
                     description: Section items
                     items:
                       $ref: '#/components/schemas/Choice'
+    TranscodeRequest:
+      type: object
+      required:
+      - app_id
+      - app_message
+      - channels
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        app_message:
+          $ref: '#/components/schemas/AppMessage'
+        channels:
+          type: array
+          description: Target channels for transcoding
+          items:
+            type: string
     TranscodeResponse:
       type: object
       properties:
@@ -176,14 +171,19 @@ components:
           description: Map of channel to transcoded message
           additionalProperties:
             type: string
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
+    Choice:
+      type: object
+      properties:
+        text_message:
+          type: object
+          description: Text choice
+          properties:
+            text:
+              type: string
+              description: The choice text
+        postback_data:
+          type: string
+          description: Data sent back when the choice is selected
   securitySchemes:
     oAuth2:
       type: oauth2

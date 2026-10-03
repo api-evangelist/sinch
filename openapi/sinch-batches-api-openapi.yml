@@ -180,22 +180,34 @@ paths:
         '401':
           description: Unauthorized
 components:
-  parameters:
-    BatchId:
-      name: batch_id
-      in: path
-      required: true
-      description: The unique identifier for the batch
-      schema:
-        type: string
-    ServicePlanId:
-      name: service_plan_id
-      in: path
-      required: true
-      description: The unique identifier for the service plan
-      schema:
-        type: string
   schemas:
+    UpdateBatchRequest:
+      type: object
+      properties:
+        to_add:
+          type: array
+          description: Phone numbers to add to the batch
+          items:
+            type: string
+        to_remove:
+          type: array
+          description: Phone numbers to remove from the batch
+          items:
+            type: string
+        from:
+          type: string
+          description: Updated sender number
+        body:
+          type: string
+          description: Updated message body
+        delivery_report:
+          type: string
+          enum:
+          - none
+          - summary
+          - full
+          - per_recipient
+          description: Updated delivery report type
     DryRunResponse:
       type: object
       properties:
@@ -278,50 +290,6 @@ components:
             type: object
             additionalProperties:
               type: string
-    BatchList:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: Total number of batches
-        page:
-          type: integer
-          description: Current page number
-        page_size:
-          type: integer
-          description: Number of batches per page
-        batches:
-          type: array
-          description: List of batch objects
-          items:
-            $ref: '#/components/schemas/Batch'
-    UpdateBatchRequest:
-      type: object
-      properties:
-        to_add:
-          type: array
-          description: Phone numbers to add to the batch
-          items:
-            type: string
-        to_remove:
-          type: array
-          description: Phone numbers to remove from the batch
-          items:
-            type: string
-        from:
-          type: string
-          description: Updated sender number
-        body:
-          type: string
-          description: Updated message body
-        delivery_report:
-          type: string
-          enum:
-          - none
-          - summary
-          - full
-          - per_recipient
-          description: Updated delivery report type
     Batch:
       type: object
       properties:
@@ -364,6 +332,38 @@ components:
           type: string
           format: date-time
           description: The expiration time
+    BatchList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of batches
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of batches per page
+        batches:
+          type: array
+          description: List of batch objects
+          items:
+            $ref: '#/components/schemas/Batch'
+  parameters:
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
+    BatchId:
+      name: batch_id
+      in: path
+      required: true
+      description: The unique identifier for the batch
+      schema:
+        type: string
   securitySchemes:
     bearerAuth:
       type: http

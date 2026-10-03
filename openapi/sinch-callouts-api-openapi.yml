@@ -42,75 +42,6 @@ paths:
           description: Unauthorized
 components:
   schemas:
-    CalloutResponse:
-      type: object
-      properties:
-        callId:
-          type: string
-          description: The unique call identifier for the initiated call
-    CustomCallout:
-      type: object
-      required:
-      - cli
-      - destination
-      - ice
-      properties:
-        cli:
-          type: string
-          description: The caller ID to display
-        destination:
-          $ref: '#/components/schemas/Destination'
-        ice:
-          type: string
-          description: SVAML ICE response in JSON format
-        ace:
-          type: string
-          description: SVAML ACE response in JSON format
-        pie:
-          type: string
-          description: SVAML PIE response in JSON format
-    CalloutRequest:
-      type: object
-      required:
-      - method
-      properties:
-        method:
-          type: string
-          enum:
-          - conferenceCallout
-          - ttsCallout
-          - customCallout
-          description: The callout method type
-        conferenceCallout:
-          $ref: '#/components/schemas/ConferenceCallout'
-        ttsCallout:
-          $ref: '#/components/schemas/TtsCallout'
-        customCallout:
-          $ref: '#/components/schemas/CustomCallout'
-    TtsCallout:
-      type: object
-      required:
-      - cli
-      - destination
-      - text
-      properties:
-        cli:
-          type: string
-          description: The caller ID to display
-        destination:
-          $ref: '#/components/schemas/Destination'
-        text:
-          type: string
-          description: The text to convert to speech
-        locale:
-          type: string
-          description: The locale for text-to-speech
-        enableAce:
-          type: boolean
-          description: Enable Answered Call Event callback
-        enableDice:
-          type: boolean
-          description: Enable Disconnected Call Event callback
     ConferenceCallout:
       type: object
       required:
@@ -167,6 +98,75 @@ components:
         endpoint:
           type: string
           description: The destination endpoint identifier
+    CustomCallout:
+      type: object
+      required:
+      - cli
+      - destination
+      - ice
+      properties:
+        cli:
+          type: string
+          description: The caller ID to display
+        destination:
+          $ref: '#/components/schemas/Destination'
+        ice:
+          type: string
+          description: SVAML ICE response in JSON format
+        ace:
+          type: string
+          description: SVAML ACE response in JSON format
+        pie:
+          type: string
+          description: SVAML PIE response in JSON format
+    CalloutRequest:
+      type: object
+      required:
+      - method
+      properties:
+        method:
+          type: string
+          enum:
+          - conferenceCallout
+          - ttsCallout
+          - customCallout
+          description: The callout method type
+        conferenceCallout:
+          $ref: '#/components/schemas/ConferenceCallout'
+        ttsCallout:
+          $ref: '#/components/schemas/TtsCallout'
+        customCallout:
+          $ref: '#/components/schemas/CustomCallout'
+    CalloutResponse:
+      type: object
+      properties:
+        callId:
+          type: string
+          description: The unique call identifier for the initiated call
+    TtsCallout:
+      type: object
+      required:
+      - cli
+      - destination
+      - text
+      properties:
+        cli:
+          type: string
+          description: The caller ID to display
+        destination:
+          $ref: '#/components/schemas/Destination'
+        text:
+          type: string
+          description: The text to convert to speech
+        locale:
+          type: string
+          description: The locale for text-to-speech
+        enableAce:
+          type: boolean
+          description: Enable Answered Call Event callback
+        enableDice:
+          type: boolean
+          description: Enable Disconnected Call Event callback
   securitySchemes:
     basicAuth:
       type: http

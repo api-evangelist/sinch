@@ -144,35 +144,7 @@ paths:
         '404':
           description: Service not found
 components:
-  parameters:
-    ServiceId:
-      name: service_id
-      in: path
-      required: true
-      description: The unique service identifier
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
-    UpdateServiceRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Updated service name
-        incomingWebhookUrl:
-          type: string
-          format: uri
-          description: Updated webhook URL
-        imageConversionMethod:
-          type: string
-          description: Updated conversion method
     ServiceNumberList:
       type: object
       properties:
@@ -229,6 +201,19 @@ components:
         saveInboundFaxDocuments:
           type: boolean
           description: Whether to save inbound fax documents
+    UpdateServiceRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Updated service name
+        incomingWebhookUrl:
+          type: string
+          format: uri
+          description: Updated webhook URL
+        imageConversionMethod:
+          type: string
+          description: Updated conversion method
     ServiceList:
       type: object
       properties:
@@ -264,6 +249,21 @@ components:
         saveInboundFaxDocuments:
           type: boolean
           description: Save inbound documents
+  parameters:
+    ServiceId:
+      name: service_id
+      in: path
+      required: true
+      description: The unique service identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

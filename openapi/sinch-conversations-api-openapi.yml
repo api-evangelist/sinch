@@ -172,18 +172,6 @@ paths:
           description: Conversation not found
 components:
   schemas:
-    UpdateConversationRequest:
-      type: object
-      properties:
-        active:
-          type: boolean
-          description: Updated active status
-        active_channel:
-          type: string
-          description: Updated active channel
-        metadata:
-          type: string
-          description: Updated metadata
     Conversation:
       type: object
       properties:
@@ -208,6 +196,29 @@ components:
         metadata_json:
           type: object
           description: Structured conversation metadata
+    UpdateConversationRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: Updated active status
+        active_channel:
+          type: string
+          description: Updated active channel
+        metadata:
+          type: string
+          description: Updated metadata
+    ConversationList:
+      type: object
+      properties:
+        conversations:
+          type: array
+          description: List of conversations
+          items:
+            $ref: '#/components/schemas/Conversation'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
     CreateConversationRequest:
       type: object
       required:
@@ -230,30 +241,19 @@ components:
         metadata:
           type: string
           description: Conversation metadata
-    ConversationList:
-      type: object
-      properties:
-        conversations:
-          type: array
-          description: List of conversations
-          items:
-            $ref: '#/components/schemas/Conversation'
-        next_page_token:
-          type: string
-          description: Pagination token for the next page
   parameters:
-    ConversationId:
-      name: conversation_id
-      in: path
-      required: true
-      description: The unique conversation identifier
-      schema:
-        type: string
     ProjectId:
       name: project_id
       in: path
       required: true
       description: The unique project identifier
+      schema:
+        type: string
+    ConversationId:
+      name: conversation_id
+      in: path
+      required: true
+      description: The unique conversation identifier
       schema:
         type: string
   securitySchemes:

@@ -83,6 +83,14 @@ paths:
           description: Phone number not found
 components:
   schemas:
+    AddPhoneNumberRequest:
+      type: object
+      required:
+      - phoneNumber
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in E.164 format to assign
     TrunkPhoneNumberList:
       type: object
       properties:
@@ -98,27 +106,19 @@ components:
               trunkId:
                 type: string
                 description: The trunk ID
-    AddPhoneNumberRequest:
-      type: object
-      required:
-      - phoneNumber
-      properties:
-        phoneNumber:
-          type: string
-          description: The phone number in E.164 format to assign
   parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
     TrunkId:
       name: trunk_id
       in: path
       required: true
       description: The unique SIP trunk identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
       schema:
         type: string
   securitySchemes:

@@ -147,30 +147,38 @@ paths:
         '404':
           description: Number not found
 components:
+  parameters:
+    PhoneNumber:
+      name: phone_number
+      in: path
+      required: true
+      description: The phone number in E.164 format
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   schemas:
-    Money:
+    VoiceConfiguration:
       type: object
       properties:
-        currencyCode:
+        appId:
           type: string
-          description: The ISO 4217 currency code
-        amount:
-          type: string
-          description: The monetary amount as a string
-    UpdateActiveNumberRequest:
-      type: object
-      properties:
-        displayName:
-          type: string
-          description: Updated display name
-        smsConfiguration:
-          $ref: '#/components/schemas/SmsConfiguration'
-        voiceConfiguration:
-          $ref: '#/components/schemas/VoiceConfiguration'
-        callbackUrl:
-          type: string
-          format: uri
-          description: Updated callback URL
+          description: The Voice API app ID to associate
+        scheduledVoiceProvisioning:
+          type: object
+          description: Scheduled voice provisioning details
+          properties:
+            appId:
+              type: string
+              description: Target app ID
+            status:
+              type: string
+              description: Provisioning status
     SmsConfiguration:
       type: object
       properties:
@@ -193,6 +201,20 @@ components:
             status:
               type: string
               description: Provisioning status
+    ActiveNumberList:
+      type: object
+      properties:
+        activeNumbers:
+          type: array
+          description: List of active numbers
+          items:
+            $ref: '#/components/schemas/ActiveNumber'
+        nextPageToken:
+          type: string
+          description: Pagination token for the next page
+        totalSize:
+          type: integer
+          description: Total number of active numbers
     ActiveNumber:
       type: object
       properties:
@@ -237,51 +259,29 @@ components:
           type: string
           format: uri
           description: The callback URL for the number
-    ActiveNumberList:
+    UpdateActiveNumberRequest:
       type: object
       properties:
-        activeNumbers:
-          type: array
-          description: List of active numbers
-          items:
-            $ref: '#/components/schemas/ActiveNumber'
-        nextPageToken:
+        displayName:
           type: string
-          description: Pagination token for the next page
-        totalSize:
-          type: integer
-          description: Total number of active numbers
-    VoiceConfiguration:
+          description: Updated display name
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/VoiceConfiguration'
+        callbackUrl:
+          type: string
+          format: uri
+          description: Updated callback URL
+    Money:
       type: object
       properties:
-        appId:
+        currencyCode:
           type: string
-          description: The Voice API app ID to associate
-        scheduledVoiceProvisioning:
-          type: object
-          description: Scheduled voice provisioning details
-          properties:
-            appId:
-              type: string
-              description: Target app ID
-            status:
-              type: string
-              description: Provisioning status
-  parameters:
-    PhoneNumber:
-      name: phone_number
-      in: path
-      required: true
-      description: The phone number in E.164 format
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
+          description: The ISO 4217 currency code
+        amount:
+          type: string
+          description: The monetary amount as a string
   securitySchemes:
     oAuth2:
       type: oauth2

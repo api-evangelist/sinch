@@ -92,18 +92,18 @@ paths:
           description: Conference or participant not found
 components:
   parameters:
-    CallId:
-      name: call_id
-      in: path
-      required: true
-      description: The unique call identifier
-      schema:
-        type: string
     ConferenceId:
       name: conference_id
       in: path
       required: true
       description: The unique conference identifier
+      schema:
+        type: string
+    CallId:
+      name: call_id
+      in: path
+      required: true
+      description: The unique call identifier
       schema:
         type: string
   schemas:
@@ -118,6 +118,17 @@ components:
           description: List of participants in the conference
           items:
             $ref: '#/components/schemas/Participant'
+    ManageParticipantRequest:
+      type: object
+      properties:
+        command:
+          type: string
+          enum:
+          - mute
+          - unmute
+          - onhold
+          - resume
+          description: The command to execute on the participant
     Participant:
       type: object
       properties:
@@ -136,17 +147,6 @@ components:
         onhold:
           type: boolean
           description: Whether the participant is on hold
-    ManageParticipantRequest:
-      type: object
-      properties:
-        command:
-          type: string
-          enum:
-          - mute
-          - unmute
-          - onhold
-          - resume
-          description: The command to execute on the participant
   securitySchemes:
     basicAuth:
       type: http

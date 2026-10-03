@@ -112,39 +112,7 @@ paths:
         '401':
           description: Unauthorized
 components:
-  parameters:
-    BatchId:
-      name: batch_id
-      in: path
-      required: true
-      description: The unique identifier for the batch
-      schema:
-        type: string
-    ServicePlanId:
-      name: service_plan_id
-      in: path
-      required: true
-      description: The unique identifier for the service plan
-      schema:
-        type: string
   schemas:
-    DeliveryReportList:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: Total number of delivery reports
-        page:
-          type: integer
-          description: Current page number
-        page_size:
-          type: integer
-          description: Number of reports per page
-        delivery_reports:
-          type: array
-          description: List of delivery report objects
-          items:
-            $ref: '#/components/schemas/DeliveryReport'
     DeliveryReport:
       type: object
       properties:
@@ -177,6 +145,23 @@ components:
         total_message_count:
           type: integer
           description: Total number of messages in the batch
+    DeliveryReportList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of delivery reports
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of reports per page
+        delivery_reports:
+          type: array
+          description: List of delivery report objects
+          items:
+            $ref: '#/components/schemas/DeliveryReport'
     RecipientDeliveryReport:
       type: object
       properties:
@@ -200,6 +185,21 @@ components:
           type: string
           format: date-time
           description: When the operator reported the status
+  parameters:
+    BatchId:
+      name: batch_id
+      in: path
+      required: true
+      description: The unique identifier for the batch
+      schema:
+        type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
   securitySchemes:
     bearerAuth:
       type: http

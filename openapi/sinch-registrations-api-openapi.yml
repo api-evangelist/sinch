@@ -171,20 +171,6 @@ components:
           type: object
           description: Updated registration details
           additionalProperties: true
-    RegistrationList:
-      type: object
-      properties:
-        registrations:
-          type: array
-          description: List of registrations
-          items:
-            $ref: '#/components/schemas/Registration'
-        nextPageToken:
-          type: string
-          description: Pagination token
-        totalSize:
-          type: integer
-          description: Total number of registrations
     CreateRegistrationRequest:
       type: object
       required:
@@ -257,19 +243,33 @@ components:
           type: string
           format: date-time
           description: When the registration was submitted
+    RegistrationList:
+      type: object
+      properties:
+        registrations:
+          type: array
+          description: List of registrations
+          items:
+            $ref: '#/components/schemas/Registration'
+        nextPageToken:
+          type: string
+          description: Pagination token
+        totalSize:
+          type: integer
+          description: Total number of registrations
   parameters:
-    RegistrationId:
-      name: registration_id
-      in: path
-      required: true
-      description: The unique registration identifier
-      schema:
-        type: string
     ProjectId:
       name: project_id
       in: path
       required: true
       description: The unique project identifier
+      schema:
+        type: string
+    RegistrationId:
+      name: registration_id
+      in: path
+      required: true
+      description: The unique registration identifier
       schema:
         type: string
   securitySchemes:

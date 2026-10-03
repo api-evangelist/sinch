@@ -144,19 +144,25 @@ components:
       schema:
         type: string
   schemas:
-    CreateAppRequest:
+    UpdateAppRequest:
       type: object
-      required:
-      - display_name
       properties:
         display_name:
           type: string
-          description: The app display name
+          description: Updated display name
         channel_credentials:
           type: array
-          description: Channel credential configurations
+          description: Updated channel credentials
           items:
             $ref: '#/components/schemas/ChannelCredential'
+    AppList:
+      type: object
+      properties:
+        apps:
+          type: array
+          description: List of apps
+          items:
+            $ref: '#/components/schemas/App'
     ChannelCredential:
       type: object
       properties:
@@ -183,17 +189,6 @@ components:
         callback_secret:
           type: string
           description: Secret for validating callbacks from the channel
-    UpdateAppRequest:
-      type: object
-      properties:
-        display_name:
-          type: string
-          description: Updated display name
-        channel_credentials:
-          type: array
-          description: Updated channel credentials
-          items:
-            $ref: '#/components/schemas/ChannelCredential'
     App:
       type: object
       properties:
@@ -211,14 +206,19 @@ components:
         conversation_metadata_report_view:
           type: string
           description: Metadata report configuration
-    AppList:
+    CreateAppRequest:
       type: object
+      required:
+      - display_name
       properties:
-        apps:
+        display_name:
+          type: string
+          description: The app display name
+        channel_credentials:
           type: array
-          description: List of apps
+          description: Channel credential configurations
           items:
-            $ref: '#/components/schemas/App'
+            $ref: '#/components/schemas/ChannelCredential'
   securitySchemes:
     oAuth2:
       type: oauth2

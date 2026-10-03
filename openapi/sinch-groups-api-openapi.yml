@@ -168,31 +168,23 @@ paths:
           description: Group not found
 components:
   schemas:
-    Group:
+    GroupList:
       type: object
       properties:
-        id:
-          type: string
-          description: The unique group identifier
-        name:
-          type: string
-          description: The group name
-        size:
+        count:
           type: integer
-          description: The number of members in the group
-        created_at:
-          type: string
-          format: date-time
-          description: When the group was created
-        modified_at:
-          type: string
-          format: date-time
-          description: When the group was last modified
-        child_groups:
+          description: Total number of groups
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of groups per page
+        groups:
           type: array
-          description: List of child group IDs
+          description: List of group objects
           items:
-            type: string
+            $ref: '#/components/schemas/Group'
     CreateGroupRequest:
       type: object
       properties:
@@ -231,23 +223,31 @@ components:
         remove_from_group:
           type: string
           description: Remove all members that are in another group
-    GroupList:
+    Group:
       type: object
       properties:
-        count:
+        id:
+          type: string
+          description: The unique group identifier
+        name:
+          type: string
+          description: The group name
+        size:
           type: integer
-          description: Total number of groups
-        page:
-          type: integer
-          description: Current page number
-        page_size:
-          type: integer
-          description: Number of groups per page
-        groups:
+          description: The number of members in the group
+        created_at:
+          type: string
+          format: date-time
+          description: When the group was created
+        modified_at:
+          type: string
+          format: date-time
+          description: When the group was last modified
+        child_groups:
           type: array
-          description: List of group objects
+          description: List of child group IDs
           items:
-            $ref: '#/components/schemas/Group'
+            type: string
   parameters:
     ServicePlanId:
       name: service_plan_id

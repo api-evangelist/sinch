@@ -161,32 +161,6 @@ components:
       schema:
         type: string
   schemas:
-    WebhookList:
-      type: object
-      properties:
-        webhooks:
-          type: array
-          description: List of webhooks
-          items:
-            $ref: '#/components/schemas/Webhook'
-    UpdateWebhookRequest:
-      type: object
-      properties:
-        target:
-          type: string
-          format: uri
-          description: Updated target URL
-        target_type:
-          type: string
-          description: Updated target type
-        triggers:
-          type: array
-          description: Updated trigger list
-          items:
-            type: string
-        secret:
-          type: string
-          description: Updated secret
     CreateWebhookRequest:
       type: object
       required:
@@ -216,6 +190,14 @@ components:
         secret:
           type: string
           description: Secret for HMAC validation
+    WebhookList:
+      type: object
+      properties:
+        webhooks:
+          type: array
+          description: List of webhooks
+          items:
+            $ref: '#/components/schemas/Webhook'
     Webhook:
       type: object
       properties:
@@ -263,6 +245,24 @@ components:
         secret:
           type: string
           description: Secret for HMAC signature validation
+    UpdateWebhookRequest:
+      type: object
+      properties:
+        target:
+          type: string
+          format: uri
+          description: Updated target URL
+        target_type:
+          type: string
+          description: Updated target type
+        triggers:
+          type: array
+          description: Updated trigger list
+          items:
+            type: string
+        secret:
+          type: string
+          description: Updated secret
   securitySchemes:
     oAuth2:
       type: oauth2

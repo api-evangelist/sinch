@@ -146,31 +146,6 @@ paths:
           description: Sender not found
 components:
   schemas:
-    RcsSenderList:
-      type: object
-      properties:
-        senders:
-          type: array
-          description: List of RCS senders
-          items:
-            $ref: '#/components/schemas/RcsSender'
-    UpdateRcsSenderRequest:
-      type: object
-      properties:
-        displayName:
-          type: string
-          description: Updated display name
-        description:
-          type: string
-          description: Updated description
-        logoUrl:
-          type: string
-          format: uri
-          description: Updated logo URL
-        heroImageUrl:
-          type: string
-          format: uri
-          description: Updated hero image URL
     CreateRcsSenderRequest:
       type: object
       required:
@@ -208,6 +183,14 @@ components:
           type: string
           format: uri
           description: Terms of service URL
+    RcsSenderList:
+      type: object
+      properties:
+        senders:
+          type: array
+          description: List of RCS senders
+          items:
+            $ref: '#/components/schemas/RcsSender'
     RcsSender:
       type: object
       properties:
@@ -257,6 +240,23 @@ components:
           type: string
           format: date-time
           description: When the sender was last updated
+    UpdateRcsSenderRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Updated display name
+        description:
+          type: string
+          description: Updated description
+        logoUrl:
+          type: string
+          format: uri
+          description: Updated logo URL
+        heroImageUrl:
+          type: string
+          format: uri
+          description: Updated hero image URL
   parameters:
     SenderId:
       name: sender_id

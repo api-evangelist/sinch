@@ -129,46 +129,29 @@ paths:
         '404':
           description: ACL not found
 components:
+  parameters:
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    AclId:
+      name: acl_id
+      in: path
+      required: true
+      description: The unique access control list identifier
+      schema:
+        type: string
   schemas:
-    Acl:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique ACL identifier
-        name:
-          type: string
-          description: The ACL name
-        enabled:
-          type: boolean
-          description: Whether the ACL is active
-        entries:
-          type: array
-          description: List of IP address entries
-          items:
-            $ref: '#/components/schemas/AclEntry'
-        createTime:
-          type: string
-          format: date-time
-          description: When the ACL was created
-        updateTime:
-          type: string
-          format: date-time
-          description: When the ACL was last updated
-    UpdateAclRequest:
-      type: object
-      properties:
-        name:
-          type: string
-          description: Updated ACL name
-        enabled:
-          type: boolean
-          description: Updated enabled status
-        entries:
-          type: array
-          description: Updated IP entries
-          items:
-            $ref: '#/components/schemas/AclEntry'
     CreateAclRequest:
       type: object
       required:
@@ -194,6 +177,31 @@ components:
           description: List of access control lists
           items:
             $ref: '#/components/schemas/Acl'
+    Acl:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ACL identifier
+        name:
+          type: string
+          description: The ACL name
+        enabled:
+          type: boolean
+          description: Whether the ACL is active
+        entries:
+          type: array
+          description: List of IP address entries
+          items:
+            $ref: '#/components/schemas/AclEntry'
+        createTime:
+          type: string
+          format: date-time
+          description: When the ACL was created
+        updateTime:
+          type: string
+          format: date-time
+          description: When the ACL was last updated
     AclEntry:
       type: object
       properties:
@@ -203,28 +211,20 @@ components:
         description:
           type: string
           description: A description of this entry
-  parameters:
-    AclId:
-      name: acl_id
-      in: path
-      required: true
-      description: The unique access control list identifier
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    TrunkId:
-      name: trunk_id
-      in: path
-      required: true
-      description: The unique SIP trunk identifier
-      schema:
-        type: string
+    UpdateAclRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Updated ACL name
+        enabled:
+          type: boolean
+          description: Updated enabled status
+        entries:
+          type: array
+          description: Updated IP entries
+          items:
+            $ref: '#/components/schemas/AclEntry'
   securitySchemes:
     oAuth2:
       type: oauth2

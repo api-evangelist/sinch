@@ -58,35 +58,15 @@ paths:
         '404':
           description: Call not found
 components:
+  parameters:
+    CallId:
+      name: call_id
+      in: path
+      required: true
+      description: The unique call identifier
+      schema:
+        type: string
   schemas:
-    Price:
-      type: object
-      properties:
-        currencyId:
-          type: string
-          description: The currency code
-        amount:
-          type: number
-          description: The amount
-    SVAMLControl:
-      type: object
-      properties:
-        action:
-          type: object
-          description: The SVAML action to execute
-          properties:
-            name:
-              type: string
-              description: The action name
-        instructions:
-          type: array
-          description: List of SVAML instructions
-          items:
-            type: object
-            properties:
-              name:
-                type: string
-                description: The instruction name
     CallInformation:
       type: object
       properties:
@@ -122,14 +102,34 @@ components:
           $ref: '#/components/schemas/Price'
         debit:
           $ref: '#/components/schemas/Price'
-  parameters:
-    CallId:
-      name: call_id
-      in: path
-      required: true
-      description: The unique call identifier
-      schema:
-        type: string
+    Price:
+      type: object
+      properties:
+        currencyId:
+          type: string
+          description: The currency code
+        amount:
+          type: number
+          description: The amount
+    SVAMLControl:
+      type: object
+      properties:
+        action:
+          type: object
+          description: The SVAML action to execute
+          properties:
+            name:
+              type: string
+              description: The action name
+        instructions:
+          type: array
+          description: List of SVAML instructions
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The instruction name
   securitySchemes:
     basicAuth:
       type: http

@@ -174,91 +174,6 @@ paths:
           description: Unauthorized
 components:
   schemas:
-    ContactList:
-      type: object
-      properties:
-        contacts:
-          type: array
-          description: List of contacts
-          items:
-            $ref: '#/components/schemas/Contact'
-        next_page_token:
-          type: string
-          description: Pagination token for the next page
-    ChannelIdentity:
-      type: object
-      properties:
-        channel:
-          type: string
-          enum:
-          - SMS
-          - RCS
-          - WHATSAPP
-          - MESSENGER
-          - INSTAGRAM
-          - VIBER
-          - VIBERBM
-          - TELEGRAM
-          - KAKAOTALK
-          - LINE
-          - MMS
-          description: The channel type
-        identity:
-          type: string
-          description: The channel-specific identity
-        app_id:
-          type: string
-          description: The app ID for the channel
-    CreateContactRequest:
-      type: object
-      required:
-      - channel_identities
-      properties:
-        display_name:
-          type: string
-          description: The display name
-        email:
-          type: string
-          format: email
-          description: The email address
-        external_id:
-          type: string
-          description: An external identifier
-        language:
-          type: string
-          description: The preferred language
-        metadata:
-          type: string
-          description: Contact metadata
-        channel_identities:
-          type: array
-          description: Channel identities
-          items:
-            $ref: '#/components/schemas/ChannelIdentity'
-    UpdateContactRequest:
-      type: object
-      properties:
-        display_name:
-          type: string
-          description: Updated display name
-        email:
-          type: string
-          format: email
-          description: Updated email address
-        external_id:
-          type: string
-          description: Updated external identifier
-        language:
-          type: string
-          description: Updated preferred language
-        metadata:
-          type: string
-          description: Updated metadata
-        channel_identities:
-          type: array
-          description: Updated channel identities
-          items:
-            $ref: '#/components/schemas/ChannelIdentity'
     Contact:
       type: object
       properties:
@@ -286,19 +201,104 @@ components:
           description: The channel identities for the contact
           items:
             $ref: '#/components/schemas/ChannelIdentity'
+    ContactList:
+      type: object
+      properties:
+        contacts:
+          type: array
+          description: List of contacts
+          items:
+            $ref: '#/components/schemas/Contact'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
+    UpdateContactRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+          description: Updated display name
+        email:
+          type: string
+          format: email
+          description: Updated email address
+        external_id:
+          type: string
+          description: Updated external identifier
+        language:
+          type: string
+          description: Updated preferred language
+        metadata:
+          type: string
+          description: Updated metadata
+        channel_identities:
+          type: array
+          description: Updated channel identities
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
+    CreateContactRequest:
+      type: object
+      required:
+      - channel_identities
+      properties:
+        display_name:
+          type: string
+          description: The display name
+        email:
+          type: string
+          format: email
+          description: The email address
+        external_id:
+          type: string
+          description: An external identifier
+        language:
+          type: string
+          description: The preferred language
+        metadata:
+          type: string
+          description: Contact metadata
+        channel_identities:
+          type: array
+          description: Channel identities
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
+    ChannelIdentity:
+      type: object
+      properties:
+        channel:
+          type: string
+          enum:
+          - SMS
+          - RCS
+          - WHATSAPP
+          - MESSENGER
+          - INSTAGRAM
+          - VIBER
+          - VIBERBM
+          - TELEGRAM
+          - KAKAOTALK
+          - LINE
+          - MMS
+          description: The channel type
+        identity:
+          type: string
+          description: The channel-specific identity
+        app_id:
+          type: string
+          description: The app ID for the channel
   parameters:
-    ContactId:
-      name: contact_id
-      in: path
-      required: true
-      description: The unique contact identifier
-      schema:
-        type: string
     ProjectId:
       name: project_id
       in: path
       required: true
       description: The unique project identifier
+      schema:
+        type: string
+    ContactId:
+      name: contact_id
+      in: path
+      required: true
+      description: The unique contact identifier
       schema:
         type: string
   securitySchemes:

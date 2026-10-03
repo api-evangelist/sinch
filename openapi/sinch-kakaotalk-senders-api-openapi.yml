@@ -61,15 +61,15 @@ paths:
         '401':
           description: Unauthorized
 components:
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
+    SenderList:
+      type: object
+      properties:
+        senders:
+          type: array
+          description: List of senders
+          items:
+            $ref: '#/components/schemas/Sender'
     Sender:
       type: object
       properties:
@@ -89,14 +89,6 @@ components:
           type: string
           format: date-time
           description: When the sender was created
-    SenderList:
-      type: object
-      properties:
-        senders:
-          type: array
-          description: List of senders
-          items:
-            $ref: '#/components/schemas/Sender'
     CreateSenderRequest:
       type: object
       required:
@@ -108,6 +100,14 @@ components:
         channelCredentials:
           type: object
           description: Channel-specific credentials and configuration
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
     oAuth2:
       type: oauth2
