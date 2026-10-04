@@ -130,11 +130,11 @@ paths:
           description: ACL not found
 components:
   parameters:
-    TrunkId:
-      name: trunk_id
+    AclId:
+      name: acl_id
       in: path
       required: true
-      description: The unique SIP trunk identifier
+      description: The unique access control list identifier
       schema:
         type: string
     ProjectId:
@@ -144,14 +144,23 @@ components:
       description: The unique project identifier
       schema:
         type: string
-    AclId:
-      name: acl_id
+    TrunkId:
+      name: trunk_id
       in: path
       required: true
-      description: The unique access control list identifier
+      description: The unique SIP trunk identifier
       schema:
         type: string
   schemas:
+    AclEntry:
+      type: object
+      properties:
+        ipRange:
+          type: string
+          description: The IP address or CIDR range
+        description:
+          type: string
+          description: A description of this entry
     CreateAclRequest:
       type: object
       required:
@@ -169,14 +178,6 @@ components:
           description: IP address entries
           items:
             $ref: '#/components/schemas/AclEntry'
-    AclList:
-      type: object
-      properties:
-        accessControlLists:
-          type: array
-          description: List of access control lists
-          items:
-            $ref: '#/components/schemas/Acl'
     Acl:
       type: object
       properties:
@@ -202,15 +203,6 @@ components:
           type: string
           format: date-time
           description: When the ACL was last updated
-    AclEntry:
-      type: object
-      properties:
-        ipRange:
-          type: string
-          description: The IP address or CIDR range
-        description:
-          type: string
-          description: A description of this entry
     UpdateAclRequest:
       type: object
       properties:
@@ -225,6 +217,14 @@ components:
           description: Updated IP entries
           items:
             $ref: '#/components/schemas/AclEntry'
+    AclList:
+      type: object
+      properties:
+        accessControlLists:
+          type: array
+          description: List of access control lists
+          items:
+            $ref: '#/components/schemas/Acl'
   securitySchemes:
     oAuth2:
       type: oauth2

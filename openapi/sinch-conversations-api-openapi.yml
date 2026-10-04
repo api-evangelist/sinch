@@ -172,6 +172,51 @@ paths:
           description: Conversation not found
 components:
   schemas:
+    CreateConversationRequest:
+      type: object
+      required:
+      - app_id
+      - contact_id
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        contact_id:
+          type: string
+          description: The contact ID
+        active:
+          type: boolean
+          description: Whether the conversation is active
+          default: true
+        active_channel:
+          type: string
+          description: The active channel
+        metadata:
+          type: string
+          description: Conversation metadata
+    UpdateConversationRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: Updated active status
+        active_channel:
+          type: string
+          description: Updated active channel
+        metadata:
+          type: string
+          description: Updated metadata
+    ConversationList:
+      type: object
+      properties:
+        conversations:
+          type: array
+          description: List of conversations
+          items:
+            $ref: '#/components/schemas/Conversation'
+        next_page_token:
+          type: string
+          description: Pagination token for the next page
     Conversation:
       type: object
       properties:
@@ -196,64 +241,19 @@ components:
         metadata_json:
           type: object
           description: Structured conversation metadata
-    UpdateConversationRequest:
-      type: object
-      properties:
-        active:
-          type: boolean
-          description: Updated active status
-        active_channel:
-          type: string
-          description: Updated active channel
-        metadata:
-          type: string
-          description: Updated metadata
-    ConversationList:
-      type: object
-      properties:
-        conversations:
-          type: array
-          description: List of conversations
-          items:
-            $ref: '#/components/schemas/Conversation'
-        next_page_token:
-          type: string
-          description: Pagination token for the next page
-    CreateConversationRequest:
-      type: object
-      required:
-      - app_id
-      - contact_id
-      properties:
-        app_id:
-          type: string
-          description: The app ID
-        contact_id:
-          type: string
-          description: The contact ID
-        active:
-          type: boolean
-          description: Whether the conversation is active
-          default: true
-        active_channel:
-          type: string
-          description: The active channel
-        metadata:
-          type: string
-          description: Conversation metadata
   parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
     ConversationId:
       name: conversation_id
       in: path
       required: true
       description: The unique conversation identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
       schema:
         type: string
   securitySchemes:

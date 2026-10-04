@@ -208,6 +208,65 @@ components:
           - full
           - per_recipient
           description: Updated delivery report type
+    Batch:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique batch identifier
+        to:
+          type: array
+          description: List of recipients
+          items:
+            type: string
+        from:
+          type: string
+          description: The sender number
+        body:
+          type: string
+          description: The message body
+        type:
+          type: string
+          description: The batch type
+        created_at:
+          type: string
+          format: date-time
+          description: When the batch was created
+        modified_at:
+          type: string
+          format: date-time
+          description: When the batch was last modified
+        canceled:
+          type: boolean
+          description: Whether the batch has been canceled
+        delivery_report:
+          type: string
+          description: The delivery report type
+        send_at:
+          type: string
+          format: date-time
+          description: The scheduled send time
+        expire_at:
+          type: string
+          format: date-time
+          description: The expiration time
+    BatchList:
+      type: object
+      properties:
+        count:
+          type: integer
+          description: Total number of batches
+        page:
+          type: integer
+          description: Current page number
+        page_size:
+          type: integer
+          description: Number of batches per page
+        batches:
+          type: array
+          description: List of batch objects
+          items:
+            $ref: '#/components/schemas/Batch'
     DryRunResponse:
       type: object
       properties:
@@ -290,78 +349,19 @@ components:
             type: object
             additionalProperties:
               type: string
-    Batch:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique batch identifier
-        to:
-          type: array
-          description: List of recipients
-          items:
-            type: string
-        from:
-          type: string
-          description: The sender number
-        body:
-          type: string
-          description: The message body
-        type:
-          type: string
-          description: The batch type
-        created_at:
-          type: string
-          format: date-time
-          description: When the batch was created
-        modified_at:
-          type: string
-          format: date-time
-          description: When the batch was last modified
-        canceled:
-          type: boolean
-          description: Whether the batch has been canceled
-        delivery_report:
-          type: string
-          description: The delivery report type
-        send_at:
-          type: string
-          format: date-time
-          description: The scheduled send time
-        expire_at:
-          type: string
-          format: date-time
-          description: The expiration time
-    BatchList:
-      type: object
-      properties:
-        count:
-          type: integer
-          description: Total number of batches
-        page:
-          type: integer
-          description: Current page number
-        page_size:
-          type: integer
-          description: Number of batches per page
-        batches:
-          type: array
-          description: List of batch objects
-          items:
-            $ref: '#/components/schemas/Batch'
   parameters:
-    ServicePlanId:
-      name: service_plan_id
-      in: path
-      required: true
-      description: The unique identifier for the service plan
-      schema:
-        type: string
     BatchId:
       name: batch_id
       in: path
       required: true
       description: The unique identifier for the batch
+      schema:
+        type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
       schema:
         type: string
   securitySchemes:

@@ -87,6 +87,21 @@ paths:
         '404':
           description: Configuration not found
 components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    ServiceId:
+      name: service_id
+      in: path
+      required: true
+      description: The unique service identifier
+      schema:
+        type: string
   schemas:
     FaxToEmailRequest:
       type: object
@@ -100,6 +115,14 @@ components:
         phoneNumber:
           type: string
           description: Specific phone number to associate
+    FaxToEmailList:
+      type: object
+      properties:
+        emails:
+          type: array
+          description: List of fax-to-email configurations
+          items:
+            $ref: '#/components/schemas/FaxToEmail'
     FaxToEmail:
       type: object
       properties:
@@ -116,29 +139,6 @@ components:
         projectId:
           type: string
           description: The project ID
-    FaxToEmailList:
-      type: object
-      properties:
-        emails:
-          type: array
-          description: List of fax-to-email configurations
-          items:
-            $ref: '#/components/schemas/FaxToEmail'
-  parameters:
-    ServiceId:
-      name: service_id
-      in: path
-      required: true
-      description: The unique service identifier
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

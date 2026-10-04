@@ -130,11 +130,11 @@ paths:
           description: Endpoint not found
 components:
   parameters:
-    TrunkId:
-      name: trunk_id
+    EndpointId:
+      name: endpoint_id
       in: path
       required: true
-      description: The unique SIP trunk identifier
+      description: The unique SIP endpoint identifier
       schema:
         type: string
     ProjectId:
@@ -144,14 +144,26 @@ components:
       description: The unique project identifier
       schema:
         type: string
-    EndpointId:
-      name: endpoint_id
+    TrunkId:
+      name: trunk_id
       in: path
       required: true
-      description: The unique SIP endpoint identifier
+      description: The unique SIP trunk identifier
       schema:
         type: string
   schemas:
+    UpdateSipEndpointRequest:
+      type: object
+      properties:
+        sipAddress:
+          type: string
+          description: Updated SIP address
+        priority:
+          type: integer
+          description: Updated priority
+        enabled:
+          type: boolean
+          description: Updated enabled status
     SipEndpoint:
       type: object
       properties:
@@ -183,18 +195,6 @@ components:
           description: List of SIP endpoints
           items:
             $ref: '#/components/schemas/SipEndpoint'
-    UpdateSipEndpointRequest:
-      type: object
-      properties:
-        sipAddress:
-          type: string
-          description: Updated SIP address
-        priority:
-          type: integer
-          description: Updated priority
-        enabled:
-          type: boolean
-          description: Updated enabled status
     CreateSipEndpointRequest:
       type: object
       required:

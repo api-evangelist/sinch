@@ -145,59 +145,7 @@ paths:
         '404':
           description: Webhook not found
 components:
-  parameters:
-    AppId:
-      name: app_id
-      in: path
-      required: true
-      description: The unique app identifier
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
-    CreateWebhookRequest:
-      type: object
-      required:
-      - app_id
-      - target
-      - triggers
-      properties:
-        app_id:
-          type: string
-          description: The app ID
-        target:
-          type: string
-          format: uri
-          description: The webhook target URL
-        target_type:
-          type: string
-          enum:
-          - HTTP
-          - GRPC
-          description: The target type
-          default: HTTP
-        triggers:
-          type: array
-          description: Event triggers to subscribe to
-          items:
-            type: string
-        secret:
-          type: string
-          description: Secret for HMAC validation
-    WebhookList:
-      type: object
-      properties:
-        webhooks:
-          type: array
-          description: List of webhooks
-          items:
-            $ref: '#/components/schemas/Webhook'
     Webhook:
       type: object
       properties:
@@ -263,6 +211,58 @@ components:
         secret:
           type: string
           description: Updated secret
+    WebhookList:
+      type: object
+      properties:
+        webhooks:
+          type: array
+          description: List of webhooks
+          items:
+            $ref: '#/components/schemas/Webhook'
+    CreateWebhookRequest:
+      type: object
+      required:
+      - app_id
+      - target
+      - triggers
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        target:
+          type: string
+          format: uri
+          description: The webhook target URL
+        target_type:
+          type: string
+          enum:
+          - HTTP
+          - GRPC
+          description: The target type
+          default: HTTP
+        triggers:
+          type: array
+          description: Event triggers to subscribe to
+          items:
+            type: string
+        secret:
+          type: string
+          description: Secret for HMAC validation
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    AppId:
+      name: app_id
+      in: path
+      required: true
+      description: The unique app identifier
+      schema:
+        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

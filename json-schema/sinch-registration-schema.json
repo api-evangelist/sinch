@@ -1,0 +1,72 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-registration-schema.json",
+  "title": "Registration",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-registrations-api-openapi.yml#/components/schemas/Registration",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The unique registration identifier"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "The project ID"
+    },
+    "marketId": {
+      "type": "string",
+      "description": "The market identifier"
+    },
+    "displayName": {
+      "type": "string",
+      "description": "The display name for the sender"
+    },
+    "senderId": {
+      "type": "string",
+      "description": "The sender ID being registered"
+    },
+    "senderType": {
+      "type": "string",
+      "description": "The sender type"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "SUBMITTED",
+        "UNDER_REVIEW",
+        "APPROVED",
+        "REJECTED",
+        "REVOKED"
+      ],
+      "description": "The current registration status"
+    },
+    "rejectionReason": {
+      "type": "string",
+      "description": "Reason for rejection if applicable"
+    },
+    "registrationDetails": {
+      "type": "object",
+      "description": "Market-specific registration details",
+      "additionalProperties": true
+    },
+    "createTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the registration was created"
+    },
+    "updateTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the registration was last updated"
+    },
+    "submitTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "When the registration was submitted"
+    }
+  }
+}

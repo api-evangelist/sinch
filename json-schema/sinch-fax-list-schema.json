@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-fax-list-schema.json",
+  "title": "FaxList",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-faxes-api-openapi.yml#/components/schemas/FaxList",
+  "type": "object",
+  "properties": {
+    "faxes": {
+      "type": "array",
+      "description": "List of faxes",
+      "items": {
+        "$ref": "#/$defs/Fax"
+      }
+    },
+    "page": {
+      "type": "integer",
+      "description": "Current page number"
+    },
+    "pageSize": {
+      "type": "integer",
+      "description": "Number of faxes per page"
+    },
+    "totalItems": {
+      "type": "integer",
+      "description": "Total number of faxes"
+    }
+  },
+  "$defs": {
+    "Fax": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique fax identifier"
+        },
+        "direction": {
+          "type": "string",
+          "enum": [
+            "INBOUND",
+            "OUTBOUND"
+          ],
+          "description": "The fax direction"
+        },
+        "from": {
+          "type": "string",
+          "description": "The sender fax number"
+        },
+        "to": {
+          "type": "string",
+          "description": "The recipient fax number"
+        },
+        "status": {
+          "type": "string",
+          "description": "The fax status"
+        },
+        "pageCount": {
+          "type": "integer",
+          "description": "The number of pages"
+        },
+        "contentUrl": {
+          "type": "string",
+          "format": "uri",
+          "description": "URL to download the fax content"
+        },
+        "createTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the fax was created"
+        },
+        "completedTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the fax was completed"
+        },
+        "projectId": {
+          "type": "string",
+          "description": "The project ID"
+        },
+        "serviceId": {
+          "type": "string",
+          "description": "The service ID"
+        },
+        "headerText": {
+          "type": "string",
+          "description": "The header text on the fax"
+        }
+      }
+    }
+  }
+}

@@ -112,39 +112,22 @@ paths:
         '401':
           description: Unauthorized
 components:
+  parameters:
+    BatchId:
+      name: batch_id
+      in: path
+      required: true
+      description: The unique identifier for the batch
+      schema:
+        type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
   schemas:
-    DeliveryReport:
-      type: object
-      properties:
-        batch_id:
-          type: string
-          description: The batch identifier
-        type:
-          type: string
-          description: The delivery report type
-        statuses:
-          type: array
-          description: List of status objects with counts
-          items:
-            type: object
-            properties:
-              code:
-                type: integer
-                description: The status code
-              status:
-                type: string
-                description: The delivery status
-              count:
-                type: integer
-                description: The number of recipients with this status
-              recipients:
-                type: array
-                description: List of recipient phone numbers
-                items:
-                  type: string
-        total_message_count:
-          type: integer
-          description: Total number of messages in the batch
     DeliveryReportList:
       type: object
       properties:
@@ -185,21 +168,38 @@ components:
           type: string
           format: date-time
           description: When the operator reported the status
-  parameters:
-    BatchId:
-      name: batch_id
-      in: path
-      required: true
-      description: The unique identifier for the batch
-      schema:
-        type: string
-    ServicePlanId:
-      name: service_plan_id
-      in: path
-      required: true
-      description: The unique identifier for the service plan
-      schema:
-        type: string
+    DeliveryReport:
+      type: object
+      properties:
+        batch_id:
+          type: string
+          description: The batch identifier
+        type:
+          type: string
+          description: The delivery report type
+        statuses:
+          type: array
+          description: List of status objects with counts
+          items:
+            type: object
+            properties:
+              code:
+                type: integer
+                description: The status code
+              status:
+                type: string
+                description: The delivery status
+              count:
+                type: integer
+                description: The number of recipients with this status
+              recipients:
+                type: array
+                description: List of recipient phone numbers
+                items:
+                  type: string
+        total_message_count:
+          type: integer
+          description: Total number of messages in the batch
   securitySchemes:
     bearerAuth:
       type: http

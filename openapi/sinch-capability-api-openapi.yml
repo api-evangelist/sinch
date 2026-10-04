@@ -49,6 +49,30 @@ paths:
           description: Unauthorized
 components:
   schemas:
+    CapabilityQueryRequest:
+      type: object
+      required:
+      - app_id
+      - recipient
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        recipient:
+          type: object
+          description: The recipient to query capability for
+          properties:
+            contact_id:
+              type: string
+              description: The contact ID
+            identified_by:
+              type: object
+              description: Channel identity to query
+              properties:
+                channel_identities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChannelIdentity'
     CapabilityQueryResponse:
       type: object
       properties:
@@ -85,30 +109,6 @@ components:
         app_id:
           type: string
           description: The app ID for the channel
-    CapabilityQueryRequest:
-      type: object
-      required:
-      - app_id
-      - recipient
-      properties:
-        app_id:
-          type: string
-          description: The app ID
-        recipient:
-          type: object
-          description: The recipient to query capability for
-          properties:
-            contact_id:
-              type: string
-              description: The contact ID
-            identified_by:
-              type: object
-              description: Channel identity to query
-              properties:
-                channel_identities:
-                  type: array
-                  items:
-                    $ref: '#/components/schemas/ChannelIdentity'
   parameters:
     ProjectId:
       name: project_id

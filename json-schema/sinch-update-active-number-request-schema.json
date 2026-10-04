@@ -1,0 +1,83 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-update-active-number-request-schema.json",
+  "title": "UpdateActiveNumberRequest",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-active-numbers-api-openapi.yml#/components/schemas/UpdateActiveNumberRequest",
+  "type": "object",
+  "properties": {
+    "displayName": {
+      "type": "string",
+      "description": "Updated display name"
+    },
+    "smsConfiguration": {
+      "$ref": "#/$defs/SmsConfiguration"
+    },
+    "voiceConfiguration": {
+      "$ref": "#/$defs/VoiceConfiguration"
+    },
+    "callbackUrl": {
+      "type": "string",
+      "format": "uri",
+      "description": "Updated callback URL"
+    }
+  },
+  "$defs": {
+    "SmsConfiguration": {
+      "type": "object",
+      "properties": {
+        "servicePlanId": {
+          "type": "string",
+          "description": "The SMS service plan ID to associate"
+        },
+        "campaignId": {
+          "type": "string",
+          "description": "The campaign ID for 10DLC"
+        },
+        "scheduledProvisioning": {
+          "type": "object",
+          "description": "Scheduled provisioning details",
+          "properties": {
+            "servicePlanId": {
+              "type": "string",
+              "description": "Target service plan ID"
+            },
+            "campaignId": {
+              "type": "string",
+              "description": "Target campaign ID"
+            },
+            "status": {
+              "type": "string",
+              "description": "Provisioning status"
+            }
+          }
+        }
+      }
+    },
+    "VoiceConfiguration": {
+      "type": "object",
+      "properties": {
+        "appId": {
+          "type": "string",
+          "description": "The Voice API app ID to associate"
+        },
+        "scheduledVoiceProvisioning": {
+          "type": "object",
+          "description": "Scheduled voice provisioning details",
+          "properties": {
+            "appId": {
+              "type": "string",
+              "description": "Target app ID"
+            },
+            "status": {
+              "type": "string",
+              "description": "Provisioning status"
+            }
+          }
+        }
+      }
+    }
+  }
+}

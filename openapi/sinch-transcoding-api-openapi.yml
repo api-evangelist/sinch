@@ -48,14 +48,6 @@ paths:
         '401':
           description: Unauthorized
 components:
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
     AppMessage:
       type: object
@@ -146,6 +138,14 @@ components:
                     description: Section items
                     items:
                       $ref: '#/components/schemas/Choice'
+    TranscodeResponse:
+      type: object
+      properties:
+        transcoded_message:
+          type: object
+          description: Map of channel to transcoded message
+          additionalProperties:
+            type: string
     TranscodeRequest:
       type: object
       required:
@@ -163,14 +163,6 @@ components:
           description: Target channels for transcoding
           items:
             type: string
-    TranscodeResponse:
-      type: object
-      properties:
-        transcoded_message:
-          type: object
-          description: Map of channel to transcoded message
-          additionalProperties:
-            type: string
     Choice:
       type: object
       properties:
@@ -184,6 +176,14 @@ components:
         postback_data:
           type: string
           description: Data sent back when the choice is selected
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

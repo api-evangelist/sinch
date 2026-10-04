@@ -1,0 +1,63 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-start-verification-response-schema.json",
+  "title": "StartVerificationResponse",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-verifications-api-openapi.yml#/components/schemas/StartVerificationResponse",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The unique verification identifier"
+    },
+    "method": {
+      "type": "string",
+      "description": "The verification method used"
+    },
+    "sms": {
+      "type": "object",
+      "description": "SMS-specific response data",
+      "properties": {
+        "template": {
+          "type": "string",
+          "description": "The SMS template used"
+        },
+        "interceptionTimeout": {
+          "type": "integer",
+          "description": "Timeout in seconds for SMS interception"
+        }
+      }
+    },
+    "flashcall": {
+      "type": "object",
+      "description": "Flashcall-specific response data",
+      "properties": {
+        "cliFilter": {
+          "type": "string",
+          "description": "Regex filter for matching the flashcall CLI"
+        },
+        "interceptionTimeout": {
+          "type": "integer",
+          "description": "Timeout in seconds for flashcall interception"
+        }
+      }
+    },
+    "callout": {
+      "type": "object",
+      "description": "Callout-specific response data"
+    },
+    "seamless": {
+      "type": "object",
+      "description": "Seamless-specific response data",
+      "properties": {
+        "targetUri": {
+          "type": "string",
+          "format": "uri",
+          "description": "The target URI for data verification"
+        }
+      }
+    }
+  }
+}

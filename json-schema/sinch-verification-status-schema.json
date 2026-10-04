@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-verification-status-schema.json",
+  "title": "VerificationStatus",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-verifications-api-openapi.yml#/components/schemas/VerificationStatus",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The verification identifier"
+    },
+    "method": {
+      "type": "string",
+      "description": "The verification method"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "PENDING",
+        "SUCCESSFUL",
+        "FAIL",
+        "DENIED",
+        "ERROR"
+      ],
+      "description": "The current verification status"
+    },
+    "reason": {
+      "type": "string",
+      "description": "The reason for the current status"
+    },
+    "reference": {
+      "type": "string",
+      "description": "The custom reference string"
+    },
+    "identity": {
+      "type": "object",
+      "description": "The verified identity",
+      "properties": {
+        "type": {
+          "type": "string",
+          "description": "The identity type"
+        },
+        "endpoint": {
+          "type": "string",
+          "description": "The phone number"
+        }
+      }
+    },
+    "price": {
+      "type": "object",
+      "description": "The verification price",
+      "properties": {
+        "currencyId": {
+          "type": "string",
+          "description": "The currency code"
+        },
+        "amount": {
+          "type": "number",
+          "description": "The price amount"
+        }
+      }
+    }
+  }
+}

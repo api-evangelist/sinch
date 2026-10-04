@@ -162,6 +162,53 @@ paths:
           description: Fax not found
 components:
   schemas:
+    SendFaxRequest:
+      type: object
+      required:
+      - to
+      properties:
+        to:
+          type: string
+          description: The recipient fax number in E.164 format
+        from:
+          type: string
+          description: The sender fax number
+        contentUrl:
+          type: string
+          format: uri
+          description: URL to the document to fax
+        serviceId:
+          type: string
+          description: The fax service to use
+        headerText:
+          type: string
+          description: Header text to include on the fax
+        headerPageNumbers:
+          type: boolean
+          description: Whether to include page numbers in the header
+        imageConversionMethod:
+          type: string
+          enum:
+          - HALFTONE
+          - MONOCHROME
+          description: Image conversion method for the fax
+    FaxList:
+      type: object
+      properties:
+        faxes:
+          type: array
+          description: List of faxes
+          items:
+            $ref: '#/components/schemas/Fax'
+        page:
+          type: integer
+          description: Current page number
+        pageSize:
+          type: integer
+          description: Number of faxes per page
+        totalItems:
+          type: integer
+          description: Total number of faxes
     SendFaxMultipartRequest:
       type: object
       required:
@@ -226,53 +273,6 @@ components:
         headerText:
           type: string
           description: The header text on the fax
-    FaxList:
-      type: object
-      properties:
-        faxes:
-          type: array
-          description: List of faxes
-          items:
-            $ref: '#/components/schemas/Fax'
-        page:
-          type: integer
-          description: Current page number
-        pageSize:
-          type: integer
-          description: Number of faxes per page
-        totalItems:
-          type: integer
-          description: Total number of faxes
-    SendFaxRequest:
-      type: object
-      required:
-      - to
-      properties:
-        to:
-          type: string
-          description: The recipient fax number in E.164 format
-        from:
-          type: string
-          description: The sender fax number
-        contentUrl:
-          type: string
-          format: uri
-          description: URL to the document to fax
-        serviceId:
-          type: string
-          description: The fax service to use
-        headerText:
-          type: string
-          description: Header text to include on the fax
-        headerPageNumbers:
-          type: boolean
-          description: Whether to include page numbers in the header
-        imageConversionMethod:
-          type: string
-          enum:
-          - HALFTONE
-          - MONOCHROME
-          description: Image conversion method for the fax
   parameters:
     ProjectId:
       name: project_id

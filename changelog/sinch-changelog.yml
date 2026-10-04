@@ -1,0 +1,79 @@
+generated: '2026-10-03'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://developers.sinch.com/docs/numbers/sdk/java/1.0/migration-guides/migration-to-versioned.md
+sources:
+- https://developers.sinch.com/docs/numbers/sdk/java/1.0/migration-guides/migration-to-versioned.md
+- https://developers.sinch.com/docs/conversation/release-notes.md
+- https://developers.sinch.com/docs/voice/release-notes.md
+- https://developers.sinch.com/docs/voice/sdk/java/1.0/migration-guides/migration-to-versioned.md
+entries:
+- breaking: false
+  highlights:
+  - The `v1alpha` and `v1beta` Batch API endpoints have been deprecated.
+  - Beginning December 16, 2026, they will no longer be accessible.
+  - This removal should not impact most users as the `v1alpha` and `v1beta` endpoints were intended for test purposes.
+  - The `v1` endpoints, which are documented in the API reference, have not been deprecated and are not being removed.
+  date: '2026-12-16'
+- breaking: false
+  highlights:
+  - Conversation API has added support for sending contextual replies to contacts on the WhatsApp channel.
+  - Include the `reply_to` field in the API call to the Send Message endpoint and set `message_id` to the ID of the inbound message to which you
+    are replying.
+  - See Sending contextual replies for details.
+  date: '2026-10-02'
+- breaking: false
+  highlights:
+  - Added support for Webhook routing, which is currently available for open beta usage.
+  - This feature allows you to define fine-grained rules that determine where Conversation API delivers specific callbacks based on message content,
+    sender ID, channel, or delivery status.
+  date: '2026-08-19'
+- breaking: false
+  highlights:
+  - The `nrs_data` field was added to the structure of various callback payloads.
+  - The `nrs_data` field is located within the `channel_identity` object in the callback JSON.
+  - All channels that use MSISDN may include this field. For now, it is supported on the SMS, MMS, and RCS channels.
+  date: '2026-07-15'
+- breaking: false
+  highlights:
+  - A bug that affected the SMS configuration flow on the Sinch Build Dashboard has been fixed.
+  - The issue previously affected the process of configuring SMS credentials on newly created Conversation API apps.
+  - Only the configuration process itself was affected; users do not need to update their current configurations.
+  date: '2026-06-26'
+- breaking: false
+  highlights:
+  - A helper feature has been added to the SMS channel credentials update flow.
+  - This back-end feature addition prevents unwanted credential changes when masked SMS credentials are included in update calls made to Conversation
+    API apps.
+  - If SMS channel credentials are included in the payload as a masked string when updating a Conversation API app, the existing SMS channel credentials
+    for that app will be unaffected by the update.
+  date: '2026-06-24'
+- breaking: false
+  highlights:
+  - Updated `validateResponseCode` in the NRS service to properly handle error codes, with improved logging and tracing for better observability
+    in NRS integration.
+  date: '2026-03-18'
+- breaking: false
+  highlights:
+  - Updated Smart Conversations' PII service to remove support for unmarked number patterns (e.g. '123456789') from the `{NATIONAL_ID}` tag.
+  date: '2026-03-11'
+- breaking: false
+  highlights:
+  - Updated Smart Conversations' PII service to support currency symbols after the number (e.g. 92.50$) for the `{AMOUNT_OF_MONEY}` regex.
+  date: '2026-03-04'
+- breaking: false
+  highlights:
+  - Added documentation for `RCS_CARD_ORIENTATION` and `RCS_CARD_THUMBNAIL_IMAGE_ALIGNMENT` RCS channel properties.
+  date: '2026-02-19'
+- breaking: false
+  highlights:
+  - Improved internal error handling for MT message path.
+  - Improved traceability for message and webhook processing.
+  date: '2026-02-11'
+- breaking: false
+  highlights:
+  - Enabled propagation of the `operator` field from the RCS `ChannelMetadata` structure for all positive message delivery reports.
+  date: '2026-01-14'
+scheme: vX namespace (e.g., client.sms().v1())
+current_version: '1.5'
+docs: https://developers.sinch.com/docs/numbers/sdk/java/1.0/migration-guides/migration-to-versioned.md

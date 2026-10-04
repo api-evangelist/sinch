@@ -1,0 +1,67 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-group-list-schema.json",
+  "title": "GroupList",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-groups-api-openapi.yml#/components/schemas/GroupList",
+  "type": "object",
+  "properties": {
+    "count": {
+      "type": "integer",
+      "description": "Total number of groups"
+    },
+    "page": {
+      "type": "integer",
+      "description": "Current page number"
+    },
+    "page_size": {
+      "type": "integer",
+      "description": "Number of groups per page"
+    },
+    "groups": {
+      "type": "array",
+      "description": "List of group objects",
+      "items": {
+        "$ref": "#/$defs/Group"
+      }
+    }
+  },
+  "$defs": {
+    "Group": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique group identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "The group name"
+        },
+        "size": {
+          "type": "integer",
+          "description": "The number of members in the group"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the group was created"
+        },
+        "modified_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the group was last modified"
+        },
+        "child_groups": {
+          "type": "array",
+          "description": "List of child group IDs",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

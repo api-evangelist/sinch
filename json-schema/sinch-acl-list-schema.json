@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-acl-list-schema.json",
+  "title": "AclList",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-access-control-lists-api-openapi.yml#/components/schemas/AclList",
+  "type": "object",
+  "properties": {
+    "accessControlLists": {
+      "type": "array",
+      "description": "List of access control lists",
+      "items": {
+        "$ref": "#/$defs/Acl"
+      }
+    }
+  },
+  "$defs": {
+    "Acl": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique ACL identifier"
+        },
+        "name": {
+          "type": "string",
+          "description": "The ACL name"
+        },
+        "enabled": {
+          "type": "boolean",
+          "description": "Whether the ACL is active"
+        },
+        "entries": {
+          "type": "array",
+          "description": "List of IP address entries",
+          "items": {
+            "$ref": "#/$defs/AclEntry"
+          }
+        },
+        "createTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the ACL was created"
+        },
+        "updateTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the ACL was last updated"
+        }
+      }
+    },
+    "AclEntry": {
+      "type": "object",
+      "properties": {
+        "ipRange": {
+          "type": "string",
+          "description": "The IP address or CIDR range"
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of this entry"
+        }
+      }
+    }
+  }
+}
