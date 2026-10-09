@@ -1,0 +1,133 @@
+openapi: 3.2.0
+info:
+  title: Porting Port-in settings API
+  description: Automated processing of port-in phone number operations
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- url: https://porting.api.sinch.com/v1/projects/{projectId}
+  description: v1.0 of the porting API
+  variables:
+    projectId:
+      description: The project with which you are working.
+      default: YOUR_project_id
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Port-in settings
+  description: Porting default settings
+paths:
+  /configuration:
+    post:
+      operationId: createConfiguration
+      tags:
+      - Port-in settings
+      summary: Create Configuration
+      description: Create default Configuration for a given project
+      requestBody:
+        required: true
+        description: Create Communication Configuration for a given project
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DefaultsConfiguration'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultsConfiguration'
+    get:
+      operationId: getConfiguration
+      tags:
+      - Port-in settings
+      summary: Get Configuration
+      description: Retrieve Notification Configuration for a given project
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultsConfiguration'
+    put:
+      operationId: updateConfiguration
+      tags:
+      - Port-in settings
+      summary: Update configuration
+      description: Update default configurations for a given project
+      requestBody:
+        required: true
+        description: Update default configurations for a given project
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DefaultsConfiguration'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DefaultsConfiguration'
+components:
+  schemas:
+    DefaultsConfiguration:
+      type: object
+      description: Default configuration properties. If you do not provide values when making requests these values will be used instead.
+      properties:
+        contact:
+          type: object
+          description: Contains the contact information for the default user.
+          properties:
+            email:
+              type: string
+              description: The email address of the default user.
+              example: name@email.com
+            name:
+              type: string
+              description: The name of the default user.
+              example: John Smith
+            phone:
+              type: string
+              description: The phone number of the default user.
+              example: '+15559999'
+        webhookUrl:
+          type: string
+          description: The default webhook URL to use for callbacks.
+          example: my.callback.server
+        defaultPortTime:
+          type: string
+          description: The default time for porting in numbers. If you don't specify a time in the order this time will be used.
+          example: 09:00:00
+        defaultPortTimeZone:
+          type: string
+          enum:
+          - US/Eastern
+          - US/Central
+          - US/Mountain
+          - US/Pacific
+          - GMT
+          x-enumDescriptions:
+            US/Eastern: US Eastern Timezone
+            US/Central: US Central Timezone
+            US/Mountain: US Mountain Timezone
+            US/Pacific: US Pacific Timezone
+            GMT: Greenwich Mean Time
+          description: The default time zone for porting in numbers. If you don't specify a time zone in the order, this time zone will be used.
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Your key ID and Key secret serve as the username and password, respectively. Both can be found in the [Sinch Build Dashboard](https://dashboard.sinch.com/settings/access-keys). For more information about basic authentication in the Numbers API, click [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/basic).
+    bearerAuth:
+      type: oauth2
+      description: The username and password are your Key ID and Key Secret from the [Sinch Build Dashboard](https://dashboard.sinch.com/settings/access-keys). Exchange these for a bearer token (access token). Learn how [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

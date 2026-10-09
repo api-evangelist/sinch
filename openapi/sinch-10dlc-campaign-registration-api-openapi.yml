@@ -1,0 +1,1559 @@
+openapi: 3.2.0
+info:
+  title: 10DLC Campaign Registration API
+  description: Service for creating and listing US 10DLC brand and campaign registrations and TFN Verifications.
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- url: https://us10dlc.numbers.api.sinch.com
+  description: HTTP 10DLC API Server (Default(US))
+security:
+- BasicAuth: []
+- OAuth2: []
+tags:
+- name: 10DLC Campaign Registration
+  description: 10DLC is a system in the United States that allows businesses to send Application-to-Person (A2P) messaging via 10-digit-long-codes (10DLC).
+paths:
+  /v1/projects/{projectId}/campaignRegistrations:submit:
+    post:
+      tags:
+      - 10DLC Campaign Registration
+      summary: Create new Campaign in TCR
+      description: 'Create a 10DLC campaign at TCR (The Campaign Registry).
+
+
+        Campaign fees and carrier requirements are determined by the brand and use-case being used. To check the campaign requirements, use the campaign:qualify API.'
+      operationId: CampaignRegistrationExternalService_CreateTcrCampaign
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTcrCampaignRequest'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTcrCampaignResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: useCase must not be blank
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: useCase
+                      description: must not be blank
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while retrieving account mapped to the given project id.
+                  status: INTERNAL
+                  details:
+                  - type: ResourceInfo
+                    resourceType: Project
+                    resourceName: ec9f3e99-f7b1-474d-9dbd-ba3cef667d6e
+                    owner: ''
+                    description: Error while retrieving account mapped to the given project id.
+      x-codegen-request-body-name: body
+  /v1/projects/{projectId}/uploadCampaignFile:submit:
+    post:
+      tags:
+      - 10DLC Campaign Registration
+      summary: Upload attachments for 10DLC campaign registration
+      description: Uploads supporting documentation for 10DLC campaign registrations.
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      operationId: CampaignRegistrationExternalService_UploadCampaignFile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1uploadCampaignFilesRequest'
+            example:
+              projectId: 0fc52975-636a-4700-8943-68759df5c9e1
+              campaignInternalId: 01k4cxccbt519xa3ejty1r5jb4
+              file:
+                fileName: TestText.txt
+                fileContent: VGhpcyBpcyBhIHRlc3QgdGV4dCBmaWxlLg==
+                fileCategory: 5
+              submitCampaign: false
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Indicates whether the file upload was successful or not.
+                    example: success
+                  message:
+                    type: string
+                    description: A message providing details if the file upload was not successful. Will be an empty string if the upload was successful.
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid campaign_registration_id
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: campaign_registration_id
+                      description: invalid value
+        '404':
+          description: The campaign could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+                  details:
+                  - type: ResourceInfo
+                    resourceType: Campaign
+                    resourceName: 01frjdjhq2mnps0srvbt9wpvek
+                    owner: ''
+                    description: not found
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while retrieving campaign details.
+                  status: INTERNAL
+                  details:
+                  - type: ResourceInfo
+                    resourceType: Campaign
+                    resourceName: 01frjdjhq2mnps0srvbt9wpvek
+                    owner: ''
+                    description: Error while retrieving campaign details.
+  /v1/projects/{projectId}/campaignRegistrations/{campaignRegistrationId}:
+    get:
+      tags:
+      - 10DLC Campaign Registration
+      summary: Get Campaign Details
+      description: Returns the details of the specified campaign by its registration ID.
+      operationId: CampaignRegistrationExternalService_GetCampaign
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/campaignRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid campaign_registration_id
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: campaign_registration_id
+                      description: invalid value
+        '404':
+          description: The campaign could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+                  details:
+                  - type: ResourceInfo
+                    resourceType: Campaign
+                    resourceName: 01frjdjhq2mnps0srvbt9wpvek
+                    owner: ''
+                    description: not found
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while retrieving campaign details.
+                  status: INTERNAL
+                  details:
+                  - type: ResourceInfo
+                    resourceType: Campaign
+                    resourceName: 01frjdjhq2mnps0srvbt9wpvek
+                    owner: ''
+                    description: Error while retrieving campaign details.
+  /v1/projects/{projectId}/campaignRegistrations:fetchByTcrCampaignId:
+    get:
+      tags:
+      - 10DLC Campaign Registration
+      summary: Get Campaign Details using the TCR Campaign ID
+      description: Returns the specified campaign by its TCR Campaign ID.
+      operationId: CampaignRegistrationExternalService_GetCampaignByTcrCampaignId
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/campaignRegistrationIdQuery'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid tcr_campaign_id
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: tcr_campaign_id
+                      description: invalid value
+        '404':
+          description: The campaign could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+                  details:
+                  - type: ResourceInfo
+                    resourceType: Campaign
+                    resourceName: CTF4STM
+                    owner: ''
+                    description: not found
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while retrieving campaign details.
+                  status: INTERNAL
+                  details:
+                  - type: ResourceInfo
+                    resourceType: Campaign
+                    resourceName: CTF4STM
+                    owner: ''
+                    description: Error while retrieving campaign details.
+  /v1/projects/{projectId}/campaignRegistrations:qualify:
+    get:
+      tags:
+      - 10DLC Campaign Registration
+      summary: Qualify Brand by Use Case
+      description: 'Before submitting a campaign, this API will provide some important feedback about how the resulting campaign will be treated. You can verify that the campaign will be supported by all operators, the AT&T message class and TPM, the T-Mobile brand daily bucket that will be applied and more.
+
+
+        It is suggested to validate that the operator restrictions will meet your needs prior to submitting the campaign request. Brand revettings do not automatically adjust operator restrictions, and in some cases a new campaign may have to be resubmitted to receive the adjusted MNO values.'
+      operationId: CampaignRegistrationExternalService_QualifyBrandByUseCase
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/brandId'
+      - $ref: '#/components/parameters/useCase'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualifyBrandByUseCaseResponse'
+        '400':
+          description: Invalid Brand ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid brand_id. It must have upper-case alphanumeric characters with prefix letter 'B' and max length of 8 characters
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: brand_id
+                      description: invalid value, it must have upper-case alphanumeric characters with prefix letter 'B' and max length of 8 characters
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Brand not found
+                  status: INTERNAL
+                  details:
+                  - type: ResourceInfo
+                    resourceType: QualifyBrandByUseCaseResponse
+                    resourceName: ''
+                    owner: ''
+                    description: Brand not found
+  /v1/projects/{projectId}/campaignRegistration/{campaignRegistrationId}:
+    delete:
+      tags:
+      - 10DLC Campaign Registration
+      summary: Delete Campaign by campaignId
+      description: Deactivate a campaign by removing the campaign from TCR and OSR. A campaign cannot be restored once it is deactivated. New campaign status is EXPIRED.
+      operationId: CampaignRegistrationExternalService_DeleteCampaign
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/campaignRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid campaign_id
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: tcr_campaign_id
+                      description: invalid value
+        '404':
+          description: The campaign could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+                  details:
+                  - type: ResourceInfo
+                    resourceType: Campaign
+                    resourceName: CTF4STM
+                    owner: ''
+                    description: not found
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while retrieving campaign details.
+                  status: INTERNAL
+                  details:
+                  - type: ResourceInfo
+                    resourceType: Campaign
+                    resourceName: CTF4STM
+                    owner: ''
+                    description: Error while retrieving campaign details.
+  /v1/projects/{projectId}/campaignRegistrations:
+    get:
+      tags:
+      - 10DLC Campaign Registration
+      summary: List Campaign Registrations
+      description: Lists all campaign registrations per project.
+      operationId: CampaignRegistrationService_ListCampaignRegistrationRequest
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/status'
+      - $ref: '#/components/parameters/mock'
+      - $ref: '#/components/parameters/useCase'
+      - $ref: '#/components/parameters/brand'
+      - $ref: '#/components/parameters/pageSize'
+      - $ref: '#/components/parameters/pageToken'
+      - $ref: '#/components/parameters/orderBy'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCampaignRegistrationResponse'
+        '400':
+          description: If the page_token, number_pattern or order_by is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: order_by
+                      description: Invalid order_by XXX
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while getting campaign registration.
+                  status: INTERNAL
+  /v1/projects/{projectId}/campaignRegistrations/{campaignRegistrationId}/feedback:
+    get:
+      tags:
+      - 10DLC Campaign Registration
+      summary: Campaign Registration Feedback
+      description: 'Returns feedback information for campaign registrations that were rejected.
+
+        Campaign registrations could be rejected due to TCR error or any other internal error.'
+      operationId: CampaignRegistrationService_GetCampaignRegistrationFeedback
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/campaignRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCampaignRegistrationFeedbackResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: projectId
+                      description: invalid value
+        '404':
+          description: The campaign could not be found or if the requested campaign does not belong to the given project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while getting campaign feedback.
+                  status: INTERNAL
+  /v1/projects/{projectId}/campaignRegistrations/{campaignRegistrationId}/resubmit:
+    put:
+      tags:
+      - 10DLC Campaign Registration
+      summary: Campaign Registration Resubmit
+      description: '"Resubmit a campaign to:
+
+
+        1. Backfill missing MNO campaign operation records for one or more networks.
+
+        2. Retroactively update the campaign to reflect newly assigned message class.
+
+
+        Please note that running this endpoint could potentially downgrade campaign business terms.
+
+
+        After hitting this endpoint, call the Get Campaign Registration API to to check lastActionStatus:
+
+
+        1. If lastActionStatus is `RESUBMIT_IN_PROGRESS, mno metadata not updated`, poll again.
+
+        2. If lastActionStatus is `RESUBMIT_SUCCESSFUL`, get updated MNO metadata.
+
+        3. If lastActionStatus is `RESUBMIT_FAILED`, call the Campaign Feedback API to know the reason for failure.'
+      operationId: CampaignRegistrationService_ResubmitCampaignRegistration
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/campaignRegistrationId'
+      requestBody:
+        description: 'List of MNOs (ATT, TMO, USC, VZW) to resubmit a campaign in TCR. Default value for empty list: ALL, i.e. all MNOs.'
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResubmitCampaignRegistrationRequest'
+        required: false
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: projectId
+                      description: invalid value
+        '404':
+          description: The campaign could not be found or if the requested campaign does not belong to the given project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while resubmitting campaign registration.
+                  status: INTERNAL
+      x-codegen-request-body-name: body
+components:
+  parameters:
+    pageSize:
+      name: pageSize
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    mock:
+      name: mock
+      in: query
+      required: false
+      schema:
+        type: boolean
+    status:
+      name: status
+      description: The campaign status on which to filter.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+          - SINCH_REVIEW
+          - SINCH_APPROVED
+          - SINCH_REJECTED
+          - SUBMITTED
+          - APPROVED
+          - ACTIVE
+          - EXPIRED
+          - REJECTED
+          - SUBMISSION_FAILED
+          x-enumDescriptions:
+            SINCH_REVIEW: Campaign submitted successfully and awaiting approval from Sinch.
+            SINCH_APPROVED: Campaign approved by Sinch.
+            SINCH_REJECTED: Campaign rejected by Sinch.
+            SUBMITTED: Campaign submitted successfully to TCR and awaiting approval from operators.
+            APPROVED: Campaign has been approved by the operators and is ready to be activated by adding a number to it.
+            ACTIVE: Campaign is active and running.
+            EXPIRED: Campaign is expired. Traffic cannot be sent, cannot be reactivated.
+            REJECTED: Campaign was rejected by one of the operators.
+            SUBMISSION_FAILED: Campaign submission failed.
+    campaignRegistrationIdQuery:
+      name: campaignRegistrationIdQuery
+      description: Campaign Registration Id returned by the create campaign API.
+      in: query
+      required: true
+      schema:
+        type: string
+    useCase:
+      name: useCase
+      description: The desired Use Case.
+      in: query
+      required: false
+      schema:
+        type: string
+    brand:
+      name: brand
+      in: query
+      required: false
+      schema:
+        type: string
+    pageToken:
+      name: pageToken
+      in: query
+      required: false
+      schema:
+        type: string
+    campaignRegistrationId:
+      name: campaignRegistrationId
+      description: Campaign Registration Id returned by the create campaign API.
+      in: path
+      required: true
+      schema:
+        type: string
+    projectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Sinch uses projects to group resources such as contacts and apps together to manage and connect a unique set of keys and secret IDs for all your Sinch API products. To identify a project, it is given a unique alphanumeric identifier that ties it to your account. Your project ID can be found in the [Customer Dashboard](https://dashboard.sinch.com/settings/project-management).
+    brandId:
+      name: brandId
+      description: Brand Id to be qualified
+      in: query
+      required: true
+      schema:
+        type: string
+    orderBy:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+  schemas:
+    ResubmitCampaignRegistrationRequest:
+      type: object
+      properties:
+        mnos:
+          type: array
+          items:
+            type: string
+    CampaignVerticalType:
+      deprecated: true
+      title: Campaign Vertical Type
+      type: string
+      description: This field has been deprecated and is no longer being captured.
+    CampaignMnoMetadata:
+      title: MNO properties
+      type: object
+      properties:
+        mno:
+          type: string
+          description: Name of the MNO
+        status:
+          type: string
+          description: MNO operation status
+        msgClass:
+          type: string
+          description: Message class assigned to the campaign by MNO. Please refer to AT&T 10DLC guide for complete list of available message class and definition
+        tpm:
+          type: string
+          description: Message TPM(throughput per minute) qualified by the brand for desired use-case
+          format: integer
+        tpmScope:
+          type: string
+          description: 'TPM restriction scope. Possible values: CAMPAIGN, PHONE_NUMBER. If scope is at PHONE_NUMBER level, then the TPM rate-limiting imposed separately for each phone number provisioned to the campaign. CAMPAIGN level scope implies rate-limiting imposed at campaign level.'
+        brandTier:
+          type: string
+          description: 'Daily message volume is restricted based on brand tier or brand qualifcation. The daily volume restriction applies to brand across campaigns and CSPs. Please contact your message service provider for updated T-Mobile terms. Possible values: LOW, LOWER_MID, UPPER_MID, TOP, UNCAPPED'
+        brandDailyCap:
+          type: string
+          description: Number of messages allowed per day on T-Mobile network. If the brandTier attribute is 'UNCAPPED', then this attribute will be NULL.
+          format: integer
+    CampaignResponse:
+      title: Campaign Response
+      type: object
+      properties:
+        campaignId:
+          maxLength: 7
+          type: string
+          description: Campaign ID returned by external partner. i.e. TCR Campaign Id
+        campaignName:
+          maxLength: 128
+          type: string
+          description: Optional name to help track and view campaign.
+        campaignRegistrationId:
+          maxLength: 26
+          type: string
+          description: Campaign Registration Id returned by the Create Campaign API
+        createDate:
+          type: string
+          description: Campaign Creation Date
+          format: date-time
+        modifiedDate:
+          type: string
+          description: Campaign Modified Date
+          format: date-time
+        createdBy:
+          maxLength: 20
+          type: string
+          description: Represents who Created this Campaign
+        modifiedBy:
+          maxLength: 20
+          type: string
+          description: Represents who was the Last to Modify this Campaign
+        autoRenewal:
+          type: boolean
+          description: Campaign subscription auto-renewal status.
+        billedDate:
+          type: string
+          description: Campaign recent billed date.
+          format: date-time
+        brandId:
+          maxLength: 8
+          type: string
+          description: Alphanumeric identifier of the brand associated with this campaign.
+        vertical:
+          maxLength: 20
+          type: string
+          description: Business/industry segment of this campaign. Must be of defined valid types.
+        useCase:
+          maxLength: 20
+          type: string
+          description: Campaign useCase.
+        subUseCases:
+          type: array
+          description: 'Campaign sub use-cases. '
+          items:
+            maxLength: 20
+            type: string
+        description:
+          maxLength: 4096
+          type: string
+          description: Summary description of this campaign.
+        embeddedLink:
+          type: boolean
+          description: Does message generated by the campaign include URL link in SMS?
+        embeddedPhone:
+          type: boolean
+          description: Does message generated by the campaign include phone number in SMS?
+        affiliateMarketing:
+          type: boolean
+          description: Does message content controlled by affiliate marketing other than the brand?
+        numberPool:
+          type: boolean
+          description: Indicates whether this campaign has been approved and configured as a numberpool campaign
+        ageGated:
+          type: boolean
+          description: Age gated content in campaign.
+        directLending:
+          type: boolean
+          description: is direct lending.
+        subscriberOptIn:
+          type: boolean
+          description: Does campaign require subscriber to opt-in before SMS is sent to subscriber?
+        subscriberOptOut:
+          type: boolean
+          description: Does campaign support subscriber opt-out keyword(s)?
+        subscriberHelp:
+          type: boolean
+          description: Does campaign responds to help keyword(s)?
+        sample1:
+          maxLength: 1024
+          type: string
+          description: Message sample. Some campaign tiers require 1 or more message samples.
+        sample2:
+          maxLength: 1024
+          type: string
+          description: Message sample. Some campaign tiers require 2 or more message samples.
+        sample3:
+          maxLength: 1024
+          type: string
+          description: Message sample. Some campaign tiers require 3 or more message samples.
+        sample4:
+          maxLength: 1024
+          type: string
+          description: Message sample. Some campaign tiers require 4 or more message samples.
+        stopMessage:
+          maxLength: 255
+          type: string
+          description: Message that will be returned if a subscriber opts out of the campaign.
+        optInMessage:
+          maxLength: 255
+          type: string
+          description: Message that will be returned when a subscriber opts into a campaign.
+        helpMessage:
+          maxLength: 255
+          type: string
+          description: Help message of the campaign.
+        monthlyFee:
+          type: number
+          description: Monthly Fee
+          format: float
+        setupFee:
+          type: number
+          description: Initial Setup Fee
+          format: float
+        status:
+          maxLength: 32
+          type: string
+          description: Campaign Status.
+          enum:
+          - SINCH_REVIEW
+          - SINCH_APPROVED
+          - SINCH_REJECTED
+          - SUBMITTED
+          - APPROVED
+          - ACTIVE
+          - EXPIRED
+          - REJECTED
+          - SUBMISSION_FAILED
+          x-enumDescriptions:
+            SINCH_REVIEW: Campaign submitted successfully and awaiting approval from Sinch.
+            SINCH_APPROVED: Campaign approved by Sinch.
+            SINCH_REJECTED: Campaign rejected by Sinch.
+            SUBMITTED: Campaign submitted successfully to TCR and awaiting approval from operators.
+            APPROVED: Campaign has been approved by the operators and is ready to be activated by adding a number to it.
+            ACTIVE: Campaign is active and running.
+            EXPIRED: Campaign is expired. Traffic cannot be sent, cannot be reactivated.
+            REJECTED: Campaign was rejected by one of the operators.
+            SUBMISSION_FAILED: Campaign submission failed.
+        mnoMetadata:
+          title: Map of Metadata  Map of MNO metadata where key is the 'networkId' of the MNO and value is Metadata of the MNO
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CampaignMnoMetadata'
+        mock:
+          type: boolean
+          description: Defines if campaign mocked or real one
+        lastActionStatus:
+          type: string
+          description: Last Action Status.
+          enum:
+          - CREATE_IN_PROGRESS
+          - CREATE_SUCCESSFUL
+          - CREATE_FAILED
+          - DELETE_IN_PROGRESS
+          - DELETE_SUCCESSFUL
+          - DELETE_FAILED
+          - RESUBMIT_IN_PROGRESS
+          - RESUBMIT_SUCCESSFUL
+          - RESUBMIT_FAILED
+          x-enumDescriptions:
+            CREATE_IN_PROGRESS: Creating campaign in TCR.
+            CREATE_SUCCESSFUL: Campaign created in TCR.
+            CREATE_FAILED: Campaign creation failed in TCR.
+            DELETE_IN_PROGRESS: Deleting campaign in TCR.
+            DELETE_SUCCESSFUL: Campaign deleted in TCR.
+            DELETE_FAILED: Campaign deletion failed in TCR.
+            RESUBMIT_IN_PROGRESS: Campaign resubmission in progress.
+            RESUBMIT_SUCCESSFUL: Campaign resubmission completed.
+            RESUBMIT_FAILED: Campaign resubmission failed.
+        optinKeywords:
+          maxLength: 255
+          type: string
+          description: Subscriber opt-in keywords. Must be upper-case alphanumeric comma(,) separated keywords without space.
+        optoutKeywords:
+          maxLength: 255
+          type: string
+          description: Subscriber opt-out keywords. Default value is 'STOP'. Must be upper-case alphanumeric comma(,) separated keywords without space.
+        helpKeywords:
+          maxLength: 255
+          type: string
+          description: Subscriber help keywords. Default value is 'HELP'. Must be upper-case alphanumeric comma(,) separated keywords without space.
+        messageFlow:
+          maxLength: 2048
+          type: string
+          description: Message flow description.
+        nextRenewalOrExpirationDate:
+          type: string
+          description: When the campaign would be due for its next renew/bill date.
+          format: date-time
+    CampaignSubUseCaseType:
+      type: string
+      enum:
+      - 2FA
+      - ACCOUNT_NOTIFICATION
+      - CUSTOMER_CARE
+      - DELIVERY_NOTIFICATION
+      - FRAUD_ALERT
+      - HIGHER_EDUCATION
+      - MARKETING
+      - POLLING_VOTING
+      - PUBLIC_SERVICE_ANNOUNCEMENT
+      - SECURITY_ALERT
+      x-enumDescriptions:
+        2FA: Any authentication, verification, or one-time passcode.
+        ACCOUNT_NOTIFICATION: Standard notifications for account holders, relating to and being about an account.
+        CUSTOMER_CARE: All customer care interaction, including but not limited to account management and customer support.
+        DELIVERY_NOTIFICATION: Notification about the status of the delivery of a product or service.
+        FRAUD_ALERT: Notifications regarding potential fraudulent activity on a user's account.
+        HIGHER_EDUCATION: Messaging created on behalf of Colleges or Universities, including School Districts and education institutions. This use case is NOT for the "free to the consumer" messaging model.
+        MARKETING: Any communication that includes marketing and/or promotional content.
+        POLLING_VOTING: The sending of surveys and polling/voting campaigns for non political arenas.
+        PUBLIC_SERVICE_ANNOUNCEMENT: Informational messaging to raise an audience's awareness about important issues.
+        SECURITY_ALERT: A notification that the security of a system, either software or hardware, has been compromised in some way and there is an action you need to take.
+    v1uploadCampaignFilesRequest:
+      type: object
+      description: Request payload to upload a file for a campaign registration. Only one file can be uploaded at a time.
+      required:
+      - campaignInternalId
+      - submitCampaign
+      properties:
+        projectId:
+          type: string
+          description: The project ID to which the campaign belongs.
+          example: 0fc52975-636a-4700-8943-68759df5c9e1
+        campaignInternalId:
+          type: string
+          description: The campaign ID returned by the create campaign API endpoint.
+          example: 01k4cxccbt519xa3ejty1r5jb4
+        file:
+          type: object
+          description: 'Files must be no larger than 10MB.
+
+
+            For PRIVACY_POLICY, TERMS_AND_CONDITIONS, CALL_TO_ACTION, and OPT_IN file categories, the following file types are supported:
+
+
+            jpg, jpeg, png, bmp, tiff, raw, pdf, rtf, xml, odt, docx, tml, txt
+
+
+            For MMS file category, the following file types are supported:
+
+
+            bmp, dib, gif, jpeg, jpg, m2a, m4a, m4b, m4p, m4r, m4v, mp1, mp2, mp3, mp4, mpa, oga, ogg, ogm, ogv, ogx, png, spx, txt, wav, webm
+
+
+            There can be a maximum of 5 files submitted for MMS and a maximum of 5 files for the other categories.'
+          properties:
+            fileName:
+              type: string
+              description: The name of the file you want to upload.
+              example: MyFile.txt
+            fileContent:
+              type: string
+              description: The content of the file encoded in base64.
+              example: VGhpcyBpcyBhIHRlc3QgdGV4dCBmaWxlLg==
+            fileCategory:
+              type: integer
+              description: Represents the category or intended purpose of a file and used to classify uploaded files based on their content or function.
+              enum:
+              - 1
+              - 2
+              - 3
+              - 4
+              - 5
+              x-enumDescriptions:
+                PRIVACY_POLICY=1: File related to privacy policy content.
+                TERMS_AND_CONDITIONS=2: File related to terms and conditions.
+                CALL_TO_ACTION=3: File related to call-to-action prompts.
+                OPT_IN=4: File related to user opt-in/consent.
+                MMS=5: File related to MMS (Multimedia Messaging Service) contexts.
+        submitCampaign:
+          type: boolean
+          description: 'Set this property to `false` for all uploaded files except the final one, which will allow for uploading documents across multiple requests without submitting the campaign.
+
+            For the last file, set it to `true` to indicate that the upload is complete and the campaign should be submitted for review.'
+    fieldViolations:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field which produced the error.
+          example: order_by
+        description:
+          type: string
+          description: The description of the error.
+          example: Invalid `order_by` number.
+    InternalErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+    errorDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: A more specific description of the error.
+          example: BadRequest
+        resourceType:
+          type: string
+          description: The type of resource relevant to the error, if applicable.
+        resourceName:
+          type: string
+          description: The name of the resource, if applicable.
+        owner:
+          type: string
+          description: The owner of the resource, if applicable.
+        description:
+          type: string
+          description: A description of the error, if applicable.
+        fieldViolations:
+          type: array
+          description: An array of all the field violations which contributed to the error.
+          items:
+            $ref: '#/components/schemas/fieldViolations'
+    MnoMetadata:
+      title: MNO properties
+      type: object
+      properties:
+        mno:
+          type: string
+          description: Name of the MNO
+        mnoSupport:
+          type: boolean
+          description: If 'false', then desired use-case cannot be supported by the MNO
+        mnoReview:
+          type: boolean
+          description: If 'true', then the submitted campaign is subject to MNO (manual) review process. Campaign review status can be access via TCR APIs for some of the MNOs
+        qualify:
+          type: boolean
+          description: If 'false', then brand does not qualify for the desired use-case on the MNO. CSP might consider getting brand vetted by one of the approved external vetting provider
+        minMsgSamples:
+          type: string
+          description: Minimum number of message samples required by MNO for submission of desired use-case
+          format: integer
+        reqSubscriberOptIn:
+          type: boolean
+          description: If 'true' then MNO requires subscriber to opt-into the campaign before message may be sent to subscriber. Opt-in mechanism can be mobile or web opt-in
+        reqSubscriberOptOut:
+          type: boolean
+          description: If 'true' then MNO requires campaign to support an opt-out mechanism through MO stop key words such as 'STOP', 'QUIT'. Upon receive STOP message from subscriber, campaign must stop sending message to subscriber immediately
+        reqSubscriberHelp:
+          title: If 'true' then MNO requires campaign to support a 'help' mechanism through MO help key words such as 'HELP', 'INFO'
+          type: boolean
+        noEmbeddedLink:
+          type: boolean
+          description: If 'true' then MNO forbids call-to-action link/URL to be embedded in all messages send to subscriber
+        noEmbeddedPhone:
+          type: boolean
+          description: If 'true' then MNO forbids call-to-action phone number to be embedded in all messages send to subscriber
+        surcharge:
+          type: number
+          description: Per message fee imposed by MNO. This fee may vary depending on brand qualification and use-case
+          format: double
+        msgClass:
+          type: string
+          description: Message class assigned to the campaign by MNO. Please refer to AT&T 10DLC guide for complete list of available message class and definition
+        tpm:
+          type: string
+          description: Message TPM(throughput per minute) qualified by the brand for desired use-case
+          format: integer
+        tpmScope:
+          type: string
+          description: 'TPM restriction scope. Possible values: CAMPAIGN, PHONE_NUMBER. If scope is at PHONE_NUMBER level, then the TPM rate-limiting imposed separately for each phone number provisioned to the campaign. CAMPAIGN level scope implies rate-limiting imposed at campaign level.'
+        brandTier:
+          type: string
+          description: 'Daily message volume is restricted based on brand tier or brand qualifcation. The daily volume restriction applies to brand across campaigns and CSPs. Please contact your message service provider for updated T-Mobile terms. Possible values: LOW, LOWER_MID, UPPER_MID, TOP, UNCAPPED'
+        brandDailyCap:
+          type: string
+          description: Number of messages allowed per day on T-Mobile network. If the brandTier attribute is 'UNCAPPED', then this attribute will be NULL.
+          format: string
+    CreateTcrCampaignRequest:
+      title: Campaign Request
+      type: object
+      required:
+      - brandId
+      - useCase
+      - campaignName
+      - description
+      - sample1
+      - sample2
+      - sample3
+      - stopMessage
+      - optInMessage
+      - helpMessage
+      - autoRenewal
+      - embeddedLink
+      - embeddedPhone
+      - affiliateMarketing
+      - numberPool
+      - ageGated
+      - directLending
+      - subscriberOptIn
+      - subscriberOptOut
+      - subscriberHelp
+      - optinKeywords
+      - optoutKeywords
+      - helpKeywords
+      - messageFlow
+      properties:
+        brandId:
+          maxLength: 8
+          type: string
+          description: 'The brand is the company or entity represented in the campaign. The brand ID is an alphanumeric identifier that always begins with a "B". When registering a brand in The Campaign Registry (TCR), TCR returns a brand ID value, example: BESINCH. For more info, see [Brand Registrations](https://developers.sinch.com/docs/10dlc-registration/api-reference/10dlc-registration/tag/Brand-Registration/).'
+        useCase:
+          $ref: '#/components/schemas/CampaignUseCaseType'
+        campaignName:
+          maxLength: 128
+          type: string
+          description: This is an optional name to help track and view your campaign within Sinch's platform. Use a name that is easily recognizable, this will help you identify your campaign later within the Sinch customer dashboard. This name is not part of the campaign registration in TCR.
+        vertical:
+          $ref: '#/components/schemas/CampaignVerticalType'
+        description:
+          maxLength: 4096
+          type: string
+          description: Describe in detail the service the message program is providing to the end user and the purpose of the brand's messages (i.e. appointment reminders, OTP alerts, etc.). The description should match the selected use case and identify who is sending the messages, who is receiving the messages, and why messages are being sent.
+          minLength: 40
+        sample1:
+          minLength: 20
+          maxLength: 1024
+          type: string
+          description: Provide sample production message content. Include the Brand name and opt out instructions (e.g. Reply STOP to stop) in every message. If you have selected Mixed use case, please provide examples of each sub use case selected.
+          example: '{Brand name}: We are contacting you today to let you know your order is ready for pickup. Reply STOP to stop.'
+        sample2:
+          maxLength: 1024
+          type: string
+          description: Message sample. Some campaign tiers require 2 or more message samples, depending on sub-usecases.
+          example: '{Brand name}: Your confirmation code is SINCH1234. Please enter it on the authentication website. Reply STOP to stop.'
+        sample3:
+          maxLength: 1024
+          type: string
+          description: Message sample. Some campaign tiers require 3 or more message samples, depending on sub-usecases.
+          example: '{Brand name}: Shop at www.example.com for all your retail needs! From clothing to home goods, we''ve got you covered. Visit us today and save! Reply STOP to stop. '
+        sample4:
+          maxLength: 1024
+          type: string
+          description: Message sample. Some campaign tiers require 4 or more message samples, depending on sub-usecases.
+        stopMessage:
+          minLength: 20
+          maxLength: 255
+          type: string
+          description: Message sent in response to a STOP keyword. It must confirm that the end user has unsubscribed from the message program and will not receive any further messages. Include the brand name. You can also include customer care contact information (e.g. support email or phone number).
+          example: You have been unsubscribed and will not receive any more messages from {Brand name}.  For more information call {phone number} or email {email address}.
+        optInMessage:
+          minLength: 20
+          maxLength: 255
+          type: string
+          description: Initial message that is sent confirming the end user's subscription. Include the brand name, opt-out instructions (reply STOP to stop), customer care instructions (reply HELP for help), message frequency (#msgs/mo, msg frequency varies, recurring messages, etc.) and the "message and data rates may apply" disclosure (Msg & Data rates may apply).
+          example: You have opted in to receive messages from {Brand name}! Msg freq varies. Msg & data rates may apply. Reply HELP for help. Reply STOP to stop.
+        helpMessage:
+          minLength: 20
+          maxLength: 255
+          type: string
+          description: Message sent in response to HELP. Include the brand name and additional customer care contact information (e.g. support email or phone number).
+          example: '{Brand name}: For help call {phone number} or email {email address}  Reply STOP to stop.'
+        subUseCases:
+          type: array
+          description: If you have selected a mixed use case, select all sub use cases that apply to your message program. Choose between 2 and 5 sub use cases for this campaign.  The input(s) should be one of the accepted enum values.
+          items:
+            $ref: '#/components/schemas/CampaignSubUseCaseType'
+        autoRenewal:
+          type: boolean
+          description: Will your campaign automatically renew? If "Yes", a monthly recurring fee will be charged to the account. If "No", only the initial setup fee will be charged, and the campaign will expire after three months unless it is reviewed manually.
+          default: true
+        embeddedLink:
+          type: boolean
+          description: Will your message content include a URL? Note that public URL shorteners are not allowed.
+          default: false
+        embeddedPhone:
+          type: boolean
+          description: Will your message content include embedded phone numbers?
+          default: false
+        numberPool:
+          type: boolean
+          description: Will your campaign support a number pool (more than 50 numbers)? If yes, your use case should clearly support the need for a number pool. For more info, see [When should I use a number pool for my 10DLC campaign](https://community.sinch.com/t5/10DLC/When-should-I-use-a-number-pool-for-my-10DLC-campaign/ta-p/12432).
+          default: false
+        ageGated:
+          type: boolean
+          description: Will your traffic include any content related to age-restricted goods or services? If yes, you must implement an age gate verification process.
+          default: false
+        directLending:
+          type: boolean
+          description: Are you a financial institution engaged in direct, first-party lending to your customers? If yes, note that your campaign description should clearly indicate direct lending, even if your use case is not related to your lending services (e.g. OTP).
+          default: false
+        subscriberOptIn:
+          type: boolean
+          description: Will your campaign collect and process end user opt-ins? This is mandatory for all use cases, except for Machine-to-Machine.
+          default: true
+        subscriberOptOut:
+          type: boolean
+          description: Message sent in response to a STOP keyword. It must confirm that the end user has unsubscribed from the message program and will not receive any further messages. Include the brand name. You can also include customer care contact information (e.g. support email or phone number).
+          default: true
+        subscriberHelp:
+          type: boolean
+          description: Message sent in response to HELP. Include the brand name and additional customer care contact information (e.g. support email or phone number).
+          default: true
+        optinKeywords:
+          maxLength: 255
+          type: string
+          description: If subscribers can opt-in via a keyword, enter keyword(s) here (alphanumeric comma separated values, no blank spaces).
+          example: Join,Subscribe,Agree
+        optoutKeywords:
+          maxLength: 255
+          type: string
+          description: Subscriber opt-out keywords. Default values are STOP, QUIT, END, CANCEL and UNSUBSCRIBE. If you accept additional opt-out keywords, you can enter them here (alphanumeric comma separated values, no blank spaces).
+          example: Stop,Quit,Cancel
+        helpKeywords:
+          maxLength: 255
+          type: string
+          description: Subscriber help keywords. Default value is HELP.  If you accept additional help keywords, you can enter them here. (alphanumeric comma separated values, no blank spaces).
+          example: Help,Info
+        messageFlow:
+          minLength: 40
+          maxLength: 2048
+          type: string
+          description: Provide instructions for how end users opt-in to receive messages. A compliant opt-in is critical to the approval of your campaign. Include all opt-in mechanisms (e.g. keyword/text-to-join, online form, point-of-sale (POS) system, verbal consent, interactive voice response (IVR) system, paper form) and a clear program description. The Call-to-Action should include opt-out instructions (reply STOP to stop), customer care instructions (reply HELP for help), message frequency (#msgs/mo, msg frequency varies, recurring messages, etc.) and message and data rates disclosure (Msg & Data rates may apply).
+          example: Users will opt-in to receive messages from {Brand name} via {opt-in mechanism}
+        terms_and_conditions_link:
+          type: string
+          maxLength: 255
+          description: A URL to a page containing the terms and conditions.
+          example: https://my.website.com/toc
+        privacy_policy_link:
+          type: string
+          maxLength: 255
+          description: A URL to a page containing the privacy policy.
+          example: https://my.website.com/privacy_policy
+        attachments:
+          type: boolean
+          description: If this property is set to `true`, this will delay the submission of the campaign until all necessary documentation is uploaded using the [Upload Campaign Files](https://developers.sinch.com/docs/10dlc-registration/api-reference/10dlc-registration/tag/10DLC-Campaign-Registration/#tag/10DLC-Campaign-Registration/operation/CampaignRegistrationExternalService_UploadCampaignFile) operation.
+          default: false
+          example: false
+    CreateTcrCampaignResponse:
+      title: Response Body for CreateTcrCampaign Request
+      type: object
+      properties:
+        campaignRegistrationId:
+          maxLength: 26
+          type: string
+          description: Sinch generated campaign ID (ULID format).  Note that this is not the TCR campaign ID.  The TCR Campaign ID will be available once the campaign has been approved and submitted to TCR.
+    error:
+      required:
+      - error
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: integer
+              description: The error code.
+              example: 400
+            message:
+              type: string
+              description: The error message.
+              example: Invalid argument.
+            status:
+              type: string
+              description: The status of the error.
+              example: INVALID_ARGUMENT
+            details:
+              type: array
+              description: An array of objects describing the error in more detail, if applicable.
+              items:
+                $ref: '#/components/schemas/errorDetails'
+    CampaignUseCaseType:
+      title: Campaign Usecase Type
+      type: string
+      description: 'Select a use case that is the primary use case that is most applicable to the service that messages are providing to subscribers. Standard use cases are immediately available for all qualified registered brands, whereas special use cases require vetting or pre/post approval by mobile network operators (MNOs).
+
+
+        Special use cases are sensitive or critical in nature and may require vetting or pre/post registration approval by mobile network operators (MNOs). Requirements may vary according to each MNO.
+
+
+        For more information on standard use case versus special use case campaigns, see [10DLC Use Cases - Standard Use Cases vs Special Use Cases](https://community.sinch.com/t5/10DLC/10DLC-Use-Cases-Standard-Use-Cases-vs-Special-Use-Cases/ta-p/7028/). '
+      enum:
+      - 2FA
+      - ACCOUNT_NOTIFICATION
+      - CUSTOMER_CARE
+      - DELIVERY_NOTIFICATION
+      - FRAUD_ALERT
+      - HIGHER_EDUCATION
+      - LOW_VOLUME
+      - MARKETING
+      - MIXED
+      - POLLING_VOTING
+      - PUBLIC_SERVICE_ANNOUNCEMENT
+      - SECURITY_ALERT
+      - AGENTS_FRANCHISES
+      - CARRIER_EXEMPT
+      - CHARITY
+      - EMERGENCY
+      - K12_EDUCATION
+      - POLITICAL
+      - PROXY
+      - SOCIAL
+      - SWEEPSTAKE
+      - SOLE_PROPRIETOR
+      x-enumDescriptions:
+        2FA: Any authentication, verification, or one-time passcode.
+        ACCOUNT_NOTIFICATION: Standard notifications for account holders, relating to and being about an account.
+        CUSTOMER_CARE: All customer care interaction, including but not limited to account management and customer support.
+        DELIVERY_NOTIFICATION: Notification about the status of the delivery of a product or service.
+        FRAUD_ALERT: Notifications regarding potential fraudulent activity on a user's account.
+        HIGHER_EDUCATION: Messaging created on behalf of Colleges or Universities, including School Districts and education institutions. This use case is NOT for the "free to the consumer" messaging model.
+        LOW_VOLUME: 'For Brands that have multiple use cases and only need very low messaging throughput. Examples include: test or demo accounts, small businesses (single Doctor''s office, single Pizza shop etc.).'
+        MARKETING: Any communication that includes marketing and/or promotional content.
+        MIXED: Any messaging campaign containing 2 to 5 standard uses cases.
+        POLLING_VOTING: The sending of surveys and polling/voting campaigns for non political arenas.
+        PUBLIC_SERVICE_ANNOUNCEMENT: Informational messaging to raise an audience's awareness about important issues.
+        SECURITY_ALERT: A notification that the security of a system, either software or hardware, has been compromised in some way and there is an action you need to take.
+        AGENTS_FRANCHISES: Agents; franchises; local branches.
+        CARRIER_EXEMPT: Carrier exempt.
+        CHARITY: Communications from a registered charity aimed at providing help and raising money for those in need.
+        EMERGENCY: Notification services designed to support public safety/health during natural disasters, armed conflicts, pandemics, and other national or regional emergencies.
+        K12_EDUCATION: Campaigns created for messaging platforms that support schools from grades K - 12, and distance learning centers.
+        POLITICAL: Part of organized effort to influence decision making of specific groups. Available only to Non-Profit entities with a Campaign Verify token or Aegis Political Vet, or Non Profit entities with a verified 501(c)(3/4/5/6) tax exempt status.
+        PROXY: Peer-to-peer, app-based group messaging with proxy/pooled numbers. Supporting personalized services and non-exposure of personal numbers for enterprise or A2P communications.
+        SOCIAL: Communication between public figures/influencers and their communities.
+        SWEEPSTAKE: All sweepstakes messaging.
+        SOLE_PROPRIETOR: A business that is owned and operated by a single individual/business entity. This use case is intended for sole proprietors who do not fit the low volume use case but still have relatively low messaging needs.
+    GetCampaignRegistrationFeedbackResponse:
+      type: object
+      properties:
+        campaignRegistrationId:
+          type: string
+        campaignId:
+          type: string
+        status:
+          type: string
+        tcrErrorResponse:
+          type: array
+          items:
+            $ref: '#/components/schemas/TcrErrorResponse'
+        internalErrorResponse:
+          type: array
+          items:
+            $ref: '#/components/schemas/InternalErrorResponse'
+    TcrErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        description:
+          type: string
+    QualifyBrandByUseCaseResponse:
+      title: Qualify Brand by Use Case response
+      type: object
+      properties:
+        useCase:
+          type: string
+          description: Desired useCase.
+        monthlyFee:
+          type: number
+          description: Monthly registration fee for campaign. If auto-renew is selected on a campaign, this recurring fee will be charged monthly starting three months after the campaign is submitted.
+          format: float
+        setupFee:
+          type: number
+          description: Initial setup fee, charged immediately once the campaign has been approved by Sinch and submitted to partners.  This fee covers the first three months of campaign use, and will be charged whether or not the autoRenewal parameter is set on the campaign.
+          format: float
+        minSubUseCases:
+          type: number
+          description: Minimum number of sub use-cases required when registering a campaign with the desired use case.
+        maxSubUseCases:
+          type: number
+          description: Maximum number of sub use-cases required when registering a campaign with the desired use case.
+        mnoMetadata:
+          title: Map of Metadata  Map of MNO metadata where key is the 'networkId' of the MNO and value is Metadata of the MNO
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/MnoMetadata'
+    ListCampaignRegistrationResponse:
+      type: object
+      properties:
+        campaignRegistrations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignResponse'
+        nextPageToken:
+          type: string
+        totalSize:
+          type: integer
+          format: int32
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: Our basic security works with any project. Simply use the client_id and client_secret that were displayed when you created your access key through the dashboard in the [Access keys section](https://dashboard.sinch.com/settings/access-keys).
+    OAuth2:
+      type: oauth2
+      description: This is the recommended way to access our APIs in production.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

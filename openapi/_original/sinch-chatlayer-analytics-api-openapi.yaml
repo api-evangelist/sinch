@@ -1,0 +1,2113 @@
+openapi: 3.0.1
+info:
+  title: Chatlayer Analytics API
+  version: 1.0.0
+  contact:
+    name: Support
+    url: www.sinch.com
+    email: support@sinch.com
+externalDocs:
+  description: Learn more
+  url: https://developers.sinch.com/docs/chatlayer-analytics/
+servers:
+  - url: https://analytics.api.chatlayer.ai
+    description: Europe
+  - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+    description: US
+  - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+    description: APAC
+  - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+    description: South America
+security:
+  - basicAuth: []
+paths:
+  /v1/apps/{app_id}/logs/stream:
+    get:
+      tags:
+        - Apps
+      operationId: Analytics_ListAppIntegrationsLogs
+      parameters:
+        - name: app_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: query
+          in: query
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          description: >-
+            The maximum number of logs to return.
+
+            The service may return fewer than this value.
+
+            The maximum value allowed is 100; value above 100 will be coerced to
+            100.
+          schema:
+            type: integer
+            format: int32
+        - name: page_token
+          in: query
+          description: >-
+            A page token, received from a previous
+            ListAppIntegrationsLogsRequest call.
+
+            Provide this to retrieve a subsequent page.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAppIntegrationsLogsResponse'
+  /v1/bots/{bot_id}/conversations:
+    get:
+      tags:
+        - Conversations
+      summary: Get conversation analytics
+      operationId: Analytics_GetConversations
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+        - name: bucket
+          in: query
+          description: |-
+            Time interval in which results will be grouped.
+            Supported values are 1h,1d,1w. The interval should be smaller
+            than the range specified in the  [start_time,end_time)
+          schema:
+            type: string
+        - name: group_by
+          in: query
+          description: Group by a specific category. Can be channel_type or language
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConversationsResponse'
+  /v1/bots/{bot_id}/conversations/insights:
+    get:
+      tags:
+        - Conversations
+      operationId: Analytics_GetConversationsInsights
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+        - name: stat
+          in: query
+          description: >-
+            The stat to return, one of 'num_conversations', 'duration_seconds',
+            'num_messages'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConversationsInsightsResponse'
+  /v1/bots/{bot_id}/conversations/{conversation_id}/flow:
+    get:
+      tags:
+        - Conversations
+      operationId: Analytics_GetConversationFlow
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot
+          required: true
+          schema:
+            type: string
+        - name: conversation_id
+          in: path
+          description: Identifies the conversation
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date of the a range containing the conversation
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The end date of the a range containing the conversation
+          required: true
+          schema:
+            type: string
+        - name: message_id
+          in: query
+          description: >-
+            Identifies a message withing a conversation. Optional.
+
+            When specified only the transitions for the given message will be
+            included
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConversationFlowResponse'
+  /v1/bots/{bot_id}/events/attributes/{attribute_key}/values:
+    post:
+      tags:
+        - Events
+      operationId: Analytics_GetEventAttributeValues
+      parameters:
+        - name: bot_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: attribute_key
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEventAttributeValuesResponse'
+  /v1/bots/{bot_id}/events/definitions:
+    get:
+      tags:
+        - Events
+      operationId: Analytics_ListEventDefinitions
+      parameters:
+        - name: bot_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page_token
+          in: query
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            format: int32
+        - name: team_id
+          in: query
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEventDefinitionsResponse'
+    post:
+      tags:
+        - Events
+      operationId: Analytics_CreateEventDefinition
+      parameters:
+        - name: bot_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                description:
+                  type: string
+                team_id:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateEventDefinitionResponse'
+  /v1/bots/{bot_id}/events/funnel:
+    post:
+      tags:
+        - Events
+      operationId: Analytics_ComputeEventsFunnel
+      parameters:
+        - name: bot_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - end_time
+                - start_time
+                - steps
+                - version
+              type: object
+              properties:
+                version:
+                  type: string
+                start_time:
+                  type: string
+                end_time:
+                  type: string
+                steps:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FunnelStep'
+                breakdown_property:
+                  type: string
+                order_type:
+                  title: one of 'strict' or  'sequential'
+                  type: string
+                  default: sequential
+                properties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FunnelStepFilter'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputeFunnelResponse'
+  /v1/bots/{bot_id}/events/stream:
+    get:
+      tags:
+        - Events
+      operationId: Analytics_ListEvents
+      parameters:
+        - name: bot_id
+          in: path
+          description: The ID of the bot
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: The version of the bot (either DRAFT or LIVE)
+          required: true
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          description: >-
+            The maximum number of events to return.
+
+            The service may return fewer than this value.
+
+            The maximum value allowed is 100; value above 100 will be coerced to
+            100.
+          schema:
+            type: integer
+            format: int32
+        - name: page_token
+          in: query
+          description: |-
+            A page token, received from a previous ListEvent call.
+            Provide this to retrieve a subsequent page.
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the events, inclusive.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the events, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: event
+          in: query
+          description: >-
+            The event name to filter on. When provided, only occurences of that
+            given event will be returned
+          schema:
+            type: string
+        - name: conversation_id
+          in: query
+          description: >-
+            The conversation to filter on. When provided, only events for the
+            given conversation will be returned
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          description: >-
+            The user to filter on. When provided, only events for the given user
+            will be returned
+          schema:
+            type: string
+        - name: campaign_id
+          in: query
+          description: >-
+            The campaign to filter on. When provided, only events for the given
+            campaign will be returned
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEventsResponse'
+    post:
+      tags:
+        - Events
+      operationId: Analytics_ListEventsWithFilters
+      parameters:
+        - name: bot_id
+          in: path
+          description: The ID of the bot
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - end_time
+                - start_time
+                - version
+              type: object
+              properties:
+                version:
+                  title: The version of the bot (either DRAFT or LIVE)
+                  type: string
+                page_size:
+                  type: integer
+                  description: >-
+                    The maximum number of events to return.
+
+                    The service may return fewer than this value.
+
+                    The maximum value allowed is 100; value above 100 will be
+                    coerced to 100.
+                  format: int32
+                page_token:
+                  type: string
+                  description: |-
+                    A page token, received from a previous ListEvent call.
+                    Provide this to retrieve a subsequent page.
+                start_time:
+                  type: string
+                  description: >-
+                    The starting date for the time range of the events,
+                    inclusive.
+                end_time:
+                  type: string
+                  description: The ending date for the time range of the events, exclusive.
+                event:
+                  title: >-
+                    The event name to filter on. When provided, only occurences
+                    of that given event will be returned
+                  type: string
+                conversation_id:
+                  title: >-
+                    The conversation to filter on. When provided, only events
+                    for the given conversation will be returned
+                  type: string
+                user_id:
+                  title: >-
+                    The user to filter on. When provided, only events for the
+                    given user will be returned
+                  type: string
+                campaign_id:
+                  title: >-
+                    The campaign to filter on. When provided, only events for
+                    the given campaign will be returned
+                  type: string
+                filters:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AttributeFilter'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEventsResponse'
+  /v1/bots/{bot_id}/events/track:
+    post:
+      tags:
+        - Events
+      operationId: Analytics_TrackEvent
+      parameters:
+        - name: bot_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                version:
+                  type: string
+                user_id:
+                  type: string
+                event:
+                  type: string
+                attributes:
+                  type: object
+                  additionalProperties:
+                    type: string
+                context:
+                  $ref: '#/components/schemas/TrackEventRequestContext'
+                timestamp:
+                  type: string
+                  format: date-time
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackEventResponse'
+  /v1/bots/{bot_id}/flows:
+    get:
+      tags:
+        - Flows
+      operationId: Analytics_GetFlows
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+        - name: path
+          in: query
+          description: >-
+            Filter by specific path, multiple values with each value specifying
+            the nodes in that path.
+              eg. path[0]=somepath&path[1]=someOtherPath
+               or path=somepath&path=someOtherPath
+          style: form
+          explode: true
+          schema:
+            type: array
+            items:
+              type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFlowsResponse'
+  /v1/bots/{bot_id}/flows/funnel:
+    post:
+      tags:
+        - Flows
+      operationId: Analytics_ComputeFlowFunnel
+      parameters:
+        - name: bot_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - end_time
+                - start_time
+                - steps
+                - version
+              type: object
+              properties:
+                version:
+                  type: string
+                start_time:
+                  type: string
+                end_time:
+                  type: string
+                steps:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FunnelStep'
+                breakdown_property:
+                  type: string
+                order_type:
+                  title: one of 'strict' or  'sequential'
+                  type: string
+                  default: sequential
+                properties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FunnelStepFilter'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputeFunnelResponse'
+  /v1/bots/{bot_id}/flows/{step_id}:
+    get:
+      tags:
+        - Flows
+      operationId: Analytics_GetFlowStepDetails
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: step_id
+          in: path
+          description: Filter by specific step in the flow identified by dialogstate id
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFlowStepDetailsResponse'
+  /v1/bots/{bot_id}/flows/{step_id}/edges:
+    get:
+      tags:
+        - Flows
+      operationId: Analytics_GetFlowStepEdges
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: step_id
+          in: path
+          description: Filter by specific step in the flow identified by dialogstate id
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+        - name: type
+          in: query
+          description: The edge type to return, one of 'sources' or 'targets'
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFlowStepEdgesResponse'
+  /v1/bots/{bot_id}/intents:
+    get:
+      tags:
+        - Intents
+      summary: Get most used intents
+      operationId: Analytics_GetIntents
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+        - name: bucket
+          in: query
+          description: |-
+            Time interval in which results will be grouped.
+            Supported values are 1h,1d,1w. The interval should be smaller
+            than the range specified in the  [start_time,end_time)
+          schema:
+            type: string
+        - name: after
+          in: query
+          description: Pagination cursor
+          schema:
+            type: string
+        - name: before
+          in: query
+          description: Pagination cursor
+          schema:
+            type: string
+        - name: first
+          in: query
+          description: First x items. Used in combination with after
+          schema:
+            type: integer
+            format: int64
+        - name: last
+          in: query
+          description: Last x items. Used in combination with before
+          schema:
+            type: integer
+            format: int64
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIntentsResponse'
+  /v1/bots/{bot_id}/intents/insights:
+    get:
+      tags:
+        - Intents
+      operationId: Analytics_GetIntentInsights
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+        - name: bucket
+          in: query
+          description: |-
+            Time interval in which results will be grouped.
+            Supported values are 1h,1d,1w. The interval should be smaller
+            than the range specified in the  [start_time,end_time)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIntentInsightsResponse'
+  /v1/bots/{bot_id}/knowledge_base:
+    get:
+      tags:
+        - KnowledgeBase
+      operationId: Analytics_GetKnowledgeBaseUsage
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+        - name: bucket
+          in: query
+          description: |-
+            Time interval in which results will be grouped.
+            Supported values are 1h,1d,1w. The interval should be smaller
+            than the range specified in the  [start_time,end_time)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetKnowledgeBaseResponse'
+  /v1/bots/{bot_id}/knowledge_base/tags:
+    get:
+      tags:
+        - KnowledgeBase
+      operationId: Analytics_GetKnowledgeBaseTagsInsights
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetKnowledgeBaseTagsInsightsResponse'
+  /v1/bots/{bot_id}/messages:
+    get:
+      tags:
+        - Messages
+      summary: Get message analytics
+      operationId: Analytics_GetMessages
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channel.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific language.
+          schema:
+            type: string
+        - name: bucket
+          in: query
+          description: |-
+            Time interval in which results will be grouped.
+            Supported values are 1h, 1d, 1w. The interval should be smaller
+            than the range specified in the  [start_time,end_time).
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetMessagesResponse'
+  /v1/bots/{bot_id}/subscriptions:
+    get:
+      tags:
+        - Subscriptions
+      operationId: Analytics_ListSubscriptions
+      parameters:
+        - name: bot_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: page_token
+          in: query
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSubscriptionsResponse'
+    post:
+      tags:
+        - Subscriptions
+      operationId: Analytics_CreateSubscription
+      parameters:
+        - name: bot_id
+          in: path
+          description: the id of the bot
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bot_version:
+                  title: the version of the bot
+                  type: string
+                  example: LIVE
+                target:
+                  title: the target url to which the request will be sent
+                  type: string
+                  example: https://httpbin.org/post
+                secret:
+                  title: the secret with which the request will be signed
+                  type: string
+                event_type:
+                  type: string
+                  description: >-
+                    The event type you want to be notified about. One of
+                    TRACKING_EVENT, FLOW_EVENT or MESSAGE_EVENT
+                  example: TRACKING_EVENT
+                event_names:
+                  title: >-
+                    when specified only the events with the given name will be
+                    sent
+
+                    only valid for TRACKING_EVENTS for now
+                  type: array
+                  items:
+                    type: string
+                version:
+                  title: |-
+                    identifies the definition of the subscription type to use.
+                    currently only the value "v1" is allowed
+                  type: string
+                  example: v1
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSubscriptionResponse'
+  /v1/bots/{bot_id}/subscriptions/{subscription_id}:
+    delete:
+      tags:
+        - Subscriptions
+      operationId: Analytics_DeleteSubscription
+      parameters:
+        - name: bot_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: subscription_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+  /v1/bots/{bot_id}/users:
+    get:
+      tags:
+        - Users
+      summary: Get user analytics
+      operationId: Analytics_GetUsers
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+        - name: bucket
+          in: query
+          description: |-
+            Time interval in which results will be grouped.
+            Supported values are 1h,1d,1w. The interval should be smaller
+            than the range specified in the  [start_time,end_time)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUsersResponse'
+  /v1/bots/{bot_id}/users/activity:
+    get:
+      tags:
+        - Users
+      summary: Get user activity by day of week and time of day
+      operationId: Analytics_GetUserActivity
+      parameters:
+        - name: bot_id
+          in: path
+          description: Identifies the bot.
+          required: true
+          schema:
+            type: string
+        - name: version
+          in: query
+          description: Identifies the bot version.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserActivityResponse'
+  /v1/echo:
+    post:
+      tags:
+        - Analytics
+      summary: Check connectivity
+      operationId: Analytics_Echo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EchoRequest'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EchoResponse'
+  /v1/teams/{team_id}/conversations:
+    get:
+      tags:
+        - Conversations
+      operationId: Analytics_GetTeamConversationsUsage
+      parameters:
+        - name: team_id
+          in: path
+          description: Identifies the team.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: bucket
+          in: query
+          description: |-
+            Time interval in which results will be grouped.
+            Supported values are 1d, 1w, 1m. The interval should be smaller
+            than the range specified in the  [start_time,end_time).
+          required: true
+          schema:
+            type: string
+        - name: group_by
+          in: query
+          description: >-
+            Group data by field, comma separated. Can be any of [bot_id,
+            bot_version, team_id, channel_type, language, campaign_id,
+            campaign_source]
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTeamUsageResponse'
+  /v1/teams/{team_id}/events:
+    get:
+      tags:
+        - Events
+      operationId: Analytics_GetTeamEvents
+      parameters:
+        - name: team_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: user_id
+          in: query
+          description: The id of the customer
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          description: >-
+            The maximum number of events to return.
+
+            The service may return fewer than this value.
+
+            The maximum value allowed is 100; value above 100 will be coerced to
+            100.
+          schema:
+            type: integer
+            format: int32
+        - name: page_token
+          in: query
+          description: |-
+            A page token, received from a previous ListEvent call.
+            Provide this to retrieve a subsequent page.
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the events, inclusive.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the events, exclusive.
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTeamEventsResponse'
+  /v1/teams/{team_id}/events/definitions:
+    get:
+      tags:
+        - Events
+      operationId: Analytics_ListTeamEventDefinitions
+      parameters:
+        - name: team_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: bot_id
+          in: query
+          schema:
+            type: string
+        - name: page_token
+          in: query
+          schema:
+            type: string
+        - name: page_size
+          in: query
+          schema:
+            type: integer
+            format: int32
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEventDefinitionsResponse'
+  /v1/teams/{team_id}/knowledge_base:
+    get:
+      tags:
+        - KnowledgeBase
+      operationId: Analytics_GetTeamKnowledgeBaseUsage
+      parameters:
+        - name: team_id
+          in: path
+          description: Identifies the team.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: bucket
+          in: query
+          description: |-
+            Time interval in which results will be grouped.
+            Supported values are 1d, 1w, 1m. The interval should be smaller
+            than the range specified in the  [start_time,end_time).
+          required: true
+          schema:
+            type: string
+        - name: channel_type
+          in: query
+          description: Filter by specific channels, multiple values separated by comma.
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTeamKnowledgeBaseResponse'
+  /v1/teams/{team_id}/voice_minutes:
+    get:
+      tags:
+        - Voice
+      operationId: Analytics_GetVoiceAnalytics
+      parameters:
+        - name: team_id
+          in: path
+          description: Identifies the team.
+          required: true
+          schema:
+            type: string
+        - name: start_time
+          in: query
+          description: The starting date for the time range of the data series.
+          required: true
+          schema:
+            type: string
+        - name: end_time
+          in: query
+          description: The ending date for the time range of the data series, exclusive.
+          required: true
+          schema:
+            type: string
+        - name: language
+          in: query
+          description: Filter by specific languages, multiple values separated by comma.
+          schema:
+            type: string
+        - name: bucket
+          in: query
+          description: |-
+            Time interval in which results will be grouped.
+            Supported values are 1h,1d,1w. The interval should be smaller
+            than the range specified in the  [start_time,end_time)
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetVoiceAnalyticsResponse'
+components:
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: >-
+        Generate your access token on the [Chatlayer
+        platform](https://app.chatlayer.ai/settings/api-access/tokens).
+  schemas:
+    AttributeFilter:
+      type: object
+      properties:
+        key:
+          type: string
+        operator:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
+    CampaignInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+        medium:
+          type: string
+        name:
+          type: string
+        content:
+          type: string
+        term:
+          type: string
+    ComputeFunnelResponse:
+      type: object
+      properties:
+        result:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStepResultByCohort'
+    CreateEventDefinitionResponse:
+      type: object
+      properties:
+        event_definition:
+          $ref: '#/components/schemas/EventDefinition'
+    CreateSubscriptionResponse:
+      type: object
+      properties:
+        subscription:
+          $ref: '#/components/schemas/Subscription'
+    EchoRequest:
+      required:
+        - message
+      type: object
+      properties:
+        message:
+          title: The message to echo back
+          type: string
+    EchoResponse:
+      type: object
+      properties:
+        message:
+          title: The echoed message
+          type: string
+    Edge:
+      type: object
+      properties:
+        count:
+          title: Total number of times this edge was traversed
+          type: integer
+          format: int64
+        id:
+          title: The id of the destination/source step (Deprecated)
+          type: string
+        type:
+          title: The type of the destination/source step (Deprecated)
+          type: string
+        from_step:
+          $ref: '#/components/schemas/Step'
+        to_step:
+          $ref: '#/components/schemas/Step'
+    EventDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+        team_id:
+          type: string
+        bot_id:
+          type: string
+        event:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        last_seen_at:
+          type: string
+          format: date-time
+        volume_30_day:
+          type: integer
+          format: int32
+    FlowStep:
+      type: object
+      properties:
+        occurrences:
+          type: integer
+          description: The number of times this flow step occurred.
+          format: int64
+        id:
+          type: string
+          description: >-
+            Identifies a bot dialog or a dropoff if the special value "DROPOFF
+            is used.
+    FlowTransition:
+      type: object
+      properties:
+        id:
+          type: string
+        from_step:
+          $ref: '#/components/schemas/Step'
+        to_step:
+          $ref: '#/components/schemas/Step'
+        depth:
+          type: integer
+          format: int64
+        timestamp:
+          type: string
+          format: date-time
+    FunnelStep:
+      type: object
+      properties:
+        order:
+          type: integer
+          format: int32
+        event_id:
+          type: string
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStepFilter'
+    FunnelStepFilter:
+      type: object
+      properties:
+        key:
+          type: string
+        operator:
+          type: string
+        type:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
+    FunnelStepResult:
+      type: object
+      properties:
+        event_id:
+          type: string
+        count:
+          type: integer
+          format: int32
+        order:
+          type: integer
+          format: int64
+        breakdown_value:
+          type: string
+    FunnelStepResultByCohort:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStepResult'
+    GetConversationFlowResponse:
+      type: object
+      properties:
+        bot_id:
+          type: string
+        conversation_id:
+          type: string
+        user_id:
+          type: string
+        transitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowTransition'
+    GetConversationsInsightsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetConversationsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetEventAttributeValuesResponse:
+      type: object
+      properties:
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingEventAttribute'
+    GetFlowStepDetailsResponse:
+      type: object
+      properties:
+        message_count:
+          title: Total number of times the specified step was invoked
+          type: integer
+          format: int64
+        drop_off_count:
+          title: Number of dropoffs from the specified step
+          type: integer
+          format: int64
+        conversation_count:
+          title: Number of conversations which includes the specified step
+          type: integer
+          format: int64
+    GetFlowStepEdgesResponse:
+      type: object
+      properties:
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Edge'
+    GetFlowsResponse:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowStep'
+    GetIntentInsightsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetIntentsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IntentInfo'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    GetKnowledgeBaseResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetKnowledgeBaseTagsInsightsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/KnowledgeBaseTagInsight'
+    GetMessagesResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetTeamEventsResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingEvent'
+        next_page_token:
+          type: string
+    GetTeamKnowledgeBaseResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetTeamUsageResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetUserActivityResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetUsersResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetVoiceAnalyticsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    IntentInfo:
+      type: object
+      properties:
+        intent_id:
+          title: Id of the intent. This is also the name of the intent
+          type: string
+        count:
+          title: Total count of these intents
+          type: integer
+          format: int32
+        rank:
+          title: Ordering position for this intent. Starts at 1
+          type: integer
+          format: int32
+    KnowledgeBaseTagInsight:
+      type: object
+      properties:
+        tag:
+          title: Name of the tag
+          type: string
+        count:
+          title: Total count of these tags
+          type: integer
+          format: int32
+        rank:
+          title: Ordering position for this tag. Starts at 1
+          type: integer
+          format: int32
+    ListAppIntegrationsLog:
+      type: object
+      properties:
+        id:
+          type: string
+        app_id:
+          type: string
+        app_version:
+          type: string
+        platform_version:
+          type: string
+        log_message:
+          type: string
+        log_type:
+          type: string
+        severity_level:
+          type: integer
+          format: int32
+        timestamp:
+          type: string
+          format: date-time
+        log_attributes:
+          type: object
+          additionalProperties:
+            type: string
+        resource_attributes:
+          type: object
+          additionalProperties:
+            type: string
+        event_method:
+          type: string
+        event_command:
+          type: string
+    ListAppIntegrationsLogsResponse:
+      type: object
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListAppIntegrationsLog'
+        next_page_token:
+          type: string
+    ListEventDefinitionsResponse:
+      type: object
+      properties:
+        event_definitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventDefinition'
+        next_page_token:
+          type: string
+    ListEventsResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingEvent'
+        next_page_token:
+          type: string
+    ListSubscriptionsResponse:
+      type: object
+      properties:
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+        next_page_token:
+          type: string
+    Pagination:
+      type: object
+      properties:
+        start_cursor:
+          title: Starting cursor for the returned dataset
+          type: string
+        end_cursor:
+          title: Ending cursor for the returned dataset
+          type: string
+        has_more:
+          title: >-
+            Defines if there is more data. This means more data after the
+            dataset when using after, or more data before the dataset when using
+            before
+          type: boolean
+    Serie:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            type: integer
+            format: int32
+        mean:
+          type: integer
+          description: The mean value.
+          format: int32
+        max:
+          type: integer
+          description: The max value.
+          format: int32
+        min:
+          type: integer
+          description: The min value.
+          format: int32
+        sum:
+          type: integer
+          description: The sum of all values.
+          format: int32
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+    SeriesData:
+      type: object
+      properties:
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/Serie'
+        series_labels:
+          type: array
+          items:
+            type: string
+        x_values:
+          type: array
+          items:
+            type: string
+    Step:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+    Subscription:
+      type: object
+      properties:
+        id:
+          title: identifies the subscription
+          type: string
+        bot_id:
+          title: identifies the bot
+          type: string
+        bot_version:
+          type: string
+        target:
+          title: the destination url where the events will be sent to
+          type: string
+        event_type:
+          title: the event type you want to be notified about
+          type: string
+        event_names:
+          title: |-
+            when specified only the events with the given name will be sent
+            only valid for TRACKING_EVENTS for now
+          type: array
+          items:
+            type: string
+        created_at:
+          title: the time when the subscription was created
+          type: string
+          format: date-time
+        version:
+          title: |-
+            identifies the definition of the subscription payload to use
+            currently only the value "v1" is allowed
+          type: string
+        status:
+          type: string
+    TrackEventRequestContext:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        campaign:
+          $ref: '#/components/schemas/CampaignInfo'
+    TrackEventResponse:
+      type: object
+      properties:
+        event_id:
+          type: string
+    TrackingEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        event:
+          type: string
+        bot_id:
+          type: string
+        version:
+          type: string
+        user_id:
+          type: string
+        channel_id:
+          type: string
+        channel_type:
+          type: string
+        conversation_id:
+          type: string
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+        timestamp:
+          type: string
+          format: date-time
+    TrackingEventAttribute:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+x-original-swagger-version: '2.0'

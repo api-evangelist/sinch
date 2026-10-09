@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-registration-schema.json",
+  "title": "Registration",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-numbers-api-openapi.yml#/components/schemas/Registration",
+  "type": "object",
+  "properties": {
+    "requestDetails": {
+      "type": "object",
+      "additionalProperties": true,
+      "description": "Free-form JSON object representing registration data."
+    },
+    "attachments": {
+      "type": "array",
+      "description": "The attachments submitted for this registration, via the dedicated endpoint",
+      "items": {
+        "$ref": "#/$defs/Attachment"
+      }
+    },
+    "logs": {
+      "type": "array",
+      "description": "A list of timestamped messages from our team with feedback regarding your submitted registration details, in ascending timestamp order",
+      "items": {
+        "$ref": "#/$defs/RegistrationLog"
+      }
+    }
+  },
+  "$defs": {
+    "Attachment": {
+      "type": "object",
+      "properties": {
+        "attachmentId": {
+          "type": "string"
+        },
+        "fileName": {
+          "type": "string"
+        },
+        "mimeType": {
+          "type": "string"
+        },
+        "createTime": {
+          "type": "string",
+          "description": "Timestamp string (RFC3339).",
+          "format": "date-time"
+        },
+        "updateTime": {
+          "type": "string",
+          "description": "Timestamp string (RFC3339).",
+          "format": "date-time"
+        },
+        "uploadStatus": {
+          "$ref": "#/$defs/UploadStatus"
+        },
+        "documentType": {
+          "type": "string"
+        }
+      }
+    },
+    "RegistrationLog": {
+      "type": "object",
+      "properties": {
+        "message": {
+          "type": "string",
+          "description": "The feedback / message from our team"
+        },
+        "createTime": {
+          "type": "string",
+          "description": "Timestamp string (RFC3339). Indicates the date & time when the message was created.",
+          "format": "date-time"
+        }
+      }
+    },
+    "UploadStatus": {
+      "default": "WAITING",
+      "description": "The attachment upload status. It will be either `COMPLETED`, `WAITING` or `FAILED`.",
+      "enum": [
+        "COMPLETED",
+        "WAITING",
+        "FAILED"
+      ],
+      "x-enumDescriptions": {
+        "WAITING": "Waiting for upload",
+        "COMPLETED": "Upload completed",
+        "FAILED": "Upload failed"
+      },
+      "title": "Upload Status"
+    }
+  }
+}

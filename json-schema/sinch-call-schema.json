@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-call-schema.json",
+  "title": "Call",
+  "description": "The call resource represents an inbound or outbound connection between Sinch and a supported device",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-elastic-sip-trunking-api-openapi.yml#/components/schemas/Call",
+  "type": "object",
+  "properties": {
+    "callId": {
+      "type": "string",
+      "description": "The unique identifier of the call.",
+      "format": "ULID"
+    },
+    "to": {
+      "x-version": 1,
+      "x-PII": true,
+      "type": "string",
+      "description": "For `INBOUND` calls, this is the Sinch number the phone dialed.\nFor `OUTBOUND` calls, this is the phone number you want to make a call to.\nFormatted according e164 format."
+    },
+    "from": {
+      "x-version": 1,
+      "x-PII": true,
+      "x-v1": "breaking",
+      "type": "string",
+      "x-mvp-description": "The call's origination, formatted according to the call's `callType`. For calls to the telephone network, this is a phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format, including the leading `+`.\n<b>Note:</b> If you do not include the `from` property, the call is made from the number or identifier configured as the default for your application or service.",
+      "description": "For `INBOUND` calls, this is the number of the person calling. When making an outbound call set this to the your Sinch number you want to show up as Caller Id.\nThe call's origination, formatted according to the call's `callType`. For calls in the telephone network,\nthis is a phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format, including the leading `+`.",
+      "format": "phoneNumber"
+    },
+    "direction": {
+      "x-version": 1,
+      "type": "string",
+      "enum": [
+        "INBOUND",
+        "OUTBOUND"
+      ],
+      "readOnly": true,
+      "x-PII": false,
+      "x-v1": false,
+      "description": "Describes whether the call was `INBOUND` *to* your Sinch number or was `OUTBOUND` and made *from* your Sinch number.",
+      "x-enumDescriptions": {
+        "INBOUND": "Someone called your Sinch number.",
+        "OUTBOUND": "Someone called from your SIP device."
+      }
+    },
+    "answerTime": {
+      "x-version": 1,
+      "readOnly": true,
+      "x-PII": false,
+      "x-V1": "breaking",
+      "type": "string",
+      "format": "date-time",
+      "description": "Time when call was answered"
+    },
+    "endTime": {
+      "x-version": 1,
+      "readOnly": true,
+      "type": "string",
+      "format": "date-time",
+      "x-PII": false,
+      "x-V1": "breaking",
+      "description": "The time the call ended"
+    },
+    "durationSeconds": {
+      "x-version": 1,
+      "x-PII": false,
+      "x-V1": "breaking",
+      "description": "The duration of the call in seconds. For inbound calls, this is the time from when the call started until the call ended. For outbound calls, this is the time from when the call was answered until the call ended.",
+      "readOnly": true,
+      "type": "integer"
+    },
+    "callResult": {
+      "$ref": "#/$defs/CallResult"
+    },
+    "pricePerMinute": {
+      "description": "The price per minute for this call.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/Money"
+        }
+      ],
+      "readOnly": true
+    },
+    "billingDurationSeconds": {
+      "x-version": 1,
+      "readOnly": true,
+      "description": "The duration of the call adjusted with the billing period.",
+      "type": "integer"
+    },
+    "price": {
+      "x-version": 1,
+      "description": "The total price for this call. This field is populated when the call ends.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/Money"
+        }
+      ],
+      "readOnly": true
+    },
+    "createTime": {
+      "x-version": 1,
+      "readOnly": true,
+      "x-PII": false,
+      "x-v1": true,
+      "type": "string",
+      "format": "date-time",
+      "description": "The time the call was created."
+    },
+    "projectId": {
+      "x-version": 1,
+      "type": "string",
+      "description": "The ID of the project that the call belongs to."
+    },
+    "trunkId": {
+      "x-version": 1,
+      "type": "string",
+      "description": "The ID of the trunk that the call was made through."
+    },
+    "pcapId": {
+      "type": "string",
+      "description": "The ID of the PCAP that can be retrieved. PCAPs are only stored for 10 days."
+    }
+  },
+  "$defs": {
+    "CallResult": {
+      "description": "The result of the call.",
+      "readOnly": true,
+      "type": "string",
+      "enum": [
+        "COMPLETED",
+        "NO_ANSWER",
+        "CANCEL",
+        "BUSY",
+        "FAILED"
+      ],
+      "x-enumDescriptions": {
+        "COMPLETED": "The call was completed successfully.",
+        "NO_ANSWER": "The call timeout before the recipient answered.",
+        "CANCEL": "The call was canceled.",
+        "BUSY": "The recipient was busy.",
+        "FAILED": "The call failed."
+      }
+    },
+    "Money": {
+      "type": "object",
+      "readOnly": true,
+      "properties": {
+        "currencyCode": {
+          "readOnly": true,
+          "description": "The 3-letter currency code defined in ISO 4217.",
+          "type": "string"
+        },
+        "amount": {
+          "readOnly": true,
+          "description": "The amount with 4 decimals and decimal delimiter `.`.",
+          "type": "string"
+        }
+      }
+    }
+  }
+}

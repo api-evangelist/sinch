@@ -1,0 +1,3756 @@
+openapi: 3.2.0
+info:
+  title: Sinch Conversation API
+  version: '1.0'
+  description: 'Operations tagged Conversation across 2 of this provider''s published API definitions: sinch-conversation-api-openapi.yaml, sinch-provisioning-api-openapi.yaml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://{region}.conversation.api.sinch.com
+  variables:
+    region:
+      default: us
+      enum:
+      - us
+      - eu
+      - br
+  description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+- url: https://provisioning.api.sinch.com
+  description: Production server
+tags:
+- description: Endpoints for working with the conversation log.
+  name: Conversation
+  x-displayName: Conversations
+paths:
+  /v1/projects/{project_id}/conversations:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    get:
+      description: This operation lists all conversations that are associated with an app and/or a contact. Note that either `app_id` or `contact_id` is required in order for the operation to function correctly.
+      tags:
+      - Conversation
+      summary: List conversations
+      operationId: Conversation_ListConversations
+      parameters:
+      - $ref: '#/components/parameters/query_app_id'
+      - $ref: '#/components/parameters/query_contact_id'
+      - description: Set to `true` to list only active conversations. Set to `false` to list only inactive conversations.
+        name: only_active
+        in: query
+        schema:
+          type: boolean
+      - description: The maximum number of conversations to fetch. Defaults to 10 and the maximum is 20.
+        name: page_size
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - description: Next page token previously returned if any.
+        name: page_token
+        in: query
+        schema:
+          type: string
+      - description: Only fetch conversations from the `active_channel`
+        name: active_channel
+        in: query
+        schema:
+          $ref: '#/components/schemas/ConversationChannel'
+      responses:
+        '200':
+          $ref: '#/components/responses/listConversationsResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.conversations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConversationsService;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.request.ConversationsListQueryParameters;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.response.ConversationsListResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class List {\n\n  private static final Logger LOGGER = Logger.getLogger(List.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the application to list conversations for\n    String conversationApplicationId = \"APPLICATION_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConversationsService conversationsService = client.conversation().v1().conversations();\n\n    LOGGER.info(\n        String.format(\n            \"List conversations for application with ID '%s'\", conversationApplicationId));\n\n    ConversationsListQueryParameters request =\n        ConversationsListQueryParameters.builder().setAppId(conversationApplicationId).build();\n\n    ConversationsListResponse response = conversationsService.list(request);\n\n    LOGGER.info(\"Response:\");\n\n    response.iterator().forEachRemaining(f -> LOGGER.info(f.toString()));\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation App to list Conversations from\n  const appId = 'CONVERSATION_APP_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.conversation.list({\n      app_id: appId,\n    });\n    if (response.data.length === 0) {\n      console.log('No Conversations found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Conversations.`);\n    response.data.forEach((conversation) => {\n      console.log(conversation);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list the Conversations:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    post:
+      description: 'Creates a new empty conversation. In Conversation mode, it is generally not needed to create
+
+        a conversation explicitly since sending or receiving a message
+
+        automatically creates a new conversation if it does not already
+
+        exist between the given app and contact.
+
+        Creating empty conversation is useful if the metadata of the conversation
+
+        should be populated when the first message in the conversation is a contact message
+
+        or the first message in the conversation comes out-of-band and
+
+        needs to be injected with InjectMessage endpoint.'
+      tags:
+      - Conversation
+      summary: Create a conversation
+      operationId: Conversation_CreateConversation
+      requestBody:
+        $ref: '#/components/requestBodies/CreateConversationRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/createConversationResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.conversations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConversationsService;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.Conversation;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.request.CreateConversationRequest;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Create {\n\n  private static final Logger LOGGER = Logger.getLogger(Create.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the application to create the conversation in\n    String conversationApplicationId = \"APPLICATION_ID\";\n    // The ID of the contact to create the conversation with\n    String conversationContactId = \"CONTACT_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConversationsService conversationsService = client.conversation().v1().conversations();\n\n    CreateConversationRequest request =\n        CreateConversationRequest.builder()\n            .setAppId(conversationApplicationId)\n            .setContactId(conversationContactId)\n            .build();\n\n    LOGGER.info(\n        String.format(\n            \"Create conversation for application with ID '%s'\", conversationApplicationId));\n\n    Conversation response = conversationsService.create(request);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation App to create the Conversation in\n  const appId = 'CONVERSATION_APP_ID';\n  // The ID of the Contact to create the Conversation with\n  const contactId = 'CONTACT_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.conversation.create({\n      createConversationRequestBody: {\n        app_id: appId,\n        contact_id: contactId,\n      },\n    });\n    console.log('✅ Successfully created the Conversation.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to create the Conversation in the App ${appId} with Contact ${contactId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+  /v1/projects/{project_id}/conversations/{conversation_id}:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    - $ref: '#/components/parameters/conversation_id'
+    get:
+      description: 'Retrieves a conversation by id. A conversation has two participating
+
+        entities, an app and a contact.'
+      tags:
+      - Conversation
+      summary: Get a conversation
+      operationId: Conversation_GetConversation
+      responses:
+        '200':
+          $ref: '#/components/responses/getConversationResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.conversations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConversationsService;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.Conversation;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Get {\n\n  private static final Logger LOGGER = Logger.getLogger(Get.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the conversation to retrieve\n    String conversationId = \"CONVERSATION_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConversationsService conversationsService = client.conversation().v1().conversations();\n\n    LOGGER.info(String.format(\"Get information for conversation with ID '%s'\", conversationId));\n\n    Conversation response = conversationsService.get(conversationId);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation to retrieve\n  const conversationId = 'CONVERSATION_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.conversation.get({\n      conversation_id: conversationId,\n    });\n    console.log('✅ Successfully retrieved the Conversation.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the Conversation with ID ${conversationId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    delete:
+      description: Deletes a conversation together with all the messages sent as part of the conversation.
+      tags:
+      - Conversation
+      summary: Delete a conversation
+      operationId: Conversation_DeleteConversation
+      responses:
+        '200':
+          description: A successful response.
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.conversations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConversationsService;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Delete {\n\n  private static final Logger LOGGER = Logger.getLogger(Delete.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the conversation to delete\n    String conversationId = \"CONVERSATION_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConversationsService conversationsService = client.conversation().v1().conversations();\n\n    LOGGER.info(String.format(\"Delete conversation with ID '%s'\", conversationId));\n\n    conversationsService.delete(conversationId);\n\n    LOGGER.info(\"Done\");\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation to delete\n  const conversationId = 'CONVERSATION_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    await sinch.conversation.conversation.delete({\n      conversation_id: conversationId,\n    });\n    console.log(`✅ Successfully deleted the Conversation with ID ${conversationId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete the Conversation with ID ${conversationId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    patch:
+      description: 'This operation updates a conversation which can, for instance, be used to
+
+        update the metadata associated with a conversation.'
+      tags:
+      - Conversation
+      summary: Update a conversation
+      operationId: Conversation_UpdateConversation
+      parameters:
+      - $ref: '#/components/parameters/update_mask'
+      - description: Update strategy for the `conversation_metadata` field.
+        name: metadata_update_strategy
+        in: query
+        schema:
+          $ref: '#/components/schemas/MetadataUpdateStrategy'
+        required: false
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateConversationRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/getConversationResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.conversations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConversationsService;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.Conversation;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.request.ConversationsUpdateQueryParameters;\nimport com.sinch.sdk.domains.conversation.models.v1.request.MetadataUpdateStrategy;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Update {\n\n  private static final Logger LOGGER = Logger.getLogger(Update.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the conversation to update\n    String conversationId = \"CONVERSATION_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConversationsService conversationsService = client.conversation().v1().conversations();\n\n    ConversationsUpdateQueryParameters request =\n        ConversationsUpdateQueryParameters.builder()\n            .setMetadataUpdateStrategy(MetadataUpdateStrategy.REPLACE)\n            .build();\n\n    Conversation conversation = Conversation.builder().setActive(true).build();\n\n    LOGGER.info(String.format(\"Update conversation with ID '%s'\", conversationId));\n\n    Conversation result = conversationsService.update(conversationId, request, conversation);\n\n    LOGGER.info(\"Response: \" + result);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation to update\n  const conversationId = 'CONVERSATION_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.conversation.update({\n      conversation_id: conversationId,\n      updateConversationRequestBody: {\n        active: true,\n      },\n    });\n    console.log('✅ Successfully updated the Conversation.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to update the Conversation with ID ${conversationId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+  /v1/projects/{project_id}/conversations:recent:
+    get:
+      description: 'This operation lists conversations and their most recent message, ordered by when the most
+
+        recent message was sent for that conversation.'
+      tags:
+      - Conversation
+      summary: List recent conversations
+      operationId: Conversation_ListRecentConversations
+      parameters:
+      - $ref: '#/components/parameters/project_id'
+      - name: app_id
+        description: The application ID
+        required: true
+        in: query
+        schema:
+          type: string
+      - name: only_active
+        description: True if only active conversations should be listed. Default is false.
+        in: query
+        schema:
+          type: boolean
+      - name: page_size
+        description: 'The maximum number of conversations to fetch.
+
+          Defaults to 10 and the maximum value is 50.'
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: page_token
+        description: 'Next page token previously returned if any. When specifying this token, make sure to use the same values
+
+          for the other parameters from the request that originated the token, otherwise the paged results may be inconsistent.'
+        in: query
+        schema:
+          type: string
+      - name: order
+        in: query
+        description: Whether to sort conversations by newest message first or oldest. Default is DESC (newest first)
+        required: false
+        schema:
+          type: string
+          x-enumDescriptions:
+            DESC: Descending order. Newest first.
+            ASC: Ascending order. Oldest first.
+          enum:
+          - ASC
+          - DESC
+      responses:
+        '200':
+          $ref: '#/components/responses/listRecentConversationResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.conversations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConversationsService;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.request.RecentConversationsListQueryParameters;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.response.RecentConversationsListResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class ListRecent {\n\n  private static final Logger LOGGER = Logger.getLogger(ListRecent.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the application to list recent conversations for\n    String conversationApplicationId = \"APPLICATION_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConversationsService conversationsService = client.conversation().v1().conversations();\n\n    LOGGER.info(\n        String.format(\n            \"List recent conversations for application with ID '%s'\", conversationApplicationId));\n\n    RecentConversationsListQueryParameters request =\n        RecentConversationsListQueryParameters.builder()\n            .setOnlyActive(false)\n            .setAppId(conversationApplicationId)\n            .build();\n\n    RecentConversationsListResponse response = conversationsService.listRecent(request);\n\n    LOGGER.info(\"Response:\");\n\n    response.iterator().forEachRemaining(f -> LOGGER.info(f.toString()));\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation App to list Recent Conversations from\n  const appId = 'CONVERSATION_APP_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.conversation.listRecent({\n      app_id: appId,\n      only_active: true,\n    });\n    if (response.data.length === 0) {\n      console.log('No Recent Conversations found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Recent Conversations.`);\n    response.data.forEach((recentConversation) => {\n      console.log(recentConversation);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list the Recent Conversations:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+  /v1/projects/{project_id}/conversations/{conversation_id}:inject-event:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    - $ref: '#/components/parameters/conversation_id'
+    post:
+      summary: Inject an event
+      description: This operation injects a conversation event in to a specific conversation. It only supports injecting App events in `CONVERSATION` mode.
+      tags:
+      - Conversation
+      operationId: Events_InjectEvent
+      requestBody:
+        $ref: '#/components/requestBodies/InjectEventRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/injectEventResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.conversations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConversationsService;\nimport com.sinch.sdk.domains.conversation.models.v1.ChannelIdentity;\nimport com.sinch.sdk.domains.conversation.models.v1.ConversationChannel;\nimport com.sinch.sdk.domains.conversation.models.v1.ProcessingMode;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.request.InjectEventRequest;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.response.InjectEventResponse;\nimport com.sinch.sdk.domains.conversation.models.v1.events.AppEvent;\nimport com.sinch.sdk.domains.conversation.models.v1.events.types.GenericEvent;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.time.Instant;\nimport java.util.HashMap;\nimport java.util.Map;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class InjectEvent {\n\n  private static final Logger LOGGER = Logger.getLogger(InjectEvent.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the conversation to inject the event into\n    String conversationId = \"CONVERSATION_ID\";\n    // The channel to use for the recipient\n    ConversationChannel recipientChannel = ConversationChannel.SMS;\n    // The identity of the recipient (e.g. phone number for SMS)\n    String recipientPhoneNumber = \"RECIPIENT_PHONE_NUMBER\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConversationsService conversationsService = client.conversation().v1().conversations();\n\n    Map<String, String> map = new HashMap<>();\n    map.put(\"a property key\", \"a property value\");\n\n    AppEvent event = GenericEvent.builder().setPayload(map).build();\n\n    InjectEventRequest request =\n        InjectEventRequest.builder()\n            .setAcceptTime(Instant.now())\n            .setAppEvent(event)\n            .setChannelIdentity(\n                ChannelIdentity.builder()\n                    .setChannel(recipientChannel)\n                    .setIdentity(recipientPhoneNumber)\n                    .build())\n            .setConversationId(conversationId)\n            .setProcessingMode(ProcessingMode.CONVERSATION)\n            .build();\n\n    LOGGER.info(\"Inject event request: \" + request);\n\n    InjectEventResponse response = conversationsService.injectEvent(conversationId, request);\n\n    LOGGER.info(\"Inject event response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation to inject an event to\n  const conversationId = 'CONVERSATION_ID';\n  // The phone number of the recipient to inject an event to\n  const recipientPhoneNumber = 'RECIPIENT_PHONE_NUMBER';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.conversation.injectEvent({\n      conversation_id: conversationId,\n      injectConversationEventRequestBody: {\n        accept_time: new Date(),\n        app_event: {\n          generic_event: {\n            payload: {\n              'a_property_key': 'a property value',\n            },\n          },\n        },\n        channel_identity: {\n          channel: 'RCS',\n          identity: recipientPhoneNumber,\n        },\n        conversation_id: conversationId,\n        processing_mode: 'CONVERSATION',\n      },\n    });\n    console.log('✅ Successfully injected the Event.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to inject an Event in the conversation ${conversationId} for recipient ${recipientPhoneNumber}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+  /v1/projects/{project_id}/conversations/{conversation_id}:stop:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    - $ref: '#/components/parameters/conversation_id'
+    post:
+      description: 'This operation stops the referenced conversation, if the conversation is still active.
+
+        In Conversation mode, a new conversation will be created if a new message is exchanged between the app or contact
+
+        that was part of the stopped conversation.'
+      tags:
+      - Conversation
+      summary: Stop conversation
+      operationId: Conversation_StopActiveConversation
+      responses:
+        '200':
+          description: A successful response.
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.conversations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConversationsService;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class StopActive {\n\n  private static final Logger LOGGER = Logger.getLogger(StopActive.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the conversation to stop\n    String conversationId = \"CONVERSATION_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConversationsService conversationsService = client.conversation().v1().conversations();\n\n    LOGGER.info(String.format(\"Stop conversation with ID '%s'\", conversationId));\n\n    conversationsService.stopActive(conversationId);\n\n    LOGGER.info(\"Done\");\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation to stop\n  const conversationId = 'CONVERSATION_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    await sinch.conversation.conversation.stopActive({\n      conversation_id: conversationId,\n    });\n    console.log(`✅ Successfully stopped the conversation with Id ${conversationId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to stop the conversation with ID ${conversationId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+  /v1/projects/{project_id}/conversations/{conversation_id}:inject-message:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    - description: The ID of the conversation.
+      name: conversation_id
+      in: path
+      required: true
+      schema:
+        type: string
+    post:
+      description: This operation injects a conversation message in to a specific conversation.
+      tags:
+      - Conversation
+      summary: Inject a message
+      operationId: Conversation_InjectMessage
+      requestBody:
+        $ref: '#/components/requestBodies/InjectMessageRequest'
+      responses:
+        '200':
+          description: A successful response.
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.conversations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConversationsService;\nimport com.sinch.sdk.domains.conversation.models.v1.ChannelIdentity;\nimport com.sinch.sdk.domains.conversation.models.v1.ConversationChannel;\nimport com.sinch.sdk.domains.conversation.models.v1.ConversationDirection;\nimport com.sinch.sdk.domains.conversation.models.v1.conversations.request.InjectMessageRequest;\nimport com.sinch.sdk.domains.conversation.models.v1.messages.AppMessage;\nimport com.sinch.sdk.domains.conversation.models.v1.messages.types.text.TextMessage;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.time.Instant;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class InjectMessage {\n\n  private static final Logger LOGGER = Logger.getLogger(InjectMessage.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the conversation to inject the message into\n    String conversationId = \"CONVERSATION_ID\";\n    // The ID of the contact to inject the message into\n    String conversationContactId = \"CONTACT_ID\";\n    // The channel to use for the recipient\n    ConversationChannel recipientChannel = ConversationChannel.SMS;\n    // The phone number of the recipient in E.164 format\n    String recipientPhoneNumber = \"RECIPIENT_PHONE_NUMBER\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConversationsService conversationsService = client.conversation().v1().conversations();\n\n    AppMessage appMessage =\n        AppMessage.<TextMessage>builder()\n            .setBody(TextMessage.builder().setText(\"Text from Inject AppMessage\").build())\n            .build();\n\n    InjectMessageRequest request =\n        InjectMessageRequest.builder()\n            .setContactId(conversationContactId)\n            .setBody(appMessage)\n            .setChannelIdentity(\n                ChannelIdentity.builder()\n                    .setChannel(recipientChannel)\n                    .setIdentity(recipientPhoneNumber)\n                    .build())\n            .setDirection(ConversationDirection.TO_CONTACT)\n            .setAcceptTime(Instant.now())\n            .build();\n\n    LOGGER.info(String.format(\"Inject message to conversation with ID '%s'\", conversationId));\n\n    conversationsService.injectMessage(conversationId, request);\n\n    LOGGER.info(\"Done\");\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation to inject a message into\n  const conversationId = 'CONVERSATION_ID';\n  // The ID of the Contact to inject a message into\n  const contactId = 'CONTACT_ID';\n  // The phone number of the recipient in E.164 format as identity for a given channel\n  const recipientPhoneNumber = 'RECIPIENT_PHONE_NUMBER';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.conversation.injectMessage({\n      conversation_id: conversationId,\n      injectMessageRequestBody: {\n        contact_id: contactId,\n        contact_message: {\n          text_message: {\n            text: 'Text from Inject AppMessage',\n          },\n        },\n        channel_identity: {\n          channel: 'RCS',\n          identity: recipientPhoneNumber,\n        },\n        direction: 'TO_CONTACT',\n        accept_time: new Date(),\n      },\n    });\n    console.log('✅ Successfully injected the Message.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to inject a Message in the conversation ${conversationId} for recipient ${recipientPhoneNumber}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+  /v1/projects/{projectId}/conversation/apps/{conversationAppId}/instagram:
+    get:
+      description: Returns the information for an Instagram channel linked to a Conversation API App.
+      operationId: ConversationInstagramController_get_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: conversationAppId
+        required: true
+        in: path
+        description: The unique ID of the app. You can find this on the <a href="https://dashboard.sinch.com/convapi/apps">Sinch Dashboard</a>.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Instagram information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationInstagramInfoDto'
+              examples:
+                example:
+                  summary: Example sender information response
+                  description: "\n    The information for the Instagram page connected to the Conversation API App.\n    "
+                  value:
+                    id: '1234567890'
+                    username: Sinch
+                    status: ACTIVE
+                    followersCount: 1
+                    followsCount: 3
+                    mediaCount: 0
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                conversation_app_id_invalid-0:
+                  summary: ConversationAppIdInvalidError
+                  value:
+                    errorCode: conversation_app_id_invalid
+                    message: Conversation app id not valid.
+                    resolution: Verify the id is correct.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                conversation_app_not_found-0:
+                  summary: ConversationAppNotFoundError
+                  value:
+                    errorCode: conversation_app_not_found
+                    message: Conversation app not found.
+                    resolution: Verify that the parameters are correct.
+                conversation_app_no_instagram_channel-1:
+                  summary: ConversationAppNoInstagramChannelError
+                  value:
+                    errorCode: conversation_app_no_instagram_channel
+                    message: Conversation app has no initialized Instagram channel.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                facebook_api_error-0:
+                  summary: FacebookApiErrorError
+                  value:
+                    errorCode: facebook_api_error
+                    message: Facebook API returned error.
+                    resolution: Please try again later.
+                internal_error-1:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get Instagram channel information
+      tags:
+      - Conversation
+      x-badges:
+      - name: Closed Beta
+        position: after
+        color: red
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
+  /v1/projects/{projectId}/conversation/apps/{conversationAppId}/messenger:
+    get:
+      description: Returns the information for a Facebook Messenger channel linked to a Conversation API App.
+      operationId: ConversationMessengerController_get_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: conversationAppId
+        required: true
+        in: path
+        description: The unique ID of the app. You can find this on the <a href="https://dashboard.sinch.com/convapi/apps">Sinch Dashboard</a>.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Facebook Messenger information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationMessengerInfoDto'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                conversation_app_id_invalid-0:
+                  summary: ConversationAppIdInvalidError
+                  value:
+                    errorCode: conversation_app_id_invalid
+                    message: Conversation app id not valid.
+                    resolution: Verify the id is correct.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                conversation_app_not_found-0:
+                  summary: ConversationAppNotFoundError
+                  value:
+                    errorCode: conversation_app_not_found
+                    message: Conversation app not found.
+                    resolution: Verify that the parameters are correct.
+                conversation_app_no_messenger_channel-1:
+                  summary: ConversationAppNoMessengerChannelError
+                  value:
+                    errorCode: conversation_app_no_messenger_channel
+                    message: Conversation app has no initialized Messenger channel.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                facebook_api_error-0:
+                  summary: FacebookApiErrorError
+                  value:
+                    errorCode: facebook_api_error
+                    message: Facebook API returned error.
+                    resolution: Please try again later.
+                internal_error-1:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get Facebook Messenger channel information
+      tags:
+      - Conversation
+      x-badges:
+      - name: Closed Beta
+        position: after
+        color: red
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
+  /v1/projects/{projectId}/conversation/apps/{conversationAppId}/telegram:
+    get:
+      description: Returns the information for a Telegram Bot channel linked to a Conversation API App.
+      operationId: ConversationTelegramController_get_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: conversationAppId
+        required: true
+        in: path
+        description: The unique ID of the app. You can find this on the <a href="https://dashboard.sinch.com/convapi/apps">Sinch Dashboard</a>.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Telegram Bot information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationTelegramBotInfoDto'
+              examples:
+                example:
+                  summary: Example sender information response
+                  description: "\n    The information for the Telegram sender connected to the Conversation API App.\n    "
+                  value:
+                    status: ACTIVE
+                    name: Sinch
+                    username: sinch_bot
+                    canJoinGroups: true
+                    canReadAllGroupMessages: false
+                    supportsInlineQueries: false
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                conversation_app_id_invalid-0:
+                  summary: ConversationAppIdInvalidError
+                  value:
+                    errorCode: conversation_app_id_invalid
+                    message: Conversation app id not valid.
+                    resolution: Verify the id is correct.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                conversation_app_not_found-0:
+                  summary: ConversationAppNotFoundError
+                  value:
+                    errorCode: conversation_app_not_found
+                    message: Conversation app not found.
+                    resolution: Verify that the parameters are correct.
+                conversation_app_no_telegram_channel-1:
+                  summary: ConversationAppNoTelegramChannelError
+                  value:
+                    errorCode: conversation_app_no_telegram_channel
+                    message: Conversation app has no initialized Telegram channel.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                telegram_api_error-0:
+                  summary: TelegramApiErrorError
+                  value:
+                    errorCode: telegram_api_error
+                    message: 'Telegram API returned error: 400, description: Bad Request: PHOTO_CROP_SIZE_SMALL.'
+                    resolution: Please try again later.
+                internal_error-1:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get Telegram Bot channel information
+      tags:
+      - Conversation
+      x-badges:
+      - name: Closed Beta
+        position: after
+        color: red
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
+  /v1/projects/{projectId}/conversation/apps/{conversationAppId}/viber:
+    get:
+      description: Returns the information for a Viber Bot channel linked to a Conversation API App.
+      operationId: ConversationViberController_get_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: conversationAppId
+        required: true
+        in: path
+        description: The unique ID of the app. You can find this on the <a href="https://dashboard.sinch.com/convapi/apps">Sinch Dashboard</a>.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Viber Bot information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationViberBotInfoDto'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                conversation_app_not_found-0:
+                  summary: ConversationAppNotFoundError
+                  value:
+                    errorCode: conversation_app_not_found
+                    message: Conversation app not found.
+                    resolution: Verify that the parameters are correct.
+                conversation_app_no_viber_channel-1:
+                  summary: ConversationAppNoViberChannelError
+                  value:
+                    errorCode: conversation_app_no_viber_channel
+                    message: Conversation app has no initialized Viber channel.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ConversationPapiErrorDto'
+              examples:
+                viber_api_error-0:
+                  summary: ViberApiErrorError
+                  value:
+                    errorCode: viber_api_error
+                    message: Viber API returned error.
+                    resolution: Please try again later.
+                internal_error-1:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get Viber Bot channel information
+      tags:
+      - Conversation
+      x-badges:
+      - name: Closed Beta
+        position: after
+        color: red
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
+components:
+  schemas:
+    AppEventField:
+      type: object
+      title: App Event Type
+      properties:
+        app_event:
+          description: Event originating from an app
+          type: object
+          title: App Event
+          oneOf:
+          - $ref: '#/components/schemas/ComposingEventField'
+          - $ref: '#/components/schemas/ComposingEndEventField'
+          - $ref: '#/components/schemas/ReadMessageEventField'
+          - $ref: '#/components/schemas/CommentReplyEventField'
+          - $ref: '#/components/schemas/AgentJoinedEventField'
+          - $ref: '#/components/schemas/AgentLeftEventField'
+          - $ref: '#/components/schemas/GenericEventField'
+    CreateConversationRequest:
+      required:
+      - app_id
+      - contact_id
+      description: The conversation to create.
+      type: object
+      title: Conversation
+      allOf:
+      - $ref: '#/components/schemas/ConversationBase'
+    WhatsAppPaymentButton:
+      description: WhatsApp Payment Button
+      oneOf:
+      - $ref: '#/components/schemas/WhatsAppPaymentSettingsButtonPix'
+      - $ref: '#/components/schemas/WhatsAppPaymentSettingsButtonPaymentLink'
+      - $ref: '#/components/schemas/WhatsAppPaymentSettingsButtonBoleto'
+      discriminator:
+        propertyName: type
+        mapping:
+          pix_dynamic_code: '#/components/schemas/WhatsAppPaymentSettingsButtonPix'
+          payment_link: '#/components/schemas/WhatsAppPaymentSettingsButtonPaymentLink'
+          boleto: '#/components/schemas/WhatsAppPaymentSettingsButtonBoleto'
+    KakaoTalkWebLinkButton:
+      title: KakaoTalk Web Link Button
+      description: A button that opens a web link.
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkButton'
+      - type: object
+        properties:
+          type:
+            enum:
+            - WL
+          link_mo:
+            type: string
+            description: URL opened on a mobile device
+          link_pc:
+            type: string
+            description: URL opened on a desktop device
+        required:
+        - link_mo
+    WhatsAppPaymentSettingsPix:
+      type: object
+      deprecated: true
+      required:
+      - dynamic_pix
+      properties:
+        dynamic_pix:
+          type: object
+          description: The dynamic Pix payment settings.
+          required:
+          - code
+          - merchant_name
+          - key
+          - key_type
+          properties:
+            code:
+              type: string
+              description: The dynamic Pix code to be used by the buyer to pay.
+            merchant_name:
+              type: string
+              description: Account holder name.
+            key:
+              type: string
+              description: Pix key.
+            key_type:
+              type: string
+              description: Pix key type.
+              enum:
+              - CPF
+              - CNPJ
+              - EMAIL
+              - PHONE
+              - EVP
+              x-enumDescriptions:
+                CPF: The CPF key type.
+                CNPJ: The CNPJ key type.
+                EMAIL: The EMAIL key type.
+                PHONE: The PHONE key type.
+                EVP: The EVP key type.
+    FallbackMessageField:
+      description: Fallback message. Used when original contact message can not be handled.
+      type: object
+      title: Fallback
+      properties:
+        fallback_message:
+          title: Fallback Message
+          type: object
+          properties:
+            raw_message:
+              description: Optional. The raw fallback message if provided by the channel.
+              type: string
+            reason:
+              $ref: '#/components/schemas/Reason'
+    LocationMessageField:
+      type: object
+      description: Message containing geographic location.
+      title: Location
+      properties:
+        location_message:
+          title: Location Message
+          type: object
+          required:
+          - coordinates
+          - title
+          properties:
+            coordinates:
+              $ref: '#/components/schemas/Coordinates'
+            label:
+              description: Label or name for the position.
+              type: string
+            title:
+              description: The title is shown close to the button or link that leads to a map showing the location. The title can be clickable in some cases.
+              type: string
+    Choice:
+      description: A choice is an action the user can take such as buttons for quick replies or other call to actions.
+      type: object
+      title: Choice message
+      allOf:
+      - $ref: '#/components/schemas/choiceTypes'
+      - $ref: '#/components/schemas/choiceCommonProps'
+    ContactMessageTypes:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/ChannelSpecificContactMessage'
+      - $ref: '#/components/schemas/ChoiceResponseMessageField'
+      - $ref: '#/components/schemas/FallbackMessageField'
+      - $ref: '#/components/schemas/LocationMessageField'
+      - $ref: '#/components/schemas/MediaCardMessageField'
+      - $ref: '#/components/schemas/MediaMessageField'
+      - $ref: '#/components/schemas/ProductResponseMessage'
+      - $ref: '#/components/schemas/TextMessageField'
+    CarouselMessageField:
+      description: Message containing a list of cards often rendered horizontally on supported channels.
+      type: object
+      title: Carousel
+      properties:
+        carousel_message:
+          title: Carousel Message
+          type: object
+          required:
+          - cards
+          properties:
+            cards:
+              description: A list of up to 10 cards.
+              type: array
+              items:
+                $ref: '#/components/schemas/CardMessage'
+            choices:
+              description: Optional. Outer choices on the carousel level. The number of outer choices is limited to 3.
+              type: array
+              items:
+                $ref: '#/components/schemas/Choice'
+    AgentType:
+      description: Agent's classification. It can be UNKNOWN_AGENT_TYPE, HUMAN or BOT.
+      enum:
+      - UNKNOWN_AGENT_TYPE
+      - HUMAN
+      - BOT
+      x-enumDescriptions:
+        UNKNOWN_AGENT_TYPE: The default AgentType. When the agent type is unknown.
+        HUMAN: Human agent.
+        BOT: Bot agent.
+      type: string
+      default: UNKNOWN_AGENT_TYPE
+    ListConversationsResponse:
+      type: object
+      properties:
+        conversations:
+          description: List of conversations matching the search query.
+          type: array
+          items:
+            $ref: '#/components/schemas/Conversation'
+          readOnly: true
+        next_page_token:
+          type: string
+          description: Token that should be included in the next request to fetch the next page.
+        total_size:
+          type: integer
+          format: int32
+    KakaoTalkRegularPriceCommerce:
+      description: Information about a product with regular price
+      type: object
+      properties:
+        type:
+          enum:
+          - REGULAR_PRICE_COMMERCE
+          x-enumDescriptions:
+            REGULAR_PRICE_COMMERCE: Commerce with regular price
+        title:
+          description: Product title
+          type: string
+          maxLength: 30
+        regular_price:
+          description: Regular price of the product
+          type: integer
+          minimum: 0
+          maximum: 99999999
+      required:
+      - type
+      - title
+      - regular_price
+    CardHeight:
+      description: You can set the desired size of the card in the message.
+      type: string
+      x-enumDescriptions:
+        UNSPECIFIED_HEIGHT: The height of the card is unspecified.
+        SHORT: The shortest card height.
+        MEDIUM: Medium card height.
+        TALL: The tallest card height.
+      enum:
+      - UNSPECIFIED_HEIGHT
+      - SHORT
+      - MEDIUM
+      - TALL
+    choiceCommonProps:
+      type: object
+      properties:
+        postback_data:
+          description: An optional field. This data will be returned in the ChoiceResponseMessage. The default is message_id_{text, title}.
+        display_mode:
+          $ref: '#/components/schemas/DisplayMode'
+    PhoneNumberInfo:
+      type: object
+      title: Phone number
+      description: Phone numbers of the contact.
+      required:
+      - phone_number
+      properties:
+        phone_number:
+          description: Phone number with country code included.
+          type: string
+        type:
+          description: Phone number type, e.g. WORK or HOME.
+          type: string
+    PaymentOrderStatusChannelSpecificMessage:
+      allOf:
+      - $ref: '#/components/schemas/ChannelSpecificCommonProps'
+      - type: object
+        title: WhatsApp Payment Order Status channel specific message.
+        description: A message type for sending WhatsApp Payment Status Requests.
+        required:
+        - payment
+        properties:
+          payment:
+            type: object
+            description: The payment order status message content
+            required:
+            - reference_id
+            - order
+            properties:
+              reference_id:
+                type: string
+                description: Unique ID used to query the current payment status.
+              order:
+                type: object
+                description: The payment order.
+                required:
+                - status
+                properties:
+                  status:
+                    type: string
+                    description: The new payment message status.
+                    enum:
+                    - pending
+                    - processing
+                    - partially-shipped
+                    - shipped
+                    - completed
+                    - canceled
+                    x-enumDescriptions:
+                      pending: The order is pending.
+                      processing: The order is processing.
+                      partially-shipped: A portion of the order has been shipped.
+                      shipped: The order has been shipped.
+                      completed: The order is complete.
+                      canceled: The order was canceled.
+                  description:
+                    type: string
+                    description: The description of payment message status update (120 characters maximum).
+    ContactInfoMessageField:
+      type: object
+      description: Message containing contact information.
+      title: Contact Info
+      properties:
+        contact_info_message:
+          title: Contact Info Message
+          type: object
+          required:
+          - name
+          - phone_numbers
+          properties:
+            name:
+              $ref: '#/components/schemas/NameInfo'
+            phone_numbers:
+              description: Phone numbers of the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/PhoneNumberInfo'
+            addresses:
+              description: Physical addresses of the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/AddressInfo'
+            email_addresses:
+              description: Email addresses of the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/EmailInfo'
+            organization:
+              $ref: '#/components/schemas/OrganizationInfo'
+            urls:
+              description: URLs/websites associated with the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/UrlInfo'
+            birthday:
+              description: Date of birth in YYYY-MM-DD format.
+              type: string
+    WhatsAppInteractiveTextHeader:
+      type: object
+      description: Header of the interactive message with text.
+      required:
+      - type
+      - text
+      properties:
+        type:
+          type: string
+          x-enumDescriptions:
+            text: The text of the header.
+          enum:
+          - text
+        text:
+          type: string
+          description: Text for the header. Formatting allows emojis, but not Markdown.
+    ListSection:
+      type: object
+      title: List Section
+      description: Section for interactive WhatsApp messages containing ListItem
+      required:
+      - items
+      properties:
+        title:
+          description: Optional parameter. Title for list section.
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListItem'
+    WhatsAppInteractiveBody:
+      type: object
+      description: Body of the interactive message.
+      required:
+      - text
+      properties:
+        text:
+          type: string
+          description: The content of the message (1024 characters maximum). Emojis and Markdown are supported.
+    TemplateMessageField:
+      type: object
+      description: Message referring to predefined template
+      title: Template Message
+      properties:
+        template_message:
+          type: object
+          title: Template Message
+          properties:
+            channel_template:
+              description: 'Optional. Channel specific template reference with parameters per channel.
+
+                The channel template if exists overrides the omnichannel template.
+
+                At least one of `channel_template` or `omni_template` needs to be present.
+
+                The key in the map must point to a valid conversation channel as
+
+                defined by the enum ConversationChannel.'
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/TemplateReference'
+            omni_template:
+              $ref: '#/components/schemas/TemplateReferenceWithVersion'
+    Agent:
+      description: Represents an agent that is involved in a conversation.
+      type: object
+      title: Agent
+      properties:
+        display_name:
+          description: Agent's display name
+          type: string
+        type:
+          $ref: '#/components/schemas/AgentType'
+        picture_url:
+          description: The Agent's picture url.
+          type: string
+    OmniMessageOverride:
+      oneOf:
+      - $ref: '#/components/schemas/TextMessageField'
+      - $ref: '#/components/schemas/MediaMessageField'
+      - $ref: '#/components/schemas/TemplateReferenceField'
+      - $ref: '#/components/schemas/ChoiceMessageField'
+      - $ref: '#/components/schemas/CardMessageField'
+      - $ref: '#/components/schemas/CarouselMessageField'
+      - $ref: '#/components/schemas/LocationMessageField'
+      - $ref: '#/components/schemas/ContactInfoMessageField'
+      - $ref: '#/components/schemas/ListMessageField'
+    DisplayMode:
+      description: Controls the display behavior of a choice. Only supported for Choice Message on the RCS channel. Has no effect on other channels or message types, except for a carousel's outer choices, where it is rejected outright.
+      type: string
+      x-enumDescriptions:
+        DISPLAY_MODE_UNSPECIFIED: Default. Transient — choice disappears when new messages arrive.
+        PERSISTENT: Persistent — choice remains visible in the message bubble.
+      enum:
+      - DISPLAY_MODE_UNSPECIFIED
+      - PERSISTENT
+    KakaoTalkCoupon:
+      properties:
+        type:
+          description: Coupon type
+          type: string
+        description:
+          description: Coupon description
+          type: string
+          maxLength: 12
+        link_mo:
+          description: Coupon URL opened on a mobile device
+          type: string
+        link_pc:
+          description: Coupon URL opened on a desktop device
+          type: string
+        scheme_android:
+          description: 'Channel coupon URL (format: `alimtalk=coupon://...`)'
+          type: string
+        scheme_ios:
+          description: 'Channel coupon URL (format: `alimtalk=coupon://...`)'
+          type: string
+      required:
+      - type
+    WhatsAppInteractiveVideoHeader:
+      type: object
+      description: Header of the interactive message with video.
+      required:
+      - type
+      - video
+      properties:
+        type:
+          type: string
+          x-enumDescriptions:
+            video: The video associated with the header.
+          enum:
+          - video
+        video:
+          $ref: '#/components/schemas/WhatsAppInteractiveHeaderMedia'
+    OrganizationInfo:
+      type: object
+      title: Organization information
+      description: Organization information of the contact.
+      properties:
+        company:
+          description: Company name
+          type: string
+        department:
+          description: Department at the company
+          type: string
+        title:
+          description: Corporate title, e.g. Software engineer
+          type: string
+    choiceTypes:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/CallMessageField'
+      - $ref: '#/components/schemas/LocationMessageField'
+      - $ref: '#/components/schemas/TextMessageField'
+      - $ref: '#/components/schemas/UrlMessageField'
+      - $ref: '#/components/schemas/CalendarMessageField'
+      - $ref: '#/components/schemas/ShareLocationMessageField'
+    TemplateReferenceField:
+      type: object
+      title: Template (Reference)
+      properties:
+        template_reference:
+          $ref: '#/components/schemas/TemplateReferenceWithVersion'
+    WhatsAppPaymentSettingsBoleto:
+      type: object
+      deprecated: true
+      required:
+      - boleto
+      properties:
+        boleto:
+          type: object
+          description: The Boleto payment settings.
+          required:
+          - digitable_line
+          properties:
+            digitable_line:
+              type: string
+              description: The Boleto digitable line which will be copied to the clipboard when the user taps the Boleto button.
+    MediaProperties:
+      title: Media Properties
+      type: object
+      required:
+      - url
+      properties:
+        thumbnail_url:
+          type: string
+          description: An optional parameter. Will be used where it is natively supported.
+        url:
+          description: Url to the media file.
+          type: string
+        filename_override:
+          description: Overrides the media file name.
+          type: string
+    MetadataUpdateStrategy:
+      enum:
+      - REPLACE
+      - MERGE_PATCH
+      description: Update strategy for the `conversation_metadata` field. Only supported in `CONVERSATION` processing mode.
+      x-enumDescriptions:
+        REPLACE: The default strategy. Replaces the whole `conversation_metadata` field with the new value provided.
+        MERGE_PATCH: Patches the `conversation_metadata` field with the patch provided according to RFC 7386.
+      type: string
+      default: REPLACE
+    ListItem:
+      type: object
+      title: List Item
+      description: Item containing either choiceItem or ProductItem
+      oneOf:
+      - required:
+        - choice
+        type: object
+        properties:
+          choice:
+            $ref: '#/components/schemas/ChoiceItem'
+        title: Choice
+      - required:
+        - product
+        type: object
+        properties:
+          product:
+            $ref: '#/components/schemas/ProductItem'
+        title: Product
+    Coordinates:
+      type: object
+      title: Geographic coordinates
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          description: The latitude.
+          type: number
+          format: float
+        longitude:
+          description: The longitude.
+          type: number
+          format: float
+    InjectEventResponse:
+      type: object
+      properties:
+        event_id:
+          type: string
+          description: Event id.
+        accepted_time:
+          type: string
+          format: date-time
+    ComposingEndEventField:
+      type: object
+      title: Composing End Event Type
+      properties:
+        composing_end_event:
+          title: Composing End Event
+          type: object
+          description: Represents a typing-end indicator. Stops a typing indicator previously shown to the contact.
+    InjectMessageCommonProps:
+      type: object
+      required:
+      - channel_identity
+      - contact_id
+      - direction
+      - accept_time
+      properties:
+        accept_time:
+          description: The processed time of the message in UTC timezone. Must be less than current_time and greater than (current_time - 30 days)
+          type: string
+          format: date-time
+        channel_identity:
+          $ref: '#/components/schemas/ChannelIdentity'
+        contact_id:
+          description: The ID of the contact registered in the conversation provided.
+          type: string
+        direction:
+          $ref: '#/components/schemas/ConversationDirection'
+        conversation_id:
+          type: string
+          description: The ID of the conversation.
+        sender_id:
+          description: For Contact Messages (MO messages), the sender ID represents the recipient to which the message was sent. This may be a phone number (in the case of SMS and MMS) or a unique ID (in the case of WhatsApp). This is field is not supported on all channels, nor is it supported for MT messages.
+          type: string
+        processing_mode:
+          $ref: '#/components/schemas/ProcessingMode'
+        metadata:
+          description: 'Optional. Metadata associated with the contact.
+
+            Up to 1024 characters long.'
+          type: string
+    Conversation:
+      description: 'A collection of messages exchanged between a contact and an app.
+
+        Conversations are normally created on the fly by Conversation API once
+
+        a message is sent and there is no active conversation already.
+
+        There can be only one active conversation at any given time between
+
+        a particular contact and an app.'
+      type: object
+      title: Conversation
+      allOf:
+      - $ref: '#/components/schemas/ConversationBase'
+      - type: object
+        properties:
+          id:
+            description: The ID of the conversation.
+            type: string
+          last_received:
+            description: 'The timestamp of the latest message in the conversation. The timestamp will be
+
+              Thursday January 01, 1970 00:00:00 UTC if the conversation contains no messages.'
+            type: string
+            format: date-time
+            readOnly: true
+    PaymentOrderDetailsChannelSpecificMessage:
+      allOf:
+      - $ref: '#/components/schemas/ChannelSpecificCommonProps'
+      - type: object
+        title: WhatsApp Payment Order Details channel specific message.
+        description: A message type for sending WhatsApp Payment Requests.
+        required:
+        - payment
+        properties:
+          payment:
+            type: object
+            description: The payment order details content.
+            required:
+            - type
+            - reference_id
+            - type_of_goods
+            - total_amount_value
+            - order
+            properties:
+              type:
+                type: string
+                description: The country/currency associated with the payment message.
+                enum:
+                - br
+                - sg
+                x-enumDescriptions:
+                  br: Brazil
+                  sg: Singapore
+              reference_id:
+                type: string
+                description: Unique reference ID.
+              type_of_goods:
+                type: string
+                description: The type of good associated with this order.
+                enum:
+                - digital-goods
+                - physical-goods
+                x-enumDescriptions:
+                  digital-goods: Digital goods.
+                  physical-goods: Physical goods.
+              payment_settings:
+                deprecated: true
+                description: The payment settings. Use `payment_buttons` in place of this deprecated field.
+                oneOf:
+                - $ref: '#/components/schemas/WhatsAppPaymentSettingsPix'
+                - $ref: '#/components/schemas/WhatsAppPaymentSettingsPaymentLink'
+                - $ref: '#/components/schemas/WhatsAppPaymentSettingsBoleto'
+              payment_buttons:
+                type: array
+                description: Array of payment buttons (1 to 2 items).
+                minItems: 1
+                maxItems: 2
+                items:
+                  $ref: '#/components/schemas/WhatsAppPaymentButton'
+              total_amount_value:
+                type: integer
+                description: Integer representing the total amount of the transaction.
+              order:
+                type: object
+                description: The payment order.
+                required:
+                - items
+                - subtotal_value
+                - tax_value
+                properties:
+                  catalog_id:
+                    type: string
+                    description: Unique ID of the Facebook catalog being used by the business.
+                  expiration_time:
+                    type: string
+                    description: 'UTC timestamp indicating when the order should expire.
+
+                      The timestamp must be given in seconds.
+
+                      The minimum threshold for the timestamp is 300 seconds.'
+                  expiration_description:
+                    type: string
+                    description: Description of the expiration.
+                  subtotal_value:
+                    type: integer
+                    description: Value representing the subtotal amount of this order.
+                  tax_value:
+                    type: integer
+                    description: Value representing the tax amount for this order.
+                  tax_description:
+                    type: string
+                    description: Description of the tax for this order.
+                  shipping_value:
+                    type: integer
+                    description: Value representing the shipping amount for this order.
+                  shipping_description:
+                    type: string
+                    description: Shipping description for this order.
+                  discount_value:
+                    type: integer
+                    description: Value of the discount for this order.
+                  discount_description:
+                    type: string
+                    description: Description of the discount for this order.
+                  discount_program_name:
+                    type: string
+                    description: Discount program name for this order.
+                  items:
+                    type: array
+                    description: The items list for this order.
+                    items:
+                      type: object
+                      required:
+                      - retailer_id
+                      - name
+                      - amount_value
+                      - quantity
+                      properties:
+                        retailer_id:
+                          type: string
+                          description: Unique ID of the retailer.
+                        name:
+                          type: string
+                          description: Item's name as displayed to the user.
+                        amount_value:
+                          type: integer
+                          description: Price per item.
+                        quantity:
+                          type: integer
+                          description: Number of items in this order.
+                        sale_amount_value:
+                          type: integer
+                          description: Discounted price per item.
+    CommentReplyEventField:
+      type: object
+      title: Comment Reply Event Type
+      properties:
+        comment_reply_event:
+          title: Comment Reply Event
+          description: Represents a response to a comment event.
+          type: object
+          required:
+          - text
+          properties:
+            text:
+              description: The text of the comment reply.
+              type: string
+    ReadMessageEventField:
+      type: object
+      title: Read Message Event Type
+      properties:
+        read_message_event:
+          title: Read Message Event
+          type: object
+          description: Marks an inbound (contact) message as read on the channel, producing a read receipt for the contact. Supported on WhatsApp and RCS.
+    WhatsAppInteractiveHeaderMedia:
+      type: object
+      description: Media object for the header.
+      required:
+      - link
+      properties:
+        link:
+          type: string
+          description: URL for the media.
+    LineNotificationMessageTemplateBody:
+      type: object
+      description: Template body
+      properties:
+        emphasized_item:
+          $ref: '#/components/schemas/LineNotificationMessageTemplateEmphasizedItem'
+        items:
+          type: array
+          description: List of template items
+          items:
+            $ref: '#/components/schemas/LineNotificationMessageTemplateItem'
+          maxItems: 15
+        buttons:
+          type: array
+          description: List of template buttons
+          items:
+            $ref: '#/components/schemas/LineNotificationMessageTemplateButton'
+          maxItems: 2
+    WhatsAppPaymentSettingsButtonBoleto:
+      type: object
+      description: The Boleto payment settings.
+      required:
+      - type
+      - digitable_line
+      properties:
+        type:
+          type: string
+          enum:
+          - boleto
+          x-enumDescriptions:
+            boleto: The Boleto button identifier
+        digitable_line:
+          type: string
+          description: The Boleto digitable line which will be copied to the clipboard when the user taps the Boleto button.
+    runtimeError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/protobufAny'
+            message:
+              type: string
+            status:
+              type: string
+    WhatsAppPaymentSettingsPaymentLink:
+      type: object
+      deprecated: true
+      required:
+      - payment_link
+      properties:
+        payment_link:
+          type: object
+          description: The payment link payment settings.
+          required:
+          - uri
+          properties:
+            uri:
+              type: string
+              description: The payment link to be used by the buyer to pay.
+    ShareLocationMessageField:
+      description: Message requesting location from a user.
+      type: object
+      title: Request location
+      properties:
+        share_location_message:
+          title: Share Location Message
+          type: object
+          required:
+          - title
+          - fallback_url
+          properties:
+            title:
+              description: The title is shown close to the button that leads to open a map to share a location.
+              type: string
+            fallback_url:
+              description: The URL that is opened when channel does not have support for this type.
+              type: string
+    KakaoTalkCommerceMessage:
+      type: object
+      title: KakaoTalk commerce message
+      description: A message type for sending KakaoTalk commerce messages
+      properties:
+        buttons:
+          description: Buttons list
+          type: array
+          minItems: 1
+          maxItems: 2
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/KakaoTalkWebLinkButton'
+            - $ref: '#/components/schemas/KakaoTalkAppLinkButton'
+            - $ref: '#/components/schemas/KakaoTalkBotKeywordButton'
+        additional_content:
+          description: Additional information
+          type: string
+          maxLength: 34
+        image:
+          description: Product image
+          type: object
+          properties:
+            image_url:
+              type: string
+              description: URL to the product image
+            image_link:
+              type: string
+              description: URL opened when a user clicks on the image
+          required:
+          - image_url
+        commerce:
+          description: Product information
+          oneOf:
+          - $ref: '#/components/schemas/KakaoTalkRegularPriceCommerce'
+          - $ref: '#/components/schemas/KakaoTalkDiscountFixedCommerce'
+          - $ref: '#/components/schemas/KakaoTalkDiscountRateCommerce'
+        coupon:
+          description: Discount coupon
+          oneOf:
+          - $ref: '#/components/schemas/KakaoTalkFixedDiscountCoupon'
+          - $ref: '#/components/schemas/KakaoTalkDiscountRateCoupon'
+          - $ref: '#/components/schemas/KakaoTalkShippingDiscountCoupon'
+          - $ref: '#/components/schemas/KakaoTalkFreeCoupon'
+          - $ref: '#/components/schemas/KakaoTalkUpCoupon'
+      required:
+      - image
+      - commerce
+      - buttons
+    ChannelSpecificContactMessage:
+      type: object
+      title: Channel Specific Message
+      description: A contact message containing a channel specific message (not supported by OMNI types).
+      required:
+      - message_type
+      - message
+      properties:
+        channel_specific_message:
+          type: object
+          properties:
+            message_type:
+              type: string
+              description: The message type.
+              enum:
+              - nfm_reply
+              x-enumDescriptions:
+                nfm_reply: The `nfm_reply` message type.
+            message:
+              description: The message content.
+              oneOf:
+              - $ref: '#/components/schemas/WhatsAppInteractiveNfmReplyChannelSpecificContactMessage'
+          example:
+            nfm_reply:
+              summary: WhatsApp NFM Reply Channel Specific Contact Message Example
+              value:
+                channel_specific_message:
+                  message_type: nfm_reply
+                  message:
+                    type: nfm_reply
+                    nfm_reply:
+                      name: flow
+                      response_json: '{"flow_token": "<FLOW_TOKEN>", "optional_param1": "<value1>", "optional_param2": "<value2>"}'
+                      body: Sent
+    ReasonCode:
+      enum:
+      - UNKNOWN
+      - INTERNAL_ERROR
+      - RATE_LIMITED
+      - RECIPIENT_INVALID_CHANNEL_IDENTITY
+      - RECIPIENT_NOT_REACHABLE
+      - RECIPIENT_NOT_OPTED_IN
+      - OUTSIDE_ALLOWED_SENDING_WINDOW
+      - CHANNEL_FAILURE
+      - CHANNEL_BAD_CONFIGURATION
+      - CHANNEL_CONFIGURATION_MISSING
+      - MEDIA_TYPE_UNSUPPORTED
+      - MEDIA_TOO_LARGE
+      - MEDIA_NOT_REACHABLE
+      - NO_CHANNELS_LEFT
+      - TEMPLATE_NOT_FOUND
+      - TEMPLATE_INSUFFICIENT_PARAMETERS
+      - TEMPLATE_NON_EXISTING_LANGUAGE_OR_VERSION
+      - DELIVERY_TIMED_OUT
+      - DELIVERY_REJECTED_DUE_TO_POLICY
+      - CONTACT_NOT_FOUND
+      - BAD_REQUEST
+      - UNKNOWN_APP
+      - NO_CHANNEL_IDENTITY_FOR_CONTACT
+      - CHANNEL_REJECT
+      - NO_PERMISSION
+      - NO_PROFILE_AVAILABLE
+      - UNSUPPORTED_OPERATION
+      x-enumDescriptions:
+        UNKNOWN: UNKNOWN is used if no other code can be used to describe the encountered error.
+        INTERNAL_ERROR: An internal error occurred. Please save the entire callback if you want to report an error.
+        RATE_LIMITED: The message or event was not sent due to rate limiting.
+        RECIPIENT_INVALID_CHANNEL_IDENTITY: The channel recipient identity was malformed.
+        RECIPIENT_NOT_REACHABLE: It was not possible to reach the contact, or channel recipient identity, on the channel.
+        RECIPIENT_NOT_OPTED_IN: The contact, or channel recipient identity, has not opt-ed in on the channel.
+        OUTSIDE_ALLOWED_SENDING_WINDOW: The allowed sending window has expired. See the channel documentation for more information about how the sending window works for the different channels.
+        CHANNEL_FAILURE: The channel failed to accept the message. The Conversation API performs multiple retries in case of transient errors.
+        CHANNEL_BAD_CONFIGURATION: The configuration of the channel for the used App is wrong. The bad configuration caused the channel to reject the message. Please see the [channel support documentation page](https://developers.sinch.com/docs/conversation/channel-support/) for how to set it up correctly.
+        CHANNEL_CONFIGURATION_MISSING: The configuration of the channel is missing from the used App. Please see the [channel support documentation](https://developers.sinch.com/docs/conversation/channel-support/) page for how to set it up correctly.
+        MEDIA_TYPE_UNSUPPORTED: Some of the referenced media files are of an unsupported media type. Please read the [channel support documentation](https://developers.sinch.com/docs/conversation/channel-support/) page to find out the limitations on media that the different channels impose.
+        MEDIA_TOO_LARGE: Some of the referenced media files are too large. Please read the [channel support documentation](https://developers.sinch.com/docs/conversation/channel-support/) to find out the limitations on file size that the different channels impose.
+        MEDIA_NOT_REACHABLE: The provided media link was not accessible from the Conversation API or from the underlying channels. Please make sure that the media file is accessible.
+        NO_CHANNELS_LEFT: No channels to try to send the message to. This error will occur if one attempts to send a message to a channel with no channel identities or if all applicable channels have been attempted.
+        TEMPLATE_NOT_FOUND: The referenced template was not found.
+        TEMPLATE_INSUFFICIENT_PARAMETERS: Sufficient template parameters was not given. All parameters defined in the template must be provided when sending a template message.
+        TEMPLATE_NON_EXISTING_LANGUAGE_OR_VERSION: The selected language, or version, of the referenced template did not exist. Please check the available versions and languages of the template.
+        DELIVERY_TIMED_OUT: The message delivery, or event delivery, failed due to a channel-imposed timeout. See the [channel support documentation](https://developers.sinch.com/docs/conversation/channel-support/) page for further details about how the different channels behave.
+        DELIVERY_REJECTED_DUE_TO_POLICY: The message or event was rejected by the channel due to a policy. Some channels have specific policies that must be met to send a message. See the [channel support documentation](https://developers.sinch.com/docs/conversation/channel-support/) page for more information about when this error will be triggered.
+        CONTACT_NOT_FOUND: The provided Contact ID did not exist.
+        BAD_REQUEST: Conversation API validates send requests in two different stages. The first stage is right before the message is enqueued. If this first validation fails the API responds with 400 Bad Request and the request is discarded immediately. The second validation kicks in during message processing and it normally contains channel specific validation rules. Failures during second request validation are delivered as callbacks to `MESSAGE_DELIVERY (EVENT_DELIVERY)` webhooks with ReasonCode `BAD_REQUEST`.
+        UNKNOWN_APP: The used App is missing. This error may occur when the app is removed during message processing.
+        NO_CHANNEL_IDENTITY_FOR_CONTACT: The contact has no channel identities set up, or the contact has no channels set up for the resolved channel priorities.
+        CHANNEL_REJECT: Generic error for channel permanently rejecting a message. Only used if no other better matching error can be used.
+        NO_PERMISSION: No permission to perform action.
+        NO_PROFILE_AVAILABLE: No available profile data for user.
+        UNSUPPORTED_OPERATION: Generic error for channel unsupported operations.
+      type: string
+    AddressInfo:
+      type: object
+      title: Address information
+      description: Physical addresses of the contact.
+      properties:
+        city:
+          description: City Name
+          type: string
+        country:
+          description: Country Name
+          type: string
+        state:
+          description: Name of a state or region of a country.
+          type: string
+        zip:
+          description: Zip/postal code
+          type: string
+        type:
+          description: Address type, e.g. WORK or HOME
+          type: string
+        country_code:
+          description: Two letter country code.
+          type: string
+    ChoiceItem:
+      type: object
+      title: Choice
+      description: A message component for interactive messages, containing a choice.
+      required:
+      - title
+      properties:
+        title:
+          type: string
+          description: Required parameter. Title for the choice item.
+        description:
+          type: string
+          description: Optional parameter. The description (or subtitle) of this choice item.
+        media:
+          description: Optional parameter. The media of this choice item.
+          allOf:
+          - $ref: '#/components/schemas/MediaProperties'
+        postback_data:
+          type: string
+          description: Optional parameter. Postback data that will be returned in the MO if the user selects this option.
+    TemplateReference:
+      type: object
+      title: Template reference with concrete parameter values
+      description: The referenced template can be an omnichannel template stored in Conversation API Template Store as an AppMessage. You may also reference external channel-specific templates, such as a WhatsApp Business Template. Note that channel-specific template references are not supported when populating the `explicit_channel_omni_message` field.
+      required:
+      - template_id
+      properties:
+        version:
+          type: string
+          description: 'Used to specify what version of a template to use. Required when using `omni_channel_override` and `omni_template` fields.
+
+            This will be used in conjunction with `language_code`. Note that, when referencing omni-channel templates using the [Sinch Customer Dashboard](https://dashboard.sinch.com/), the latest version of a given omni-template can be identified by populating this field with `latest`.'
+        language_code:
+          description: 'The BCP-47 language code, such as `en_US` or `sr_Latn`.
+
+            For more information, see http://www.unicode.org/reports/tr35/#Unicode_locale_identifier. English is the default `language_code`.
+
+            Note that, while many API calls involving templates accept either the dashed format (`en-US`) or the underscored format (`en_US`), some channel specific templates (for example, WhatsApp channel-specific templates) only accept the underscored format. Note that this field is required for WhatsApp channel-specific templates.'
+          type: string
+        parameters:
+          description: 'Required if the template has parameters. Concrete values must
+
+            be present for all defined parameters
+
+            in the template. Parameters can be different for
+
+            different versions and/or languages of the template.'
+          type: object
+          additionalProperties:
+            type: string
+        template_id:
+          description: The ID of the template. Note that, in the case of WhatsApp channel-specific templates, this field must be populated by the name of the template.
+          type: string
+    CalendarMessageField:
+      description: Message containing details about a calendar event.
+      type: object
+      title: Calendar
+      properties:
+        calendar_message:
+          title: Calendar message
+          type: object
+          required:
+          - title
+          - event_start
+          - event_end
+          - event_title
+          - fallback_url
+          properties:
+            title:
+              description: The title is shown close to the button that leads to open a user calendar.
+              type: string
+            event_start:
+              description: The timestamp defines start of a calendar event.
+              type: string
+              format: date-time
+              example: '2025-11-30T10:00:00Z'
+            event_end:
+              description: The timestamp defines end of a calendar event.
+              type: string
+              format: date-time
+              example: '2025-11-30T11:00:00Z'
+            event_title:
+              description: Title of a calendar event.
+              type: string
+            event_description:
+              description: Description of a calendar event.
+              type: string
+            fallback_url:
+              description: The URL that is opened when the user cannot open a calendar event directly or channel does not have support for this type.
+              type: string
+    AppMessageCommonProps:
+      type: object
+      properties:
+        explicit_channel_message:
+          description: Allows you to specify a channel and define a corresponding channel specific message payload that will override the standard Conversation API message types. The key in the map must point to a valid conversation channel as defined in the enum `ConversationChannel`. The message content must be provided in a string format. You may use the [transcoding endpoint](https://developers.sinch.com/docs/conversation/api-reference/conversation/tag/Transcoding/) to help create your message. For more information about how to construct an explicit channel message for a particular channel, see that [channel's corresponding documentation](https://developers.sinch.com/docs/conversation/channel-support/) (for example, using explicit channel messages with [the WhatsApp channel](https://developers.sinch.com/docs/conversation/channel-support/whatsapp/message-support/#explicit-channel-messages)).
+          type: object
+          additionalProperties:
+            type: string
+        explicit_channel_omni_message:
+          description: Override the message's content for specified channels. The key in the map must point to a valid conversation channel as defined in the enum `ConversationChannel`. The content defined under the specified channel will be sent on that channel.
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/OmniMessageOverride'
+        channel_specific_message:
+          description: 'Channel specific messages, overriding any transcoding. The structure of this property is more well-defined than the open structure of the `explicit_channel_message` property, and may be easier to use.
+
+            The key in the map must point to a valid conversation channel as defined in the enum `ConversationChannel`.'
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ChannelSpecificMessage'
+        agent:
+          $ref: '#/components/schemas/Agent'
+        reply_to:
+          title: Reply To
+          description: Sends this message as a contextual reply to an inbound contact message, so the contact sees their original message quoted. Only supported on the WhatsApp channel. Conversation API keeps the mapping needed for the quote for 96 hours. If the referenced message is unknown or older than 96 hours, or the message is sent on a channel that does not support contextual replies, the message is still sent without the quote. For more information, see [Sending contextual replies](https://developers.sinch.com/docs/conversation/channel-support/whatsapp/message-support/#sending-contextual-replies).
+          type: object
+          required:
+          - message_id
+          properties:
+            message_id:
+              type: string
+              description: Required when using `reply_to`. The Conversation API ID of the inbound contact message this message replies to. Do not use a channel message ID (e.g., a WhatsApp message ID) from Meta.
+    AgentLeftEventField:
+      type: object
+      title: Agent Left Event Type
+      properties:
+        agent_left_event:
+          title: Agent Left Event
+          type: object
+          properties:
+            agent:
+              $ref: '#/components/schemas/Agent'
+          required:
+          - agent
+    WhatsAppPaymentSettingsButtonPaymentLink:
+      type: object
+      description: The payment link payment settings.
+      required:
+      - type
+      - uri
+      properties:
+        type:
+          type: string
+          enum:
+          - payment_link
+          x-enumDescriptions:
+            payment_link: The payment link button identifier
+        uri:
+          type: string
+          description: The payment link to be used by the buyer to pay.
+    ChannelSpecificCommonProps:
+      type: object
+      properties:
+        header:
+          description: The header of the interactive message.
+          type: object
+          oneOf:
+          - $ref: '#/components/schemas/WhatsAppInteractiveTextHeader'
+          - $ref: '#/components/schemas/WhatsAppInteractiveImageHeader'
+          - $ref: '#/components/schemas/WhatsAppInteractiveDocumentHeader'
+          - $ref: '#/components/schemas/WhatsAppInteractiveVideoHeader'
+          discriminator:
+            propertyName: type
+            mapping:
+              text: '#/components/schemas/WhatsAppInteractiveTextHeader'
+              image: '#/components/schemas/WhatsAppInteractiveImageHeader'
+              document: '#/components/schemas/WhatsAppInteractiveDocumentHeader'
+              video: '#/components/schemas/WhatsAppInteractiveVideoHeader'
+        body:
+          $ref: '#/components/schemas/WhatsAppInteractiveBody'
+        footer:
+          $ref: '#/components/schemas/WhatsAppInteractiveFooter'
+    TextMessageField:
+      type: object
+      title: Text
+      description: A message containing only text.
+      properties:
+        text_message:
+          type: object
+          title: Text Message
+          required:
+          - text
+          properties:
+            text:
+              description: The text to be sent.
+              type: string
+    CardMessageField:
+      description: Field containing a Card Message
+      type: object
+      title: Card
+      properties:
+        card_message:
+          $ref: '#/components/schemas/CardMessage'
+    KakaoTalkCarouselCommerceChannelSpecificMessage:
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkChannelSpecificMessage'
+      - type: object
+        title: KakaoTalk carousel commerce channel specific message
+        description: A message type for sending KakaoTalk carousel commerce messages
+        properties:
+          carousel:
+            description: Carousel content
+            type: object
+            properties:
+              head:
+                description: Carousel introduction
+                type: object
+                properties:
+                  header:
+                    description: Carousel introduction title
+                    type: string
+                    maxLength: 20
+                  content:
+                    description: Carousel introduction description
+                    type: string
+                    maxLength: 50
+                  image_url:
+                    description: URL to the image displayed in the introduction
+                    type: string
+                  link_mo:
+                    description: URL opened on a mobile device
+                    type: string
+                  link_pc:
+                    description: URL opened on a desktop device
+                    type: string
+                  scheme_ios:
+                    description: App link opened on an iOS device (e.g. `tel://PHONE_NUMBER`)
+                    type: string
+                  scheme_android:
+                    description: App link opened on an Android device (e.g. `tel://PHONE_NUMBER`)
+                    type: string
+                required:
+                - header
+                - content
+                - image_url
+              list:
+                description: List of carousel cards
+                type: array
+                minItems: 2
+                maxItems: 10
+                items:
+                  $ref: '#/components/schemas/KakaoTalkCommerceMessage'
+              tail:
+                description: '"More" button'
+                type: object
+                properties:
+                  link_mo:
+                    description: URL opened on a mobile device
+                    type: string
+                  link_pc:
+                    description: URL opened on a desktop device
+                    type: string
+                  scheme_ios:
+                    description: App link opened on an iOS device (e.g. `tel://PHONE_NUMBER`)
+                    type: string
+                  scheme_android:
+                    description: App link opened on an Android device (e.g. `tel://PHONE_NUMBER`)
+                    type: string
+                required:
+                - link_mo
+            required:
+            - list
+        required:
+        - carousel
+    LineNotificationMessageTemplateButton:
+      type: object
+      description: Template button
+      required:
+      - button_key
+      - url
+      properties:
+        button_key:
+          type: string
+          description: Button key. See [LINE documentation](https://developers.line.biz/en/docs/partner-docs/line-notification-messages/template/?r=jp#buttons) for available keys
+        url:
+          type: string
+          maxLength: 1000
+          description: Button URL
+    ConversationDirection:
+      type: string
+      description: The direction of the message flow, indicating whether the message was sent to or from the Conversation API app.
+      x-enumDescriptions:
+        TO_APP: Sent to the Conversation API app.
+        TO_CONTACT: Sent to a recipient/contact from the Conversation API app.
+      enum:
+      - TO_APP
+      - TO_CONTACT
+    ListMessageField:
+      type: object
+      title: List
+      description: A message containing a list of options to choose from. All items must be of the same type.
+      properties:
+        list_message:
+          title: List Message
+          type: object
+          required:
+          - title
+          - sections
+          properties:
+            title:
+              description: A title for the message that is displayed near the products or choices.
+              type: string
+            description:
+              description: This is an optional field, containing a description for the message.
+              type: string
+            media:
+              $ref: '#/components/schemas/MediaProperties'
+            sections:
+              description: List of ListSection objects containing choices to be presented in the list message.
+              type: array
+              items:
+                $ref: '#/components/schemas/ListSection'
+            message_properties:
+              description: Additional properties for the message. Required if sending a product list message.
+              properties:
+                catalog_id:
+                  description: Required if sending a product list message. The ID of the catalog to which the products belong.
+                  type: string
+                menu:
+                  description: Optional. Sets the text for the menu of a choice list message.
+                  type: string
+                whatsapp_header:
+                  description: Optional. Sets the text for the header of a WhatsApp choice list message. Ignored for other channels.
+                  type: string
+    ComposingEventField:
+      type: object
+      title: Composing
+      properties:
+        composing_event:
+          title: Composing Event Type
+          type: object
+          description: Represents a typing indicator shown to the contact.
+    LineNotificationMessageTemplateItem:
+      type: object
+      description: Template item
+      required:
+      - item_key
+      - content
+      properties:
+        item_key:
+          description: Item key. See [LINE documentation](https://developers.line.biz/en/docs/partner-docs/line-notification-messages/template/?r=jp#items) for available keys
+          type: string
+        content:
+          description: Item value
+          type: string
+          maxLength: 300
+    ConversationMessage:
+      description: A message on a particular channel.
+      type: object
+      title: Conversation Message
+      allOf:
+      - $ref: '#/components/schemas/ConversationMessageTypes'
+      - $ref: '#/components/schemas/ConversationMessageCommonProps'
+    protobufAny:
+      type: object
+      properties:
+        type_url:
+          type: string
+        value:
+          type: string
+          format: byte
+    ListRecentConversationsResponse:
+      type: object
+      properties:
+        conversations:
+          description: List of recent conversations
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationRecentMessage'
+        next_page_token:
+          type: string
+          description: Token that should be included in the next request to fetch the next page.
+        total_size:
+          type: integer
+          format: int32
+    Choices:
+      type: object
+      properties:
+        choices:
+          type: array
+          description: The number of choices is limited to 10.
+          items:
+            $ref: '#/components/schemas/Choice'
+    InjectMessageRequest:
+      description: A message on a particular channel.
+      type: object
+      title: Conversation Message Injected
+      allOf:
+      - $ref: '#/components/schemas/ConversationMessageTypesInject'
+      - $ref: '#/components/schemas/InjectMessageCommonProps'
+    KakaoTalkBotKeywordButton:
+      title: KakaoTalk Bot Keyword Button
+      description: A button that sends a keyword specified in `name` property
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkButton'
+      - type: object
+        properties:
+          type:
+            enum:
+            - BK
+    GenericEventField:
+      type: object
+      title: Generic Type
+      properties:
+        generic_event:
+          title: Generic Event
+          type: object
+          properties:
+            payload:
+              description: Arbitrary data set to the event. A valid JSON object.
+              type: object
+          description: Event that contains only a flexible payload field.
+          required:
+          - payload
+    ConversationBase:
+      description: 'A collection of messages exchanged between a contact and an app.
+
+        Conversations are normally created on the fly by Conversation API once
+
+        a message is sent and there is no active conversation already.
+
+        There can be only one active conversation at any given time between
+
+        a particular contact and an app.'
+      type: object
+      title: Conversation
+      properties:
+        active:
+          description: Flag for whether this conversation is active.
+          type: boolean
+        active_channel:
+          $ref: '#/components/schemas/ConversationChannel'
+        app_id:
+          description: The ID of the participating app.
+          type: string
+        contact_id:
+          description: The ID of the participating contact.
+          type: string
+        metadata:
+          description: 'Arbitrary data set by the Conversation API clients.
+
+            Up to 1024 characters long.
+
+            NOTE: This field has been deprecated due to changes in the system architecture or functionality.
+
+            It is no longer actively maintained and may be removed in future versions. Please avoid relying on this field in new code.'
+          type: string
+          deprecated: true
+        metadata_json:
+          description: 'Arbitrary data set by the Conversation API clients and/or provided in the `conversation_metadata` field of a SendMessageRequest.
+
+            A valid JSON object.'
+          type: object
+        correlation_id:
+          type: string
+          description: Arbitrary correlation ID related to the MT message set by the Conversation API user.
+    WhatsAppInteractiveNfmReplyChannelSpecificContactMessage:
+      type: object
+      title: WhatsApp Interactive Nfm Reply Channel Specific Contact Message
+      description: A WhatsApp interactive contact message containing the nfm_reply.
+      required:
+      - type
+      - nfm_reply
+      properties:
+        type:
+          type: string
+          description: The interactive message type.
+          default: nfm_reply
+          x-enumDescriptions:
+            nfm_reply: The interactive nfm reply type.
+          enum:
+          - nfm_reply
+        nfm_reply:
+          $ref: '#/components/schemas/WhatsAppInteractiveNfmReply'
+    ConversationRecentMessage:
+      type: object
+      properties:
+        conversation:
+          $ref: '#/components/schemas/Conversation'
+        last_message:
+          $ref: '#/components/schemas/ConversationMessage'
+    ConversationMessageCommonProps:
+      type: object
+      properties:
+        accept_time:
+          description: The time Conversation API processed the message.
+          type: string
+          format: date-time
+          readOnly: true
+        channel_identity:
+          $ref: '#/components/schemas/ChannelIdentity'
+        contact_id:
+          description: The ID of the contact.
+          type: string
+        conversation_id:
+          description: The ID of the conversation.
+          type: string
+        direction:
+          $ref: '#/components/schemas/ConversationDirection'
+        id:
+          description: The ID of the message.
+          type: string
+        metadata:
+          description: 'Optional. Metadata associated with the contact.
+
+            Up to 1024 characters long.'
+          type: string
+        injected:
+          description: Flag for whether this message was injected.
+          type: boolean
+          readOnly: true
+        sender_id:
+          description: For Contact Messages (MO messages), the sender ID represents the recipient to which the message was sent. This may be a phone number (in the case of SMS and MMS) or a unique ID (in the case of WhatsApp). This is field is not supported on all channels, nor is it supported for MT messages.
+          type: string
+        processing_mode:
+          $ref: '#/components/schemas/ProcessingMode'
+    WhatsAppInteractiveFooter:
+      type: object
+      description: Footer of the interactive message.
+      required:
+      - text
+      properties:
+        text:
+          type: string
+          description: The footer content (60 characters maximum). Emojis, Markdown and links are supported.
+    WhatsAppInteractiveDocumentHeader:
+      type: object
+      description: Header of the interactive message with document.
+      required:
+      - type
+      - document
+      properties:
+        type:
+          type: string
+          x-enumDescriptions:
+            document: The document associated with the header.
+          enum:
+          - document
+        document:
+          $ref: '#/components/schemas/WhatsAppInteractiveHeaderMedia'
+    AppMessageTypes:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/CardMessageField'
+      - $ref: '#/components/schemas/CarouselMessageField'
+      - $ref: '#/components/schemas/ChoiceMessageField'
+      - $ref: '#/components/schemas/LocationMessageField'
+      - $ref: '#/components/schemas/MediaMessageField'
+      - $ref: '#/components/schemas/TemplateMessageField'
+      - $ref: '#/components/schemas/TextMessageField'
+      - $ref: '#/components/schemas/ListMessageField'
+      - $ref: '#/components/schemas/ContactInfoMessageField'
+    ChannelSpecificMessage:
+      type: object
+      title: Channel specific message
+      description: A message containing a channel specific message (not supported by OMNI types).
+      required:
+      - message_type
+      - message
+      properties:
+        message_type:
+          type: string
+          x-enumDescriptions:
+            FLOWS: The WhatsApp Flows message type.
+            ORDER_DETAILS: The WhatsApp order details message type.
+            ORDER_STATUS: The WhatsApp order status message type.
+            COMMERCE: KakaoTalk commerce channel specific message type
+            CAROUSEL_COMMERCE: KakaoTalk carousel commerce channel specific message type
+            NOTIFICATION_MESSAGE_TEMPLATE: LINE notification message template type
+          description: The type of the channel specific message.
+          enum:
+          - FLOWS
+          - ORDER_DETAILS
+          - ORDER_STATUS
+          - COMMERCE
+          - CAROUSEL_COMMERCE
+          - NOTIFICATION_MESSAGE_TEMPLATE
+        message:
+          oneOf:
+          - $ref: '#/components/schemas/FlowChannelSpecificMessage'
+          - $ref: '#/components/schemas/PaymentOrderDetailsChannelSpecificMessage'
+          - $ref: '#/components/schemas/PaymentOrderStatusChannelSpecificMessage'
+          - $ref: '#/components/schemas/KakaoTalkCommerceChannelSpecificMessage'
+          - $ref: '#/components/schemas/KakaoTalkCarouselCommerceChannelSpecificMessage'
+          - $ref: '#/components/schemas/LineNotificationMessageTemplateChannelSpecificMessage'
+    WhatsAppPaymentSettingsButtonPix:
+      type: object
+      description: The dynamic Pix payment settings button.
+      required:
+      - type
+      - code
+      - merchant_name
+      - key
+      - key_type
+      properties:
+        type:
+          type: string
+          enum:
+          - pix_dynamic_code
+          x-enumDescriptions:
+            pix_dynamic_code: The dynamic Pix code button identifier
+        code:
+          type: string
+          description: The dynamic Pix code to be used by the buyer to pay.
+        merchant_name:
+          type: string
+          description: Account holder name.
+        key:
+          type: string
+          description: Pix key.
+        key_type:
+          type: string
+          description: Pix key type.
+          enum:
+          - CPF
+          - CNPJ
+          - EMAIL
+          - PHONE
+          - EVP
+          x-enumDescriptions:
+            CPF: The CPF key type.
+            CNPJ: The CNPJ key type.
+            EMAIL: The EMAIL key type.
+            PHONE: The PHONE key type.
+            EVP: The EVP key type.
+    ConversationEventBase:
+      type: object
+      title: Conversation Event
+      description: Common properties to ConversationEvent management
+      allOf:
+      - $ref: '#/components/schemas/AppEventField'
+      - type: object
+        properties:
+          conversation_id:
+            type: string
+            description: Optional. The ID of the event's conversation. Will not be present for apps in Dispatch Mode.
+          contact_id:
+            type: string
+            description: Optional. The ID of the contact. Will not be present for apps in Dispatch Mode.
+          channel_identity:
+            $ref: '#/components/schemas/ChannelIdentity'
+          accept_time:
+            type: string
+            format: date-time
+            description: The processed time of the message in UTC timezone. Must be less than current_time and greater than (current_time - 30 days).
+          processing_mode:
+            $ref: '#/components/schemas/ProcessingMode'
+    ConversationMessageTypesInject:
+      type: object
+      oneOf:
+      - type: object
+        properties:
+          app_message:
+            $ref: '#/components/schemas/AppMessage'
+        title: App Message to be injected
+      - type: object
+        properties:
+          contact_message:
+            $ref: '#/components/schemas/ContactMessage'
+        title: Contact Message to be injected
+    KakaoTalkDiscountRateCommerce:
+      description: Information about a product with discount rate
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkRegularPriceCommerce'
+      - type: object
+        properties:
+          type:
+            enum:
+            - PERCENTAGE_DISCOUNT_COMMERCE
+            x-enumDescriptions:
+              PERCENTAGE_DISCOUNT_COMMERCE: Commerce with percentage discount
+          discount_price:
+            description: Discounted price of the product
+            type: integer
+            minimum: 0
+            maximum: 99999999
+          discount_rate:
+            description: Discount rate (%)
+            type: integer
+            minimum: 0
+            maximum: 100
+        required:
+        - discount_price
+        - discount_rate
+    KakaoTalkDiscountRateCoupon:
+      title: KakaoTalk discount rate coupon
+      description: '<p>Percentage discount coupon with the following title: "<code>discount_rate</code>% 할인 쿠폰" (translates to: "<code>discount_rate</code>% discount coupon")</p>
+
+        <p><b>One of the following fields is required: <code>link_mo</code>, <code>scheme_android</code>, <code>scheme_ios</code></b></p>'
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkCoupon'
+      - type: object
+        properties:
+          type:
+            enum:
+            - PERCENTAGE_DISCOUNT_COUPON
+          discount_rate:
+            description: Discount rate (%)
+            type: integer
+            minimum: 0
+            maximum: 100
+        required:
+        - discount_rate
+    KakaoTalkShippingDiscountCoupon:
+      title: KakaoTalk shipping discount coupon
+      description: '<p>Shipping discount coupon with with the following title: "배송비 할인 쿠폰" (translates to: "shipping fee discount coupon")</p> <p><b>One of the following fields is required: <code>link_mo</code>, <code>scheme_android</code>, <code>scheme_ios</code></b></p>
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkCoupon'
+      - type: object
+        properties:
+          type:
+            enum:
+            - SHIPPING_DISCOUNT_COUPON
+    UrlMessageField:
+      description: A generic URL message.
+      type: object
+      title: URL
+      properties:
+        url_message:
+          title: URL Message
+          type: object
+          required:
+          - title
+          - url
+          properties:
+            title:
+              description: The title shown close to the URL. The title can be clickable in some cases.
+              type: string
+            url:
+              description: The url to show.
+              type: string
+    ProcessingMode:
+      description: Whether or not Conversation API should store contacts and conversations for the app. For more information, see [Processing Modes](https://developers.sinch.com/docs/conversation/processing-modes/).
+      enum:
+      - CONVERSATION
+      - DISPATCH
+      x-enumDescriptions:
+        CONVERSATION: Creates contacts and conversations automatically when a message is sent or received and there's no existing contact or active conversation.
+        DISPATCH: The default Processing Mode. Does not associate messages with contacts and conversations. This processing mode is mostly intended for unidirectional high volume SMS use cases. The lack of contacts and conversations limits some API features as related data won't be queryable in the [Contact](https://developers.sinch.com/docs/conversation/api-reference/conversation/tag/Contact/) and [Conversation](https://developers.sinch.com/docs/conversation/api-reference/conversation/tag/Conversation/) APIs.
+      type: string
+      default: DISPATCH
+    ConversationMessageTypes:
+      type: object
+      oneOf:
+      - type: object
+        properties:
+          app_message:
+            $ref: '#/components/schemas/AppMessage'
+        title: App Message
+      - type: object
+        properties:
+          contact_message:
+            $ref: '#/components/schemas/ContactMessage'
+        title: Contact Message
+    WhatsAppInteractiveImageHeader:
+      type: object
+      description: Header of the interactive message with image.
+      required:
+      - type
+      - image
+      properties:
+        type:
+          type: string
+          x-enumDescriptions:
+            image: The image associated with the header.
+          enum:
+          - image
+        image:
+          $ref: '#/components/schemas/WhatsAppInteractiveHeaderMedia'
+    InjectConversationEventRequest:
+      description: Inject Event request
+      type: object
+      title: Inject event request
+      required:
+      - accept_time
+      allOf:
+      - $ref: '#/components/schemas/ConversationEventBase'
+    WhatsAppInteractiveNfmReply:
+      type: object
+      title: Nfm Reply
+      description: The interactive nfm reply message.
+      required:
+      - name
+      - response_json
+      - body
+      properties:
+        name:
+          type: string
+          description: The nfm reply message type.
+          x-enumDescriptions:
+            flow: The WhatsApp flow nfm reply message type.
+            address_message: The address nfm reply message type.
+          enum:
+          - flow
+          - address_message
+        response_json:
+          type: string
+          description: The JSON specific data.
+        body:
+          type: string
+          description: The message body.
+    MediaCardMessageField:
+      type: object
+      title: Media Card
+      description: A message containing a media component, such as an image or video.
+      properties:
+        media_card_message:
+          type: object
+          title: Media Card Message
+          required:
+          - url
+          properties:
+            caption:
+              description: Caption for the media on supported channels.
+              type: string
+            url:
+              description: Url to the media file.
+              type: string
+    ContactMessageCommonProps:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ReplyToField'
+    ChoiceMessageField:
+      description: Message containing choices/actions.
+      type: object
+      title: Choice
+      properties:
+        choice_message:
+          title: Choice Message
+          type: object
+          required:
+          - choices
+          allOf:
+          - description: A message containing choices.
+          - $ref: '#/components/schemas/Choices'
+          - $ref: '#/components/schemas/TextMessageField'
+          - $ref: '#/components/schemas/ChoiceMessagePropertiesField'
+    CallMessageField:
+      description: Message for triggering a call.
+      type: object
+      title: Call
+      properties:
+        call_message:
+          title: Call Message
+          type: object
+          required:
+          - phone_number
+          - title
+          properties:
+            phone_number:
+              description: Phone number in E.164 with leading +.
+              type: string
+              example: '+15551231234'
+            title:
+              description: 'Title shown close to the phone number.
+
+                The title is clickable in some cases.'
+              type: string
+              example: Message text
+    TemplateReferenceWithVersion:
+      type: object
+      allOf:
+      - required:
+        - version
+      - $ref: '#/components/schemas/TemplateReference'
+    ProductItem:
+      type: object
+      title: Product
+      description: A message component for interactive messages, containing a product.
+      required:
+      - id
+      - marketplace
+      properties:
+        id:
+          type: string
+          description: Required parameter. The ID for the product.
+        marketplace:
+          type: string
+          description: Required parameter. The marketplace to which the product belongs.
+          example: FACEBOOK
+        quantity:
+          type: integer
+          format: int32
+          description: Output only. The quantity of the chosen product.
+        item_price:
+          type: number
+          format: float
+          description: Output only. The price for one unit of the chosen product.
+        currency:
+          type: string
+          description: Output only. The currency of the item_price.
+    ReplyToField:
+      description: If the contact message was a response to a previous App message then this field contains information about that.
+      type: object
+      title: Reply To
+      properties:
+        reply_to:
+          title: Reply To
+          type: object
+          required:
+          - message_id
+          properties:
+            message_id:
+              type: string
+              description: Required. The Id of the message that this is a response to
+    CardMessage:
+      description: Message containing text, media and choices.
+      title: Card Message
+      type: object
+      properties:
+        choices:
+          description: You may include choices in your Card Message. The number of choices is limited to 10.
+          type: array
+          items:
+            $ref: '#/components/schemas/Choice'
+        description:
+          description: This is an optional description field that is displayed below the title on the card.
+          type: string
+        height:
+          $ref: '#/components/schemas/CardHeight'
+        title:
+          description: The title of the card message.
+          type: string
+        media_message:
+          type: object
+          description: A message containing a media component.
+          allOf:
+          - $ref: '#/components/schemas/MediaProperties'
+        message_properties:
+          type: object
+          description: Optional additional properties.
+          properties:
+            whatsapp_header:
+              description: Optional. Sets the header for the footer of a WhatsApp reply button message, if there is no media in the message. Ignored for other channels. Ignored if not transcoded to a native WhatsApp message with reply buttons.
+              type: string
+    ProductResponseMessage:
+      type: object
+      title: Product Response Message
+      description: Represents an interactive WhatsApp message containing ProductItem objects
+      required:
+      - products
+      properties:
+        product_response_message:
+          type: object
+          properties:
+            products:
+              description: The selected products.
+              type: array
+              items:
+                $ref: '#/components/schemas/ProductItem'
+            title:
+              description: Optional parameter. Text that may be sent with selected products.
+              type: string
+            catalog_id:
+              description: Optional parameter. The catalog id that the selected products belong to.
+              type: string
+    MediaMessageField:
+      type: object
+      title: Media Message
+      description: A message containing a media component, such as an image, document, or video.
+      properties:
+        media_message:
+          $ref: '#/components/schemas/MediaProperties'
+    ChoiceMessagePropertiesField:
+      type: object
+      title: Properties
+      description: Additional properties for the message.
+      properties:
+        message_properties:
+          type: object
+          properties:
+            whatsapp_footer:
+              description: Optional. Sets the text for the footer of a WhatsApp reply button or URL button message. Ignored for other channels.
+              type: string
+    AgentJoinedEventField:
+      type: object
+      title: Agent Joined Event Type
+      properties:
+        agent_joined_event:
+          title: Agent Joined Event
+          type: object
+          properties:
+            agent:
+              $ref: '#/components/schemas/Agent'
+          required:
+          - agent
+    AppMessage:
+      type: object
+      title: Message originating from app
+      description: A message originating from a Conversation API app
+      allOf:
+      - $ref: '#/components/schemas/AppMessageTypes'
+      - $ref: '#/components/schemas/AppMessageCommonProps'
+    UrlInfo:
+      type: object
+      title: URL Info
+      description: A URL/website
+      required:
+      - url
+      properties:
+        url:
+          description: The URL to be referenced
+          type: string
+        type:
+          description: Optional. URL type, e.g. Org or Social
+          type: string
+    ContactMessage:
+      title: Message originating from a contact
+      description: A message originating from a contact.
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ContactMessageTypes'
+      - $ref: '#/components/schemas/ContactMessageCommonProps'
+    FlowChannelSpecificMessage:
+      allOf:
+      - $ref: '#/components/schemas/ChannelSpecificCommonProps'
+      - type: object
+        title: WhatsApp Flow channel specific message
+        description: A message type for sending WhatsApp Flows.
+        required:
+        - flow_id
+        - flow_cta
+        properties:
+          flow_id:
+            type: string
+            description: ID of the Flow.
+          flow_token:
+            type: string
+            description: Generated token which is an identifier.
+          flow_mode:
+            type: string
+            description: The mode in which the flow is.
+            default: published
+            enum:
+            - draft
+            - published
+            x-enumDescriptions:
+              draft: The flow is in draft mode.
+              published: The flow is published.
+          flow_cta:
+            type: string
+            description: Text which is displayed on the Call To Action button (20 characters maximum, emoji not supported).
+          flow_action:
+            type: string
+            default: navigate
+            enum:
+            - navigate
+            - data_exchange
+            x-enumDescriptions:
+              navigate: The navigate flow action.
+              data_exchange: The data exchange flow action.
+          flow_action_payload:
+            type: object
+            properties:
+              screen:
+                type: string
+                description: The ID of the screen displayed first. This must be an entry screen.
+              data:
+                type: object
+                description: Data for the first screen.
+    KakaoTalkDiscountFixedCommerce:
+      description: Information about a product with fixed discount
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkRegularPriceCommerce'
+      - type: object
+        properties:
+          type:
+            enum:
+            - FIXED_DISCOUNT_COMMERCE
+            x-enumDescriptions:
+              FIXED_DISCOUNT_COMMERCE: Commerce with fixed discount
+          discount_price:
+            description: Discounted price of the product
+            type: integer
+            minimum: 0
+            maximum: 99999999
+          discount_fixed:
+            description: Fixed discount
+            type: integer
+            minimum: 0
+            maximum: 999999
+        required:
+        - discount_price
+        - discount_fixed
+    LineNotificationMessageTemplateEmphasizedItem:
+      type: object
+      description: Template emphasized item
+      required:
+      - item_key
+      - content
+      properties:
+        item_key:
+          description: Item key. See [LINE documentation](https://developers.line.biz/en/docs/partner-docs/line-notification-messages/template/?r=jp#items) for available keys
+          type: string
+        content:
+          description: Item value
+          type: string
+          maxLength: 15
+    ReasonSubCode:
+      enum:
+      - UNSPECIFIED_SUB_CODE
+      - ATTACHMENT_REJECTED
+      - MEDIA_TYPE_UNDETERMINED
+      - INACTIVE_SENDER
+      x-enumDescriptions:
+        UNSPECIFIED_SUB_CODE: UNSPECIFIED_SUB_CODE is used if no other sub code can be used to describe the encountered error.
+        ATTACHMENT_REJECTED: The message attachment was rejected by the channel due to a policy. Some channels have specific policies that must be met to receive an attachment.
+        MEDIA_TYPE_UNDETERMINED: The specified media urls media type could not be determined.
+        INACTIVE_SENDER: The used credentials for the underlying channel is inactivated and not allowed to send or receive messages.
+      type: string
+    KakaoTalkFreeCoupon:
+      title: KakaoTalk free coupon
+      description: '<p>Free coupon with the following title: "<code>title</code> 무료 쿠폰" (translates to: "<code>title</code> free coupon")</p>
+
+        <p><b>One of the following fields is required: <code>link_mo</code>, <code>scheme_android</code>, <code>scheme_ios</code></b></p>'
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkCoupon'
+      - type: object
+        properties:
+          type:
+            enum:
+            - FREE_COUPON
+          title:
+            description: Coupon title
+            type: string
+            maxLength: 7
+        required:
+        - title
+    LineNotificationMessageTemplateChannelSpecificMessage:
+      type: object
+      title: LINE notification message (template) channel specific message
+      description: A message type for sending LINE notification messages (template)
+      required:
+      - template_key
+      properties:
+        template_key:
+          description: Template key. See [LINE documentation](https://developers.line.biz/en/docs/partner-docs/line-notification-messages/template/?r=jp#templates) for available keys
+          type: string
+        body:
+          $ref: '#/components/schemas/LineNotificationMessageTemplateBody'
+    NameInfo:
+      type: object
+      title: Name of the contact
+      description: Name information of the contact.
+      required:
+      - full_name
+      properties:
+        full_name:
+          description: Full name of the contact
+          type: string
+        first_name:
+          description: First name.
+          type: string
+        last_name:
+          description: Last name.
+          type: string
+        middle_name:
+          description: Middle name.
+          type: string
+        prefix:
+          description: Prefix before the name. e.g. Mr, Mrs, Dr etc.
+          type: string
+        suffix:
+          description: Suffix after the name.
+          type: string
+    KakaoTalkButton:
+      type: object
+      properties:
+        type:
+          description: Button type
+          type: string
+        name:
+          description: Text displayed on the button
+          type: string
+          maxLength: 8
+      required:
+      - type
+      - name
+    KakaoTalkCommerceChannelSpecificMessage:
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkChannelSpecificMessage'
+      - $ref: '#/components/schemas/KakaoTalkCommerceMessage'
+      - type: object
+        title: KakaoTalk commerce channel specific message
+        description: A message type for sending KakaoTalk commerce messages
+    ConversationChannel:
+      type: string
+      title: Channel Identifier
+      description: The identifier of the channel you want to include. Must be one of the enum values.
+      example: WHATSAPP
+      x-enumDescriptions:
+        SMS: The SMS channel.
+        RCS: The RCS channel.
+        WHATSAPP: The WhatsApp channel.
+        MMS: The MMS channel.
+        KAKAOTALK: The KakaoTalk channel.
+        KAKAOTALKCHAT: The KakaoTalk chat channel (used primarily in ConsultationTalk).
+        VIBERBM: The Viber Business Messages channel.
+        LINE: The LINE channel.
+        INSTAGRAM: The Instagram channel.
+        MESSENGER: The Facebook Messenger channel.
+        WECHAT: The WeChat channel.
+        TELEGRAM: The Telegram channel.
+        APPLEBC: The Apple Messages for Business channel.
+      enum:
+      - SMS
+      - RCS
+      - WHATSAPP
+      - MMS
+      - KAKAOTALK
+      - KAKAOTALKCHAT
+      - VIBERBM
+      - LINE
+      - INSTAGRAM
+      - MESSENGER
+      - WECHAT
+      - TELEGRAM
+      - APPLEBC
+    ChannelIdentity:
+      description: 'A unique identity of message recipient on a particular channel.
+
+        For example, the channel identity on SMS, WHATSAPP or VIBERBM is a MSISDN phone number.'
+      type: object
+      title: Channel Identity
+      required:
+      - identity
+      - channel
+      properties:
+        app_id:
+          description: Required if using a channel that uses app-scoped channel identities. Currently, FB Messenger, Instagram, LINE, and WeChat use app-scoped channel identities, which means contacts will have different channel identities on different Conversation API apps. These can be thought of as virtual identities that are app-specific and, therefore, the app_id must be included in the API call.
+          type: string
+        channel:
+          $ref: '#/components/schemas/ConversationChannel'
+        identity:
+          description: The channel identity. This will differ from channel to channel. For example, a phone number for SMS, WhatsApp, and Viber Business.
+          type: string
+    Reason:
+      type: object
+      properties:
+        code:
+          $ref: '#/components/schemas/ReasonCode'
+        description:
+          description: A textual description of the reason.
+          type: string
+        sub_code:
+          $ref: '#/components/schemas/ReasonSubCode'
+        channel_code:
+          description: Error code forwarded directly from the channel. Useful in case of unmapped or channel specific errors. Currently only supported on the WhatsApp channel.
+          type: string
+    KakaoTalkFixedDiscountCoupon:
+      title: KakaoTalk fixed discount coupon
+      description: '<p>Fixed discount coupon with with the following title: "<code>discount_fixed</code> 원 할인 쿠폰" (translates to: "<code>discount_fixed</code> won discount coupon")</p>
+
+        <p><b>One of the following fields is required: <code>link_mo</code>, <code>scheme_android</code>, <code>scheme_ios</code></b></p>'
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkCoupon'
+      - type: object
+        properties:
+          type:
+            enum:
+            - FIXED_DISCOUNT_COUPON
+          discount_fixed:
+            description: Fixed discount
+            type: integer
+            minimum: 0
+            maximum: 999999
+        required:
+        - discount_fixed
+    KakaoTalkAppLinkButton:
+      title: KakaoTalk App Link Button
+      description: A button that opens an app link (e.g. call button)
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkButton'
+      - type: object
+        properties:
+          type:
+            enum:
+            - AL
+          scheme_ios:
+            type: string
+            description: App link opened on an iOS device (e.g. `tel://PHONE_NUMBER`)
+          scheme_android:
+            type: string
+            description: App link opened on an Android device (e.g. `tel://PHONE_NUMBER`)
+        required:
+        - scheme_ios
+        - scheme_android
+    KakaoTalkUpCoupon:
+      title: KakaoTalk UP coupon
+      description: '<p>UP coupon with the following title: "<code>title</code> UP 쿠폰" (translates to: "<code>title</code> UP coupon")</p>
+
+        <p><b>One of the following fields is required: <code>link_mo</code>, <code>scheme_android</code>, <code>scheme_ios</code></b></p>'
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkCoupon'
+      - type: object
+        properties:
+          type:
+            enum:
+            - UP_COUPON
+          title:
+            description: Coupon title
+            type: string
+            maxLength: 7
+        required:
+        - title
+    EmailInfo:
+      type: object
+      title: Email information
+      description: Email addresses of the contact.
+      required:
+      - email_address
+      properties:
+        email_address:
+          description: Email address.
+          type: string
+        type:
+          description: Email address type. e.g. WORK or HOME.
+          type: string
+    ChoiceResponseMessageField:
+      description: Represents a response to a choice message.
+      type: object
+      title: Choice Response
+      properties:
+        choice_response_message:
+          title: Choice Response Message
+          type: object
+          required:
+          - message_id
+          - postback_data
+          properties:
+            message_id:
+              description: The message id containing the choice.
+              type: string
+            postback_data:
+              description: The postback_data defined in the selected choice.
+              type: string
+    KakaoTalkChannelSpecificMessage:
+      type: object
+      properties:
+        push_alarm:
+          type: boolean
+          default: true
+          description: Set to `true` if a push alarm should be sent to a device.
+        adult:
+          type: boolean
+          default: false
+          description: Set to `true` if a message contains adult content. Set to `false` by default.
+    ConversationTelegramBotInfoDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            ACTIVE: The communication channel is active and operating normally.
+            ERROR: The communication channel has encountered an operational error and is disabled.
+            FAILING: The communication channel is failing validation or delivery metrics and requires troubleshooting.
+            PENDING: The communication channel setup or verification is pending system completion.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Channel integration status.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/ConversationChannelStatusEnum'
+        statusDescription:
+          type: string
+          description: Channel integration description if status is ERROR or FAILED.
+          uniqueItems: false
+        name:
+          type: string
+          description: Name of the bot.
+          uniqueItems: false
+        username:
+          type: string
+          description: Username of the bot.
+          uniqueItems: false
+        canJoinGroups:
+          type: boolean
+          description: If the bot can be invited to groups.
+          uniqueItems: false
+        canReadAllGroupMessages:
+          type: boolean
+          description: If <a href="https://core.telegram.org/bots#privacy-mode">privacy mode</a> is disabled for the bot.
+          uniqueItems: false
+        supportsInlineQueries:
+          type: boolean
+          description: If the bot supports inline queries.
+          uniqueItems: false
+      required:
+      - status
+    ConversationMessengerInfoDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            ACTIVE: The communication channel is active and operating normally.
+            ERROR: The communication channel has encountered an operational error and is disabled.
+            FAILING: The communication channel is failing validation or delivery metrics and requires troubleshooting.
+            PENDING: The communication channel setup or verification is pending system completion.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Channel integration status.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/ConversationChannelStatusEnum'
+        statusDescription:
+          type: string
+          description: Channel integration description if status is ERROR or FAILED.
+          uniqueItems: false
+        id:
+          type: string
+          description: The ID of the page.
+          uniqueItems: false
+        name:
+          type: string
+          description: The name of the page.
+          uniqueItems: false
+        globalBrandPageName:
+          type: string
+          description: The name of the Page with country codes appended for Global Pages. Only visible to the Page admin.
+          uniqueItems: false
+      required:
+      - status
+    ConversationAccountLocationDto:
+      type: object
+      properties:
+        lon:
+          type: number
+          description: Location longitude
+          uniqueItems: false
+        lat:
+          type: number
+          description: Location latitude
+          uniqueItems: false
+      required:
+      - lon
+      - lat
+    ConversationInstagramInfoDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            ACTIVE: The communication channel is active and operating normally.
+            ERROR: The communication channel has encountered an operational error and is disabled.
+            FAILING: The communication channel is failing validation or delivery metrics and requires troubleshooting.
+            PENDING: The communication channel setup or verification is pending system completion.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Channel integration status.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/ConversationChannelStatusEnum'
+        statusDescription:
+          type: string
+          description: Channel integration description if status is ERROR or FAILED.
+          uniqueItems: false
+        id:
+          type: string
+          description: Instagram ID.
+          uniqueItems: false
+        name:
+          type: string
+          description: Public profile name if set.
+          uniqueItems: false
+        username:
+          type: string
+          description: Profile username.
+          uniqueItems: false
+        biography:
+          type: string
+          description: Public profile biography if set.
+          uniqueItems: false
+        followersCount:
+          type: number
+          description: Total number of Instagram users following the sender.
+          uniqueItems: false
+        followsCount:
+          type: number
+          description: Total number of Instagram users the sender follows.
+          uniqueItems: false
+        mediaCount:
+          type: number
+          description: Total number of Instagram Media published on the sender.
+          uniqueItems: false
+        profilePictureUrl:
+          type: string
+          description: Public profile picture URL if set.
+          uniqueItems: false
+        website:
+          type: string
+          description: Public profile website URL if set.
+          uniqueItems: false
+      required:
+      - status
+    ConversationViberBotInfoDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            ACTIVE: The communication channel is active and operating normally.
+            ERROR: The communication channel has encountered an operational error and is disabled.
+            FAILING: The communication channel is failing validation or delivery metrics and requires troubleshooting.
+            PENDING: The communication channel setup or verification is pending system completion.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Channel integration status.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/ConversationChannelStatusEnum'
+        statusDescription:
+          type: string
+          description: Channel integration description if status is ERROR or FAILED.
+          uniqueItems: false
+        id:
+          type: string
+          description: Account ID
+          uniqueItems: false
+        name:
+          type: string
+          description: Account name
+          uniqueItems: false
+        uri:
+          type: string
+          description: Account URI
+          uniqueItems: false
+        icon:
+          type: string
+          description: Account icon URI
+          uniqueItems: false
+        category:
+          type: string
+          description: Account category
+          uniqueItems: false
+        subcategory:
+          type: string
+          description: Account subcategory
+          uniqueItems: false
+        location:
+          description: Account location
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/ConversationAccountLocationDto'
+        country:
+          type: string
+          description: Account country name (long)
+          uniqueItems: false
+        subscribersCount:
+          type: number
+          description: Account subscribers count
+          uniqueItems: false
+      required:
+      - status
+    ConversationChannelStatusEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - ERROR
+      - FAILING
+      - PENDING
+      - UNRECOGNIZED
+      description: Channel integration status.
+    ConversationPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+  examples:
+    createConversationRequest:
+      summary: Create a new conversation
+      value:
+        active: true
+        active_channel: WHATSAPP
+        app_id: '{APP_ID}'
+        contact_id: '{CONTACT_ID}'
+        id: string
+        metadata: string
+        metadata_json: {}
+    injectEventRequest:
+      summary: Inject Event Request
+      value:
+        id: string
+        direction: TO_APP
+        channel_identity:
+          channel: MESSENGER
+          identity: '{{FACEBOOK_USER_NAME}}'
+          app_id: '{{APP_ID}}'
+        app_event:
+          composing_event: {}
+        accept_time: YYYY-MM-DDTHH:MM:SS
+    updateConversationRequest:
+      summary: Update a conversation
+      value:
+        app_id: 'string '
+        metadata: string
+        active_channel: WHATSAPP
+        active: true
+    injectMessageRequest:
+      summary: Inject a message into a specific conversation
+      value:
+        direction: TO_CONTACT
+        channel_identity:
+          channel: '{{CHANNEL_NAME}}'
+          identity: '{{CHANNEL_IDENTITY}}'
+        app_message:
+          text_message:
+            text: string
+        contact_id: string
+        accept_time: YYYY-MM-DDTHH:MM:SS
+    injectEventResponse:
+      summary: Inject event response
+      value:
+        event_id: string
+        accepted_time: YYYY-MM-DDTHH:MM:SS
+  responses:
+    listRecentConversationResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListRecentConversationsResponse'
+    500Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 500
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    401Error:
+      description: Incorrect credentials. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            type: object
+    createConversationResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Conversation'
+    listConversationsResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListConversationsResponse'
+    getConversationResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Conversation'
+    403Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 403
+            message: You do not have access to the requested resource.
+            status: UNAUTHORIZED
+            details: []
+    injectEventResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InjectEventResponse'
+          examples:
+            injectEventResponse:
+              $ref: '#/components/examples/injectEventResponse'
+    501Error:
+      description: Something went wrong on our end, try again with exponential back-off. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 501
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    400Error:
+      description: Malformed request. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 400
+            message: Malformed request
+            status: INVALID_REQUEST
+            details: []
+  requestBodies:
+    InjectEventRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InjectConversationEventRequest'
+          examples:
+            injectEventRequest:
+              $ref: '#/components/examples/injectEventRequest'
+      description: Inject event request
+      required: true
+    UpdateConversationRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Conversation'
+          examples:
+            updateConversationRequest:
+              $ref: '#/components/examples/updateConversationRequest'
+      description: The updated conversation.
+      required: true
+    CreateConversationRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CreateConversationRequest'
+          examples:
+            createNewConversation:
+              $ref: '#/components/examples/createConversationRequest'
+      description: The conversation to create. ID will be generated for the conversation and any ID in the given conversation will be ignored.
+      required: true
+    InjectMessageRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/InjectMessageRequest'
+          examples:
+            injectNewMessage:
+              $ref: '#/components/examples/injectMessageRequest'
+      description: Message to be injected.
+      required: true
+  parameters:
+    conversation_id:
+      name: conversation_id
+      description: The unique ID of the conversation. This is generated by the system.
+      in: path
+      required: true
+      schema:
+        type: string
+    query_contact_id:
+      name: contact_id
+      description: Resource name (ID) of the contact.
+      in: query
+      schema:
+        type: string
+    project_id:
+      name: project_id
+      description: The unique ID of the project. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+      in: path
+      required: true
+      schema:
+        type: string
+    update_mask:
+      description: The set of field mask paths.
+      name: update_mask
+      in: query
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    query_app_id:
+      description: The ID of the app involved in the conversations.
+      name: app_id
+      in: query
+      schema:
+        type: string
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/conversation/api-reference/#authentication).
+    oAuth2:
+      type: oauth2
+      description: The user name and password are your client_id and key_secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
+x-refined-from:
+- sinch-conversation-api-openapi.yaml
+- sinch-provisioning-api-openapi.yaml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

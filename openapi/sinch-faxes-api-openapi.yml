@@ -1,31 +1,398 @@
 openapi: 3.2.0
 info:
-  title: Sinch Fax Faxes API
-  description: The Sinch Fax API allows developers to send and receive faxes programmatically at scale. It supports sending faxes to single or multiple recipients, downloading received faxes, and managing fax numbers. The API is HIPAA, SOC 2 Type 1, and GDPR compliant, making it suitable for healthcare and other regulated industries that require secure document transmission. It integrates with the Sinch Numbers API for provisioning fax-capable phone numbers.
+  title: Sinch Faxes API
   version: '3.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  description: 'Operations tagged Faxes across 2 of this provider''s published API definitions: sinch-fax-api-openapi.yaml, original-sinch-fax-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://fax.api.sinch.com
-  description: Global Production Server
-security:
-- oAuth2: []
-- basicAuth: []
+  description: v3.0 of the Fax API
 tags:
 - name: Faxes
-  description: Send and manage faxes including sending to single or multiple recipients, listing sent and received faxes, and downloading fax content.
+  description: 'The Fax API allows you to send and receive faxes. You can send faxes to a single recipient or to multiple recipients. You can also receive faxes and download them.
+
+
+    To send a TEST Outbound fax you can send a fax TO +19898989898. This will emulate all aspects of a real fax without charging your account.'
 paths:
+  /v3/projects/{projectId}/faxes:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    post:
+      tags:
+      - Faxes
+      summary: Send a fax
+      description: 'Create and send a fax.
+
+
+        Fax content may be supplied via one or more files or URLs of supported filetypes.
+
+
+        This endpoint supports the following content types for the fax payload:
+
+
+        - Multipart/form-data
+
+        - Application/json
+
+
+        We will however always return a fax object in the response in application json. If you supply a callbackUrl the callback will be sent as multipart/form-data
+
+        with the content of the fax as an attachment to the body, *unless* you specify callbackUrlContentType as application/json.
+
+
+        #### file(s)
+
+        Files may be included in the POST request as multipart/form-data parts.
+
+
+        #### contentUrl
+
+        Any URL on the Internet (including ones with basic authentication), and we''ll pull it down and make it a fax. This might be useful to you if you''re using a web framework for templates and creating fax files.
+
+
+        Please note: If you are passing fax a secure URL (starting with `https://`), make sure that your SSL certificate (including your intermediate cert, if you have one) is installed properly, valid, and up-to-date.'
+      operationId: sendFax
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              required:
+              - to
+              allOf:
+              - type: object
+                properties:
+                  to:
+                    description: 'When you send a fax you can specify a single number or a list of numbers separated by commas (for example, `+12345550100,+12345550101`).
+
+                      Please note that if you specify a list of numbers, the fax will be sent to all numbers and a Fax resource will be created for each number.
+
+
+                      When you receive a fax, this is the number where the fax is sent to.'
+                    $ref: '#/components/schemas/PhoneNumber'
+                  file:
+                    description: 'The file(s) you want to send as a fax as body attachment. You made use any of the following file types:
+
+
+                      - `.docx`
+
+                      - `.html`
+
+                      - `.jpg`
+
+                      - `.png`
+
+                      - `.tif`
+
+                      - `.pdf`
+
+                      - `.txt`'
+                    type: string
+                    format: binary
+              - $ref: '#/components/schemas/Fax'
+            encoding:
+              files:
+                contentType: application/octet-stream
+            examples:
+              SendFax:
+                $ref: '#/components/examples/SendWebPageAsFax'
+              SendFileAsFaxWithCoverPage:
+                $ref: '#/components/examples/SendFileAsFaxWithCoverPage'
+              SendFileAsFax:
+                $ref: '#/components/examples/SendFileAsFax'
+          application/json:
+            schema:
+              required:
+              - to
+              allOf:
+              - type: object
+                properties:
+                  to:
+                    description: 'When you send a fax you can specify a single number, a list of numbers separated by by commas (for example, `+12345550100,+12345550101`), or an array of phone numbers.
+
+                      Please note that if you specify a list of numbers, the fax will be sent to all numbers and a Fax resource will be created for each number.
+
+
+                      When you receive a fax, this is the number where the fax is sent to.'
+                    oneOf:
+                    - $ref: '#/components/schemas/PhoneNumber'
+                    - $ref: '#/components/schemas/PhoneNumberArray'
+                  from:
+                    $ref: '#/components/schemas/PhoneNumber'
+                    description: 'The number you want to send a fax from. This number must be associated with your account.
+
+                      If you do not specify a from number, we will use the first number associated with your account.'
+              - $ref: '#/components/schemas/FaxBase64Array'
+              - $ref: '#/components/schemas/Fax'
+            examples:
+              SendFileAsFaxWithCoverPage:
+                $ref: '#/components/examples/SendFileAsFaxWithCoverPage'
+              SendWebPageAsFax:
+                $ref: '#/components/examples/SendWebPageAsFax'
+              SendFileAsFaxJson:
+                $ref: '#/components/examples/SendFileAsFaxJson'
+      responses:
+        '200':
+          description: The created fax
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fax'
+              example:
+                id: 01HDF5S9P29WC29J578J8EKC1C
+                direction: OUTBOUND
+                to: '+1234567890'
+                status: IN_PROGRESS
+                headerTimeZone: America/New_York
+                retryDelaySeconds: 60
+                callbackUrl: https://my.callback.server
+                projectId: YOUR_PROJECT_ID
+                serviceId: YOUR_SERVICE_ID
+                maxRetries: 3
+                createTime: '2023-10-23T21:06:52.231Z'
+                headerPageNumbers: true
+                contentUrl: https://www.google.com
+                imageConversionMethod: HALFTONE
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The recipient number you want to send a Fax to\n  const faxRecipientNumber = 'FAX_RECIPIENT_NUMBER';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.faxes.send({\n      sendFaxRequestBody: {\n        to: faxRecipientNumber,\n        contentUrl: 'https://developers.sinch.com/fax/fax.pdf',\n      },\n    });\n    console.log('✅ Successfully sent the Fax.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to send the Fax to the recipient number ${faxRecipientNumber}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    get:
+      tags:
+      - Faxes
+      summary: List faxes
+      operationId: getFaxes
+      description: 'List faxes sent (OUTBOUND) or received (INBOUND), set parameters to filter the list.
+
+        Example: Return calls made between 1st of January 2021 and 10th of January 2021.
+
+        ```
+
+        created>=2021-01-01&startTime<=2021-01-10
+
+        ```'
+      parameters:
+      - name: serviceId
+        in: query
+        description: Limits results to faxes that were sent using the specified service.
+        schema:
+          type: string
+          example: YOUR_SERVICE_ID
+      - name: createTime
+        in: query
+        description: 'Filter calls based on  `createTime`. If you make the query more precise, fewer results will be returned.
+
+          For example, `2021-02-01` will return all calls from the first of February 2021, and `2021-02-01T14:00:00Z` will return all calls after 14:00 on the first of February.
+
+          This field also supports `<=` and `>=` to search for calls in a range `?createTime>=2021-10-01&startTime<=2021-10-30` to get a list of calls for all of October 2021.
+
+          It is also possible to submit partial dates. For example, `createTime=2021-02` will return all calls for February 2021.
+
+
+          If not value is submitted, the default value is the prior week.'
+        schema:
+          type: string
+          format: date-time
+      - name: direction
+        in: query
+        description: Limits results to faxes with the specified direction.
+        schema:
+          $ref: '#/components/schemas/FaxDirection'
+        example: OUTBOUND
+      - name: status
+        in: query
+        description: Limits results to faxes with the specified status.
+        schema:
+          $ref: '#/components/schemas/FaxStatus'
+        example: COMPLETED
+      - name: to
+        in: query
+        description: Filters the results by the phone number to which the fax was sent. The parameter search with startsWith, so you can pass a partial number to get all faxes sent to numbers that start with the number you passed.
+        schema:
+          $ref: '#/components/schemas/PhoneNumber'
+        example: '+14155552222'
+      - name: from
+        in: query
+        description: Filters the results by the phone number from which the fax was sent.  The parameter search with startsWith, so you can pass a partial number to get all faxes sent to numbers that start with the number you passed.
+        schema:
+          $ref: '#/components/schemas/PhoneNumber'
+      - $ref: '#/components/parameters/Labels'
+      - $ref: '#/components/parameters/Format'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/Page'
+      - name: fromCountry
+        in: query
+        description: Filter by the country which sent the fax. The country code should be in ISO 3166-1 alpha-2 format.
+        schema:
+          type: string
+          example: US
+      - name: toCountry
+        in: query
+        description: Filter by the country to which the fax was sent. The country code should be in ISO 3166-1 alpha-2 format.
+        schema:
+          type: string
+          example: US
+      responses:
+        '200':
+          description: Result of the query.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListFaxesObject'
+            text/csv:
+              schema: {}
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.faxes.list({});\n    if (response.data.length === 0) {\n      console.log('No Faxes found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Faxes.`);\n    response.data.forEach((fax) => {\n      console.log(fax);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list Faxes:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: v3.0 of the Fax API
+  /v3/projects/{projectId}/faxes/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+      - Faxes
+      summary: Get fax
+      description: Get fax information using the ID number of the fax.
+      operationId: getFaxInfoPerId
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: The fax
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Fax'
+              example:
+                id: 01HDF5S9P29WC29J578J8EKC1C
+                direction: OUTBOUND
+                to: '+1234567890'
+                status: IN_PROGRESS
+                headerTimeZone: America/New_York
+                retryDelaySeconds: 60
+                callbackUrl: https://my.callback.server
+                projectId: YOUR_PROJECT_ID
+                serviceId: YOUR_SERVICE_ID
+                maxRetries: 3
+                createTime: '2023-10-23T21:06:52.231Z'
+                headerPageNumbers: true
+                contentUrl:
+                - www.google.com
+                imageConversionMethod: HALFTONE
+                hasFile: false
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax ID you want to retrieve\n  const faxId = 'FAX_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.faxes.get({ id: faxId });\n    console.log('✅ Successfully retrieved the Fax.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the Fax with ID: ${faxId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: v3.0 of the Fax API
+  /v3/projects/{projectId}/faxes/{id}/file:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+      - Faxes
+      summary: Download fax content
+      description: Download the fax content.
+      operationId: getFaxFilebyId
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '200':
+          description: A file for the fax you requested will be returned in the format you specified.
+          content:
+            application/pdf:
+              schema:
+                description: 'A PDF file named ''fax-1234.pdf'' containing all files sent for fax #1234.'
+                type: string
+                format: binary
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport { writeFileSync } from 'fs';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax ID you want to download the content from\n  const faxId = 'FAX_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.faxes.downloadContent({\n      id: faxId,\n    });\n    console.log('✅ Successfully downloaded the Fax content.');\n    writeFileSync(`fax_${faxId}.pdf`, response.buffer);\n  } catch (err) {\n    console.error(`❌ Failed to download the content from the Fax with ID: ${faxId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    delete:
+      tags:
+      - Faxes
+      summary: Delete fax content
+      description: 'Delete the fax content for a fax using the ID number of the fax.
+
+        Please note that this only deletes the content of the fax from storage.'
+      operationId: deleteFaxContentById
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      responses:
+        '204':
+          description: The fax content was deleted.
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax ID you want to delete the content from\n  const faxId = 'FAX_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    await sinch.fax.faxes.deleteContent({ id: faxId });\n    console.log(`✅ Successfully deleted content from the Fax with ID ${faxId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete content from the Fax with ID: ${faxId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: v3.0 of the Fax API
+  /v3/projects/{projectId}/faxes/{id}/file.{fileFormat}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+      - Faxes
+      summary: Download fax content
+      description: Download the fax content.
+      operationId: getFaxFileByIdDeprecated
+      deprecated: true
+      parameters:
+      - $ref: '#/components/parameters/Id'
+      - name: fileFormat
+        in: path
+        required: true
+        schema:
+          type: string
+          enum:
+          - pdf
+          default: pdf
+          x-enumDescriptions:
+            pdf: PDF format
+        description: The file format to download. Currently only PDF is supported.
+        example: pdf
+      responses:
+        '200':
+          description: A file for the fax you requested will be returned in the format you specified.
+          content:
+            application/pdf:
+              schema:
+                description: 'A PDF file named ''fax-1234.pdf'' containing all files sent for fax #1234.'
+                type: string
+                format: binary
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport { writeFileSync } from 'fs';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax ID you want to download the content from\n  const faxId = 'FAX_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.faxes.downloadContent({\n      id: faxId,\n      fileFormat: 'pdf',\n    });\n    console.log('✅ Successfully downloaded the Fax content (deprecated /file.pdf path).');\n    writeFileSync(`fax_${faxId}.pdf`, response.buffer);\n  } catch (err) {\n    console.error(`❌ Failed to download the content from the Fax with ID: ${faxId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: v3.0 of the Fax API
   /v3/projects/{project_id}/faxes:
     post:
-      operationId: sendFax
+      operationId: postV3ProjectsByProjectIdFaxes
       summary: Send a Fax
       description: Sends a fax to one or more recipients. The fax content can be provided as a URL to a document or as a file upload. Supports PDF and TIFF formats.
       tags:
       - Faxes
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       requestBody:
         required: true
         content:
@@ -41,11 +408,16 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Fax'
+                $ref: '#/components/schemas/Fax_2'
         '400':
           description: Invalid request
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
+      x-operation-id-source: normalized
+      x-operation-id-original: sendFax
     get:
       operationId: listFaxes
       summary: List Faxes
@@ -53,7 +425,7 @@ paths:
       tags:
       - Faxes
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - name: page
         in: query
         description: The page number to retrieve
@@ -101,6 +473,12 @@ paths:
                 $ref: '#/components/schemas/FaxList'
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: Global Production Server
   /v3/projects/{project_id}/faxes/{fax_id}:
     get:
       operationId: getFax
@@ -109,7 +487,7 @@ paths:
       tags:
       - Faxes
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/FaxId'
       responses:
         '200':
@@ -117,11 +495,14 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/Fax'
+                $ref: '#/components/schemas/Fax_2'
         '401':
           description: Unauthorized
         '404':
           description: Fax not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
     delete:
       operationId: deleteFaxContent
       summary: Delete Fax Content
@@ -129,7 +510,7 @@ paths:
       tags:
       - Faxes
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/FaxId'
       responses:
         '200':
@@ -138,6 +519,12 @@ paths:
           description: Unauthorized
         '404':
           description: Fax not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: Global Production Server
   /v3/projects/{project_id}/faxes/{fax_id}/file:
     get:
       operationId: downloadFaxContent
@@ -146,7 +533,7 @@ paths:
       tags:
       - Faxes
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/FaxId'
       responses:
         '200':
@@ -160,28 +547,687 @@ paths:
           description: Unauthorized
         '404':
           description: Fax not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: Global Production Server
+webhooks:
+  incomingFax:
+    post:
+      security:
+      - WebhookBasicAuth: []
+      operationId: incomingFaxEvent
+      tags:
+      - Faxes
+      summary: Incoming fax event
+      description: 'This webhook is triggered when a fax is received on a Sinch number associated with a service. The webhook will contain information about the fax, such as the sender, the recipient, and the content of the fax. You set the callback URL for incoming fax events on the service, either through the dashboard or using the service API.
+
+
+        ### Example payloads
+
+
+        Multipart/form-data request payloads are encoded as forms with a content type of JSON and the actual fax content as a **''file'' application/pdf attachment**.
+
+
+        Application/json request payloads are a JSON object with the file encoded as a base64 string as part of the JSON object.'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+              - type: object
+                properties:
+                  event:
+                    type: string
+                    description: The value is always `INCOMING_FAX` for this event.
+                    enum:
+                    - INCOMING_FAX
+                    default: INCOMING_FAX
+                  file:
+                    $ref: '#/components/schemas/FileTypeMultiPart'
+              - $ref: '#/components/schemas/GenericEvent'
+            encoding:
+              file:
+                contentType: application/pdf
+              fax:
+                contentType: application/json
+              event:
+                contentType: application/json
+            example:
+              event: INCOMING_FAX
+              eventTime: '2021-11-01T23:25:57Z'
+              fax:
+                id: 01HDFHACK1YN7CCDYRA6ZRMA8Z
+                direction: INBOUND
+                from: '+14155552222'
+                to: '+14155553333'
+                numberOfPages: 1
+                status: COMPLETED
+                price:
+                  amount: '0.00'
+                  currencyCode: USD
+                createTime: '2021-11-01T23:25:57Z'
+                completedTime: '2021-11-01T23:25:57Z'
+                projectId: YOUR_PROJECT_ID
+                serviceId: YOUR_SERVICE_ID
+              file: '{application/pdf}'
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  allOf:
+                  - $ref: '#/components/schemas/WebhookEvents'
+                  description: Always `INCOMING_FAX` for this event.
+                  enum:
+                  - INCOMING_FAX
+                  default: INCOMING_FAX
+                eventTime:
+                  description: Time of the event.
+                  type: string
+                  format: date-time
+                fax:
+                  description: The incoming fax.
+                  $ref: '#/components/schemas/Fax'
+                file:
+                  description: The base64 encoded file.
+                  type: string
+                  example: '{base64_encodedData}'
+                fileType:
+                  $ref: '#/components/schemas/FileTypeJson'
+            example:
+              event: INCOMING_FAX
+              eventTime: '2021-11-01T23:25:57Z'
+              fax:
+                id: 01HDFHACK1YN7CCDYRA6ZRMA8Z
+                direction: INBOUND
+                from: '+14155552222'
+                to: '+14155553333'
+                numberOfPages: 1
+                status: COMPLETED
+                price:
+                  amount: '0.00'
+                  currencyCode: USD
+                createTime: '2021-11-01T23:25:57Z'
+                completedTime: '2021-11-01T23:25:57Z'
+                projectId: YOUR_PROJECT_ID
+                serviceId: YOUR_SERVICE_ID
+              file: '{base64_encodedData}'
+              fileType: PDF
+      responses:
+        '200':
+          description: Returns a 200 OK response if the webhook was received successfully.
+    servers:
+    - url: https://fax.api.sinch.com
+      description: v3.0 of the Fax API
+  faxCompleted:
+    post:
+      security:
+      - WebhookBasicAuth: []
+      summary: Fax completed
+      description: Triggered when the fax has been completed. The callback will contain information about the fax, such as the sender, the recipient, and the content of the fax. You must set the callback URL where you want the callback sent when you make a send fax request.
+      operationId: faxCompletedCallback
+      tags:
+      - Faxes
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+              - type: object
+                properties:
+                  event:
+                    type: string
+                    description: Always fax completed for this event.
+                    enum:
+                    - FAX_COMPLETED
+                    default: FAX_COMPLETED
+                  file:
+                    description: The fax content as pdf attachment to the body
+                    type: string
+                    format: binary
+                    contentMediaType: application/pdf
+                    contentEncoding: binary
+              - $ref: '#/components/schemas/GenericEvent'
+            encoding:
+              file:
+                contentType: application/pdf
+              fax:
+                contentType: application/json
+              event:
+                contentType: application/json
+            example:
+              event: FAX_COMPLETED
+              eventTime: '2021-11-01T23:25:57Z'
+              fax:
+                id: 01HDFHACK1YN7CCDYRA6ZRMA8Z
+                direction: INBOUND
+                from: '+14155552222'
+                to: '+14155553333'
+                numberOfPages: 1
+                status: COMPLETED
+                price:
+                  amount: '0.07'
+                  currencyCode: USD
+                createTime: '2021-11-01T23:25:57Z'
+                completedTime: '2021-11-01T23:25:57Z'
+                callbackUrl: https://www.my-website.com/callback
+                callbackUrlContentType: multipart/form-data
+                imageConversionMethod: HALFTONE
+                projectId: YOUR_PROJECT_ID
+                serviceId: YOUR_SERVICE_ID
+              file: '{application/pdf}'
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  allOf:
+                  - $ref: '#/components/schemas/WebhookEvents'
+                  description: Always `FAX_COMPLETED` for this event.
+                  enum:
+                  - FAX_COMPLETED
+                  default: FAX_COMPLETED
+                eventTime:
+                  description: Time of the event.
+                  type: string
+                  format: date-time
+                fax:
+                  description: The incoming fax.
+                  $ref: '#/components/schemas/Fax'
+                files:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FaxBase64File'
+            example:
+              event: FAX_COMPLETED
+              eventTime: '2021-11-01T23:25:57Z'
+              fax:
+                id: 01HDFHACK1YN7CCDYRA6ZRMA8Z
+                direction: INBOUND
+                from: '+14155552222'
+                to: '+14155553333'
+                numberOfPages: 1
+                status: COMPLETED
+                price:
+                  amount: '0.07'
+                  currencyCode: USD
+                createTime: '2021-11-01T23:25:57Z'
+                completedTime: '2021-11-01T23:25:57Z'
+                callbackUrl: https://www.my-website.com/callback
+                callbackUrlContentType: application/json
+                projectId: YOUR_PROJECT_ID
+                serviceId: YOUR_SERVICE_ID
+              files:
+              - file: '{base64ecnodeddata}'
+                fileType: PDF
+      responses:
+        '200':
+          description: Returns a 200 OK response if the webhook was received successfully.
+    servers:
+    - url: https://fax.api.sinch.com
+      description: v3.0 of the Fax API
 components:
   schemas:
-    SendFaxMultipartRequest:
+    Resolution:
+      type: string
+      description: The resolution for the fax. If this is set at the service, this applies to all faxes sent using that service. If this is set on the fax, this will override the service setting.
+      enum:
+      - FINE
+      - SUPERFINE
+      x-enumDescriptions:
+        FINE: Most commonly accepted fax resolution at 200 dpi.
+        SUPERFINE: Higher but less commonly accepted fax resolution at 400 dpi. May be required when sending small text or detailed images.
+    FaxId:
+      type: string
+      readOnly: true
+      description: The id of a fax
+      example: 01F3J0G1M4WQR6HGY6HCF6JA0K
+    Money:
+      description: This is where we need description to be overridden by `$ref:` description
       type: object
-      required:
-      - to
-      - file
+      readOnly: true
       properties:
-        to:
+        currencyCode:
+          readOnly: true
+          description: The 3-letter currency code defined in ISO 4217.
           type: string
-          description: The recipient fax number in E.164 format
-        from:
+          example: USD
+        amount:
+          readOnly: true
+          description: The amount with 4 decimals and decimal delimiter `.`.
           type: string
-          description: The sender fax number
+          example: '0.0040'
+    WebhookEvents:
+      type: string
+      enum:
+      - INCOMING_FAX
+      - FAX_COMPLETED
+      x-enumDescriptions:
+        INCOMING_FAX: A webhook event triggered by an fax is incoming.
+        FAX_COMPLETED: A webhook event triggered by a fax that has successfully completed.
+      description: The different events that can trigger a webhook
+    FaxBase64File:
+      type: object
+      properties:
         file:
           type: string
-          format: binary
-          description: The document file to fax
-        serviceId:
-          type: string
-          description: The fax service to use
+          format: base64
+          contentEncoding: base64
+          description: When application/json Base64 encoded file content, this is only present when using application/json for request/response.
+          example: '{base64-encoded content}'
+        fileType:
+          $ref: '#/components/schemas/FileTypeJson'
     Fax:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/FaxId'
+        direction:
+          allOf:
+          - $ref: '#/components/schemas/FaxDirection'
+          readOnly: true
+        from:
+          allOf:
+          - $ref: '#/components/schemas/PhoneNumber'
+          readOnly: false
+          description: 'For `INBOUND` faxes, this is the number where the fax is sent from
+
+            For `OUTBOUND` faxes, this is the Sinch number you want to have as sender'
+        to:
+          allOf:
+          - $ref: '#/components/schemas/PhoneNumber'
+          readOnly: false
+          description: "For `INBOUND` faxes, this is the Sinch number someone sent the fax to.\nFor `OUTBOUND` faxes, this is the phone number you want to send a fax to.\n\nYou can add multiple numbers by adding them as an array. For example:\n\n  application/json\n\n  ```json\n  \"to\": [\"+14155552222\", \"+14155553333\"]\n  ```\n\n  multipart/form\n  ```json\n  to=+14155552222&to=+14155553333\n\n  ```"
+        contentUrl:
+          anyOf:
+          - type: string
+            format: url
+            description: 'Single URL. Fetched documents must be one of the following file types: `.docx`, `html.`, `.jpg`, `.pdf`, `.png`, `.tif`, `.txt`.'
+            example: https://example.com/fax.pdf
+          - type: array
+            items:
+              type: string
+              format: url
+            description: 'Multiple URLs. Fetched documents must be one of the following file types: `.docx`, `html.`, `.jpg`, `.pdf`, `.png`, `.tif`, `.txt`.'
+            example:
+            - https://www.google.com
+            - https://www.sinch.com
+          format: URL
+          description: 'Give us any URL on the Internet (including ones with basic authentication)
+
+            At least one file or contentUrl parameter is required.
+
+            Please note: If you are passing fax a secure URL (starting with https://), make sure that your SSL certificate (including your intermediate cert, if you have one) is installed properly, valid, and up-to-date.
+
+            If the file parameter is specified as well, content from URLs will be rendered before content from files.
+
+
+            You can add multiple URLs by adding them as an array them with a comma when posting as multipart/form-data
+
+
+            For example: "https://developers.sinch.com/fax/fax.pdf, https://developers.sinch.com/" or if posting JSON `"contentUrl": ["https://developers.sinch.com/fax/fax.pdf", "https://developers.sinch.com/"]`'
+          example: https://developers.sinch.com/fax/fax.pdf
+        numberOfPages:
+          type: integer
+          readOnly: true
+          description: The number of pages in the fax.
+        status:
+          $ref: '#/components/schemas/FaxStatus'
+        price:
+          description: The total price for this fax. This field is populated after the final fax price is calculated.
+          allOf:
+          - $ref: '#/components/schemas/Money'
+          readOnly: true
+        barCodes:
+          description: The bar codes found in the fax. This field is populated when Sinch detects bar codes on incoming faxes.
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/BarCode'
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          description: A timestamp representing the time when the initial API call was made.
+        completedTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: If the job is complete, this is a timestamp representing the time the job was completed.
+        pagesSentSuccessfully:
+          type: integer
+          description: The number of pages successfully sent to the receiving side in the fax.
+          readOnly: true
+          example: 3
+        headerText:
+          description: Text that will be displayed at the top of each page of the fax. 50 characters maximum. Default header text is "-". Note that the header is not applied until the fax is transmitted, so it will not appear on fax PDFs or thumbnails.
+          type: string
+          maximum: 50
+          default: ''
+        headerPageNumbers:
+          type: boolean
+          description: If true, page numbers will be displayed in the header. Default is true.
+          default: true
+        headerTimeZone:
+          type: string
+          format: timezone
+          description: A [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) string specifying the timezone for the header timestamp.
+          default: America/New_York
+        retryDelaySeconds:
+          description: The number of seconds to wait between retries if the fax is not yet completed.
+          type: integer
+          minimum: 30
+          maximum: 300
+          default: 60
+        labels:
+          x-version: 2
+          description: You can use this to attach labels to your call that you can use in your BI solutions.
+          allOf:
+          - $ref: '#/components/schemas/Labels'
+          example:
+            customerId: '1234'
+            customerName: John Doe
+        callbackUrl:
+          type: string
+          description: 'The URL to which a callback will be sent when the fax is completed. The callback will be sent as a POST request with a JSON body. The callback will be sent to the URL specified in the `callbackUrl` parameter, if provided, otherwise it will be sent to the URL specified in the `callbackUrl` field of the Fax Service object.
+
+
+            Note: If a callback URL uses basicauth credentials, when the callback URL is retrieved those credentials are masked. It is not possible to retrieve previously-set credentials through the API.'
+          format: URL
+          example: https://www.my-website.com/callback
+        callbackUrlContentType:
+          description: The content type of the callback.
+          type: string
+          default: multipart/form-data
+          enum:
+          - multipart/form-data
+          - application/json
+          x-enumDescriptions:
+            multipart/form-data: The callback will be sent as a multipart/form-data request with files as attachments to the body.
+            application/json: The callback will be sent as a JSON request with the files as base64 encoded strings in the JSON object.
+        imageConversionMethod:
+          $ref: '#/components/schemas/ImageConversionMethod'
+        errorType:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/ErrorType'
+        errorCode:
+          readOnly: true
+          type: integer
+          description: One of the error numbers listed in the [Fax Error Messages section](https://developers.sinch.com/docs/fax/api-reference/fax/error-messages).
+        errorMessage:
+          readOnly: true
+          type: string
+          description: One of the error codes listed in the [Fax Error Messages section](https://developers.sinch.com/docs/fax/api-reference/fax/error-messages).
+        maxRetries:
+          readOnly: false
+          type: integer
+          description: '| The number of times the fax will be retired before cancel. Default value is set in your fax service.
+
+            | The maximum number of retries is 5.'
+          maximum: 5
+          minimum: 0
+        retryCount:
+          readOnly: true
+          type: integer
+          description: The number of times the fax has been retried.
+        hasFile:
+          readOnly: true
+          type: boolean
+          description: Only shown on the fax result. This indicates if the content of the fax is stored with Sinch. (true or false)
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+        coverPageId:
+          type: string
+          description: The cover page id you want to use for the fax
+        coverPageData:
+          $ref: '#/components/schemas/CoverPageData'
+        inProgressNotifications:
+          type: boolean
+          description: If set to `true`, you will receive a webhook notification for each page sent on an outbound fax.
+          default: false
+        fromCountry:
+          readOnly: true
+          type: string
+          description: The country code in ISO 3166-1 alpha-2 format of the number sending the fax.
+          example: US
+        toCountry:
+          readOnly: true
+          type: string
+          description: The country code in ISO 3166-1 alpha-2 format of the number receiving the fax.
+          example: US
+        projectId:
+          readOnly: true
+          x-version: 1
+          allOf:
+          - $ref: '#/components/schemas/ProjectId'
+        serviceId:
+          readOnly: false
+          x-version: 1
+          allOf:
+          - $ref: '#/components/schemas/ServiceId'
+    Labels:
+      type: object
+      title: label
+      description: 'You can use this to attach labels to your call that you can use in your applications. It is a key value store.
+
+
+        - `application/json` format: `"labels": {"label1":"value1"}`
+
+        - `multipart/form-data` format: `labels[label1] = value1`'
+      additionalProperties:
+        type: string
+        x-additionalPropertiesName: labelKey
+      example:
+        use-case: fraudPrevention
+        costCenter: sales
+    ServiceId:
+      x-PII: false
+      x-v1: true
+      readOnly: true
+      type: string
+      example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      description: ID of the fax service used.
+    Pagination:
+      type: object
+      readOnly: true
+      properties:
+        page:
+          readOnly: true
+          type: integer
+          description: Current page
+        totalPages:
+          readOnly: true
+          type: integer
+          description: Total number of pages.
+        pageSize:
+          readOnly: true
+          type: integer
+          description: Number of items per page.
+        totalItems:
+          type: integer
+          readOnly: true
+          format: int32
+          description: Total size of the result.
+    CoverPageData:
+      type: object
+      title: Cover page data
+      description: 'You can use this to specify custom data for your cover page that will be sent as part of the fax. It is a key value store. Read more about how to use this [here](https://developers.sinch.com/docs/fax/api-reference/fax/cover-pages/). All keys used must be lower case.
+
+
+        - `application/json` format: `"coverPageData": {"customfield1":"customdata1"}`
+
+        - `multipart/form-data` format: `coverPageData[customfield1] = customdata1`'
+      additionalProperties:
+        type: string
+        x-additionalPropertiesName: coverPageKey
+      example:
+        toName: Acme Corp
+    FaxBase64Array:
+      description: An array of base64 encoded files
+      type: object
+      properties:
+        files:
+          type: array
+          description: An array of base64 encoded files
+          items:
+            $ref: '#/components/schemas/FaxBase64File'
+    GenericEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/WebhookEvents'
+        eventTime:
+          description: Time of the event.
+          type: string
+          format: date-time
+        fax:
+          $ref: '#/components/schemas/Fax'
+    ProjectId:
+      type: string
+      x-PII: false
+      x-v1: false
+      description: The `Id` of the project associated with the call.
+      x-Internal: to support future account keys
+      readOnly: true
+      example: ae00f005-e392-44dc-b3f5-a657a2684dg3
+    ErrorType:
+      readOnly: true
+      description: Error type
+      type: string
+      enum:
+      - DOCUMENT_CONVERSION_ERROR
+      - CALL_ERROR
+      - FAX_ERROR
+      - FATAL_ERROR
+      - GENERAL_ERROR
+      x-enumDescriptions:
+        DOCUMENT_CONVERSION_ERROR: A documentation conversion error.
+        CALL_ERROR: A call error.
+        FAX_ERROR: A fax error.
+        FATAL_ERROR: A fatal error.
+        GENERAL_ERROR: A general error.
+    BarCode:
+      type: object
+      description: Sinch will scan all pages of all incoming faxes for Code-128 and DataMatrix bar codes and include this information in webhook requests and via the API.
+      properties:
+        type:
+          type: string
+          description: The type of barcode found.
+          enum:
+          - CODE_128
+          - DATA_MATRIX
+          x-enumDescriptions:
+            CODE_128: Code-128 barcode.
+            DATA_MATRIX: DataMatrix barcode.
+        page:
+          description: The page number on which the barcode was found.
+          type: integer
+        value:
+          description: The  information of the barcode.
+          type: string
+    FileTypeJson:
+      type: string
+      description: When request/response is application/json and file is part of payload. This is the file type of the file.
+      enum:
+      - DOCX
+      - PDF
+      - TIF
+      - JPG
+      - TXT
+      - HTML
+      - PNG
+      x-enumDescriptions:
+        DOCX: Microsoft Word
+        PDF: PDF
+        TIF: TIFF
+        JPG: JPEG
+        TXT: Text
+        HTML: HTML
+        PNG: PNG
+    FaxStatus:
+      type: string
+      description: The status of the fax
+      readOnly: true
+      enum:
+      - QUEUED
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILURE
+      x-enumDescriptions:
+        QUEUED: The operation is currently in a queue on a server and should be executed very soon.
+        IN_PROGRESS: The fax is currently being sent (OUTBOUND) or received (INBOUND).
+        COMPLETED: The fax operation succeeded. Everything went as normally planned.
+        FAILURE: The fax operation failed. Details of the error can be found in the error_code field. For OUTBOUND fax, this means that NONE of the recipients received the fax.
+    FaxDirection:
+      type: string
+      description: The direction of the fax.
+      readOnly: true
+      enum:
+      - OUTBOUND
+      - INBOUND
+      x-enumDescriptions:
+        OUTBOUND: The fax was sent by you via the API.
+        INBOUND: The fax was received on one of your numbers.
+      example: OUTBOUND
+    PhoneNumber:
+      x-PII: true
+      x-v1: true
+      type: string
+      format: phoneNumber
+      description: A phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format, including the leading '+'.
+      example: '+15551235656'
+    FileTypeMultiPart:
+      description: When request/response is multipart/form-data and file is part of payload. This is the file type of the file.
+      enum:
+      - application/docx
+      - application/pdf
+      - application/tif
+      - application/jpg
+      - application/txt
+      - application/html
+      - application/png
+      x-enumDescriptions:
+        application/docx: Microsoft Word
+        application/pdf: PDF
+        application/tif: TIFF
+        application/jpg: JPEG
+        application/txt: Text
+        application/html: HTML
+        application/png: PNG
+    ImageConversionMethod:
+      type: string
+      description: Determines how documents are converted to black and white on OUTBOUND faxes only.  Image conversion is not done on INBOUND faxes. Defaults to value selected on Fax Service object.
+      enum:
+      - HALFTONE
+      - MONOCHROME
+      x-enumDescriptions:
+        HALFTONE: Converts the image to halftone.
+        MONOCHROME: Converts the image to monochrome.
+      default: HALFTONE
+    PhoneNumberArray:
+      description: An array of phone numbers to send multiple faxes.
+      type: array
+      items:
+        $ref: '#/components/schemas/PhoneNumber'
+    ListFaxesObject:
+      type: object
+      allOf:
+      - type: object
+        description: A list of faxes with pagination information.
+        properties:
+          faxes:
+            type: array
+            description: An array of faxes
+            items:
+              $ref: '#/components/schemas/Fax'
+      - $ref: '#/components/schemas/Pagination'
+    Fax_2:
       type: object
       properties:
         id:
@@ -233,7 +1279,7 @@ components:
           type: array
           description: List of faxes
           items:
-            $ref: '#/components/schemas/Fax'
+            $ref: '#/components/schemas/Fax_2'
         page:
           type: integer
           description: Current page number
@@ -273,14 +1319,99 @@ components:
           - HALFTONE
           - MONOCHROME
           description: Image conversion method for the fax
+    SendFaxMultipartRequest:
+      type: object
+      required:
+      - to
+      - file
+      properties:
+        to:
+          type: string
+          description: The recipient fax number in E.164 format
+        from:
+          type: string
+          description: The sender fax number
+        file:
+          type: string
+          format: binary
+          description: The document file to fax
+        serviceId:
+          type: string
+          description: The fax service to use
+  examples:
+    SendFileAsFaxWithCoverPage:
+      summary: Send a fax with cover page
+      value:
+        to: '+14155552222'
+        file: //path/to/file.pdf
+        coverPageId: 12312kj312kl3j12k3j
+        coverPageData:
+          message: To Dr. Smith regarding referral
+    SendFileAsFax:
+      summary: Send a file as a fax
+      value:
+        to: '+14155552222'
+        file: //path/to/file.pdf
+    SendWebPageAsFax:
+      summary: Send a web page as a fax
+      value:
+        to: '+14155552222'
+        contentUrl: https://developers.sinch.com/fax/fax.pdf
+    SendFileAsFaxJson:
+      summary: Send a file as a fax
+      value:
+        to:
+        - '+14155552222'
+        - '+14155552233'
+        files:
+        - file: '{base64EncodedData}'
+          fileType: PDF
   parameters:
-    ProjectId:
-      name: project_id
+    Id:
       in: path
+      name: id
       required: true
-      description: The unique project identifier
+      description: The ID of the fax.
+      schema:
+        $ref: '#/components/schemas/FaxId'
+    Page:
+      in: query
+      name: page
+      description: The page you want to retrieve returned from a previous List request, if any
       schema:
         type: string
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: The `projectId` is a required parameter you must include when making any API calls. You can find your project ID on your [Build dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+    Labels:
+      name: labels
+      in: query
+      schema:
+        $ref: '#/components/schemas/Labels'
+    PageSize:
+      name: pageSize
+      in: query
+      description: The maximum number of items to return per request. The default is 100 and the maximum is 1000. If you need to export larger amounts and pagination is not suitable for you can use the Export function in the dashboard.
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 1
+    Format:
+      name: format
+      in: query
+      description: If you include this parameter, you can export the list of faxes as a .csv file. Default value is `csv`
+      schema:
+        type: string
+        enum:
+        - csv
+        x-enumDescriptions:
+          csv: This exports the list of faxes as a .csv file.
+        example: csv
     FaxId:
       name: fax_id
       in: path
@@ -288,7 +1419,29 @@ components:
       description: The unique fax identifier
       schema:
         type: string
+    ProjectId_2:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
+    WebhookBasicAuth:
+      type: http
+      scheme: basic
+      description: 'You can validate whether a webhook is genuine by providing credentials you set and will check on your server side along with the callback URL, as in this example: `https://username:password@www.YourWebhookWebsite.com`'
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: The user name and password is your keyId and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+    OAuth2:
+      type: oauth2
+      description: The user name and password is your key id and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
     oAuth2:
       type: oauth2
       description: OAuth 2.0 client credentials flow.
@@ -303,3 +1456,14 @@ components:
 externalDocs:
   description: Sinch Fax API Documentation
   url: https://developers.sinch.com/docs/fax
+x-refined-from:
+- sinch-fax-api-openapi.yaml
+- original-sinch-fax-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

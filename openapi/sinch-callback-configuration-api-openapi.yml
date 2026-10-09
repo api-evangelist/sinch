@@ -1,0 +1,243 @@
+openapi: 3.2.0
+info:
+  description: 'This API describes the set of endpoints available to create customer brands.
+
+
+    The list of endpoints allows to create, update and delete a customer brand and also get the current state.'
+  title: Sinch Brands Callback Configuration API
+  version: 0.0.1
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- description: Production server
+  url: https://brand.registrations.api.sinch.com
+tags:
+- description: You can set up callback URLs to receive event notifications when your brand status is updated.
+  name: callback-configuration
+  x-displayName: callback-configuration
+paths:
+  /v1/projects/{projectId}/callback-configuration:
+    get:
+      description: The endpoint receives as path param project id. If the project exists, the details of the callback configuration are returned.
+      operationId: getCallbackConfiguration
+      parameters:
+      - in: path
+        description: Customer's project id
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigurationResponse'
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+      - OAuth2:
+        - read
+      summary: Get a callback configuration by project id
+      tags:
+      - callback-configuration
+    put:
+      description: The endpoint updates the callback configuration with specified project ID
+      operationId: updateCallbackConfiguration
+      parameters:
+      - in: path
+        description: Customer's project id
+        name: projectId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackConfigurationUpdateBody'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigurationResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Project validation error'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+      - OAuth2:
+        - write
+      summary: Update a callback configuration
+      tags:
+      - callback-configuration
+components:
+  schemas:
+    FieldViolation:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field that contains the error
+          example: brandName
+        description:
+          type: string
+          example: Brand name already exists for this brand type
+      description: A field violation error that contains the field name, reason and value that caused the error.
+    NotFoundDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: For not found details.
+          enum:
+          - ResourceInfo
+          x-enumDescriptions:
+            ResourceInfo: Value indicate it is related to a NotFound error
+          example: ResourceInfo
+        resourceType:
+          type: string
+          description: The type of the resource that was not found. Brand, Project, BrandType, etc.
+          example: Brand
+        resourceName:
+          type: string
+          description: Corresponds to the unique identifier of the resource that was not found.
+          example: '1234567890'
+        description:
+          type: string
+          description: A human-readable description of the error.
+          example: The brand with the specified ID was not found.
+    CallbackConfigurationUpdateBody:
+      properties:
+        hmacSecret:
+          description: The HMAC secret to be updated for the specified project
+          example: d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+      type: object
+    CallbackConfigurationResponse:
+      properties:
+        hmacSecret:
+          description: The HMAC secret used for hashing the callback body using the HMAC-SHA1 algorithm - and for creating the X-Sinch-Signature header.
+          example: d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+        projectId:
+          type: string
+      type: object
+    ErrorDetails:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/NotFoundDetails'
+      - $ref: '#/components/schemas/InvalidRequestDetails'
+      discriminator:
+        propertyName: type
+        mapping:
+          ResourceInfo: '#/components/schemas/NotFoundDetails'
+          BadRequest: '#/components/schemas/InvalidRequestDetails'
+    InternalRestError:
+      properties:
+        code:
+          format: int32
+          type: integer
+          example: 400
+        details:
+          items:
+            $ref: '#/components/schemas/ErrorDetails'
+          type: array
+        message:
+          type: string
+          example: Brand Name already exists for this brand type
+        status:
+          type: string
+          enum:
+          - INVALID_ARGUMENT
+          - UNKNOWN
+          - NOT_FOUND
+          - UNAUTHENTICATED
+          - FAILED_PRECONDITION
+          - ALREADY_EXISTS
+          x-enumDescriptions:
+            INVALID_ARGUMENT: The request was invalid or cannot be served. This can happen if the request body is malformed, or if a required field is missing. Expected on 400 error code.
+            UNKNOWN: An unknown error occurred. This can happen if the server encountered an unexpected condition that.
+            NOT_FOUND: The requested resource was not found. This can happen if the resource does not exist or if the resource ID is incorrect.
+            UNAUTHENTICATED: The request is not authenticated. This can happen if the request does not include a valid authentication token.
+            ALREADY_EXISTS: The resource already exists. This can happen if the request tries to create a resource that already exists.
+            FAILED_PRECONDITION: The request cannot be served due to a failed precondition. This can happen if the request is not valid for the current state of the resource.
+          example: INVALID_ARGUMENT
+      type: object
+    InvalidRequestDetails:
+      type: object
+      description: this body is expected when invalid argument, failed precondition or already exists error occurs.
+      properties:
+        type:
+          type: string
+          description: For invalid arguments details, this value is always BadRequest.
+          example: BadRequest
+          enum:
+          - BadRequest
+          x-enumDescriptions:
+            BadRequest: Value indicate it is related to a InvalidRequest error
+        fieldViolations:
+          items:
+            $ref: '#/components/schemas/FieldViolation'
+          type: array
+    RestError:
+      properties:
+        error:
+          $ref: '#/components/schemas/InternalRestError'
+      type: object
+  securitySchemes:
+    OAuth2:
+      description: The username and password are your Key ID and Key Secret from the Access keys section in the Sinch Customer Dashboard. Exchange these for a bearer token (access token).
+      flows:
+        clientCredentials:
+          scopes:
+            read: read
+            write: write
+          tokenUrl: https://auth.sinch.com/oauth2/token
+      type: oauth2
+    hmacAuth:
+      type: http
+      scheme: hmac
+      description: Used for hashing callbacks. Please refer to the callback-configuration endpoints for more information.
+externalDocs:
+  description: All endpoints available under this API require Bearer token authentication. Please check oauth api documentation if you need more details.
+  url: https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth/
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php

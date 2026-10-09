@@ -1,0 +1,416 @@
+openapi: 3.2.0
+info:
+  title: Verification | Sinch Verification status API
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    name: Sinch
+    url: https://www.sinch.com/contact-us/
+    email: support@sinch.com
+  version: 2.0.1
+  description: Sinch offers a platform for phone number verification.
+servers:
+- url: https://verification.api.sinch.com
+security:
+- Basic: []
+- Application: []
+tags:
+- name: Verification status
+  description: Get the status of specific verification requests in the verification process. Returns the status of pending and completed verifications. You can retrieve the status of verification requests by using the ID of the request, the phone number of the user being verified, or a custom reference string.
+  x-displayName: Verifications status
+paths:
+  /verification/v1/verifications/id/{id}:
+    parameters:
+    - $ref: '#/components/parameters/id'
+    get:
+      tags:
+      - Verification status
+      summary: Get verification by ID
+      description: Queries the verification result by sending the verification ID. With this query you can get the result of a verification.
+      operationId: VerificationStatusById
+      responses:
+        '200':
+          $ref: '#/components/responses/VerificationResult'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage verification.status;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.verification.api.v1.VerificationsStatusService;\nimport com.sinch.sdk.domains.verification.models.v1.status.response.VerificationStatusResponse;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class GetById {\n\n  private static final Logger LOGGER = Logger.getLogger(GetById.class.getName());\n\n  public static void main(String[] args) {\n\n    String applicationKey = Settings.getApplicationKey().orElse(\"MY_APPLICATION_KEY\");\n    String applicationSecret = Settings.getApplicationSecret().orElse(\"MY_APPLICATION_SECRET\");\n\n    // The id you received back from the API call when starting verification\n    String verificationId = \"VERIFICATION_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setApplicationKey(applicationKey)\n            .setApplicationSecret(applicationSecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    VerificationsStatusService verificationsStatusService =\n        client.verification().v1().verificationStatus();\n\n    LOGGER.info(String.format(\"Verification status for verification ID '%s'\", verificationId));\n\n    VerificationStatusResponse response = verificationsStatusService.getById(verificationId);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const applicationKey = process.env.SINCH_APPLICATION_KEY ?? 'MY_APPLICATION_KEY';\n  const applicationSecret = process.env.SINCH_APPLICATION_SECRET ?? 'MY_APPLICATION_SECRET';\n\n  // The id you received back from the API call when starting the verification.\n  const verificationId = 'VERIFICATION_ID';\n\n  const sinch = new SinchClient({ applicationKey, applicationSecret });\n\n  try {\n    const response = await sinch.verification.verificationStatus.getById({\n      id: verificationId,\n    });\n    console.log('✅ Successfully retrieved Verification.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the Verification with ID ${verificationId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /verification/v1/verifications/{method}/number/{endpoint}:
+    parameters:
+    - $ref: '#/components/parameters/endpoint'
+    - $ref: '#/components/parameters/method'
+    get:
+      tags:
+      - Verification status
+      summary: Get verification by Identity
+      description: Queries the verification result by sending the verification Identity (usually a phone number) and its method. With this query you can get the result of a verification.
+      operationId: VerificationStatusByIdentity
+      responses:
+        '200':
+          $ref: '#/components/responses/VerificationResult'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage verification.status;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.verification.api.v1.VerificationsStatusService;\nimport com.sinch.sdk.domains.verification.models.v1.NumberIdentity;\nimport com.sinch.sdk.domains.verification.models.v1.VerificationMethod;\nimport com.sinch.sdk.domains.verification.models.v1.status.response.VerificationStatusResponse;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class GetByIdentity {\n\n  private static final Logger LOGGER = Logger.getLogger(GetByIdentity.class.getName());\n\n  public static void main(String[] args) {\n\n    String applicationKey = Settings.getApplicationKey().orElse(\"MY_APPLICATION_KEY\");\n    String applicationSecret = Settings.getApplicationSecret().orElse(\"MY_APPLICATION_SECRET\");\n\n    // The phone number you are verifying, in E.164 format (e.g. +46701234567).\n    // This should be the same number you used when starting the verification.\n    String phoneNumber = \"PHONE_NUMBER\";\n    // The verification method you used when starting the verification.\n    VerificationMethod verificationMethod = VerificationMethod.SMS;\n\n    Configuration configuration =\n        Configuration.builder()\n            .setApplicationKey(applicationKey)\n            .setApplicationSecret(applicationSecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    VerificationsStatusService verificationsStatusService =\n        client.verification().v1().verificationStatus();\n\n    LOGGER.info(String.format(\"Verification status for phone number '%s'\", phoneNumber));\n\n    NumberIdentity identity = NumberIdentity.valueOf(phoneNumber);\n\n    VerificationStatusResponse response =\n        verificationsStatusService.getByIdentity(identity, verificationMethod);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const applicationKey = process.env.SINCH_APPLICATION_KEY ?? 'MY_APPLICATION_KEY';\n  const applicationSecret = process.env.SINCH_APPLICATION_SECRET ?? 'MY_APPLICATION_SECRET';\n\n  // The phone number you are verifying, in E.164 format (e.g. +46701234567).\n  // This should be the same number you used when starting the verification.\n  const phoneNumber = 'PHONE_NUMBER';\n  // Possible values: 'sms', 'flashcall', 'phonecall', 'whatsapp'\n  const verificationMethod = 'sms';\n\n  const sinch = new SinchClient({ applicationKey, applicationSecret });\n\n  try {\n    const response = await sinch.verification.verificationStatus.getByIdentity({\n      endpoint: phoneNumber,\n      method: verificationMethod,\n    });\n    console.log('✅ Successfully retrieved Verification.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the Verification for the phone number ${phoneNumber}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /verification/v1/verifications/reference/{reference}:
+    parameters:
+    - $ref: '#/components/parameters/reference'
+    get:
+      tags:
+      - Verification status
+      summary: Get verification by Reference
+      description: Queries the verification result by sending the verification Reference. With this query you can get the result of a verification.
+      operationId: VerificationStatusByReference
+      responses:
+        '200':
+          $ref: '#/components/responses/VerificationResult'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage verification.status;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.verification.api.v1.VerificationsStatusService;\nimport com.sinch.sdk.domains.verification.models.v1.status.response.VerificationStatusResponse;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class GetByReference {\n\n  private static final Logger LOGGER = Logger.getLogger(GetByReference.class.getName());\n\n  public static void main(String[] args) {\n\n    String applicationKey = Settings.getApplicationKey().orElse(\"MY_APPLICATION_KEY\");\n    String applicationSecret = Settings.getApplicationSecret().orElse(\"MY_APPLICATION_SECRET\");\n\n    // The reference you defined when starting the verification process.\n    String verificationReference = \"VERIFICATION_REFERENCE\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setApplicationKey(applicationKey)\n            .setApplicationSecret(applicationSecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    VerificationsStatusService verificationsStatusService =\n        client.verification().v1().verificationStatus();\n\n    LOGGER.info(\n        String.format(\n            \"Verification status for verification with reference '%s'\", verificationReference));\n\n    VerificationStatusResponse response =\n        verificationsStatusService.getByReference(verificationReference);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const applicationKey = process.env.SINCH_APPLICATION_KEY ?? 'MY_APPLICATION_KEY';\n  const applicationSecret = process.env.SINCH_APPLICATION_SECRET ?? 'MY_APPLICATION_SECRET';\n\n  // The reference you defined when starting the verification process.\n  const verificationReference = 'VERIFICATION_REFERENCE';\n\n  const sinch = new SinchClient({ applicationKey, applicationSecret });\n\n  try{\n    const response = await sinch.verification.verificationStatus.getByReference({\n      reference: verificationReference,\n    });\n    console.log('✅ Successfully retrieved Verification.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the Verification with reference ${verificationReference}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+components:
+  schemas:
+    Price:
+      title: Price
+      type: object
+      additionalProperties: false
+      properties:
+        currencyId:
+          type: string
+          description: ISO 4217 currency code
+          example: USD
+        amount:
+          type: number
+          format: float
+          example: 0.0127
+    VerificationStatusResponseFlashCall:
+      title: Flash Call Verification Status Response
+      type: object
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/VerificationStatusResponseBase'
+      - type: object
+        properties:
+          method:
+            type: string
+            description: The method of the verification request. This will always be `flashcall`.
+            x-enumDescriptions:
+              flashcall: Verification is of flashcall type
+            enum:
+            - flashcall
+          callComplete:
+            type: boolean
+            description: Shows whether the call is complete or not.
+            example: true
+          callResult:
+            $ref: '#/components/schemas/StatusCallResult'
+          price:
+            $ref: '#/components/schemas/StatusPrice'
+          source:
+            $ref: '#/components/schemas/Source'
+    VerificationStatusResponseWhatsApp:
+      title: WhatsApp Verification Status Response
+      type: object
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/VerificationStatusResponseBase'
+      - type: object
+        properties:
+          method:
+            type: string
+            description: The method of the verification request. This will always be `whatsapp`.
+            x-enumDescriptions:
+              whatsapp: Verification is of WhatsApp type
+            enum:
+            - whatsapp
+          price:
+            type: object
+            description: Prices associated with this verification
+            properties:
+              verificationPrice:
+                $ref: '#/components/schemas/VerificationPrice'
+          source:
+            $ref: '#/components/schemas/Source'
+    VerificationStatusResponsePhoneCall:
+      title: Phone Call Verification Status Response
+      type: object
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/VerificationStatusResponseBase'
+      - type: object
+        properties:
+          method:
+            type: string
+            description: The method of the verification request. This will always be `callout`.
+            x-enumDescriptions:
+              callout: Verification is of Phone Call type
+            enum:
+            - callout
+          callComplete:
+            type: boolean
+            description: Shows whether the call is complete or not.
+            example: true
+          callResult:
+            $ref: '#/components/schemas/StatusCallResult'
+          price:
+            $ref: '#/components/schemas/StatusPrice'
+    StatusPrice:
+      type: object
+      description: Prices associated with this verification
+      properties:
+        verificationPrice:
+          $ref: '#/components/schemas/VerificationPrice'
+        terminationPrice:
+          $ref: '#/components/schemas/TerminationPrice'
+        billableDuration:
+          $ref: '#/components/schemas/BillableDuration'
+    VerificationStatusResponseSms:
+      title: SMS Verification Status Response
+      type: object
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/VerificationStatusResponseBase'
+      - type: object
+        properties:
+          method:
+            type: string
+            description: The method of the verification request. This will always be `sms`.
+            x-enumDescriptions:
+              sms: Verification is of SMS type
+            enum:
+            - sms
+          price:
+            type: object
+            description: Prices associated with this verification
+            properties:
+              verificationPrice:
+                $ref: '#/components/schemas/VerificationPrice'
+          source:
+            $ref: '#/components/schemas/Source'
+    VerificationEventReference:
+      type: string
+      description: Used to pass your own reference in the request for tracking purposes. Must be a unique value for each started verification request. The value must be encodable in the URL path segment. This value is passed to all events and returned from the status and report endpoints. The reference can be used to check the [status of verifications](https://developers.sinch.com/docs/verification/api-reference/verification/verification-status/verificationstatusbyreference), like with ID or identity.
+    VerificationStatusResponseBase:
+      title: Verification Status Response Common Fields
+      type: object
+      additionalProperties: false
+      properties:
+        id:
+          type: string
+          description: The unique ID of the verification request.
+          example: '1234567890'
+        status:
+          $ref: '#/components/schemas/VerificationStatus'
+        reason:
+          $ref: '#/components/schemas/VerificationStatusReason'
+        reference:
+          $ref: '#/components/schemas/VerificationEventReference'
+        identity:
+          $ref: '#/components/schemas/Identity'
+        countryId:
+          $ref: '#/components/schemas/CountryId'
+        verificationTimestamp:
+          $ref: '#/components/schemas/VerificationTimestamp'
+    Source:
+      type: string
+      description: With the SMS verification method, a user's phone number is verified by sending an SMS containing an OTP code that must be manually returned. If you are are using an Android handset, you could instead intercept the SMS message delivery and capture the OTP code automatically.
+      x-enumDescriptions:
+        intercepted: OTP verification was performed automatically
+        manual: OTP verification was manually performed
+      enum:
+      - intercepted
+      - manual
+      example: intercepted
+    BillableDuration:
+      description: 'The time of the call for which the fee was charged.
+
+
+        Present only when termination debiting is enabled (disabled by default).
+
+
+        Depending on the type of rounding used, the value is the actual call time rounded to the nearest second, minute or other value.
+
+        '
+      type: integer
+      example: 42
+    VerificationStatusResponse:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/VerificationStatusResponseSms'
+      - $ref: '#/components/schemas/VerificationStatusResponseFlashCall'
+      - $ref: '#/components/schemas/VerificationStatusResponsePhoneCall'
+      - $ref: '#/components/schemas/VerificationStatusResponseWhatsApp'
+      discriminator:
+        propertyName: method
+        mapping:
+          sms: '#/components/schemas/VerificationStatusResponseSms'
+          flashcall: '#/components/schemas/VerificationStatusResponseFlashCall'
+          callout: '#/components/schemas/VerificationStatusResponsePhoneCall'
+          whatsapp: '#/components/schemas/VerificationStatusResponseWhatsApp'
+    VerificationTimestamp:
+      type: string
+      description: 'The timestamp in UTC format.
+
+        <br>
+
+        **Note:** The formatting does not respect `ISO-8601` and the returned value has the format `YYYY-MM-DDThh:mm:ss.SSS`. If you need to parse this value into a specific date object in your programming language, please append `Z` (Zulu time = UTC) at the end of the date value to match the `ISO-8601` format: `YYYY-MM-DDThh:mm:ss.SSSZ`.'
+      example: '2023-04-21T14:45:51'
+    VerificationPrice:
+      allOf:
+      - $ref: '#/components/schemas/Price'
+      description: "The maximum price charged for this verification process.\n\nThis property will appear in the body of the response with a delay. \nIt will become visible only when the verification status is other than PENDING.\n"
+    Identity:
+      type: object
+      additionalProperties: false
+      description: Specifies the type of endpoint that will be verified and the particular endpoint. `number` is currently the only supported endpoint type.
+      required:
+      - type
+      - endpoint
+      properties:
+        type:
+          type: string
+          description: Currently only `number` type is supported.
+          x-enumDescriptions:
+            number: Identity is of number type
+          enum:
+          - number
+        endpoint:
+          type: string
+          description: For type `number` use an [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537)-compatible phone number.
+          example: '+11235551234'
+    TerminationPrice:
+      allOf:
+      - $ref: '#/components/schemas/Price'
+      description: "The maximum cost of the call made during this verification process.\n\nPresent only when termination debiting is enabled (disabled by default).\n\nThis property will appear in the body of the response with a delay. \nIt will become visible only after the call is completed, when its cost is known to Sinch.\n"
+    StatusCallResult:
+      type: string
+      description: The type of the call result.
+      x-enumDescriptions:
+        ANSWERED: Call answered
+        CANCEL: Call canceled
+        COMPLETED: Call completed
+        NO_ANSWER: No answer to call
+        BUSY: Busy Call
+        FAILED: Call failed
+      enum:
+      - ANSWERED
+      - CANCEL
+      - COMPLETED
+      - NO_ANSWER
+      - BUSY
+      - FAILED
+    VerificationStatusReason:
+      type: string
+      description: Displays the reason why a verification has `FAILED`, was `DENIED`, or was `ABORTED`.
+      x-enumDescriptions:
+        Fraud: Fraudulent activity.
+        Not enough credit: Not enough credit in dashboard account.
+        Blocked: Blocked number.
+        Denied by callback: Callback response denied the verification.
+        Invalid callback: Callback was invalid.
+        Internal error: Internal server error.
+        Destination denied: Verification destination denied.
+        Network error or number unreachable: Network error or destination number is otherwise unreachable.
+        Failed pending: Pending failure.
+        SMS delivery failure: Could not deliver SMS.
+        Invalid CLI: CLI is invalid.
+        Invalid code: Input code is invalid.
+        Expired: Verification request has expired.
+        Hung up without entering valid code: Phone call ended without entering code.
+      enum:
+      - Fraud
+      - Not enough credit
+      - Blocked
+      - Denied by callback
+      - Invalid callback
+      - Internal error
+      - Destination denied
+      - Network error or number unreachable
+      - Failed pending
+      - SMS delivery failure
+      - Invalid CLI
+      - Invalid code
+      - Expired
+      - Hung up without entering valid code
+      example: Expired
+    VerificationStatus:
+      type: string
+      description: The status of the verification
+      example: PENDING
+      x-enumDescriptions:
+        PENDING: The verification is ongoing.
+        SUCCESSFUL: The verification was successful.
+        FAIL: The verification attempt was made, but the number wasn't verified.
+        DENIED: The verification attempt was denied by Sinch or your backend.
+        ABORTED: The verification attempt was aborted by requesting a new verification.
+        ERROR: The verification couldn't be completed due to a network error or the number being unreachable.
+      enum:
+      - PENDING
+      - SUCCESSFUL
+      - FAIL
+      - DENIED
+      - ABORTED
+      - ERROR
+    CountryId:
+      type: string
+      description: The ID of the country to which the verification was sent.
+      example: US
+  parameters:
+    reference:
+      name: reference
+      in: path
+      required: true
+      description: The custom reference of the verification.
+      schema:
+        type: string
+    endpoint:
+      name: endpoint
+      in: path
+      required: true
+      description: For type `number` use a [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537)-compatible phone number.
+      schema:
+        type: string
+    id:
+      name: id
+      in: path
+      required: true
+      description: The ID of the verification.
+      schema:
+        type: string
+    method:
+      name: method
+      in: path
+      required: true
+      description: The method of the verification.
+      schema:
+        type: string
+  responses:
+    VerificationResult:
+      description: A success response, or an [Error](https://developers.sinch.com/docs/verification/api-reference/errors/).
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/VerificationStatusResponse'
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/verification/api-reference/authentication/).
+    Application:
+      type: apiKey
+      in: header
+      name: Authentication
+      description: For more information about application request signing authentication, see [Request Signing](https://developers.sinch.com/docs/verification/api-reference/authentication/application-signed-request).
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- csharp
+- java
+- node
+- php
+x-proxy-enabled: true
+x-samples-enabled: true

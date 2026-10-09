@@ -1,21 +1,67 @@
 openapi: 3.2.0
 info:
-  title: Sinch Fax Projects API
-  description: The Sinch Fax API allows developers to send and receive faxes programmatically at scale. It supports sending faxes to single or multiple recipients, downloading received faxes, and managing fax numbers. The API is HIPAA, SOC 2 Type 1, and GDPR compliant, making it suitable for healthcare and other regulated industries that require secure document transmission. It integrates with the Sinch Numbers API for provisioning fax-capable phone numbers.
-  version: '3.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  title: Sinch Projects API
+  version: '1.0'
+  description: 'Operations tagged Projects across 2 of this provider''s published API definitions: sinch-elastic-sip-trunking-api-openapi.yaml, original-sinch-fax-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
+- url: https://elastic-trunking.api.sinch.com
 - url: https://fax.api.sinch.com
   description: Global Production Server
-security:
-- oAuth2: []
-- basicAuth: []
 tags:
 - name: Projects
+  description: Manage your Elastic SIP Trunking projects.
 paths:
+  /v1/projects/{projectId}/addProjects:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    post:
+      tags:
+      - Projects
+      operationId: addEstProjects
+      summary: Add additional projects to EST
+      description: Programmatically add additional projects for use with Elastic SIP Trunking. If you list a project ID which EST is already aware of, it will be ignored.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - projectIds
+              type: object
+              properties:
+                projectIds:
+                  type: array
+                  description: The project IDs you want to add.
+                  example:
+                  - 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+                  - 879c4177-af8a-4534-8168-cc2f66a1f2c6
+                  items:
+                    type: string
+                    example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+      responses:
+        '200':
+          description: The list of added projects.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  addedProjects:
+                    type: array
+                    description: The added project IDs.
+                    example:
+                    - 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+                    - 879c4177-af8a-4534-8168-cc2f66a1f2c6
+                    items:
+                      type: string
+                      example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The project ID you want to add to EST\n  const projectIdToAdd = '00000000-0000-0000-0000-000000000000';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.projects.add({\n      addProjectsRequestBody: {\n        projectIds: [projectIdToAdd],\n      },\n    });\n    console.log('✅ Successfully added additional projects to EST.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error('❌ Failed to add additional projects to EST:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - OAuth2.0: []
+    servers:
+    - url: https://elastic-trunking.api.sinch.com
   /v3/projects/{project_id}/services:
     post:
       operationId: createService
@@ -24,7 +70,7 @@ paths:
       tags:
       - Projects
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       requestBody:
         required: true
         content:
@@ -42,6 +88,9 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
     get:
       operationId: listServices
       summary: List Fax Services
@@ -49,7 +98,7 @@ paths:
       tags:
       - Projects
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       responses:
         '200':
           description: List of services
@@ -59,6 +108,12 @@ paths:
                 $ref: '#/components/schemas/ServiceList'
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: Global Production Server
   /v3/projects/{project_id}/services/{service_id}:
     get:
       operationId: getService
@@ -67,7 +122,7 @@ paths:
       tags:
       - Projects
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/ServiceId'
       responses:
         '200':
@@ -80,6 +135,9 @@ paths:
           description: Unauthorized
         '404':
           description: Service not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
     patch:
       operationId: updateService
       summary: Update a Fax Service
@@ -87,7 +145,7 @@ paths:
       tags:
       - Projects
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/ServiceId'
       requestBody:
         required: true
@@ -106,6 +164,9 @@ paths:
           description: Unauthorized
         '404':
           description: Service not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
     delete:
       operationId: deleteService
       summary: Delete a Fax Service
@@ -113,7 +174,7 @@ paths:
       tags:
       - Projects
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/ServiceId'
       responses:
         '200':
@@ -122,6 +183,12 @@ paths:
           description: Unauthorized
         '404':
           description: Service not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: Global Production Server
   /v3/projects/{project_id}/services/{service_id}/numbers:
     get:
       operationId: listServiceNumbers
@@ -130,7 +197,7 @@ paths:
       tags:
       - Projects
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/ServiceId'
       responses:
         '200':
@@ -143,26 +210,50 @@ paths:
           description: Unauthorized
         '404':
           description: Service not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: Global Production Server
 components:
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: The `projectId` is a required parameter you must include when making any API calls. You can find your project ID on your [Build dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+    ProjectId_2:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    ServiceId:
+      name: service_id
+      in: path
+      required: true
+      description: The unique service identifier
+      schema:
+        type: string
   schemas:
-    ServiceNumberList:
+    UpdateServiceRequest:
       type: object
       properties:
-        phoneNumbers:
-          type: array
-          description: List of phone numbers
-          items:
-            type: object
-            properties:
-              phoneNumber:
-                type: string
-                description: The phone number in E.164 format
-              serviceId:
-                type: string
-                description: The service ID
-              projectId:
-                type: string
-                description: The project ID
+        name:
+          type: string
+          description: Updated service name
+        incomingWebhookUrl:
+          type: string
+          format: uri
+          description: Updated webhook URL
+        imageConversionMethod:
+          type: string
+          description: Updated conversion method
     Service:
       type: object
       properties:
@@ -201,19 +292,24 @@ components:
         saveInboundFaxDocuments:
           type: boolean
           description: Whether to save inbound fax documents
-    UpdateServiceRequest:
+    ServiceNumberList:
       type: object
       properties:
-        name:
-          type: string
-          description: Updated service name
-        incomingWebhookUrl:
-          type: string
-          format: uri
-          description: Updated webhook URL
-        imageConversionMethod:
-          type: string
-          description: Updated conversion method
+        phoneNumbers:
+          type: array
+          description: List of phone numbers
+          items:
+            type: object
+            properties:
+              phoneNumber:
+                type: string
+                description: The phone number in E.164 format
+              serviceId:
+                type: string
+                description: The service ID
+              projectId:
+                type: string
+                description: The project ID
     ServiceList:
       type: object
       properties:
@@ -249,22 +345,18 @@ components:
         saveInboundFaxDocuments:
           type: boolean
           description: Save inbound documents
-  parameters:
-    ServiceId:
-      name: service_id
-      in: path
-      required: true
-      description: The unique service identifier
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   securitySchemes:
+    Basic:
+      type: http
+      description: To use basic authentication, use your Access Key ID as your username and your Access Key Secret as your password. To read about more basic authentication, see the [Basic Authentication](https://developers.sinch.com/docs/est/api-reference/est#basic) section.
+      scheme: basic
+    OAuth2.0:
+      type: oauth2
+      description: To use OAuth 2.0 authentication, use your Access Key ID and Access Key Secret to obtain your bearer token. For detailed instructions on how to do this, see the [OAuth Authentication](https://developers.sinch.com/docs/est/api-reference/est#oauth) section.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
     oAuth2:
       type: oauth2
       description: OAuth 2.0 client credentials flow.
@@ -279,3 +371,14 @@ components:
 externalDocs:
   description: Sinch Fax API Documentation
   url: https://developers.sinch.com/docs/fax
+x-refined-from:
+- sinch-elastic-sip-trunking-api-openapi.yaml
+- original-sinch-fax-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

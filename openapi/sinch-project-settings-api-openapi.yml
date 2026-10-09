@@ -1,0 +1,334 @@
+openapi: 3.2.0
+info:
+  description: '# Overview
+
+
+    Send and receive messages globally over SMS, RCS, WhatsApp, Viber Business, Facebook messenger and other popular channels using the Sinch Conversation API.'
+  title: Conversation API | Sinch Project Settings API
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    email: support@sinch.com
+    name: support at sinch
+servers:
+- url: https://{region}.conversation.api.sinch.com
+  variables:
+    region:
+      default: us
+      enum:
+      - us
+      - eu
+      - br
+  description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+security:
+- Basic: []
+- oAuth2: []
+tags:
+- description: Endpoint for managing various settings for your Sinch project.
+  name: Project Settings
+  x-displayName: Projects
+paths:
+  /v1/projects/{project_id}/settings:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    get:
+      tags:
+      - Project Settings
+      summary: Get Project Settings
+      description: Retrieves the current settings for the specified project, including contact management options such as Unified Contact ID.
+      operationId: ProjectSettings_GetSettings
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectSettings'
+              examples:
+                enabledUnifiedContactId:
+                  summary: Example response with Unified Contact ID enabled
+                  value:
+                    project_id: '{PROJECT_ID}'
+                    settings:
+                      contact_settings:
+                        unified_contact_id_enabled: true
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.projectsettings;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ProjectSettingsService;\nimport com.sinch.sdk.domains.conversation.models.v1.projectsettings.response.ProjectSettingsResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Get {\n\n  private static final Logger LOGGER = Logger.getLogger(Get.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ProjectSettingsService service = client.conversation().v1().projectSettings();\n\n    LOGGER.info(\"Get conversation project settings\");\n\n    ProjectSettingsResponse result = service.get();\n\n    LOGGER.info(\"Response: \" + result);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.projectSettings.get({});\n    console.log('✅ Successfully retrieved the Project Settings.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error('❌ Failed to retrieve the Project Settings:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+    post:
+      tags:
+      - Project Settings
+      summary: Create Project Settings
+      description: Creates initial settings for the project. Useful for enabling features like Unified Contact ID. For new projects with no existing contacts, you can enable Unified Contact ID immediately.
+      operationId: ProjectSettings_CreateSettings
+      requestBody:
+        description: The project settings to create.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectSettingsRequest'
+            examples:
+              enableUnifiedContactId:
+                summary: Enable Unified Contact ID
+                value:
+                  contact_settings:
+                    unified_contact_id_enabled: true
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectSettings'
+              examples:
+                enabledUnifiedContactId:
+                  summary: Example response with Unified Contact ID enabled
+                  value:
+                    project_id: '{PROJECT_ID}'
+                    settings:
+                      contact_settings:
+                        unified_contact_id_enabled: true
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.projectsettings;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ProjectSettingsService;\nimport com.sinch.sdk.domains.conversation.models.v1.projectsettings.ContactSettings;\nimport com.sinch.sdk.domains.conversation.models.v1.projectsettings.request.ProjectSettingsRequest;\nimport com.sinch.sdk.domains.conversation.models.v1.projectsettings.response.ProjectSettingsResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Create {\n\n  private static final Logger LOGGER = Logger.getLogger(Create.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ProjectSettingsService service = client.conversation().v1().projectSettings();\n\n    LOGGER.info(\"Create conversation project settings\");\n\n    ContactSettings contactSettings =\n        ContactSettings.builder().setUnifiedContactIdEnabled(false).build();\n\n    ProjectSettingsRequest request =\n        ProjectSettingsRequest.builder().setContactSettings(contactSettings).build();\n\n    ProjectSettingsResponse result = service.create(request);\n\n    LOGGER.info(\"Response: \" + result);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.projectSettings.create({\n      createProjectSettingsRequestBody: {\n        contact_settings: {\n          unified_contact_id_enabled: false,\n        },\n      },\n    });\n    console.log('✅ Successfully created the ProjectSettings.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error('❌ Failed to create the ProjectSettings:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+    patch:
+      tags:
+      - Project Settings
+      summary: Update Project Settings
+      description: Updates project settings (e.g. enabling/disabling Unified Contact ID). For existing projects, you must resolve all identity conflicts before enabling Unified Contact ID.
+      operationId: ProjectSettings_UpdateSettings
+      requestBody:
+        description: The project settings to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectSettingsRequest'
+            examples:
+              enableUnifiedContactId:
+                summary: Enable Unified Contact ID
+                value:
+                  contact_settings:
+                    unified_contact_id_enabled: true
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectSettings'
+              examples:
+                enabledUnifiedContactId:
+                  summary: Example response with Unified Contact ID enabled
+                  value:
+                    project_id: '{PROJECT_ID}'
+                    settings:
+                      contact_settings:
+                        unified_contact_id_enabled: true
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.projectsettings;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ProjectSettingsService;\nimport com.sinch.sdk.domains.conversation.models.v1.projectsettings.ContactSettings;\nimport com.sinch.sdk.domains.conversation.models.v1.projectsettings.request.ProjectSettingsRequest;\nimport com.sinch.sdk.domains.conversation.models.v1.projectsettings.response.ProjectSettingsResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.io.IOException;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Update {\n\n  private static final Logger LOGGER = Logger.getLogger(Update.class.getName());\n\n  public static void main(String[] args) throws IOException {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ProjectSettingsService service = client.conversation().v1().projectSettings();\n\n    LOGGER.info(\"conversation project settings\");\n\n    ContactSettings contactSettings =\n        ContactSettings.builder().setUnifiedContactIdEnabled(false).build();\n\n    ProjectSettingsRequest request =\n        ProjectSettingsRequest.builder().setContactSettings(contactSettings).build();\n\n    ProjectSettingsResponse result = service.update(request);\n\n    LOGGER.info(\"Response: \" + result);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.projectSettings.update({\n      updateProjectSettingsRequestBody: {\n        contact_settings: {\n          unified_contact_id_enabled: true,\n        },\n      },\n    });\n    console.log('✅ Successfully updated the Project Settings.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error('❌ Failed to update the Project Settings:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+    delete:
+      tags:
+      - Project Settings
+      summary: Delete Project Settings
+      description: Deletes all project-level settings for the specified project.
+      operationId: ProjectSettings_DeleteSettings
+      responses:
+        '200':
+          description: A successful response.
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.projectsettings;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ProjectSettingsService;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Delete {\n\n  private static final Logger LOGGER = Logger.getLogger(Delete.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ProjectSettingsService service = client.conversation().v1().projectSettings();\n\n    LOGGER.info(\"Delete conversation project settings\");\n\n    service.delete();\n\n    LOGGER.info(\"Deletion done.\");\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    await sinch.conversation.projectSettings.delete({});\n    console.log('✅ Successfully deleted the Project Settings.');\n  } catch (err) {\n    console.error('❌ Failed to delete the Project Settings:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+components:
+  responses:
+    400Error:
+      description: Malformed request. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 400
+            message: Malformed request
+            status: INVALID_REQUEST
+            details: []
+    403Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 403
+            message: You do not have access to the requested resource.
+            status: UNAUTHORIZED
+            details: []
+    501Error:
+      description: Something went wrong on our end, try again with exponential back-off. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 501
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    401Error:
+      description: Incorrect credentials. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            type: object
+    500Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 500
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+  schemas:
+    ContactSettings:
+      type: object
+      title: Contact Settings
+      description: Settings related to contact management for the project.
+      properties:
+        unified_contact_id_enabled:
+          type: boolean
+          description: 'Enables the Unified Contact ID feature. When enabled, contacts with the same phone number across SMS, RCS, and MMS channels are treated as a single entity. [See the documentation](https://developers.sinch.com/docs/conversation/unified-contact-id/) for details and requirements.
+
+            '
+          example: true
+    ProjectSettingsRequest:
+      type: object
+      title: Project Settings Request
+      description: Request body for creating or updating project settings.
+      properties:
+        contact_settings:
+          $ref: '#/components/schemas/ContactSettings'
+    ProjectSettings:
+      type: object
+      title: Project Settings
+      description: Project-level settings, including contact management options.
+      properties:
+        project_id:
+          type: string
+          description: The unique ID of the project.
+          example: 56bbb185-c7ea-48fb-ad97-638a0dc5eed7
+        settings:
+          type: object
+          description: The settings object containing contact settings.
+          properties:
+            contact_settings:
+              $ref: '#/components/schemas/ContactSettings'
+    runtimeError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/protobufAny'
+            message:
+              type: string
+            status:
+              type: string
+    protobufAny:
+      type: object
+      properties:
+        type_url:
+          type: string
+        value:
+          type: string
+          format: byte
+  parameters:
+    project_id:
+      name: project_id
+      description: The unique ID of the project. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+      in: path
+      required: true
+      schema:
+        type: string
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/conversation/api-reference/#authentication).
+    oAuth2:
+      type: oauth2
+      description: The user name and password are your client_id and key_secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-readme:
+  proxy-enabled: true
+  samples-enabled: true

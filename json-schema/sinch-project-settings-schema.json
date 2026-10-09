@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-project-settings-schema.json",
+  "title": "Project Settings",
+  "description": "Project-level settings, including contact management options.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-conversation-api-openapi.yml#/components/schemas/ProjectSettings",
+  "type": "object",
+  "properties": {
+    "project_id": {
+      "type": "string",
+      "description": "The unique ID of the project."
+    },
+    "settings": {
+      "type": "object",
+      "description": "The settings object containing contact settings.",
+      "properties": {
+        "contact_settings": {
+          "$ref": "#/$defs/ContactSettings"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "ContactSettings": {
+      "type": "object",
+      "title": "Contact Settings",
+      "description": "Settings related to contact management for the project.",
+      "properties": {
+        "unified_contact_id_enabled": {
+          "type": "boolean",
+          "description": "Enables the Unified Contact ID feature. When enabled, contacts with the same phone number across SMS, RCS, and MMS channels are treated as a single entity. [See the documentation](https://developers.sinch.com/docs/conversation/unified-contact-id/) for details and requirements.\n"
+        }
+      }
+    }
+  }
+}

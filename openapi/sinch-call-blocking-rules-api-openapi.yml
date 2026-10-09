@@ -1,0 +1,195 @@
+openapi: 3.2.0
+info:
+  title: Elastic SIP Trunk Call Blocking Rules API
+  description: This document provides a detailed user guide and reference documentation on the Sinch Elastic SIP Trunk API.
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    email: support@sinch.com
+    name: support at sinch
+servers:
+- url: https://elastic-trunking.api.sinch.com
+security:
+- Basic: []
+- OAuth2.0: []
+tags:
+- name: Call Blocking Rules
+  description: The Call Blocking Rules endpoint has operations that allow you to configure and manage your call blocking rules for your EST solution.
+paths:
+  /v1/projects/{projectId}/callBlockingRules:
+    get:
+      tags:
+      - Call Blocking Rules
+      summary: Get call blocking rules
+      description: Return all the call blocking rules for the specified project.
+      operationId: getBlockingRules
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CallBlockingRule'
+    post:
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      tags:
+      - Call Blocking Rules
+      summary: Create call blocking rule
+      description: Create a call blocking rule for the specified project.
+      operationId: createBlockingRule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallBlockingRule'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallBlockingRule'
+  /v1/projects/{projectId}/callBlockingRules/{id}:
+    put:
+      tags:
+      - Call Blocking Rules
+      summary: Update blocking rule
+      description: Update the call blocking rule by the specified ID.
+      operationId: updateBlockingRuleById
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: id
+        in: path
+        required: true
+        description: The ID of the call blocking rule to update.
+        schema:
+          type: string
+          example: 01KG5BN8Z0HSR2P9GM3K9YA8RE
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallBlockingRule'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallBlockingRule'
+    delete:
+      tags:
+      - Call Blocking Rules
+      operationId: deleteBlockingRuleById
+      summary: Delete blocking rule
+      description: Delete a call blocking rule using its ID.
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: id
+        in: path
+        required: true
+        description: The ID of the call blocking rule to delete.
+        schema:
+          type: string
+          example: 01KG5BN8Z0HSR2P9GM3K9YA8RE
+      responses:
+        '204':
+          description: No Content
+components:
+  parameters:
+    Sort:
+      name: sort
+      in: query
+      description: An array setting the sorting criteria in the format of `property,(ascending/descending)`
+      schema:
+        type: array
+        items:
+          type: string
+    Page:
+      in: query
+      name: page
+      description: The page you want to fetch, can set to 1 for first page, or omitted for first page
+      schema:
+        type: integer
+        default: 1
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: The `projectId` is a required parameter you must include when making any API calls. You can find your project ID on your [Build dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+    Size:
+      in: query
+      name: size
+      description: The size of each page to fetch
+      schema:
+        type: integer
+        default: 500
+        minimum: 1
+        maximum: 500
+  schemas:
+    CallBlockingRule:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name for the call blocking rule.
+          example: My Call Block Rule
+        direction:
+          type: string
+          description: The direction of the call blocking rule. Can be either INBOUND or OUTBOUND.
+          enum:
+          - INBOUND
+          - OUTBOUND
+          x-enumDescriptions:
+            INBOUND: Targets incoming calls.
+            OUTBOUND: Targets outgoing calls.
+          example: INBOUND
+        callerCountry:
+          type: string
+          description: The country code of the inbound call.
+          example: US
+        calleeCountry:
+          type: string
+          description: The country code of the outbound call.
+          example: CA
+        callerMatch:
+          type: string
+          description: Use this field to match the prefixes of an inbound call's phone number.
+          example: '123'
+        calleeMatch:
+          type: string
+          description: Use this field to match the prefixes of an outbound call's phone number.
+          example: '456'
+        id:
+          type: string
+          description: The ID of the call blocking rule.
+          example: 01KG5BN8Z0HSR2P9GM3K9YA8RE
+      required:
+      - direction
+  securitySchemes:
+    Basic:
+      type: http
+      description: To use basic authentication, use your Access Key ID as your username and your Access Key Secret as your password. To read about more basic authentication, see the [Basic Authentication](https://developers.sinch.com/docs/est/api-reference/est#basic) section.
+      scheme: basic
+    OAuth2.0:
+      type: oauth2
+      description: To use OAuth 2.0 authentication, use your Access Key ID and Access Key Secret to obtain your bearer token. For detailed instructions on how to do this, see the [OAuth Authentication](https://developers.sinch.com/docs/est/api-reference/est#oauth) section.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

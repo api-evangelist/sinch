@@ -1,0 +1,138 @@
+openapi: 3.2.0
+info:
+  title: Sinch Elastic SIP Trunking Phone Numbers API
+  description: The Sinch Elastic SIP Trunking (EST) API enables developers to programmatically create and manage SIP trunks for connecting existing telephony infrastructure to the Sinch network. It provides endpoints for managing SIP endpoints, trunk configurations, and access control lists. The API supports elastic scaling of voice capacity without requiring fixed-capacity commitments, allowing businesses to connect their PBX systems, contact centers, or communication platforms to global PSTN connectivity.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://elastic-trunking.api.sinch.com
+  description: Global Production Server
+security:
+- oAuth2: []
+- basicAuth: []
+tags:
+- name: Phone Numbers
+  description: Assign and remove phone numbers from SIP trunks for inbound and outbound calling.
+paths:
+  /v1/projects/{project_id}/trunks/{trunk_id}/phoneNumbers:
+    get:
+      operationId: listTrunkPhoneNumbers
+      summary: List Phone Numbers for a Trunk
+      description: Returns the list of phone numbers assigned to a specific SIP trunk.
+      tags:
+      - Phone Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: List of phone numbers
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrunkPhoneNumberList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: addPhoneNumberToTrunk
+      summary: Add Phone Number to Trunk
+      description: Assigns a phone number to a SIP trunk for inbound and outbound calling.
+      tags:
+      - Phone Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AddPhoneNumberRequest'
+      responses:
+        '200':
+          description: Phone number added
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/trunks/{trunk_id}/phoneNumbers/{phone_number}:
+    delete:
+      operationId: removePhoneNumberFromTrunk
+      summary: Remove Phone Number from Trunk
+      description: Removes a phone number from a SIP trunk.
+      tags:
+      - Phone Numbers
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      - name: phone_number
+        in: path
+        required: true
+        description: The phone number in E.164 format
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Phone number removed
+        '401':
+          description: Unauthorized
+        '404':
+          description: Phone number not found
+components:
+  schemas:
+    AddPhoneNumberRequest:
+      type: object
+      required:
+      - phoneNumber
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in E.164 format to assign
+    TrunkPhoneNumberList:
+      type: object
+      properties:
+        phoneNumbers:
+          type: array
+          description: List of phone numbers
+          items:
+            type: object
+            properties:
+              phoneNumber:
+                type: string
+                description: The phone number in E.164 format
+              trunkId:
+                type: string
+                description: The trunk ID
+  parameters:
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Key ID as username and key secret as password.
+externalDocs:
+  description: Sinch Elastic SIP Trunking API Documentation
+  url: https://developers.sinch.com/docs/est

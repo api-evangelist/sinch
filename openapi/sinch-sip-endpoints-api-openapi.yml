@@ -1,22 +1,147 @@
 openapi: 3.2.0
 info:
-  title: Sinch Elastic SIP Trunking SIP Endpoints API
-  description: The Sinch Elastic SIP Trunking (EST) API enables developers to programmatically create and manage SIP trunks for connecting existing telephony infrastructure to the Sinch network. It provides endpoints for managing SIP endpoints, trunk configurations, and access control lists. The API supports elastic scaling of voice capacity without requiring fixed-capacity commitments, allowing businesses to connect their PBX systems, contact centers, or communication platforms to global PSTN connectivity.
+  title: Sinch SIP Endpoints API
   version: '1.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  description: 'Operations tagged SIP Endpoints across 2 of this provider''s published API definitions: sinch-elastic-sip-trunking-api-openapi.yaml, original-sinch-elastic-sip-trunking-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://elastic-trunking.api.sinch.com
-  description: Global Production Server
-security:
-- oAuth2: []
-- basicAuth: []
 tags:
 - name: SIP Endpoints
-  description: Manage SIP endpoints that represent your SIP infrastructure such as PBX systems and contact centers.
+  description: A SIP endpoint is the resource that represents your SIP infrastructure, typically an SBC. Note the Elastic SIP Trunk API does not support user registration and presence.
 paths:
+  /v1/projects/{projectId}/trunks/{sipTrunkId}/endpoints:
+    get:
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/SipTrunkId'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      tags:
+      - SIP Endpoints
+      summary: Return SIP endpoints
+      description: Returns a list of all SIP endpoints with paging.
+      operationId: getSipEndpoint
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Pagination'
+                - type: object
+                  properties:
+                    endpoints:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/SipEndpoint'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The SIP Trunk ID to list SIP Endpoints from\n  const sipTrunkId = 'SIP_TRUNK_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.sipEndpoints.list({\n      sipTrunkId,\n    });\n    if (response.data.length === 0) {\n      console.log(`No SIP Endpoints found for the SIP Trunk with ID ${sipTrunkId}.`);\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} SIP Endpoints.`);\n    response.data.forEach((endpoint) => {\n      console.log(endpoint);\n    });\n  } catch (err) {\n    console.error(`❌ Failed to list the SIP Endpoints for the SIP Trunk with ID ${sipTrunkId}`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - OAuth2.0: []
+    post:
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/SipTrunkId'
+      tags:
+      - SIP Endpoints
+      summary: Create SIP endpoint
+      description: Create a new SIP endpoint.
+      operationId: createSipEndpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SipEndpoint'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - $ref: '#/components/schemas/Pagination'
+                - type: object
+                  properties:
+                    endpoints:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/SipEndpoint'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The SIP Trunk ID you want to create the endpoint in\n  const sipTrunkId = 'SIP_TRUNK_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.sipEndpoints.create({\n      sipTrunkId,\n      createSipEndpointRequestBody: {\n        address: '127.0.0.1',\n        name: 'Acme Endpoint',\n        priority: 1,\n      },\n    });\n    console.log('✅ Successfully created the SIP Endpoint.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error('❌ Failed to create the SIP Endpoint:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - OAuth2.0: []
+    servers:
+    - url: https://elastic-trunking.api.sinch.com
+  /v1/projects/{projectId}/trunks/{sipTrunkId}/endpoints/{sipEndpointId}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - $ref: '#/components/parameters/SipTrunkId'
+    - $ref: '#/components/parameters/SipEndpointId'
+    get:
+      tags:
+      - SIP Endpoints
+      summary: Get SIP endpoint by ID
+      description: Get a SIP endpoint by specifying its ID.
+      operationId: getSipEndpointById
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpoint'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The SIP Trunk ID of the SIP Endpoint you want to retrieve\n  const sipTrunkId = 'SIP_TRUNK_ID';\n  // The SIP Endpoint ID you want to retrieve\n  const sipEndpointId = 'SIP_ENDPOINT_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.sipEndpoints.get({\n      sipTrunkId,\n      sipEndpointId,\n    });\n    console.log('✅ Successfully retrieved the SIP Endpoint.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to fetch the SIP Endpoint with ID ${sipEndpointId} from the SIP Trunk with ID ${sipTrunkId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - OAuth2.0: []
+    put:
+      tags:
+      - SIP Endpoints
+      summary: Update existing SIP endpoint
+      description: Updated an existing SIP endpoint by specifying its ID.
+      operationId: updateSipEndpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SipEndpoint'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpoint'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The SIP Trunk ID you want to update the endpoint for\n  const sipTrunkId = 'SIP_TRUNK_ID';\n  // The SIP Endpoint ID you want to update\n  const sipEndpointId = 'SIP_ENDPOINT_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.sipEndpoints.update({\n      sipTrunkId,\n      sipEndpointId,\n      updateSipEndpointRequestBody: {\n        address: '127.0.0.1',\n        name: 'Acme Endpoint',\n        priority: 1,\n      },\n    });\n    console.log('✅ Successfully updated the SIP Endpoint.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to update the SIP Endpoint with ID ${sipEndpointId} from the SIP Trunk with ID ${sipTrunkId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - OAuth2.0: []
+    delete:
+      tags:
+      - SIP Endpoints
+      summary: Delete SIP endpoint
+      description: Delete a SIP endpoint by specifying its ID.
+      operationId: deleteSipEndpoint
+      responses:
+        '204':
+          description: SIP endpoint deleted successfully.
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The SIP Trunk ID you want to delete the SIP Endpoint from\n  const sipTrunkId = 'SIP_TRUNK_ID';\n  // The SIP Endpoint ID you want to delete\n  const sipEndpointId = 'SIP_ENDPOINT_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try{\n    await sinch.elasticSipTrunking.sipEndpoints.delete({\n      sipTrunkId,\n      sipEndpointId,\n    });\n    console.log(`✅ Successfully deleted the SIP Endpoint with ID: ${sipEndpointId} from the SIP Trunk with ID ${sipTrunkId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete the SIP Endpoint with ID ${sipEndpointId} from the SIP Trunk with ID ${sipTrunkId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - OAuth2.0: []
+    servers:
+    - url: https://elastic-trunking.api.sinch.com
   /v1/projects/{project_id}/trunks/{trunk_id}/sipEndpoints:
     get:
       operationId: listSipEndpoints
@@ -25,7 +150,7 @@ paths:
       tags:
       - SIP Endpoints
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/TrunkId'
       responses:
         '200':
@@ -36,14 +161,17 @@ paths:
                 $ref: '#/components/schemas/SipEndpointList'
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
     post:
-      operationId: createSipEndpoint
+      operationId: postV1ProjectsByProjectIdTrunksByTrunkIdSipEndpoints
       summary: Create a Sip Endpoint
       description: Creates a new SIP endpoint representing your SIP infrastructure (PBX, contact center, etc.) and associates it with a trunk.
       tags:
       - SIP Endpoints
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/TrunkId'
       requestBody:
         required: true
@@ -57,20 +185,28 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SipEndpoint'
+                $ref: '#/components/schemas/SipEndpoint_2'
         '400':
           description: Invalid request
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
+      x-operation-id-source: normalized
+      x-operation-id-original: createSipEndpoint
+    servers:
+    - url: https://elastic-trunking.api.sinch.com
+      description: Global Production Server
   /v1/projects/{project_id}/trunks/{trunk_id}/sipEndpoints/{endpoint_id}:
     get:
-      operationId: getSipEndpoint
+      operationId: getV1ProjectsByProjectIdTrunksByTrunkIdSipEndpointsByEndpointId
       summary: Get a Sip Endpoint
       description: Returns the details of a specific SIP endpoint.
       tags:
       - SIP Endpoints
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/TrunkId'
       - $ref: '#/components/parameters/EndpointId'
       responses:
@@ -79,19 +215,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SipEndpoint'
+                $ref: '#/components/schemas/SipEndpoint_2'
         '401':
           description: Unauthorized
         '404':
           description: Endpoint not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+      x-operation-id-source: normalized
+      x-operation-id-original: getSipEndpoint
     patch:
-      operationId: updateSipEndpoint
+      operationId: patchV1ProjectsByProjectIdTrunksByTrunkIdSipEndpointsByEndpointId
       summary: Update a Sip Endpoint
       description: Updates the configuration of a specific SIP endpoint.
       tags:
       - SIP Endpoints
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/TrunkId'
       - $ref: '#/components/parameters/EndpointId'
       requestBody:
@@ -106,19 +247,24 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SipEndpoint'
+                $ref: '#/components/schemas/SipEndpoint_2'
         '401':
           description: Unauthorized
         '404':
           description: Endpoint not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+      x-operation-id-source: normalized
+      x-operation-id-original: updateSipEndpoint
     delete:
-      operationId: deleteSipEndpoint
+      operationId: deleteV1ProjectsByProjectIdTrunksByTrunkIdSipEndpointsByEndpointId
       summary: Delete a Sip Endpoint
       description: Deletes a specific SIP endpoint from the trunk.
       tags:
       - SIP Endpoints
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/TrunkId'
       - $ref: '#/components/parameters/EndpointId'
       responses:
@@ -128,31 +274,163 @@ paths:
           description: Unauthorized
         '404':
           description: Endpoint not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+      x-operation-id-source: normalized
+      x-operation-id-original: deleteSipEndpoint
+    servers:
+    - url: https://elastic-trunking.api.sinch.com
+      description: Global Production Server
 components:
-  parameters:
-    TrunkId:
-      name: trunk_id
-      in: path
-      required: true
-      description: The unique SIP trunk identifier
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    EndpointId:
-      name: endpoint_id
-      in: path
-      required: true
-      description: The unique SIP endpoint identifier
-      schema:
-        type: string
   schemas:
+    RegisteredEndpoint:
+      required:
+      - isRegistered
+      - credentialUsername
+      properties:
+        isRegistered:
+          type: boolean
+          description: This property determines whether the endpoint is static or registered. If registered, this must be set to `true`.
+          example: true
+        credentialUsername:
+          type: string
+          description: The username for the credential list you want to use to register the endpoint.
+          example: MyCLUserName
+    Pagination:
+      type: object
+      readOnly: true
+      properties:
+        totalItems:
+          type: integer
+          readOnly: true
+          format: int32
+          description: Total size of the result.
+          example: 10000
+        pageNumber:
+          readOnly: true
+          type: string
+          description: The token to be used for listing the next page
+          example: '1'
+        size:
+          type: integer
+          readOnly: true
+          format: int32
+          description: The number of items per page. default is 1000
+          example: 2000
     SipEndpoint:
+      required:
+      - name
+      - priority
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/StaticEndpoint'
+      - $ref: '#/components/schemas/RegisteredEndpoint'
+      properties:
+        id:
+          type: string
+          description: The ID of the SIP endpoint.
+          readOnly: true
+        sipTrunkId:
+          type: string
+          description: The ID of the SIP trunk to which the endpoint is assigned.
+          readOnly: true
+          example: bbc55c4c-fe25-11ec-8482-d2e74e85a66f
+        name:
+          type: string
+          description: The friendly name of the SIP endpoint.
+          example: Acme Endpoint
+        transport:
+          type: string
+          description: The transport protocol of the SIP endpoint.
+          example: UDP
+          x-enumDescriptions:
+            TCP: '[Transmission Control Protocol](https://community.sinch.com/t5/Glossary/TCP/ta-p/7741)'
+            UDP: '[User Datagram Protocol](https://community.sinch.com/t5/Glossary/UDP/ta-p/7778)'
+            TLS: '[Transport Layer Security](https://community.sinch.com/t5/Glossary/TLS/ta-p/7757)'
+          enum:
+          - TCP
+          - UDP
+          - TLS
+          default: UDP
+        priority:
+          minimum: 1
+          type: integer
+          description: 'Inbound call routing priority. If two or more endpoints have the same priority, calls will be routed to them using a round-robin strategy.
+
+
+            Lower priority endpoints will be routed to first. Equal priority endpoints will round-robin calls between them.'
+          format: int32
+          example: 1
+        enabled:
+          type: boolean
+          description: Sets whether the SIP endpoint is enabled or not.
+          default: true
+        createTime:
+          readOnly: true
+          type: string
+          description: The date and time that the SIP endpoint was created.
+          format: date-time
+          example: '2022-01-01T00:00:00Z'
+        updateTime:
+          readOnly: true
+          type: string
+          description: The date and time that the SIP endpoint was last modified.
+          format: date-time
+          example: '2022-01-01T00:00:00Z'
+      description: 'A SIP endpoint which is the address of your SIP infrastructure. SIP endpoints can be one of two types: static endpoints or registered endpoints.
+
+
+        | Endpoint | Description |
+
+        | -------- | ----------- |
+
+        | Static endpoints | Static endpoints are defined by a static value which can either be an IP address or a domain name. |
+
+        | Registered endpoints | Registered endpoints use a credential list to determine the endpoint. |
+
+
+        ---'
+    StaticEndpoint:
+      required:
+      - address
+      properties:
+        address:
+          type: string
+          description: The address of the SIP endpoint can be an IP address or a domain name. EST uses IP authentication and will only accept calls from the specified address or domain.
+          example: 127.0.0.1
+        port:
+          maximum: 65535
+          minimum: 1
+          type: integer
+          description: The port of the SIP endpoint.
+          format: int32
+          example: 5060
+          default: 5060
+    CreateSipEndpointRequest:
+      type: object
+      required:
+      - sipAddress
+      properties:
+        sipAddress:
+          type: string
+          description: The SIP address for the endpoint
+        priority:
+          type: integer
+          description: Routing priority
+        enabled:
+          type: boolean
+          description: Whether the endpoint is enabled
+          default: true
+    SipEndpointList:
+      type: object
+      properties:
+        sipEndpoints:
+          type: array
+          description: List of SIP endpoints
+          items:
+            $ref: '#/components/schemas/SipEndpoint_2'
+    SipEndpoint_2:
       type: object
       properties:
         id:
@@ -175,14 +453,6 @@ components:
           type: string
           format: date-time
           description: When the endpoint was last updated
-    SipEndpointList:
-      type: object
-      properties:
-        sipEndpoints:
-          type: array
-          description: List of SIP endpoints
-          items:
-            $ref: '#/components/schemas/SipEndpoint'
     UpdateSipEndpointRequest:
       type: object
       properties:
@@ -195,22 +465,80 @@ components:
         enabled:
           type: boolean
           description: Updated enabled status
-    CreateSipEndpointRequest:
-      type: object
-      required:
-      - sipAddress
-      properties:
-        sipAddress:
-          type: string
-          description: The SIP address for the endpoint
-        priority:
-          type: integer
-          description: Routing priority
-        enabled:
-          type: boolean
-          description: Whether the endpoint is enabled
-          default: true
+  parameters:
+    Page:
+      in: query
+      name: page
+      description: The page you want to fetch, can set to 1 for first page, or omitted for first page
+      schema:
+        type: integer
+        default: 1
+    SipEndpointId:
+      name: sipEndpointId
+      in: path
+      description: The ID of the SIP endpoint.
+      required: true
+      schema:
+        minimum: 0
+        type: integer
+        format: int64
+    SipTrunkId:
+      name: sipTrunkId
+      in: path
+      description: The ID of the SIP trunk.
+      required: true
+      schema:
+        type: string
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: The `projectId` is a required parameter you must include when making any API calls. You can find your project ID on your [Build dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+    Size:
+      in: query
+      name: size
+      description: The size of each page to fetch
+      schema:
+        type: integer
+        default: 500
+        minimum: 1
+        maximum: 500
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    EndpointId:
+      name: endpoint_id
+      in: path
+      required: true
+      description: The unique SIP endpoint identifier
+      schema:
+        type: string
+    ProjectId_2:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
+    Basic:
+      type: http
+      description: To use basic authentication, use your Access Key ID as your username and your Access Key Secret as your password. To read about more basic authentication, see the [Basic Authentication](https://developers.sinch.com/docs/est/api-reference/est#basic) section.
+      scheme: basic
+    OAuth2.0:
+      type: oauth2
+      description: To use OAuth 2.0 authentication, use your Access Key ID and Access Key Secret to obtain your bearer token. For detailed instructions on how to do this, see the [OAuth Authentication](https://developers.sinch.com/docs/est/api-reference/est#oauth) section.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
     oAuth2:
       type: oauth2
       description: OAuth 2.0 client credentials flow.
@@ -225,3 +553,14 @@ components:
 externalDocs:
   description: Sinch Elastic SIP Trunking API Documentation
   url: https://developers.sinch.com/docs/est
+x-refined-from:
+- sinch-elastic-sip-trunking-api-openapi.yaml
+- original-sinch-elastic-sip-trunking-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

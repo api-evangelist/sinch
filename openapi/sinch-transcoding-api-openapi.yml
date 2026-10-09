@@ -1,63 +1,1891 @@
 openapi: 3.2.0
 info:
-  title: Sinch Conversation Transcoding API
-  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
+  title: Sinch Transcoding API
   version: '1.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  description: 'Operations tagged Transcoding across 2 of this provider''s published API definitions: sinch-conversation-api-openapi.yaml, original-sinch-conversation-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
+- url: https://{region}.conversation.api.sinch.com
+  variables:
+    region:
+      default: us
+      enum:
+      - us
+      - eu
+      - br
+  description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
 - url: https://us.conversation.api.sinch.com
   description: US Production Server
 - url: https://eu.conversation.api.sinch.com
   description: EU Production Server
 - url: https://br.conversation.api.sinch.com
   description: Brazil Production Server
-security:
-- oAuth2: []
-- basicAuth: []
 tags:
-- name: Transcoding
-  description: Transcode generic message formats to channel-specific formats for preview purposes.
+- description: Endpoint for transcoding generic message format to channel-specific one.
+  name: Transcoding
+  x-displayName: Transcode
 paths:
   /v1/projects/{project_id}/messages:transcode:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
     post:
-      operationId: transcodeMessage
-      summary: Transcode a Message
-      description: Transcodes a generic message format to a channel-specific format for preview purposes without sending the message.
+      description: 'Transcodes the message from the Conversation API format to the
+
+        channel-specific formats for the requested channels. No message
+
+        is sent to the contact.'
       tags:
       - Transcoding
-      parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      summary: Transcode a message
+      operationId: Transcoding_TranscodeMessage
       requestBody:
-        required: true
+        description: The message to be transcoded, and the app and channels for which the message is to be transcoded.
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/TranscodeRequest'
+              $ref: '#/components/schemas/TranscodeMessageRequest'
+        required: true
       responses:
         '200':
-          description: Transcoded message
+          description: A successful response.
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/TranscodeResponse'
+                $ref: '#/components/schemas/TranscodeMessageResponse'
         '400':
-          description: Invalid request
+          $ref: '#/components/responses/400Error'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.transcoding;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.TranscodingService;\nimport com.sinch.sdk.domains.conversation.models.v1.ConversationChannel;\nimport com.sinch.sdk.domains.conversation.models.v1.messages.AppMessage;\nimport com.sinch.sdk.domains.conversation.models.v1.messages.types.location.Coordinates;\nimport com.sinch.sdk.domains.conversation.models.v1.messages.types.location.LocationMessage;\nimport com.sinch.sdk.domains.conversation.models.v1.transcoding.request.TranscodeMessageRequest;\nimport com.sinch.sdk.domains.conversation.models.v1.transcoding.response.TranscodeMessageResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.Arrays;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Transcode {\n\n  private static final Logger LOGGER = Logger.getLogger(Transcode.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // ID of the Conversation application to use for transcoding\n    String conversationApplicationId = \"APPLICATION_ID\";\n    // The channel to transcode the message for\n    ConversationChannel conversationChannel = ConversationChannel.WHATSAPP;\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    TranscodingService transcodingService = client.conversation().v1().transcoding();\n\n    AppMessage<?> appMessage =\n        AppMessage.<LocationMessage>builder()\n            .setBody(\n                LocationMessage.builder()\n                    .setCoordinates(\n                        Coordinates.builder()\n                            .setLatitude(47.627980)\n                            .setLongitude(-2.822915)\n                            .build())\n                    .setTitle(\"Coordinates title\")\n                    .build())\n            .build();\n\n    TranscodeMessageRequest request =\n        TranscodeMessageRequest.builder()\n            .setAppId(conversationApplicationId)\n            .setAppMessage(appMessage)\n            .setChannels(Arrays.asList(conversationChannel))\n            .build();\n\n    LOGGER.info(\"Transcode message request: \" + request);\n\n    TranscodeMessageResponse response = transcodingService.transcodeMessage(request);\n\n    LOGGER.info(\"Transcode message response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the conversation application that must contain the target channels for transcoding\n  const appId = 'CONVERSATION_APP_ID';\n  // Add other channels as needed, e.g., 'SMS', 'RCS', 'MESSENGER'.\n  const targetChannels = ['WHATSAPP'];\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.transcoding.transcodeMessage({\n      transcodeMessageRequestBody: {\n        app_id: appId,\n        app_message: {\n          location_message: {\n            title: 'Coordinates title',\n            coordinates: {\n              latitude: 59.3360453,\n              longitude: 18.0117363,\n            },\n          },\n        },\n        channels: targetChannels,\n      },\n    });\n    console.log('✅ Successfully transcoded the message.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error('❌ Failed to transcode the message:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
 components:
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
+    WhatsAppPaymentButton:
+      description: WhatsApp Payment Button
+      oneOf:
+      - $ref: '#/components/schemas/WhatsAppPaymentSettingsButtonPix'
+      - $ref: '#/components/schemas/WhatsAppPaymentSettingsButtonPaymentLink'
+      - $ref: '#/components/schemas/WhatsAppPaymentSettingsButtonBoleto'
+      discriminator:
+        propertyName: type
+        mapping:
+          pix_dynamic_code: '#/components/schemas/WhatsAppPaymentSettingsButtonPix'
+          payment_link: '#/components/schemas/WhatsAppPaymentSettingsButtonPaymentLink'
+          boleto: '#/components/schemas/WhatsAppPaymentSettingsButtonBoleto'
+    KakaoTalkWebLinkButton:
+      title: KakaoTalk Web Link Button
+      description: A button that opens a web link.
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkButton'
+      - type: object
+        properties:
+          type:
+            enum:
+            - WL
+          link_mo:
+            type: string
+            description: URL opened on a mobile device
+          link_pc:
+            type: string
+            description: URL opened on a desktop device
+        required:
+        - link_mo
+    WhatsAppPaymentSettingsPix:
+      type: object
+      deprecated: true
+      required:
+      - dynamic_pix
+      properties:
+        dynamic_pix:
+          type: object
+          description: The dynamic Pix payment settings.
+          required:
+          - code
+          - merchant_name
+          - key
+          - key_type
+          properties:
+            code:
+              type: string
+              description: The dynamic Pix code to be used by the buyer to pay.
+            merchant_name:
+              type: string
+              description: Account holder name.
+            key:
+              type: string
+              description: Pix key.
+            key_type:
+              type: string
+              description: Pix key type.
+              enum:
+              - CPF
+              - CNPJ
+              - EMAIL
+              - PHONE
+              - EVP
+              x-enumDescriptions:
+                CPF: The CPF key type.
+                CNPJ: The CNPJ key type.
+                EMAIL: The EMAIL key type.
+                PHONE: The PHONE key type.
+                EVP: The EVP key type.
+    LocationMessageField:
+      type: object
+      description: Message containing geographic location.
+      title: Location
+      properties:
+        location_message:
+          title: Location Message
+          type: object
+          required:
+          - coordinates
+          - title
+          properties:
+            coordinates:
+              $ref: '#/components/schemas/Coordinates'
+            label:
+              description: Label or name for the position.
+              type: string
+            title:
+              description: The title is shown close to the button or link that leads to a map showing the location. The title can be clickable in some cases.
+              type: string
+    Choice:
+      description: A choice is an action the user can take such as buttons for quick replies or other call to actions.
+      type: object
+      title: Choice message
+      allOf:
+      - $ref: '#/components/schemas/choiceTypes'
+      - $ref: '#/components/schemas/choiceCommonProps'
+    CarouselMessageField:
+      description: Message containing a list of cards often rendered horizontally on supported channels.
+      type: object
+      title: Carousel
+      properties:
+        carousel_message:
+          title: Carousel Message
+          type: object
+          required:
+          - cards
+          properties:
+            cards:
+              description: A list of up to 10 cards.
+              type: array
+              items:
+                $ref: '#/components/schemas/CardMessage'
+            choices:
+              description: Optional. Outer choices on the carousel level. The number of outer choices is limited to 3.
+              type: array
+              items:
+                $ref: '#/components/schemas/Choice'
+    AgentType:
+      description: Agent's classification. It can be UNKNOWN_AGENT_TYPE, HUMAN or BOT.
+      enum:
+      - UNKNOWN_AGENT_TYPE
+      - HUMAN
+      - BOT
+      x-enumDescriptions:
+        UNKNOWN_AGENT_TYPE: The default AgentType. When the agent type is unknown.
+        HUMAN: Human agent.
+        BOT: Bot agent.
+      type: string
+      default: UNKNOWN_AGENT_TYPE
+    KakaoTalkRegularPriceCommerce:
+      description: Information about a product with regular price
+      type: object
+      properties:
+        type:
+          enum:
+          - REGULAR_PRICE_COMMERCE
+          x-enumDescriptions:
+            REGULAR_PRICE_COMMERCE: Commerce with regular price
+        title:
+          description: Product title
+          type: string
+          maxLength: 30
+        regular_price:
+          description: Regular price of the product
+          type: integer
+          minimum: 0
+          maximum: 99999999
+      required:
+      - type
+      - title
+      - regular_price
+    CardHeight:
+      description: You can set the desired size of the card in the message.
+      type: string
+      x-enumDescriptions:
+        UNSPECIFIED_HEIGHT: The height of the card is unspecified.
+        SHORT: The shortest card height.
+        MEDIUM: Medium card height.
+        TALL: The tallest card height.
+      enum:
+      - UNSPECIFIED_HEIGHT
+      - SHORT
+      - MEDIUM
+      - TALL
+    choiceCommonProps:
+      type: object
+      properties:
+        postback_data:
+          description: An optional field. This data will be returned in the ChoiceResponseMessage. The default is message_id_{text, title}.
+        display_mode:
+          $ref: '#/components/schemas/DisplayMode'
+    PhoneNumberInfo:
+      type: object
+      title: Phone number
+      description: Phone numbers of the contact.
+      required:
+      - phone_number
+      properties:
+        phone_number:
+          description: Phone number with country code included.
+          type: string
+        type:
+          description: Phone number type, e.g. WORK or HOME.
+          type: string
+    PaymentOrderStatusChannelSpecificMessage:
+      allOf:
+      - $ref: '#/components/schemas/ChannelSpecificCommonProps'
+      - type: object
+        title: WhatsApp Payment Order Status channel specific message.
+        description: A message type for sending WhatsApp Payment Status Requests.
+        required:
+        - payment
+        properties:
+          payment:
+            type: object
+            description: The payment order status message content
+            required:
+            - reference_id
+            - order
+            properties:
+              reference_id:
+                type: string
+                description: Unique ID used to query the current payment status.
+              order:
+                type: object
+                description: The payment order.
+                required:
+                - status
+                properties:
+                  status:
+                    type: string
+                    description: The new payment message status.
+                    enum:
+                    - pending
+                    - processing
+                    - partially-shipped
+                    - shipped
+                    - completed
+                    - canceled
+                    x-enumDescriptions:
+                      pending: The order is pending.
+                      processing: The order is processing.
+                      partially-shipped: A portion of the order has been shipped.
+                      shipped: The order has been shipped.
+                      completed: The order is complete.
+                      canceled: The order was canceled.
+                  description:
+                    type: string
+                    description: The description of payment message status update (120 characters maximum).
+    ContactInfoMessageField:
+      type: object
+      description: Message containing contact information.
+      title: Contact Info
+      properties:
+        contact_info_message:
+          title: Contact Info Message
+          type: object
+          required:
+          - name
+          - phone_numbers
+          properties:
+            name:
+              $ref: '#/components/schemas/NameInfo'
+            phone_numbers:
+              description: Phone numbers of the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/PhoneNumberInfo'
+            addresses:
+              description: Physical addresses of the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/AddressInfo'
+            email_addresses:
+              description: Email addresses of the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/EmailInfo'
+            organization:
+              $ref: '#/components/schemas/OrganizationInfo'
+            urls:
+              description: URLs/websites associated with the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/UrlInfo'
+            birthday:
+              description: Date of birth in YYYY-MM-DD format.
+              type: string
+    WhatsAppInteractiveTextHeader:
+      type: object
+      description: Header of the interactive message with text.
+      required:
+      - type
+      - text
+      properties:
+        type:
+          type: string
+          x-enumDescriptions:
+            text: The text of the header.
+          enum:
+          - text
+        text:
+          type: string
+          description: Text for the header. Formatting allows emojis, but not Markdown.
+    ListSection:
+      type: object
+      title: List Section
+      description: Section for interactive WhatsApp messages containing ListItem
+      required:
+      - items
+      properties:
+        title:
+          description: Optional parameter. Title for list section.
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListItem'
+    WhatsAppInteractiveBody:
+      type: object
+      description: Body of the interactive message.
+      required:
+      - text
+      properties:
+        text:
+          type: string
+          description: The content of the message (1024 characters maximum). Emojis and Markdown are supported.
+    TemplateMessageField:
+      type: object
+      description: Message referring to predefined template
+      title: Template Message
+      properties:
+        template_message:
+          type: object
+          title: Template Message
+          properties:
+            channel_template:
+              description: 'Optional. Channel specific template reference with parameters per channel.
+
+                The channel template if exists overrides the omnichannel template.
+
+                At least one of `channel_template` or `omni_template` needs to be present.
+
+                The key in the map must point to a valid conversation channel as
+
+                defined by the enum ConversationChannel.'
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/TemplateReference'
+            omni_template:
+              $ref: '#/components/schemas/TemplateReferenceWithVersion'
+    Agent:
+      description: Represents an agent that is involved in a conversation.
+      type: object
+      title: Agent
+      properties:
+        display_name:
+          description: Agent's display name
+          type: string
+        type:
+          $ref: '#/components/schemas/AgentType'
+        picture_url:
+          description: The Agent's picture url.
+          type: string
+    OmniMessageOverride:
+      oneOf:
+      - $ref: '#/components/schemas/TextMessageField'
+      - $ref: '#/components/schemas/MediaMessageField'
+      - $ref: '#/components/schemas/TemplateReferenceField'
+      - $ref: '#/components/schemas/ChoiceMessageField'
+      - $ref: '#/components/schemas/CardMessageField'
+      - $ref: '#/components/schemas/CarouselMessageField'
+      - $ref: '#/components/schemas/LocationMessageField'
+      - $ref: '#/components/schemas/ContactInfoMessageField'
+      - $ref: '#/components/schemas/ListMessageField'
+    DisplayMode:
+      description: Controls the display behavior of a choice. Only supported for Choice Message on the RCS channel. Has no effect on other channels or message types, except for a carousel's outer choices, where it is rejected outright.
+      type: string
+      x-enumDescriptions:
+        DISPLAY_MODE_UNSPECIFIED: Default. Transient — choice disappears when new messages arrive.
+        PERSISTENT: Persistent — choice remains visible in the message bubble.
+      enum:
+      - DISPLAY_MODE_UNSPECIFIED
+      - PERSISTENT
+    KakaoTalkCoupon:
+      properties:
+        type:
+          description: Coupon type
+          type: string
+        description:
+          description: Coupon description
+          type: string
+          maxLength: 12
+        link_mo:
+          description: Coupon URL opened on a mobile device
+          type: string
+        link_pc:
+          description: Coupon URL opened on a desktop device
+          type: string
+        scheme_android:
+          description: 'Channel coupon URL (format: `alimtalk=coupon://...`)'
+          type: string
+        scheme_ios:
+          description: 'Channel coupon URL (format: `alimtalk=coupon://...`)'
+          type: string
+      required:
+      - type
+    WhatsAppInteractiveVideoHeader:
+      type: object
+      description: Header of the interactive message with video.
+      required:
+      - type
+      - video
+      properties:
+        type:
+          type: string
+          x-enumDescriptions:
+            video: The video associated with the header.
+          enum:
+          - video
+        video:
+          $ref: '#/components/schemas/WhatsAppInteractiveHeaderMedia'
+    OrganizationInfo:
+      type: object
+      title: Organization information
+      description: Organization information of the contact.
+      properties:
+        company:
+          description: Company name
+          type: string
+        department:
+          description: Department at the company
+          type: string
+        title:
+          description: Corporate title, e.g. Software engineer
+          type: string
+    choiceTypes:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/CallMessageField'
+      - $ref: '#/components/schemas/LocationMessageField'
+      - $ref: '#/components/schemas/TextMessageField'
+      - $ref: '#/components/schemas/UrlMessageField'
+      - $ref: '#/components/schemas/CalendarMessageField'
+      - $ref: '#/components/schemas/ShareLocationMessageField'
+    TemplateReferenceField:
+      type: object
+      title: Template (Reference)
+      properties:
+        template_reference:
+          $ref: '#/components/schemas/TemplateReferenceWithVersion'
+    WhatsAppPaymentSettingsBoleto:
+      type: object
+      deprecated: true
+      required:
+      - boleto
+      properties:
+        boleto:
+          type: object
+          description: The Boleto payment settings.
+          required:
+          - digitable_line
+          properties:
+            digitable_line:
+              type: string
+              description: The Boleto digitable line which will be copied to the clipboard when the user taps the Boleto button.
+    MediaProperties:
+      title: Media Properties
+      type: object
+      required:
+      - url
+      properties:
+        thumbnail_url:
+          type: string
+          description: An optional parameter. Will be used where it is natively supported.
+        url:
+          description: Url to the media file.
+          type: string
+        filename_override:
+          description: Overrides the media file name.
+          type: string
+    ListItem:
+      type: object
+      title: List Item
+      description: Item containing either choiceItem or ProductItem
+      oneOf:
+      - required:
+        - choice
+        type: object
+        properties:
+          choice:
+            $ref: '#/components/schemas/ChoiceItem'
+        title: Choice
+      - required:
+        - product
+        type: object
+        properties:
+          product:
+            $ref: '#/components/schemas/ProductItem'
+        title: Product
+    Coordinates:
+      type: object
+      title: Geographic coordinates
+      required:
+      - latitude
+      - longitude
+      properties:
+        latitude:
+          description: The latitude.
+          type: number
+          format: float
+        longitude:
+          description: The longitude.
+          type: number
+          format: float
+    PaymentOrderDetailsChannelSpecificMessage:
+      allOf:
+      - $ref: '#/components/schemas/ChannelSpecificCommonProps'
+      - type: object
+        title: WhatsApp Payment Order Details channel specific message.
+        description: A message type for sending WhatsApp Payment Requests.
+        required:
+        - payment
+        properties:
+          payment:
+            type: object
+            description: The payment order details content.
+            required:
+            - type
+            - reference_id
+            - type_of_goods
+            - total_amount_value
+            - order
+            properties:
+              type:
+                type: string
+                description: The country/currency associated with the payment message.
+                enum:
+                - br
+                - sg
+                x-enumDescriptions:
+                  br: Brazil
+                  sg: Singapore
+              reference_id:
+                type: string
+                description: Unique reference ID.
+              type_of_goods:
+                type: string
+                description: The type of good associated with this order.
+                enum:
+                - digital-goods
+                - physical-goods
+                x-enumDescriptions:
+                  digital-goods: Digital goods.
+                  physical-goods: Physical goods.
+              payment_settings:
+                deprecated: true
+                description: The payment settings. Use `payment_buttons` in place of this deprecated field.
+                oneOf:
+                - $ref: '#/components/schemas/WhatsAppPaymentSettingsPix'
+                - $ref: '#/components/schemas/WhatsAppPaymentSettingsPaymentLink'
+                - $ref: '#/components/schemas/WhatsAppPaymentSettingsBoleto'
+              payment_buttons:
+                type: array
+                description: Array of payment buttons (1 to 2 items).
+                minItems: 1
+                maxItems: 2
+                items:
+                  $ref: '#/components/schemas/WhatsAppPaymentButton'
+              total_amount_value:
+                type: integer
+                description: Integer representing the total amount of the transaction.
+              order:
+                type: object
+                description: The payment order.
+                required:
+                - items
+                - subtotal_value
+                - tax_value
+                properties:
+                  catalog_id:
+                    type: string
+                    description: Unique ID of the Facebook catalog being used by the business.
+                  expiration_time:
+                    type: string
+                    description: 'UTC timestamp indicating when the order should expire.
+
+                      The timestamp must be given in seconds.
+
+                      The minimum threshold for the timestamp is 300 seconds.'
+                  expiration_description:
+                    type: string
+                    description: Description of the expiration.
+                  subtotal_value:
+                    type: integer
+                    description: Value representing the subtotal amount of this order.
+                  tax_value:
+                    type: integer
+                    description: Value representing the tax amount for this order.
+                  tax_description:
+                    type: string
+                    description: Description of the tax for this order.
+                  shipping_value:
+                    type: integer
+                    description: Value representing the shipping amount for this order.
+                  shipping_description:
+                    type: string
+                    description: Shipping description for this order.
+                  discount_value:
+                    type: integer
+                    description: Value of the discount for this order.
+                  discount_description:
+                    type: string
+                    description: Description of the discount for this order.
+                  discount_program_name:
+                    type: string
+                    description: Discount program name for this order.
+                  items:
+                    type: array
+                    description: The items list for this order.
+                    items:
+                      type: object
+                      required:
+                      - retailer_id
+                      - name
+                      - amount_value
+                      - quantity
+                      properties:
+                        retailer_id:
+                          type: string
+                          description: Unique ID of the retailer.
+                        name:
+                          type: string
+                          description: Item's name as displayed to the user.
+                        amount_value:
+                          type: integer
+                          description: Price per item.
+                        quantity:
+                          type: integer
+                          description: Number of items in this order.
+                        sale_amount_value:
+                          type: integer
+                          description: Discounted price per item.
+    WhatsAppInteractiveHeaderMedia:
+      type: object
+      description: Media object for the header.
+      required:
+      - link
+      properties:
+        link:
+          type: string
+          description: URL for the media.
+    LineNotificationMessageTemplateBody:
+      type: object
+      description: Template body
+      properties:
+        emphasized_item:
+          $ref: '#/components/schemas/LineNotificationMessageTemplateEmphasizedItem'
+        items:
+          type: array
+          description: List of template items
+          items:
+            $ref: '#/components/schemas/LineNotificationMessageTemplateItem'
+          maxItems: 15
+        buttons:
+          type: array
+          description: List of template buttons
+          items:
+            $ref: '#/components/schemas/LineNotificationMessageTemplateButton'
+          maxItems: 2
+    WhatsAppPaymentSettingsButtonBoleto:
+      type: object
+      description: The Boleto payment settings.
+      required:
+      - type
+      - digitable_line
+      properties:
+        type:
+          type: string
+          enum:
+          - boleto
+          x-enumDescriptions:
+            boleto: The Boleto button identifier
+        digitable_line:
+          type: string
+          description: The Boleto digitable line which will be copied to the clipboard when the user taps the Boleto button.
+    WhatsAppPaymentSettingsPaymentLink:
+      type: object
+      deprecated: true
+      required:
+      - payment_link
+      properties:
+        payment_link:
+          type: object
+          description: The payment link payment settings.
+          required:
+          - uri
+          properties:
+            uri:
+              type: string
+              description: The payment link to be used by the buyer to pay.
+    ShareLocationMessageField:
+      description: Message requesting location from a user.
+      type: object
+      title: Request location
+      properties:
+        share_location_message:
+          title: Share Location Message
+          type: object
+          required:
+          - title
+          - fallback_url
+          properties:
+            title:
+              description: The title is shown close to the button that leads to open a map to share a location.
+              type: string
+            fallback_url:
+              description: The URL that is opened when channel does not have support for this type.
+              type: string
+    KakaoTalkCommerceMessage:
+      type: object
+      title: KakaoTalk commerce message
+      description: A message type for sending KakaoTalk commerce messages
+      properties:
+        buttons:
+          description: Buttons list
+          type: array
+          minItems: 1
+          maxItems: 2
+          items:
+            oneOf:
+            - $ref: '#/components/schemas/KakaoTalkWebLinkButton'
+            - $ref: '#/components/schemas/KakaoTalkAppLinkButton'
+            - $ref: '#/components/schemas/KakaoTalkBotKeywordButton'
+        additional_content:
+          description: Additional information
+          type: string
+          maxLength: 34
+        image:
+          description: Product image
+          type: object
+          properties:
+            image_url:
+              type: string
+              description: URL to the product image
+            image_link:
+              type: string
+              description: URL opened when a user clicks on the image
+          required:
+          - image_url
+        commerce:
+          description: Product information
+          oneOf:
+          - $ref: '#/components/schemas/KakaoTalkRegularPriceCommerce'
+          - $ref: '#/components/schemas/KakaoTalkDiscountFixedCommerce'
+          - $ref: '#/components/schemas/KakaoTalkDiscountRateCommerce'
+        coupon:
+          description: Discount coupon
+          oneOf:
+          - $ref: '#/components/schemas/KakaoTalkFixedDiscountCoupon'
+          - $ref: '#/components/schemas/KakaoTalkDiscountRateCoupon'
+          - $ref: '#/components/schemas/KakaoTalkShippingDiscountCoupon'
+          - $ref: '#/components/schemas/KakaoTalkFreeCoupon'
+          - $ref: '#/components/schemas/KakaoTalkUpCoupon'
+      required:
+      - image
+      - commerce
+      - buttons
+    AddressInfo:
+      type: object
+      title: Address information
+      description: Physical addresses of the contact.
+      properties:
+        city:
+          description: City Name
+          type: string
+        country:
+          description: Country Name
+          type: string
+        state:
+          description: Name of a state or region of a country.
+          type: string
+        zip:
+          description: Zip/postal code
+          type: string
+        type:
+          description: Address type, e.g. WORK or HOME
+          type: string
+        country_code:
+          description: Two letter country code.
+          type: string
+    ChoiceItem:
+      type: object
+      title: Choice
+      description: A message component for interactive messages, containing a choice.
+      required:
+      - title
+      properties:
+        title:
+          type: string
+          description: Required parameter. Title for the choice item.
+        description:
+          type: string
+          description: Optional parameter. The description (or subtitle) of this choice item.
+        media:
+          description: Optional parameter. The media of this choice item.
+          allOf:
+          - $ref: '#/components/schemas/MediaProperties'
+        postback_data:
+          type: string
+          description: Optional parameter. Postback data that will be returned in the MO if the user selects this option.
+    TemplateReference:
+      type: object
+      title: Template reference with concrete parameter values
+      description: The referenced template can be an omnichannel template stored in Conversation API Template Store as an AppMessage. You may also reference external channel-specific templates, such as a WhatsApp Business Template. Note that channel-specific template references are not supported when populating the `explicit_channel_omni_message` field.
+      required:
+      - template_id
+      properties:
+        version:
+          type: string
+          description: 'Used to specify what version of a template to use. Required when using `omni_channel_override` and `omni_template` fields.
+
+            This will be used in conjunction with `language_code`. Note that, when referencing omni-channel templates using the [Sinch Customer Dashboard](https://dashboard.sinch.com/), the latest version of a given omni-template can be identified by populating this field with `latest`.'
+        language_code:
+          description: 'The BCP-47 language code, such as `en_US` or `sr_Latn`.
+
+            For more information, see http://www.unicode.org/reports/tr35/#Unicode_locale_identifier. English is the default `language_code`.
+
+            Note that, while many API calls involving templates accept either the dashed format (`en-US`) or the underscored format (`en_US`), some channel specific templates (for example, WhatsApp channel-specific templates) only accept the underscored format. Note that this field is required for WhatsApp channel-specific templates.'
+          type: string
+        parameters:
+          description: 'Required if the template has parameters. Concrete values must
+
+            be present for all defined parameters
+
+            in the template. Parameters can be different for
+
+            different versions and/or languages of the template.'
+          type: object
+          additionalProperties:
+            type: string
+        template_id:
+          description: The ID of the template. Note that, in the case of WhatsApp channel-specific templates, this field must be populated by the name of the template.
+          type: string
+    CalendarMessageField:
+      description: Message containing details about a calendar event.
+      type: object
+      title: Calendar
+      properties:
+        calendar_message:
+          title: Calendar message
+          type: object
+          required:
+          - title
+          - event_start
+          - event_end
+          - event_title
+          - fallback_url
+          properties:
+            title:
+              description: The title is shown close to the button that leads to open a user calendar.
+              type: string
+            event_start:
+              description: The timestamp defines start of a calendar event.
+              type: string
+              format: date-time
+              example: '2025-11-30T10:00:00Z'
+            event_end:
+              description: The timestamp defines end of a calendar event.
+              type: string
+              format: date-time
+              example: '2025-11-30T11:00:00Z'
+            event_title:
+              description: Title of a calendar event.
+              type: string
+            event_description:
+              description: Description of a calendar event.
+              type: string
+            fallback_url:
+              description: The URL that is opened when the user cannot open a calendar event directly or channel does not have support for this type.
+              type: string
+    AppMessageCommonProps:
+      type: object
+      properties:
+        explicit_channel_message:
+          description: Allows you to specify a channel and define a corresponding channel specific message payload that will override the standard Conversation API message types. The key in the map must point to a valid conversation channel as defined in the enum `ConversationChannel`. The message content must be provided in a string format. You may use the [transcoding endpoint](https://developers.sinch.com/docs/conversation/api-reference/conversation/tag/Transcoding/) to help create your message. For more information about how to construct an explicit channel message for a particular channel, see that [channel's corresponding documentation](https://developers.sinch.com/docs/conversation/channel-support/) (for example, using explicit channel messages with [the WhatsApp channel](https://developers.sinch.com/docs/conversation/channel-support/whatsapp/message-support/#explicit-channel-messages)).
+          type: object
+          additionalProperties:
+            type: string
+        explicit_channel_omni_message:
+          description: Override the message's content for specified channels. The key in the map must point to a valid conversation channel as defined in the enum `ConversationChannel`. The content defined under the specified channel will be sent on that channel.
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/OmniMessageOverride'
+        channel_specific_message:
+          description: 'Channel specific messages, overriding any transcoding. The structure of this property is more well-defined than the open structure of the `explicit_channel_message` property, and may be easier to use.
+
+            The key in the map must point to a valid conversation channel as defined in the enum `ConversationChannel`.'
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/ChannelSpecificMessage'
+        agent:
+          $ref: '#/components/schemas/Agent'
+        reply_to:
+          title: Reply To
+          description: Sends this message as a contextual reply to an inbound contact message, so the contact sees their original message quoted. Only supported on the WhatsApp channel. Conversation API keeps the mapping needed for the quote for 96 hours. If the referenced message is unknown or older than 96 hours, or the message is sent on a channel that does not support contextual replies, the message is still sent without the quote. For more information, see [Sending contextual replies](https://developers.sinch.com/docs/conversation/channel-support/whatsapp/message-support/#sending-contextual-replies).
+          type: object
+          required:
+          - message_id
+          properties:
+            message_id:
+              type: string
+              description: Required when using `reply_to`. The Conversation API ID of the inbound contact message this message replies to. Do not use a channel message ID (e.g., a WhatsApp message ID) from Meta.
+    WhatsAppPaymentSettingsButtonPaymentLink:
+      type: object
+      description: The payment link payment settings.
+      required:
+      - type
+      - uri
+      properties:
+        type:
+          type: string
+          enum:
+          - payment_link
+          x-enumDescriptions:
+            payment_link: The payment link button identifier
+        uri:
+          type: string
+          description: The payment link to be used by the buyer to pay.
+    ChannelSpecificCommonProps:
+      type: object
+      properties:
+        header:
+          description: The header of the interactive message.
+          type: object
+          oneOf:
+          - $ref: '#/components/schemas/WhatsAppInteractiveTextHeader'
+          - $ref: '#/components/schemas/WhatsAppInteractiveImageHeader'
+          - $ref: '#/components/schemas/WhatsAppInteractiveDocumentHeader'
+          - $ref: '#/components/schemas/WhatsAppInteractiveVideoHeader'
+          discriminator:
+            propertyName: type
+            mapping:
+              text: '#/components/schemas/WhatsAppInteractiveTextHeader'
+              image: '#/components/schemas/WhatsAppInteractiveImageHeader'
+              document: '#/components/schemas/WhatsAppInteractiveDocumentHeader'
+              video: '#/components/schemas/WhatsAppInteractiveVideoHeader'
+        body:
+          $ref: '#/components/schemas/WhatsAppInteractiveBody'
+        footer:
+          $ref: '#/components/schemas/WhatsAppInteractiveFooter'
+    TranscodeMessageResponse:
+      type: object
+      properties:
+        transcoded_message:
+          description: 'The transcoded message for the different channels.
+
+            The keys in the map correspond to channel names, as defined by the type
+
+            ConversationChannel.'
+          type: object
+          additionalProperties:
+            type: string
+          readOnly: true
+    TextMessageField:
+      type: object
+      title: Text
+      description: A message containing only text.
+      properties:
+        text_message:
+          type: object
+          title: Text Message
+          required:
+          - text
+          properties:
+            text:
+              description: The text to be sent.
+              type: string
+    CardMessageField:
+      description: Field containing a Card Message
+      type: object
+      title: Card
+      properties:
+        card_message:
+          $ref: '#/components/schemas/CardMessage'
+    KakaoTalkCarouselCommerceChannelSpecificMessage:
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkChannelSpecificMessage'
+      - type: object
+        title: KakaoTalk carousel commerce channel specific message
+        description: A message type for sending KakaoTalk carousel commerce messages
+        properties:
+          carousel:
+            description: Carousel content
+            type: object
+            properties:
+              head:
+                description: Carousel introduction
+                type: object
+                properties:
+                  header:
+                    description: Carousel introduction title
+                    type: string
+                    maxLength: 20
+                  content:
+                    description: Carousel introduction description
+                    type: string
+                    maxLength: 50
+                  image_url:
+                    description: URL to the image displayed in the introduction
+                    type: string
+                  link_mo:
+                    description: URL opened on a mobile device
+                    type: string
+                  link_pc:
+                    description: URL opened on a desktop device
+                    type: string
+                  scheme_ios:
+                    description: App link opened on an iOS device (e.g. `tel://PHONE_NUMBER`)
+                    type: string
+                  scheme_android:
+                    description: App link opened on an Android device (e.g. `tel://PHONE_NUMBER`)
+                    type: string
+                required:
+                - header
+                - content
+                - image_url
+              list:
+                description: List of carousel cards
+                type: array
+                minItems: 2
+                maxItems: 10
+                items:
+                  $ref: '#/components/schemas/KakaoTalkCommerceMessage'
+              tail:
+                description: '"More" button'
+                type: object
+                properties:
+                  link_mo:
+                    description: URL opened on a mobile device
+                    type: string
+                  link_pc:
+                    description: URL opened on a desktop device
+                    type: string
+                  scheme_ios:
+                    description: App link opened on an iOS device (e.g. `tel://PHONE_NUMBER`)
+                    type: string
+                  scheme_android:
+                    description: App link opened on an Android device (e.g. `tel://PHONE_NUMBER`)
+                    type: string
+                required:
+                - link_mo
+            required:
+            - list
+        required:
+        - carousel
+    ListMessageField:
+      type: object
+      title: List
+      description: A message containing a list of options to choose from. All items must be of the same type.
+      properties:
+        list_message:
+          title: List Message
+          type: object
+          required:
+          - title
+          - sections
+          properties:
+            title:
+              description: A title for the message that is displayed near the products or choices.
+              type: string
+            description:
+              description: This is an optional field, containing a description for the message.
+              type: string
+            media:
+              $ref: '#/components/schemas/MediaProperties'
+            sections:
+              description: List of ListSection objects containing choices to be presented in the list message.
+              type: array
+              items:
+                $ref: '#/components/schemas/ListSection'
+            message_properties:
+              description: Additional properties for the message. Required if sending a product list message.
+              properties:
+                catalog_id:
+                  description: Required if sending a product list message. The ID of the catalog to which the products belong.
+                  type: string
+                menu:
+                  description: Optional. Sets the text for the menu of a choice list message.
+                  type: string
+                whatsapp_header:
+                  description: Optional. Sets the text for the header of a WhatsApp choice list message. Ignored for other channels.
+                  type: string
+    LineNotificationMessageTemplateButton:
+      type: object
+      description: Template button
+      required:
+      - button_key
+      - url
+      properties:
+        button_key:
+          type: string
+          description: Button key. See [LINE documentation](https://developers.line.biz/en/docs/partner-docs/line-notification-messages/template/?r=jp#buttons) for available keys
+        url:
+          type: string
+          maxLength: 1000
+          description: Button URL
+    LineNotificationMessageTemplateItem:
+      type: object
+      description: Template item
+      required:
+      - item_key
+      - content
+      properties:
+        item_key:
+          description: Item key. See [LINE documentation](https://developers.line.biz/en/docs/partner-docs/line-notification-messages/template/?r=jp#items) for available keys
+          type: string
+        content:
+          description: Item value
+          type: string
+          maxLength: 300
+    protobufAny:
+      type: object
+      properties:
+        type_url:
+          type: string
+        value:
+          type: string
+          format: byte
+    Choices:
+      type: object
+      properties:
+        choices:
+          type: array
+          description: The number of choices is limited to 10.
+          items:
+            $ref: '#/components/schemas/Choice'
+    KakaoTalkBotKeywordButton:
+      title: KakaoTalk Bot Keyword Button
+      description: A button that sends a keyword specified in `name` property
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkButton'
+      - type: object
+        properties:
+          type:
+            enum:
+            - BK
+    WhatsAppInteractiveFooter:
+      type: object
+      description: Footer of the interactive message.
+      required:
+      - text
+      properties:
+        text:
+          type: string
+          description: The footer content (60 characters maximum). Emojis, Markdown and links are supported.
+    WhatsAppInteractiveDocumentHeader:
+      type: object
+      description: Header of the interactive message with document.
+      required:
+      - type
+      - document
+      properties:
+        type:
+          type: string
+          x-enumDescriptions:
+            document: The document associated with the header.
+          enum:
+          - document
+        document:
+          $ref: '#/components/schemas/WhatsAppInteractiveHeaderMedia'
+    AppMessageTypes:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/CardMessageField'
+      - $ref: '#/components/schemas/CarouselMessageField'
+      - $ref: '#/components/schemas/ChoiceMessageField'
+      - $ref: '#/components/schemas/LocationMessageField'
+      - $ref: '#/components/schemas/MediaMessageField'
+      - $ref: '#/components/schemas/TemplateMessageField'
+      - $ref: '#/components/schemas/TextMessageField'
+      - $ref: '#/components/schemas/ListMessageField'
+      - $ref: '#/components/schemas/ContactInfoMessageField'
+    ChannelSpecificMessage:
+      type: object
+      title: Channel specific message
+      description: A message containing a channel specific message (not supported by OMNI types).
+      required:
+      - message_type
+      - message
+      properties:
+        message_type:
+          type: string
+          x-enumDescriptions:
+            FLOWS: The WhatsApp Flows message type.
+            ORDER_DETAILS: The WhatsApp order details message type.
+            ORDER_STATUS: The WhatsApp order status message type.
+            COMMERCE: KakaoTalk commerce channel specific message type
+            CAROUSEL_COMMERCE: KakaoTalk carousel commerce channel specific message type
+            NOTIFICATION_MESSAGE_TEMPLATE: LINE notification message template type
+          description: The type of the channel specific message.
+          enum:
+          - FLOWS
+          - ORDER_DETAILS
+          - ORDER_STATUS
+          - COMMERCE
+          - CAROUSEL_COMMERCE
+          - NOTIFICATION_MESSAGE_TEMPLATE
+        message:
+          oneOf:
+          - $ref: '#/components/schemas/FlowChannelSpecificMessage'
+          - $ref: '#/components/schemas/PaymentOrderDetailsChannelSpecificMessage'
+          - $ref: '#/components/schemas/PaymentOrderStatusChannelSpecificMessage'
+          - $ref: '#/components/schemas/KakaoTalkCommerceChannelSpecificMessage'
+          - $ref: '#/components/schemas/KakaoTalkCarouselCommerceChannelSpecificMessage'
+          - $ref: '#/components/schemas/LineNotificationMessageTemplateChannelSpecificMessage'
+    WhatsAppPaymentSettingsButtonPix:
+      type: object
+      description: The dynamic Pix payment settings button.
+      required:
+      - type
+      - code
+      - merchant_name
+      - key
+      - key_type
+      properties:
+        type:
+          type: string
+          enum:
+          - pix_dynamic_code
+          x-enumDescriptions:
+            pix_dynamic_code: The dynamic Pix code button identifier
+        code:
+          type: string
+          description: The dynamic Pix code to be used by the buyer to pay.
+        merchant_name:
+          type: string
+          description: Account holder name.
+        key:
+          type: string
+          description: Pix key.
+        key_type:
+          type: string
+          description: Pix key type.
+          enum:
+          - CPF
+          - CNPJ
+          - EMAIL
+          - PHONE
+          - EVP
+          x-enumDescriptions:
+            CPF: The CPF key type.
+            CNPJ: The CNPJ key type.
+            EMAIL: The EMAIL key type.
+            PHONE: The PHONE key type.
+            EVP: The EVP key type.
+    KakaoTalkDiscountRateCommerce:
+      description: Information about a product with discount rate
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkRegularPriceCommerce'
+      - type: object
+        properties:
+          type:
+            enum:
+            - PERCENTAGE_DISCOUNT_COMMERCE
+            x-enumDescriptions:
+              PERCENTAGE_DISCOUNT_COMMERCE: Commerce with percentage discount
+          discount_price:
+            description: Discounted price of the product
+            type: integer
+            minimum: 0
+            maximum: 99999999
+          discount_rate:
+            description: Discount rate (%)
+            type: integer
+            minimum: 0
+            maximum: 100
+        required:
+        - discount_price
+        - discount_rate
+    KakaoTalkDiscountRateCoupon:
+      title: KakaoTalk discount rate coupon
+      description: '<p>Percentage discount coupon with the following title: "<code>discount_rate</code>% 할인 쿠폰" (translates to: "<code>discount_rate</code>% discount coupon")</p>
+
+        <p><b>One of the following fields is required: <code>link_mo</code>, <code>scheme_android</code>, <code>scheme_ios</code></b></p>'
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkCoupon'
+      - type: object
+        properties:
+          type:
+            enum:
+            - PERCENTAGE_DISCOUNT_COUPON
+          discount_rate:
+            description: Discount rate (%)
+            type: integer
+            minimum: 0
+            maximum: 100
+        required:
+        - discount_rate
+    KakaoTalkShippingDiscountCoupon:
+      title: KakaoTalk shipping discount coupon
+      description: '<p>Shipping discount coupon with with the following title: "배송비 할인 쿠폰" (translates to: "shipping fee discount coupon")</p> <p><b>One of the following fields is required: <code>link_mo</code>, <code>scheme_android</code>, <code>scheme_ios</code></b></p>
+
+        '
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkCoupon'
+      - type: object
+        properties:
+          type:
+            enum:
+            - SHIPPING_DISCOUNT_COUPON
+    UrlMessageField:
+      description: A generic URL message.
+      type: object
+      title: URL
+      properties:
+        url_message:
+          title: URL Message
+          type: object
+          required:
+          - title
+          - url
+          properties:
+            title:
+              description: The title shown close to the URL. The title can be clickable in some cases.
+              type: string
+            url:
+              description: The url to show.
+              type: string
+    WhatsAppInteractiveImageHeader:
+      type: object
+      description: Header of the interactive message with image.
+      required:
+      - type
+      - image
+      properties:
+        type:
+          type: string
+          x-enumDescriptions:
+            image: The image associated with the header.
+          enum:
+          - image
+        image:
+          $ref: '#/components/schemas/WhatsAppInteractiveHeaderMedia'
+    ChoiceMessageField:
+      description: Message containing choices/actions.
+      type: object
+      title: Choice
+      properties:
+        choice_message:
+          title: Choice Message
+          type: object
+          required:
+          - choices
+          allOf:
+          - description: A message containing choices.
+          - $ref: '#/components/schemas/Choices'
+          - $ref: '#/components/schemas/TextMessageField'
+          - $ref: '#/components/schemas/ChoiceMessagePropertiesField'
+    CallMessageField:
+      description: Message for triggering a call.
+      type: object
+      title: Call
+      properties:
+        call_message:
+          title: Call Message
+          type: object
+          required:
+          - phone_number
+          - title
+          properties:
+            phone_number:
+              description: Phone number in E.164 with leading +.
+              type: string
+              example: '+15551231234'
+            title:
+              description: 'Title shown close to the phone number.
+
+                The title is clickable in some cases.'
+              type: string
+              example: Message text
+    TemplateReferenceWithVersion:
+      type: object
+      allOf:
+      - required:
+        - version
+      - $ref: '#/components/schemas/TemplateReference'
+    ProductItem:
+      type: object
+      title: Product
+      description: A message component for interactive messages, containing a product.
+      required:
+      - id
+      - marketplace
+      properties:
+        id:
+          type: string
+          description: Required parameter. The ID for the product.
+        marketplace:
+          type: string
+          description: Required parameter. The marketplace to which the product belongs.
+          example: FACEBOOK
+        quantity:
+          type: integer
+          format: int32
+          description: Output only. The quantity of the chosen product.
+        item_price:
+          type: number
+          format: float
+          description: Output only. The price for one unit of the chosen product.
+        currency:
+          type: string
+          description: Output only. The currency of the item_price.
+    CardMessage:
+      description: Message containing text, media and choices.
+      title: Card Message
+      type: object
+      properties:
+        choices:
+          description: You may include choices in your Card Message. The number of choices is limited to 10.
+          type: array
+          items:
+            $ref: '#/components/schemas/Choice'
+        description:
+          description: This is an optional description field that is displayed below the title on the card.
+          type: string
+        height:
+          $ref: '#/components/schemas/CardHeight'
+        title:
+          description: The title of the card message.
+          type: string
+        media_message:
+          type: object
+          description: A message containing a media component.
+          allOf:
+          - $ref: '#/components/schemas/MediaProperties'
+        message_properties:
+          type: object
+          description: Optional additional properties.
+          properties:
+            whatsapp_header:
+              description: Optional. Sets the header for the footer of a WhatsApp reply button message, if there is no media in the message. Ignored for other channels. Ignored if not transcoded to a native WhatsApp message with reply buttons.
+              type: string
+    MediaMessageField:
+      type: object
+      title: Media Message
+      description: A message containing a media component, such as an image, document, or video.
+      properties:
+        media_message:
+          $ref: '#/components/schemas/MediaProperties'
+    ChoiceMessagePropertiesField:
+      type: object
+      title: Properties
+      description: Additional properties for the message.
+      properties:
+        message_properties:
+          type: object
+          properties:
+            whatsapp_footer:
+              description: Optional. Sets the text for the footer of a WhatsApp reply button or URL button message. Ignored for other channels.
+              type: string
     AppMessage:
+      type: object
+      title: Message originating from app
+      description: A message originating from a Conversation API app
+      allOf:
+      - $ref: '#/components/schemas/AppMessageTypes'
+      - $ref: '#/components/schemas/AppMessageCommonProps'
+    TranscodeMessageRequest:
+      type: object
+      required:
+      - app_id
+      - app_message
+      - channels
+      properties:
+        app_id:
+          description: The ID of the app used to transcode the message.
+          type: string
+        app_message:
+          $ref: '#/components/schemas/AppMessage'
+        channels:
+          description: The list of channels for which the message shall be transcoded.
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationChannel'
+        from:
+          description: Optional.
+          type: string
+        to:
+          description: Optional.
+          type: string
+    UrlInfo:
+      type: object
+      title: URL Info
+      description: A URL/website
+      required:
+      - url
+      properties:
+        url:
+          description: The URL to be referenced
+          type: string
+        type:
+          description: Optional. URL type, e.g. Org or Social
+          type: string
+    FlowChannelSpecificMessage:
+      allOf:
+      - $ref: '#/components/schemas/ChannelSpecificCommonProps'
+      - type: object
+        title: WhatsApp Flow channel specific message
+        description: A message type for sending WhatsApp Flows.
+        required:
+        - flow_id
+        - flow_cta
+        properties:
+          flow_id:
+            type: string
+            description: ID of the Flow.
+          flow_token:
+            type: string
+            description: Generated token which is an identifier.
+          flow_mode:
+            type: string
+            description: The mode in which the flow is.
+            default: published
+            enum:
+            - draft
+            - published
+            x-enumDescriptions:
+              draft: The flow is in draft mode.
+              published: The flow is published.
+          flow_cta:
+            type: string
+            description: Text which is displayed on the Call To Action button (20 characters maximum, emoji not supported).
+          flow_action:
+            type: string
+            default: navigate
+            enum:
+            - navigate
+            - data_exchange
+            x-enumDescriptions:
+              navigate: The navigate flow action.
+              data_exchange: The data exchange flow action.
+          flow_action_payload:
+            type: object
+            properties:
+              screen:
+                type: string
+                description: The ID of the screen displayed first. This must be an entry screen.
+              data:
+                type: object
+                description: Data for the first screen.
+    KakaoTalkDiscountFixedCommerce:
+      description: Information about a product with fixed discount
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkRegularPriceCommerce'
+      - type: object
+        properties:
+          type:
+            enum:
+            - FIXED_DISCOUNT_COMMERCE
+            x-enumDescriptions:
+              FIXED_DISCOUNT_COMMERCE: Commerce with fixed discount
+          discount_price:
+            description: Discounted price of the product
+            type: integer
+            minimum: 0
+            maximum: 99999999
+          discount_fixed:
+            description: Fixed discount
+            type: integer
+            minimum: 0
+            maximum: 999999
+        required:
+        - discount_price
+        - discount_fixed
+    LineNotificationMessageTemplateEmphasizedItem:
+      type: object
+      description: Template emphasized item
+      required:
+      - item_key
+      - content
+      properties:
+        item_key:
+          description: Item key. See [LINE documentation](https://developers.line.biz/en/docs/partner-docs/line-notification-messages/template/?r=jp#items) for available keys
+          type: string
+        content:
+          description: Item value
+          type: string
+          maxLength: 15
+    KakaoTalkFreeCoupon:
+      title: KakaoTalk free coupon
+      description: '<p>Free coupon with the following title: "<code>title</code> 무료 쿠폰" (translates to: "<code>title</code> free coupon")</p>
+
+        <p><b>One of the following fields is required: <code>link_mo</code>, <code>scheme_android</code>, <code>scheme_ios</code></b></p>'
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkCoupon'
+      - type: object
+        properties:
+          type:
+            enum:
+            - FREE_COUPON
+          title:
+            description: Coupon title
+            type: string
+            maxLength: 7
+        required:
+        - title
+    LineNotificationMessageTemplateChannelSpecificMessage:
+      type: object
+      title: LINE notification message (template) channel specific message
+      description: A message type for sending LINE notification messages (template)
+      required:
+      - template_key
+      properties:
+        template_key:
+          description: Template key. See [LINE documentation](https://developers.line.biz/en/docs/partner-docs/line-notification-messages/template/?r=jp#templates) for available keys
+          type: string
+        body:
+          $ref: '#/components/schemas/LineNotificationMessageTemplateBody'
+    NameInfo:
+      type: object
+      title: Name of the contact
+      description: Name information of the contact.
+      required:
+      - full_name
+      properties:
+        full_name:
+          description: Full name of the contact
+          type: string
+        first_name:
+          description: First name.
+          type: string
+        last_name:
+          description: Last name.
+          type: string
+        middle_name:
+          description: Middle name.
+          type: string
+        prefix:
+          description: Prefix before the name. e.g. Mr, Mrs, Dr etc.
+          type: string
+        suffix:
+          description: Suffix after the name.
+          type: string
+    KakaoTalkButton:
+      type: object
+      properties:
+        type:
+          description: Button type
+          type: string
+        name:
+          description: Text displayed on the button
+          type: string
+          maxLength: 8
+      required:
+      - type
+      - name
+    KakaoTalkCommerceChannelSpecificMessage:
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkChannelSpecificMessage'
+      - $ref: '#/components/schemas/KakaoTalkCommerceMessage'
+      - type: object
+        title: KakaoTalk commerce channel specific message
+        description: A message type for sending KakaoTalk commerce messages
+    ConversationChannel:
+      type: string
+      title: Channel Identifier
+      description: The identifier of the channel you want to include. Must be one of the enum values.
+      example: WHATSAPP
+      x-enumDescriptions:
+        SMS: The SMS channel.
+        RCS: The RCS channel.
+        WHATSAPP: The WhatsApp channel.
+        MMS: The MMS channel.
+        KAKAOTALK: The KakaoTalk channel.
+        KAKAOTALKCHAT: The KakaoTalk chat channel (used primarily in ConsultationTalk).
+        VIBERBM: The Viber Business Messages channel.
+        LINE: The LINE channel.
+        INSTAGRAM: The Instagram channel.
+        MESSENGER: The Facebook Messenger channel.
+        WECHAT: The WeChat channel.
+        TELEGRAM: The Telegram channel.
+        APPLEBC: The Apple Messages for Business channel.
+      enum:
+      - SMS
+      - RCS
+      - WHATSAPP
+      - MMS
+      - KAKAOTALK
+      - KAKAOTALKCHAT
+      - VIBERBM
+      - LINE
+      - INSTAGRAM
+      - MESSENGER
+      - WECHAT
+      - TELEGRAM
+      - APPLEBC
+    KakaoTalkFixedDiscountCoupon:
+      title: KakaoTalk fixed discount coupon
+      description: '<p>Fixed discount coupon with with the following title: "<code>discount_fixed</code> 원 할인 쿠폰" (translates to: "<code>discount_fixed</code> won discount coupon")</p>
+
+        <p><b>One of the following fields is required: <code>link_mo</code>, <code>scheme_android</code>, <code>scheme_ios</code></b></p>'
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkCoupon'
+      - type: object
+        properties:
+          type:
+            enum:
+            - FIXED_DISCOUNT_COUPON
+          discount_fixed:
+            description: Fixed discount
+            type: integer
+            minimum: 0
+            maximum: 999999
+        required:
+        - discount_fixed
+    KakaoTalkAppLinkButton:
+      title: KakaoTalk App Link Button
+      description: A button that opens an app link (e.g. call button)
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkButton'
+      - type: object
+        properties:
+          type:
+            enum:
+            - AL
+          scheme_ios:
+            type: string
+            description: App link opened on an iOS device (e.g. `tel://PHONE_NUMBER`)
+          scheme_android:
+            type: string
+            description: App link opened on an Android device (e.g. `tel://PHONE_NUMBER`)
+        required:
+        - scheme_ios
+        - scheme_android
+    KakaoTalkUpCoupon:
+      title: KakaoTalk UP coupon
+      description: '<p>UP coupon with the following title: "<code>title</code> UP 쿠폰" (translates to: "<code>title</code> UP coupon")</p>
+
+        <p><b>One of the following fields is required: <code>link_mo</code>, <code>scheme_android</code>, <code>scheme_ios</code></b></p>'
+      allOf:
+      - $ref: '#/components/schemas/KakaoTalkCoupon'
+      - type: object
+        properties:
+          type:
+            enum:
+            - UP_COUPON
+          title:
+            description: Coupon title
+            type: string
+            maxLength: 7
+        required:
+        - title
+    EmailInfo:
+      type: object
+      title: Email information
+      description: Email addresses of the contact.
+      required:
+      - email_address
+      properties:
+        email_address:
+          description: Email address.
+          type: string
+        type:
+          description: Email address type. e.g. WORK or HOME.
+          type: string
+    runtimeError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/protobufAny'
+            message:
+              type: string
+            status:
+              type: string
+    KakaoTalkChannelSpecificMessage:
+      type: object
+      properties:
+        push_alarm:
+          type: boolean
+          default: true
+          description: Set to `true` if a push alarm should be sent to a device.
+        adult:
+          type: boolean
+          default: false
+          description: Set to `true` if a message contains adult content. Set to `false` by default.
+    Choice_2:
+      type: object
+      properties:
+        text_message:
+          type: object
+          description: Text choice
+          properties:
+            text:
+              type: string
+              description: The choice text
+        postback_data:
+          type: string
+          description: Data sent back when the choice is selected
+    TranscodeRequest:
+      type: object
+      required:
+      - app_id
+      - app_message
+      - channels
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        app_message:
+          $ref: '#/components/schemas/AppMessage_2'
+        channels:
+          type: array
+          description: Target channels for transcoding
+          items:
+            type: string
+    AppMessage_2:
       type: object
       properties:
         text_message:
@@ -121,7 +1949,7 @@ components:
               type: array
               description: Action choices on the card
               items:
-                $ref: '#/components/schemas/Choice'
+                $ref: '#/components/schemas/Choice_2'
         list_message:
           type: object
           description: A list message with sections
@@ -145,24 +1973,7 @@ components:
                     type: array
                     description: Section items
                     items:
-                      $ref: '#/components/schemas/Choice'
-    TranscodeRequest:
-      type: object
-      required:
-      - app_id
-      - app_message
-      - channels
-      properties:
-        app_id:
-          type: string
-          description: The app ID
-        app_message:
-          $ref: '#/components/schemas/AppMessage'
-        channels:
-          type: array
-          description: Target channels for transcoding
-          items:
-            type: string
+                      $ref: '#/components/schemas/Choice_2'
     TranscodeResponse:
       type: object
       properties:
@@ -171,23 +1982,80 @@ components:
           description: Map of channel to transcoded message
           additionalProperties:
             type: string
-    Choice:
-      type: object
-      properties:
-        text_message:
-          type: object
-          description: Text choice
-          properties:
-            text:
-              type: string
-              description: The choice text
-        postback_data:
-          type: string
-          description: Data sent back when the choice is selected
+  responses:
+    500Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 500
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    401Error:
+      description: Incorrect credentials. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            type: object
+    403Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 403
+            message: You do not have access to the requested resource.
+            status: UNAUTHORIZED
+            details: []
+    501Error:
+      description: Something went wrong on our end, try again with exponential back-off. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 501
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    400Error:
+      description: Malformed request. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 400
+            message: Malformed request
+            status: INVALID_REQUEST
+            details: []
+  parameters:
+    project_id:
+      name: project_id
+      description: The unique ID of the project. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+      in: path
+      required: true
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/conversation/api-reference/#authentication).
     oAuth2:
       type: oauth2
-      description: OAuth 2.0 client credentials flow using project key ID and secret.
+      description: The user name and password are your client_id and key_secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
       flows:
         clientCredentials:
           tokenUrl: https://auth.sinch.com/oauth2/token
@@ -199,3 +2067,14 @@ components:
 externalDocs:
   description: Sinch Conversation API Documentation
   url: https://developers.sinch.com/docs/conversation
+x-refined-from:
+- sinch-conversation-api-openapi.yaml
+- original-sinch-conversation-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

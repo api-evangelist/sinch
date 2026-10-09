@@ -1,0 +1,486 @@
+openapi: 3.2.0
+info:
+  version: '3.0'
+  title: Fax Domains API
+  description: This document provides a detailed user guide and reference documentation on the Fax REST API.
+  contact:
+    name: Contact Fax API Team
+    url: https://www.sinch.com/contact/
+    email: faxteam@sinch.com
+  license:
+    url: https://www.sinch.com/toc
+    name: MIT
+servers:
+- url: https://fax.api.sinch.com
+  description: v3.0 of the Fax API
+security:
+- BasicAuth: []
+- OAuth2: []
+tags:
+- name: Domains
+  description: You can create email domains to handle the email notifications for your fax service. The operations in this endpoint allow you to create, manage, and verify your email domains.
+paths:
+  /v3/projects/{projectId}/services/{serviceId}/domains:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+      - Domains
+      parameters:
+      - name: serviceId
+        in: path
+        description: The serviceId containing the domains you want to list.
+        required: true
+        schema:
+          type: string
+          example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      summary: List domains
+      description: List existing domains for the specified service.
+      operationId: listDomains
+      responses:
+        '200':
+          description: The domains contained in the service.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainsListResponse'
+  /v3/projects/{projectId}/services/{serviceId}/domains/{domainName}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    post:
+      tags:
+      - Domains
+      parameters:
+      - name: serviceId
+        in: path
+        description: The serviceId where you want to create a domain.
+        required: true
+        schema:
+          type: string
+          example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      - name: domainName
+        in: path
+        description: The name of the domain to create.
+        required: true
+        schema:
+          type: string
+          example: yourdomain.com
+      summary: Create a domain
+      description: Creates a new domain on the specified service to host email templates.
+      operationId: createDomain
+      responses:
+        '201':
+          description: The created domain.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateDomainResponse'
+    get:
+      tags:
+      - Domains
+      parameters:
+      - name: serviceId
+        in: path
+        description: The serviceId containing the domain you want to retrieve.
+        required: true
+        schema:
+          type: string
+          example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      - name: domainName
+        in: path
+        description: The name of the domain you want to retrieve.
+        required: true
+        schema:
+          type: string
+          example: yourdomain.com
+      summary: Get domain
+      description: Retrieve a specific domain for the specified service.
+      operationId: getDomain
+      responses:
+        '200':
+          description: The details of the domain.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DomainDetailsResponse'
+    delete:
+      tags:
+      - Domains
+      parameters:
+      - name: serviceId
+        in: path
+        description: The serviceId containing the domain you want to delete.
+        required: true
+        schema:
+          type: string
+          example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      - name: domainName
+        in: path
+        description: The name of the domain you want to delete.
+        required: true
+        schema:
+          type: string
+          example: yourdomain.com
+      summary: Delete domain
+      description: Delete a specific domain for the specified service.
+      operationId: deleteDomain
+      responses:
+        '204':
+          description: No content
+  /v3/projects/{projectId}/services/{serviceId}/domains/{domainName}:verify:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+      - Domains
+      parameters:
+      - name: serviceId
+        in: path
+        description: The serviceId containing the domain you want to verify.
+        required: true
+        schema:
+          type: string
+          example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      - name: domainName
+        in: path
+        description: The name of the domain you want to verify.
+        required: true
+        schema:
+          type: string
+          example: yourdomain.com
+      summary: Verify domain
+      description: Verify a specific domain for the specified service.
+      operationId: verifyDomain
+      responses:
+        '200':
+          description: The verification status of the domain.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifyDomainResponse'
+components:
+  schemas:
+    CreateDomainResponse:
+      type: object
+      properties:
+        result:
+          type: string
+          description: The result of the create domain operation.
+          example: domain and route created
+        records:
+          type: object
+          properties:
+            receivingRecords:
+              type: array
+              description: The receiving records of the domain.
+              items:
+                $ref: '#/components/schemas/ReceivingRecords'
+            sendingRecords:
+              type: array
+              description: The sending records of the domain.
+              items:
+                $ref: '#/components/schemas/SendingRecords'
+    DomainsListResponse:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/Pagination'
+      - type: object
+        properties:
+          domains:
+            type: array
+            items:
+              $ref: '#/components/schemas/Domain'
+    Pagination:
+      type: object
+      readOnly: true
+      properties:
+        page:
+          readOnly: true
+          type: integer
+          description: Current page
+        totalPages:
+          readOnly: true
+          type: integer
+          description: Total number of pages.
+        pageSize:
+          readOnly: true
+          type: integer
+          description: Number of items per page.
+        totalItems:
+          type: integer
+          readOnly: true
+          format: int32
+          description: Total size of the result.
+    DomainDetailsResponse:
+      type: object
+      properties:
+        domain:
+          $ref: '#/components/schemas/DomainDetails'
+        receivingDnsRecords:
+          type: array
+          description: The receiving records of the domain.
+          items:
+            $ref: '#/components/schemas/ReceivingRecords'
+        sendingDnsRecords:
+          type: array
+          description: The sending records of the domain.
+          items:
+            $ref: '#/components/schemas/SendingRecords'
+    VerifyDomainDetails:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/DomainDetails'
+      properties:
+        serviceId:
+          type: string
+          description: The service ID to which the domain is assigned.
+          example: 01H66TG3G97XH3GGVYP1NF7CYD
+        projectId:
+          type: string
+          description: The project ID to which the domain is assigned.
+          example: 5ff51b4c-7e9f-4acc-9f0e-6dd9559722e6
+    DomainDetails:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the domain.
+          example: 01K8BS9391KGN2Y36CDSNAVHNW
+        isDisabled:
+          type: boolean
+          description: Flag that shows if the domain is disabled.
+          example: false
+        name:
+          type: string
+          description: The name of the domain.
+          example: my.domain.com
+        requireTls:
+          type: boolean
+          description: If set to true, this requires messages for the domain only be sent over a TLS connection. If a TLS connection cannot be established, Mailgun will not deliver the message. If set to false, Mailgun will still try and upgrade the connection, but if Mailgun cannot, the message will be delivered over a plaintext SMTP connection.
+          example: false
+          default: false
+        skipVerification:
+          type: boolean
+          description: If set to true, the certificate and hostname will not be verified when trying to establish a TLS connection and Mailgun will accept any certificate during delivery of a message. If set to false, Mailgun will verify the certificate and hostname. If either one can not be verified, a TLS connection will not be established.
+          example: false
+          default: false
+        smtpLogin:
+          type: string
+          description: SMTP server password for authentication.
+          example: ''
+        spamAction:
+          type: string
+          description: Disabled, block or tag. Default to disabled. If disabled, no spam filtering will occur for inbound messages.
+          enum:
+          - disabled
+          - block
+          - tag
+          x-enumDescriptions:
+            disabled: No spam filtering will occur for inbound messages.
+            block: Inbound spam messages will not be delivered.
+            tag: Inbound messages will be tagged with a spam header.
+          example: disabled
+          default: disabled
+        state:
+          type: string
+          description: The current verification status of the domain.
+          example: active
+        type:
+          type: string
+          description: The classification of the domain.
+          enum:
+          - custom
+          - sandbox
+          x-enumDescriptions:
+            custom: Domain is of custom type.
+            sandbox: Domain is of sandbox type.
+          example: custom
+        useAutomaticSenderSecurity:
+          type: boolean
+          description: Enable Automatic Sender Security. This requires setting DNS CNAME entries for DKIM keys instead of a TXT record.
+          example: false
+          default: false
+        webPrefix:
+          type: string
+          description: Sets your open, click and unsubscribe URLs domain name prefix. Links rewritten or added by Mailgun in your emails will look like <web_scheme>://<web_prefix>.<domain_name>/...
+          example: email
+          default: email
+        webScheme:
+          type: string
+          enum:
+          - http
+          - https
+          x-enumDescriptions:
+            http: Use http when opening URLs.
+            https: Use https when opening URLs.
+          description: Sets your open, click and unsubscribe URLs to use http or https. Value either `http` or `https`. Defaults to `http`. In order for https to work, you must have a valid cert created for your domain.
+          example: http
+          default: http
+        wildcard:
+          type: boolean
+          description: Allows domain to accept inbound messages received on subdomains that have MX records pointed to Mailgun.
+          example: false
+          default: false
+        encryptIncomingMessage:
+          type: boolean
+          description: Enable encrypting incoming messages for the given domain. This cannot be altered via API after being set for security purposes. Reach out to Support to disable if necessary.
+          example: false
+          default: false
+        messageTtl:
+          type: integer
+          description: Specifies the time-to-live (TTL) in seconds for retrieving both incoming and outgoing messages. The maximum TTL value is determined by your subscription plan.
+          example: 259200
+    VerifyDomainObject:
+      type: object
+      properties:
+        message:
+          type: string
+          description: This message describes what is updated.
+          example: Domain DNS records have been updated
+        domain:
+          $ref: '#/components/schemas/VerifyDomainDetails'
+        receivingDnsRecords:
+          type: array
+          description: The receiving records of the domain.
+          items:
+            $ref: '#/components/schemas/ReceivingRecords'
+        sendingDnsRecords:
+          type: array
+          description: The sending records of the domain.
+          items:
+            $ref: '#/components/schemas/SendingRecords'
+    SendingRecords:
+      type: object
+      properties:
+        isActive:
+          type: boolean
+          description: True if the domain is active.
+        cached:
+          type: array
+          description: Any cached value of the record.
+          items:
+            type: string
+        name:
+          type: string
+          description: The name of the domain record.
+          example: my.domain.com
+        recordType:
+          type: string
+          description: The type of the record.
+          example: TXT
+        valid:
+          type: string
+          description: The validity of the record.
+          enum:
+          - valid
+          - invalid
+          x-enumDescriptions:
+            valid: The record is valid.
+            invalid: The record is invalid.
+          example: valid
+        value:
+          type: string
+          description: The value of the record.
+          example: mailgun.org
+    VerifyDomainResponse:
+      type: object
+      properties:
+        domains:
+          type: array
+          items:
+            $ref: '#/components/schemas/VerifyDomainObject'
+    ReceivingRecords:
+      type: object
+      properties:
+        isActive:
+          type: boolean
+          description: True if the domain is active.
+        cached:
+          type: array
+          description: Any cached value of the record.
+          items:
+            type: string
+        priority:
+          type: integer
+          description: The priority for the record.
+          example: 10
+        recordType:
+          type: string
+          description: The type of the record.
+          example: TXT
+        valid:
+          type: string
+          description: The validity of the record.
+          enum:
+          - valid
+          - invalid
+          x-enumDescriptions:
+            valid: The record is valid.
+            invalid: The record is invalid.
+          example: valid
+        value:
+          type: string
+          description: The value of the record.
+          example: mailgun.org
+    Domain:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the domain.
+          example: 01K8BS9391KGN2Y36CDSNAVHNW
+        name:
+          type: string
+          description: The name of the domain.
+          example: my.domain.com
+        receivingDnsRecord:
+          $ref: '#/components/schemas/ReceivingRecords'
+        sendingDnsRecord:
+          $ref: '#/components/schemas/SendingRecords'
+        serviceId:
+          type: string
+          description: The ID of the service to which the domain is attached.
+          example: 01H66TG3G97XH3GGVYP1NF7CYT
+        createdAt:
+          type: string
+          description: The timestamp on which the domain was created.
+          format: date-time
+          example: '2025-10-24 18:56:42.787000+00:00'
+        updatedAt:
+          type: string
+          description: The timestamp on which the domain was updated.
+          format: date-time
+          example: '2025-10-24 19:11:50.235000+00:00'
+        verified:
+          type: boolean
+          description: Flag that shows if the domain has been verified.
+          example: true
+        routeId:
+          type: string
+          description: The route ID of the domain.
+          example: 68fbcbeb0a12858e880ffcea
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: The `projectId` is a required parameter you must include when making any API calls. You can find your project ID on your [Build dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+  securitySchemes:
+    WebhookBasicAuth:
+      type: http
+      scheme: basic
+      description: 'You can validate whether a webhook is genuine by providing credentials you set and will check on your server side along with the callback URL, as in this example: `https://username:password@www.YourWebhookWebsite.com`'
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: The user name and password is your keyId and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+    OAuth2:
+      type: oauth2
+      description: The user name and password is your key id and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

@@ -1,0 +1,569 @@
+openapi: 3.2.0
+info:
+  title: Provisioning WhatsApp API
+  description: The WhatsApp endpoint enables programmatic login to your WhatsApp account and retrieval of its details.
+  version: 1.2.117
+servers:
+- url: https://provisioning.api.sinch.com
+  description: Production server
+security:
+- BasicAuth: []
+  BearerAuth: []
+  OAuth2Production: []
+tags:
+- name: Whats App
+  description: The WhatsApp endpoint enables programmatic login to your WhatsApp account and retrieval of its details.
+paths:
+  /v1/projects/{projectId}/whatsapp/enableTemplateAnalytics:
+    put:
+      description: Enable Meta template analytics for WhatsApp Business Account.
+      operationId: WhatsappTemplateAnalyticsHelpersController_enableTemplateAnalytics_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Meta template analytics enabled for WhatsApp Business Account.
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for WhatsApp.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for WhatsApp.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '424':
+          description: FailedDependency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                template_insights_not_yet_available-0:
+                  summary: TemplateInsightsNotYetAvailableError
+                  value:
+                    errorCode: template_insights_not_yet_available
+                    message: Template Insights unavailable.
+                    resolution: Template Insights are not available yet for this WhatsApp Business account, please contact support.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Enable Meta template analytics
+      tags:
+      - Whats App
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/whatsapp/longLivedAccessToken:
+    post:
+      deprecated: true
+      description: Returns a long lived access token based on the facebook token from the embedded signup. Valid for 60 days.
+      operationId: WhatsappEmbeddedSignupHelperController_createLongLivedAccessToken_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Facebook token generated from the embedded signup process, or another long lived access token.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhatsappLongLivedAccessTokenInputDto'
+            examples:
+              withFacebookCode:
+                summary: Body request facebookCode
+                description: "\n      Example body request to create a long lived access token.\n      "
+                value:
+                  facebookCode: FACEBOOK_CODE
+              withFacebookToken:
+                summary: Body request facebookToken
+                description: "\n      Example body request to create a long lived access token.\n      "
+                value:
+                  facebookToken: FACEBOOK_TOKEN
+      responses:
+        '201':
+          description: The long lived access token.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappLongLivedAccessTokenDto'
+              examples:
+                response:
+                  summary: Create response
+                  description: "\n    Response when successfully creating a long lived access token.\n    "
+                  value:
+                    longLivedAccessToken: FACEBOOK_TOKEN
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                invalid_input-0:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - facebookToken must be a string
+                invalid_input-1:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - facebookCode must be a string
+                invalid_input-2:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - at least one of facebookToken or facebookCode must be provided
+                invalid_facebook_token-3:
+                  summary: InvalidFacebookTokenError
+                  value:
+                    errorCode: invalid_facebook_token
+                    message: Facebook token is invalid or has expired
+                    resolution: Check that token is correct, or create a new one and try again.
+                invalid_facebook_code-4:
+                  summary: InvalidFacebookCodeError
+                  value:
+                    errorCode: invalid_facebook_code
+                    message: Facebook code is invalid or has expired
+                    resolution: Check that code is correct, or request a new one and try again.
+                invalid_business_manager-5:
+                  summary: InvalidBusinessManagerError
+                  value:
+                    errorCode: invalid_business_manager
+                    message: Invalid business manager.
+                    resolution: Check that business manager is correct for project.
+                invalid_business_manager_for_environment-6:
+                  summary: InvalidBusinessManagerForEnvironmentError
+                  value:
+                    errorCode: invalid_business_manager_for_environment
+                    message: Invalid business manager for environment.
+                    resolution: Verify that business manager is valid for environment. Allowed business managers for environment SINCH_AMERICA, SINCH_UK.
+                invalid_payload-7:
+                  summary: InvalidPayloadError
+                  value:
+                    errorCode: invalid_payload
+                    message: Invalid payload.
+                    resolution: Correct payload and submit again.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                facebook_Request_limit_reached-0:
+                  summary: FacebookRequestLimitReachedError
+                  value:
+                    errorCode: facebook_Request_limit_reached
+                    message: Facebook request limit reached.
+                    resolution: Please try again later.
+                log_in_facebook_required-1:
+                  summary: LogInFacebookRequiredError
+                  value:
+                    errorCode: log_in_facebook_required
+                    message: Log in to facebook required.
+                    resolution: Log in to www.facebook.com and follow the instructions given.
+                internal_error-2:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Create a long lived access token
+      tags:
+      - Whats App
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/whatsapp/wabaDetails:
+    post:
+      deprecated: true
+      description: Returns a list of all the WhatsApp Business Accounts that the facebook token is associated with, together with the numbers that are shared.
+      operationId: WhatsappEmbeddedSignupHelperController_listWabaDetailsForToken_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: WabaDetails data with Facebook token generated from the embedded signup process.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhatsappWabaDetailsListInputDto'
+            examples:
+              input:
+                summary: Body request
+                description: "\n      Example body request to list WhatsApp Business Accounts details.\n      "
+                value:
+                  facebookToken: FACEBOOK_TOKEN
+      responses:
+        '200':
+          description: List of WhatsApp Business Accounts.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappWabaDetailsListDto'
+              examples:
+                response:
+                  summary: List waba details response
+                  description: "\n    Response for all waba details.\n    "
+                  value:
+                    wabas:
+                    - id: '100000000000000'
+                      numbers:
+                      - id: '222222222222222'
+                        displayPhoneNumber: +48 777 777777
+                        provisioned: false
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                invalid_input-0:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - facebookToken must be a string
+                invalid_facebook_token-1:
+                  summary: InvalidFacebookTokenError
+                  value:
+                    errorCode: invalid_facebook_token
+                    message: Facebook token is invalid or has expired
+                    resolution: Check that token is correct, or create a new one and try again.
+                invalid_business_manager-2:
+                  summary: InvalidBusinessManagerError
+                  value:
+                    errorCode: invalid_business_manager
+                    message: Invalid business manager.
+                    resolution: Check that business manager is correct for project.
+                invalid_business_manager_for_environment-3:
+                  summary: InvalidBusinessManagerForEnvironmentError
+                  value:
+                    errorCode: invalid_business_manager_for_environment
+                    message: Invalid business manager for environment.
+                    resolution: Verify that business manager is valid for environment. Allowed business managers for environment SINCH_AMERICA, SINCH_UK.
+                invalid_payload-4:
+                  summary: InvalidPayloadError
+                  value:
+                    errorCode: invalid_payload
+                    message: Invalid payload.
+                    resolution: Correct payload and submit again.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                facebook_Request_limit_reached-0:
+                  summary: FacebookRequestLimitReachedError
+                  value:
+                    errorCode: facebook_Request_limit_reached
+                    message: Facebook request limit reached.
+                    resolution: Please try again later.
+                log_in_facebook_required-1:
+                  summary: LogInFacebookRequiredError
+                  value:
+                    errorCode: log_in_facebook_required
+                    message: Log in to facebook required.
+                    resolution: Log in to www.facebook.com and follow the instructions given.
+                internal_error-2:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: List WhatsApp Business Accounts details
+      tags:
+      - Whats App
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+components:
+  schemas:
+    WhatsappWabaDetailsListDto:
+      type: object
+      properties:
+        wabas:
+          uniqueItems: false
+          type: array
+          items:
+            $ref: '#/components/schemas/WhatsappWabaDetailsDto'
+      required:
+      - wabas
+    WhatsappWabaDetailsDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The id of the WhatsApp Business Account.
+          uniqueItems: false
+        numbers:
+          description: The numbers that are shared to the WhatsApp Business Account.
+          uniqueItems: false
+          type: array
+          items:
+            $ref: '#/components/schemas/WhatsappWabaNumbersDto'
+      required:
+      - id
+      - numbers
+    WhatsappWabaNumbersDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique id of the number.
+          uniqueItems: false
+        displayPhoneNumber:
+          type: string
+          description: The number displayed in E.164 format.
+          uniqueItems: false
+        provisioned:
+          type: boolean
+          description: True if the number is available for usage, false otherwise.
+          uniqueItems: false
+      required:
+      - id
+      - displayPhoneNumber
+      - provisioned
+    WhatsappPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+    WhatsappWabaDetailsListInputDto:
+      type: object
+      properties:
+        facebookToken:
+          type: string
+          description: Long-Lived User access token.
+          uniqueItems: false
+        businessManager:
+          x-enumDescriptions:
+            SINCH_AMERICA: Associates the input configuration with the Sinch America Meta Business Manager account.
+            SINCH_BR: Associates the input configuration with the Sinch Brazil Meta Business Manager account.
+            SINCH_MX: Associates the input configuration with the Sinch Mexico Meta Business Manager account.
+            SINCH_SEP: Associates the input configuration with the Sinch SEP Meta Business Manager account.
+            SINCH_UK: Associates the input configuration with the Sinch UK Meta Business Manager account.
+          description: Business manager.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappInputBusinessManagersEnum'
+      required:
+      - facebookToken
+    WhatsappLongLivedAccessTokenInputDto:
+      type: object
+      properties:
+        facebookToken:
+          type: string
+          minLength: 1
+          description: Long-Lived User access token. Mandatory if `facebookCode` is not provided.
+          uniqueItems: false
+        facebookCode:
+          type: string
+          minLength: 1
+          description: Single-use access code. Mandatory if `facebookToken` is not provided.
+          uniqueItems: false
+        businessManager:
+          x-enumDescriptions:
+            SINCH_AMERICA: Associates the input configuration with the Sinch America Meta Business Manager account.
+            SINCH_BR: Associates the input configuration with the Sinch Brazil Meta Business Manager account.
+            SINCH_MX: Associates the input configuration with the Sinch Mexico Meta Business Manager account.
+            SINCH_SEP: Associates the input configuration with the Sinch SEP Meta Business Manager account.
+            SINCH_UK: Associates the input configuration with the Sinch UK Meta Business Manager account.
+          description: Business manager.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappInputBusinessManagersEnum'
+    WhatsappLongLivedAccessTokenDto:
+      type: object
+      properties:
+        longLivedAccessToken:
+          type: string
+          uniqueItems: false
+      required:
+      - longLivedAccessToken
+    WhatsappInputBusinessManagersEnum:
+      type: string
+      enum:
+      - SINCH_AMERICA
+      - SINCH_BR
+      - SINCH_MX
+      - SINCH_SEP
+      - SINCH_UK
+      description: Business manager.
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
+x-tagGroup-upscale:
+  name: Upscale
+  tags:
+  - Upscale Admin Feature Flag
+  - Upscale Admin Log Operation
+  - Upscale Admin Migrations
+  - Upscale Admin Sms
+  - Upscale Admin Upscales
+  - Internal
+  - Upscale Sms
+  - Upscale Upscales
+x-tagGroup-notification:
+  name: Notification
+  tags:
+  - Notification Admin Feature Flag
+  - Notification Admin Log Operation
+  - Internal
+x-tagGroups:
+- name: Webhook
+  tags:
+  - Webhooks
+- name: WhatsApp
+  tags:
+  - WhatsApp Accounts
+  - WhatsApp
+  - WhatsApp Flows
+  - WhatsApp Senders
+  - WhatsApp Solutions
+  - WhatsApp Templates
+- name: Bundles
+  tags:
+  - Bundles
+- name: KakaoTalk
+  tags:
+  - KakaoTalk Categories
+  - KakaoTalk Senders
+  - KakaoTalk Templates
+- name: Conversation
+  tags:
+  - Conversation
+- name: RCS
+  tags:
+  - RCS Accounts
+  - RCS Questionnaire
+  - RCS Senders
+- name: SMS
+  tags:
+  - SMS Apps

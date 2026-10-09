@@ -1,0 +1,125 @@
+openapi: 3.2.0
+info:
+  title: Sinch Provisioning LINE Senders API
+  description: The Sinch Provisioning API allows developers to programmatically set up senders, accounts, and templates on the messaging platforms used by the Sinch Conversation API. It provides endpoints for configuring messaging channel integrations, managing sender identities, and setting up message templates for approval. This API streamlines the onboarding process for new messaging channels and automates the configuration that would otherwise require manual setup through dashboards.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://provisioning.api.sinch.com
+  description: Global Production Server
+security:
+- oAuth2: []
+- basicAuth: []
+tags:
+- name: LINE Senders
+  description: Manage LINE sender identities for messaging through the Conversation API.
+paths:
+  /v1/projects/{project_id}/line/senders:
+    get:
+      operationId: listLineSenders
+      summary: List Line Senders
+      description: Returns a list of all LINE senders configured for the project.
+      tags:
+      - LINE Senders
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: List of LINE senders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SenderList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createLineSender
+      summary: Create a Line Sender
+      description: Creates a new LINE sender for messaging through the Conversation API.
+      tags:
+      - LINE Senders
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSenderRequest'
+      responses:
+        '200':
+          description: Sender created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Sender'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+components:
+  schemas:
+    SenderList:
+      type: object
+      properties:
+        senders:
+          type: array
+          description: List of senders
+          items:
+            $ref: '#/components/schemas/Sender'
+    Sender:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique sender identifier
+        name:
+          type: string
+          description: The sender name
+        status:
+          type: string
+          description: The sender status
+        channelCredentials:
+          type: object
+          description: Channel-specific credentials
+        createTime:
+          type: string
+          format: date-time
+          description: When the sender was created
+    CreateSenderRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The sender name
+        channelCredentials:
+          type: object
+          description: Channel-specific credentials and configuration
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Key ID as username and key secret as password.
+externalDocs:
+  description: Sinch Provisioning API Documentation
+  url: https://developers.sinch.com/docs/provisioning-api

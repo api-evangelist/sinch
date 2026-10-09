@@ -1,0 +1,54 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-number-schema.json",
+  "title": "Number",
+  "description": "A Sinch phone number assigned to a SIP trunk. This must be a number you own and configured for Elastic SIP Trunking.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-elastic-sip-trunking-api-openapi.yml#/components/schemas/Number",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The ID of the phone number."
+    },
+    "sipTrunkId": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The ID of the SIP trunk to which the phone number is assigned."
+    },
+    "phoneNumber": {
+      "description": "A Sinch phone number on your account and configured for Elastic SIP Trunking.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/PhoneNumber"
+        }
+      ]
+    },
+    "countryCode": {
+      "readOnly": true,
+      "type": "string",
+      "description": "The country code of the phone number in ISO 3166-1 alpha-2 format."
+    },
+    "createTime": {
+      "type": "string",
+      "description": "The date and time that the number was assigned to the SIP trunk.",
+      "format": "date-time",
+      "readOnly": true
+    },
+    "updateTime": {
+      "type": "string",
+      "description": "The date and time that the phone number was last modified.",
+      "format": "date-time",
+      "readOnly": true
+    }
+  },
+  "$defs": {
+    "PhoneNumber": {
+      "type": "string",
+      "description": "A phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format, including the leading '+'."
+    }
+  }
+}

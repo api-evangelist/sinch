@@ -1,0 +1,4323 @@
+openapi: 3.0.3
+info:
+  title: Elastic SIP Trunk API
+  description: >-
+    This document provides a detailed user guide and reference documentation on
+    the Sinch Elastic SIP Trunk API. For information on how to authenticate API
+    requests, please check the Authentication section.
+
+
+    ## Authentication
+
+
+    Elastic SIP Trunk API supports both
+    [basic](https://developers.sinch.com/docs/est/api-reference/est/section/authentication#basic)
+    and
+    [OAuth2](https://developers.sinch.com/docs/est/api-reference/est/section/authentication#oauth2)
+    authentication types.
+
+
+    ### Basic
+
+
+    {% partial file="/partials/authentication/basic/_intro.md"/ %}
+
+    {% partial file="/partials/authentication/basic/_instructions.md"/ %}
+
+
+    ### OAuth2
+
+
+    {% partial file="/partials/authentication/oauth/_intro.md"/ %}
+
+    {% partial file="/partials/authentication/oauth/_instructions.md"/ %}
+
+
+    ## Servers
+
+
+    Elastic SIP Trunk API serves all endpoints from the following server:
+
+
+    ```https://elastic-trunking.api.sinch.com/v1/projects/{projectId}```
+
+
+    {% admonition type="info" name="Note:" %}
+
+    The `projectId` is a required parameter you must include when making any API
+    calls. You can find your project ID on your
+    [dashboard](https://dashboard.sinch.com).
+
+    {% /admonition %}
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    email: support@sinch.com
+    name: support at sinch
+security:
+  - Basic: []
+  - OAuth2.0: []
+servers:
+  - url: https://elastic-trunking.api.sinch.com
+tags:
+  - name: SIP Trunks
+    description: >-
+      The SIP Trunks endpoint has operations that allow you to create, view,
+      update, and remove SIP trunks.
+  - name: SIP Endpoints
+    description: >-
+      A SIP endpoint is the resource that represents your SIP infrastructure,
+      typically an SBC. Note the Elastic SIP Trunk API does not support user
+      registration and presence.
+  - name: Country Permissions
+    description: >-
+      Country permissions are used to control which countries can be dialed from
+      a specific SIP trunk. You can view, update, and remove country
+      permissions. For beta, only US, CA and wild card are supported.
+
+      Please note that these permissions are not per trunk but rather they are
+      per project/account. In the future Sinch may extend these permissions to
+      other voice and messaging products.
+
+      If you are using sub-projects you can use the same country permissions for
+      all sub-projects.
+
+      You can also specify different country permissions for each sub-project
+      that will override the parent country permissions.
+  - name: Phone Numbers
+    description: >-
+      The `/phoneNumbers` endpoint has operations that allow you to assign and
+      remove phone numbers from SIP trunks.
+  - name: Calls
+    description: >-
+      The `/calls` endpoint has operations that allow you to retrieve call
+      history and details about calls made or received using EST.
+  - name: Call Blocking Rules
+    description: >-
+      The Call Blocking Rules endpoint has operations that allow you to
+      configure and manage your call blocking rules for your EST solution.
+  - name: Access Control List
+    description: >-
+      The Access Control List (ACL) endpoint has operations that allow you to
+      create, view, update, and remove ACLs.
+
+      You use ACLs to control which IP addresses can send traffic to your SIP
+      trunk. You can create multiple ACLs and assign them to multiple SIP
+      trunks. In order to make outbound calls you need to have at least one ACL
+      set up.
+    x-displayName: Access Control Lists
+  - name: Credential Lists
+    description: >-
+      The Credential Lists endpoint has operations that allow you to view and
+      manage credential lists. 
+
+      You use credential lists to easily configure which users are allowed to
+      make calls on a trunk.
+  - name: Credentials
+    description: >-
+      The Credentials endpoint has operations that allow you to manage
+      credentials within a credential list.
+  - name: Projects
+    description: Manage your Elastic SIP Trunking projects.
+paths:
+  /v1/projects/{projectId}/calls:
+    get:
+      summary: Find calls
+      description: Find calls by query parameters.
+      operationId: findCalls
+      tags:
+        - Calls
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: from
+          in: query
+          description: >-
+            A phone number that you want to use to filter results. You can pass
+            a partial number to get all calls sent to numbers that start with
+            the number you passed.
+          required: false
+          schema:
+            type: string
+            format: phonenumber
+        - name: to
+          in: query
+          description: >-
+            Only include calls made to this number or address. You can pass a
+            partial number to get all calls sent to numbers that start with the
+            number you passed.
+          required: false
+          schema:
+            type: string
+            format: phonenumber
+        - name: trunkId
+          in: query
+          description: Only include calls made from this trunk.
+          required: false
+          schema:
+            type: string
+        - name: createTime
+          description: >-
+            Filter calls based on  `createTime`. You make the query more
+            precise, fewer results will be returned.
+
+            For example, 2021-02-01 will return all calls from the first of
+            February 2021, and 2021-02-01T14:00:00Z will return all calls after
+            14:00 on the first of February.
+
+            This field also supports <= and >= to search for calls in a range
+            ?createTime>=2021-10-01&createTime<=2021-10-30 to get a list if
+            calls for october 2021
+
+            It is also possible to submit partial dates for example
+            createTime=2021-02 will return all calls for February
+
+
+            ***Defaults to 24 hours***
+
+
+            ***Internal notes***
+
+            If a customer submits = and not <> we should add min and max for the
+            date range
+
+            psueodo sql
+
+
+            ```
+
+            createTime = 2021-02-01
+
+            select * from calls where createTime >= 2021-02-01 and createTime <=
+            2021-02-01T23:59:59Z
+
+
+            createTime = 2021-02-01T08
+
+            select * from calls where createTime >= 2021-02-01T08:00:00 and
+            createTime <= 2021-02-01T08:59:59Z
+
+            ```
+
+
+            but if they submit < or > we should just use the value they
+            submitted and parse it a complete date
+          required: false
+          in: query
+          schema:
+            type: string
+            example: '2021-02-01'
+            default: now-24h
+        - name: callResult
+          in: query
+          description: >-
+            only include calls by on the callResult(s), example
+            callResult=COMPLETED will return all calls which have completed
+            normally.
+          required: false
+          schema:
+            $ref: '#/components/schemas/CallResult'
+        - name: direction
+          in: query
+          description: >-
+            only include calls by on the direction(s), example
+            direction=INBOUND,OUTBOUND will return all calls that are inbound or
+            outbound.
+          required: false
+          schema:
+            type: string
+            description: Filter results based on the call direction.
+            enum:
+              - INBOUND
+              - OUTBOUND
+            x-ga-description: >-
+              Describes whether the call was `INBOUND` *to* your Sinch number or
+              was `OUTBOUND` and made *from* your Sinch number. An `INBOUND`
+              call can also come from a SIP infrastructure or an application
+              built using the Sinch SDK. An `OUTBOUND` call can be placed to a
+              SIP infrastructure or an application built using the Sinch SDK.
+            x-enumDescriptions:
+              INBOUND: Somebody called your Sinch number.
+              OUTBOUND: You called somebody from your SIP device.
+        - name: page
+          in: query
+          description: The page you want to fetch
+          schema:
+            type: string
+        - name: size
+          in: query
+          description: >-
+            The maximum number of items to return per request. The default is
+            100 and the maximum is 1000. If you need to export larger amounts
+            and pagination is not suitable for you can use the Export function
+            in the dashboard.
+          schema:
+            type: integer
+            maximum: 1000
+            minimum: 1
+      responses:
+        '200':
+          description: Call result response
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      calls:
+                        type: array
+                        description: The list of calls that matches the query parameters.
+                        items:
+                          $ref: '#/components/schemas/Call'
+                  - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // Replace with a valid 'from' number in your call history
+              const fromFilter = '+1781';
+              // Replace with one of: 'COMPLETED', 'NO_ANSWER', 'CANCEL', 'BUSY', 'FAILED'
+              const callResultFilter = 'FAILED';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.calls.find({
+                  from: fromFilter,
+                  callResult: callResultFilter,
+                });
+                if (response.data.length === 0) {
+                  console.log('No calls found matching your criteria.');
+                  return;
+                }
+                console.log(`✅ Found ${response.data.length} calls.`);
+                response.data.forEach((call) => {
+                  console.log(call);
+                });
+              } catch (err) {
+                console.error('❌ Failed to find calls:');
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/calls/export:
+    get:
+      tags:
+        - Calls
+      summary: Export call records
+      description: >-
+        Export call records for a project. This returns a comma separate value
+        (CSV) response. You can specify which records to export using the query
+        parameters.
+      operationId: exportCallRecords
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: from
+          in: query
+          description: >-
+            A phone number that you want to use to filter results. You can pass
+            a partial number to get all calls sent to numbers that start with
+            the number you passed.
+          required: false
+          schema:
+            type: string
+            format: phonenumber
+        - name: to
+          in: query
+          description: >-
+            Only include calls made to this number or address. You can pass a
+            partial number to get all calls sent to numbers that start with the
+            number you passed.
+          required: false
+          schema:
+            type: string
+            format: phonenumber
+        - name: trunkId
+          in: query
+          description: Only include calls made from this trunk.
+          required: false
+          schema:
+            type: string
+        - name: createTime
+          description: >-
+            Filter calls based on  `createTime`. You make the query more
+            precise, fewer results will be returned.
+
+            For example, 2021-02-01 will return all calls from the first of
+            February 2021, and 2021-02-01T14:00:00Z will return all calls after
+            14:00 on the first of February.
+
+            This field also supports <= and >= to search for calls in a range
+            ?createTime>=2021-10-01&createTime<=2021-10-30 to get a list if
+            calls for october 2021
+
+            It is also possible to submit partial dates for example
+            createTime=2021-02 will return all calls for February
+
+
+            ***Defaults to 24 hours***
+          required: false
+          in: query
+          style: form
+          explode: true
+          schema:
+            type: string
+            example: '2021-02-01'
+            default: now-24h
+        - name: callResult
+          in: query
+          description: >-
+            only include calls by on the callResult(s), example
+            callResult=COMPLETED will return all calls which have completed
+            normally.
+          required: false
+          style: form
+          explode: false
+          schema:
+            $ref: '#/components/schemas/CallResult'
+        - name: direction
+          in: query
+          description: >-
+            only include calls by on the direction(s), example
+            direction=INBOUND,OUTBOUND will return all calls that are inbound or
+            outbound.
+          required: false
+          style: form
+          explode: false
+          schema:
+            type: string
+            description: >-
+              Filter results based on the call direction. Describes whether the
+              call was `INBOUND` *to* your Sinch number or was `OUTBOUND` and
+              made *from* your Sinch number. An `INBOUND` call can also come
+              from a SIP infrastructure or an application built using the Sinch
+              SDK. An `OUTBOUND` call can be placed to a SIP infrastructure or
+              an application built using the Sinch SDK.
+            enum:
+              - INBOUND
+              - OUTBOUND
+            x-enumDescriptions:
+              INBOUND: Somebody called your Sinch number.
+              OUTBOUND: You called somebody from your SIP device.
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: fromCountryCode
+          in: query
+          required: false
+          description: >-
+            Set this if you want to filter on the country of the caller phone
+            number.
+          schema:
+            type: string
+            example: US
+        - name: toCountryCode
+          in: query
+          required: false
+          description: >-
+            Set this if you want to filter on the country of the callee phone
+            number.
+          schema:
+            type: string
+            example: CA
+        - name: emergencyOnly
+          in: query
+          required: false
+          description: Set this if you want to filter on emergency calls or not.
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+            x-enumDescriptions:
+              'true': Include only emergency calls.
+              'false': Include all calls.
+        - name: region
+          in: query
+          required: false
+          description: Set this is you want to filter calls based on the region.
+          schema:
+            type: string
+            example: us-east
+        - name: projectIds
+          in: query
+          required: false
+          description: Set this if you want to include calls from other projects.
+          schema:
+            type: string
+        - name: fileName
+          in: query
+          required: false
+          schema:
+            type: string
+        - name: groupId
+          in: query
+          required: false
+          description: Set this if you want to filter calls based on the group ID.
+          schema:
+            type: string
+            example: >-
+              e234bd85-8uv5-44a2-a973-1f705a0960f5@vp3-i-06a73121dc26a8906.xmpp.vpc
+        - name: parentId
+          in: query
+          required: false
+          description: Set this if you want to filter calls based on the call's parent ID.
+          schema:
+            type: string
+            example: 9128525b-7273-123f-73ae-0225d0254abb
+        - name: relationshipType
+          in: query
+          required: false
+          description: >-
+            The type of relationship the call has, for example, an initial call
+            or a child call.
+          schema:
+            type: string
+            example: initial
+        - name: hasChildren
+          in: query
+          required: false
+          description: Set this if you want to filter on calls with children or not.
+          schema:
+            type: string
+            enum:
+              - 'true'
+              - 'false'
+            x-enumDescriptions:
+              'true': Include only calls with children.
+              'false': Include all calls.
+      responses:
+        '200':
+          description: OK
+          content:
+            application/csv:
+              schema:
+                type: string
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // Replace with a valid 'from' number in your call history
+              const fromFilter = '+1440';
+              // Replace with one of: 'COMPLETED', 'NO_ANSWER', 'CANCEL', 'BUSY', 'FAILED'
+              const callResultFilter = 'FAILED';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.calls.export({
+                  from: fromFilter,
+                  callResult: callResultFilter,
+                });
+                console.log('✅ Successfully exported the call records.');
+                console.log(response);
+              } catch (err) {
+                console.error('❌ Failed to export the call records:');
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/calls/records/{pcapId}/pcap:
+    get:
+      tags:
+        - Calls
+      summary: Get PCAPs by ID
+      description: >-
+        Return PCAPs by the PCAP ID. Returns a .pcap file of the requested call
+        to download. You can find the PCAP ID in the response from
+        ['/calls'](https://developers.sinch.com/docs/est/api-reference/est/calls/findcalls)
+        endpoint. PCAPs are only available for calls from within the last 10
+        days.
+      operationId: getPcap
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: pcapId
+          in: path
+          description: The ID of the PCAP you want to retrieve.
+          required: true
+          schema:
+            type: string
+            example: 0a81e938-07bd-1240-8487-0ecf41868d11
+        - name: direction
+          in: query
+          description: >-
+            Request a PCAP for the call leg specified by the direction. If this
+            query parameter is not included, the default behavior is to return
+            OUTBOUND calls.
+          required: false
+          schema:
+            type: string
+            enum:
+              - INBOUND
+              - OUTBOUND
+            x-enumDescriptions:
+              INBOUND: Somebody called your Sinch number.
+              OUTBOUND: You called somebody from your SIP device.
+            default: OUTBOUND
+      responses:
+        '200':
+          description: The .pcap file.
+          content:
+            application/octet-stream: {}
+  /v1/projects/{projectId}/callBlockingRules:
+    get:
+      tags:
+        - Call Blocking Rules
+      summary: Get call blocking rules
+      description: Return all the call blocking rules for the specified project.
+      operationId: getBlockingRules
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/CallBlockingRule'
+    post:
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      tags:
+        - Call Blocking Rules
+      summary: Create call blocking rule
+      description: Create a call blocking rule for the specified project.
+      operationId: createBlockingRule
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallBlockingRule'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallBlockingRule'
+  /v1/projects/{projectId}/callBlockingRules/{id}:
+    put:
+      tags:
+        - Call Blocking Rules
+      summary: Update blocking rule
+      description: Update the call blocking rule by the specified ID.
+      operationId: updateBlockingRuleById
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: id
+          in: path
+          required: true
+          description: The ID of the call blocking rule to update.
+          schema:
+            type: string
+            example: 01KG5BN8Z0HSR2P9GM3K9YA8RE
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallBlockingRule'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallBlockingRule'
+    delete:
+      tags:
+        - Call Blocking Rules
+      operationId: deleteBlockingRuleById
+      summary: Delete blocking rule
+      description: Delete a call blocking rule using its ID.
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: id
+          in: path
+          required: true
+          description: The ID of the call blocking rule to delete.
+          schema:
+            type: string
+            example: 01KG5BN8Z0HSR2P9GM3K9YA8RE
+      responses:
+        '204':
+          description: No Content
+  /v1/projects/{projectId}/trunks/{sipTrunkId}/endpoints:
+    get:
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/SipTrunkId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+      tags:
+        - SIP Endpoints
+      summary: Return SIP endpoints
+      description: Returns a list of all SIP endpoints with paging.
+      operationId: getSipEndpoint
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pagination'
+                  - type: object
+                    properties:
+                      endpoints:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SipEndpoint'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID to list SIP Endpoints from
+              const sipTrunkId = 'SIP_TRUNK_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.sipEndpoints.list({
+                  sipTrunkId,
+                });
+                if (response.data.length === 0) {
+                  console.log(`No SIP Endpoints found for the SIP Trunk with ID ${sipTrunkId}.`);
+                  return;
+                }
+                console.log(`✅ Found ${response.data.length} SIP Endpoints.`);
+                response.data.forEach((endpoint) => {
+                  console.log(endpoint);
+                });
+              } catch (err) {
+                console.error(`❌ Failed to list the SIP Endpoints for the SIP Trunk with ID ${sipTrunkId}`);
+                console.error(err);
+              }
+            }
+
+            main();
+    post:
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/SipTrunkId'
+      tags:
+        - SIP Endpoints
+      summary: Create SIP endpoint
+      description: Create a new SIP endpoint.
+      operationId: createSipEndpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SipEndpoint'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pagination'
+                  - type: object
+                    properties:
+                      endpoints:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SipEndpoint'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to create the endpoint in
+              const sipTrunkId = 'SIP_TRUNK_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.sipEndpoints.create({
+                  sipTrunkId,
+                  createSipEndpointRequestBody: {
+                    address: '127.0.0.1',
+                    name: 'Acme Endpoint',
+                    priority: 1,
+                  },
+                });
+                console.log('✅ Successfully created the SIP Endpoint.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error('❌ Failed to create the SIP Endpoint:');
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/trunks/{sipTrunkId}/endpoints/{sipEndpointId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/SipTrunkId'
+      - $ref: '#/components/parameters/SipEndpointId'
+    get:
+      tags:
+        - SIP Endpoints
+      summary: Get SIP endpoint by ID
+      description: Get a SIP endpoint by specifying its ID.
+      operationId: getSipEndpointById
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpoint'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID of the SIP Endpoint you want to retrieve
+              const sipTrunkId = 'SIP_TRUNK_ID';
+              // The SIP Endpoint ID you want to retrieve
+              const sipEndpointId = 'SIP_ENDPOINT_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.sipEndpoints.get({
+                  sipTrunkId,
+                  sipEndpointId,
+                });
+                console.log('✅ Successfully retrieved the SIP Endpoint.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to fetch the SIP Endpoint with ID ${sipEndpointId} from the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    put:
+      tags:
+        - SIP Endpoints
+      summary: Update existing SIP endpoint
+      description: Updated an existing SIP endpoint by specifying its ID.
+      operationId: updateSipEndpoint
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SipEndpoint'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipEndpoint'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to update the endpoint for
+              const sipTrunkId = 'SIP_TRUNK_ID';
+              // The SIP Endpoint ID you want to update
+              const sipEndpointId = 'SIP_ENDPOINT_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.sipEndpoints.update({
+                  sipTrunkId,
+                  sipEndpointId,
+                  updateSipEndpointRequestBody: {
+                    address: '127.0.0.1',
+                    name: 'Acme Endpoint',
+                    priority: 1,
+                  },
+                });
+                console.log('✅ Successfully updated the SIP Endpoint.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to update the SIP Endpoint with ID ${sipEndpointId} from the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    delete:
+      tags:
+        - SIP Endpoints
+      summary: Delete SIP endpoint
+      description: Delete a SIP endpoint by specifying its ID.
+      operationId: deleteSipEndpoint
+      responses:
+        '204':
+          description: SIP endpoint deleted successfully.
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to delete the SIP Endpoint from
+              const sipTrunkId = 'SIP_TRUNK_ID';
+              // The SIP Endpoint ID you want to delete
+              const sipEndpointId = 'SIP_ENDPOINT_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try{
+                await sinch.elasticSipTrunking.sipEndpoints.delete({
+                  sipTrunkId,
+                  sipEndpointId,
+                });
+                console.log(`✅ Successfully deleted the SIP Endpoint with ID: ${sipEndpointId} from the SIP Trunk with ID ${sipTrunkId}.`);
+              } catch (err) {
+                console.error(`❌ Failed to delete the SIP Endpoint with ID ${sipEndpointId} from the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/trunks:
+    post:
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+      tags:
+        - SIP Trunks
+      summary: Create SIP trunk
+      description: Creates a new SIP trunk.
+      operationId: createSipTrunk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SipTrunk'
+        required: true
+      responses:
+        '201':
+          description: SIP trunk created successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipTrunk'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try{
+                const response = await sinch.elasticSipTrunking.sipTrunks.create({
+                  createSipTrunkRequestBody: {
+                    name: 'Acme Trunk',
+                    hostName: 'acme-domain-1',
+                  },
+                });
+                console.log('✅ Successfully created the SIP Trunk.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error('❌ Failed to create the SIP Trunk:');
+                console.error(err);
+              }
+            }
+
+            main();
+    get:
+      summary: List SIP trunks
+      tags:
+        - SIP Trunks
+      description: >-
+        Returns a list of all SIP trunks. If you specify pagination settings,
+        the list of SIP trunks can be returned separated and sorted into pages.
+      operationId: getSipTrunks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - name: domain
+          in: query
+          description: Filter by domain
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Request completed successfully
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pagination'
+                  - type: object
+                    properties:
+                      sipTrunks:
+                        type: array
+                        description: >-
+                          The list of SIP trunks that matches the query
+                          parameters.
+                        items:
+                          $ref: '#/components/schemas/SipTrunk'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.sipTrunks.list({});
+                if (response.data.length === 0) {
+                  console.log('No SIP Trunks found.');
+                  return;
+                }
+                console.log(`✅ Found ${response.data.length} SIP Trunks.`);
+                response.data.forEach((trunk) => {
+                  console.log(trunk);
+                });
+              } catch (err) {
+                console.error('❌ Failed to list the SIP Trunks:');
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/trunks/{sipTrunkId}:
+    get:
+      summary: Get SIP Trunk
+      description: Search for a SIP trunk by ID.
+      operationId: getSipTrunkById
+      tags:
+        - SIP Trunks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/SipTrunkId'
+      responses:
+        '200':
+          description: SIP trunk found successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipTrunk'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to retrieve
+              const sipTrunkId = 'SIP_TRUNK_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.sipTrunks.get({ sipTrunkId });
+                console.log('✅ Successfully retrieved the SIP Trunk.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to retrieve the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    put:
+      summary: Update SIP trunk
+      description: >-
+        Update an existing SIP Trunk by ID. The whole object must be sent. Any
+        missing fields will be set to null.
+      operationId: updateSipTrunk
+      tags:
+        - SIP Trunks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/SipTrunkId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SipTrunk'
+        required: true
+      responses:
+        '200':
+          description: SIP trunk updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SipTrunk'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to update
+              const sipTrunkId = 'SIP_TRUNK_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.sipTrunks.update({
+                  sipTrunkId,
+                  updateSipTrunkRequestBody: {
+                    name: 'Acme Trunk',
+                    hostName: 'acme-domain-1',
+                  },
+                });
+                console.log('✅ Successfully updated the SIP Trunk.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to update the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    delete:
+      summary: Delete SIP trunk
+      description: Delete a SIP trunk by its ID.
+      operationId: deleteSipTrunk
+      tags:
+        - SIP Trunks
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - $ref: '#/components/parameters/SipTrunkId'
+      responses:
+        '204':
+          description: The SIP trunk deleted successfully
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to delete
+              const sipTrunkId = 'SIP_TRUNK_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try{
+                await sinch.elasticSipTrunking.sipTrunks.delete({ sipTrunkId });
+                console.log(`✅ Successfully deleted the SIP Trunk with ID ${sipTrunkId}.`);
+              } catch (err) {
+                console.error(`❌ Failed to delete the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/phoneNumbers:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/SipTrunkIdQuery'
+      - $ref: '#/components/parameters/Page'
+      - $ref: '#/components/parameters/Size'
+      - $ref: '#/components/parameters/Sort'
+    get:
+      summary: Get all phone numbers
+      description: >-
+        Get all phone numbers. You can filter and sort the phone numbers
+        returned with paging.
+      operationId: GetPhoneNumbers
+      tags:
+        - Phone Numbers
+      responses:
+        '200':
+          description: A successful response is an array containing phone numbers.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/Pagination'
+                  - type: object
+                    properties:
+                      phoneNumbers:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Number'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const phoneNumbers = [];
+                for await (const entry of sinch.elasticSipTrunking.phoneNumbers.list({})) {
+                  phoneNumbers.push(entry);
+                }
+                if (!phoneNumbers.length) {
+                  console.log('No phone numbers found.');
+                  return;
+                }
+                console.log(`✅ Found ${phoneNumbers.length} phone numbers.`);
+                phoneNumbers.forEach((number) => {
+                  console.log(number);
+                });
+              } catch (err) {
+                console.error('❌ Failed to list phone numbers:');
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/phoneNumbers/{phoneNumber}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/PhoneNumber'
+    get:
+      summary: Find a specific phone number
+      description: >-
+        Search for an Elastic SIP Trunk-enabled phone number by the e.164
+        number.
+      operationId: GetPhoneNumberByNumber
+      tags:
+        - Phone Numbers
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Number'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The phone number you want to search for.
+              const phoneNumber = process.env.PHONE_NUMBER ?? '+15552229999';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.phoneNumbers.get({
+                  phoneNumber,
+                });
+                console.log('✅ Successfully retrieved the phone number.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to retrieve the phone number ${phoneNumber}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/countryPermissions:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+        - Country Permissions
+      summary: Fetch all country permissions
+      description: Fetches the list of country permissions.
+      operationId: getCountryPermissions
+      responses:
+        '200':
+          description: The list of countries available
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  countryPermissions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CountryPermission'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.countryPermissions.list({});
+                if (!response.countryPermissions?.length) {
+                  console.log('No country permissions found.');
+                  return;
+                }
+                console.log(`✅ Found ${response.countryPermissions.length} country permissions.`);
+                response.countryPermissions.forEach((countryPermission) => {
+                  console.log(countryPermission);
+                });
+              } catch (err) {
+                console.error('❌ Failed to list the country permissions:');
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/countryPermissions/{isoCode}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: isoCode
+        in: path
+        description: The ISO code of the country.
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Country Permissions
+      summary: Fetch country permission
+      description: Fetches the requested country permission.
+      operationId: getCountryPermission
+      responses:
+        '200':
+          description: The returned country permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryPermission'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The country code you want to get permissions for
+              const countryCode = 'US';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.countryPermissions.get({
+                  isoCode: countryCode,
+                });
+                console.log('✅ Successfully retrieved the country permissions.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to retrieve the country permissions for country code ${countryCode}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    put:
+      tags:
+        - Country Permissions
+      summary: Update country permission
+      description: Update the requested country permission.
+      operationId: updateCountryPermission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CountryPermission'
+      responses:
+        '200':
+          description: The updated country permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryPermission'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // Replace with the country code you want to update permissions for
+              const countryCode = 'US';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.countryPermissions.update({
+                  isoCode: countryCode,
+                  updateCountryPermissionRequestBody: {
+                    enabled: true,
+                  },
+                });
+                console.log('✅ Successfully updated the country permissions.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to update the country permissions for the country code ${countryCode}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/accessControlLists:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+        - Access Control List
+      summary: List ACLs
+      description: Fetches the list of Access Control List entries.
+      operationId: getAccessControlList
+      responses:
+        '200':
+          description: The list of ACL entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      accessControlLists:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/AccessControlList'
+                  - $ref: '#/components/schemas/Pagination'
+              examples:
+                listAcls:
+                  $ref: '#/components/examples/aclListResponse'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.accessControlList.list({});
+                if (response.data.length === 0) {
+                  console.log('No ACLs found.');
+                  return;
+                }
+                console.log(`✅ Found ${response.data.length} ACLs.`);
+                response.data.forEach((acl) => {
+                  console.log(acl);
+                });
+              } catch (err) {
+                console.error('❌ Failed to list the ACLs:');
+                console.error(err);
+              }
+            }
+
+            main();
+    post:
+      tags:
+        - Access Control List
+      summary: Create an ACL
+      description: >-
+        Create an access control list entry with at least one IP address or IP
+        range.
+      operationId: createAccessControlList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessControlList'
+            examples:
+              createNewAcl:
+                $ref: '#/components/examples/createAclReq'
+      responses:
+        '200':
+          description: The list of access control list entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessControlList'
+              examples:
+                createNewAcl:
+                  $ref: '#/components/examples/createAclRes'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try{
+                const response = await sinch.elasticSipTrunking.accessControlList.create({
+                  createAccessControlListBody: {
+                    name: 'My new ACL',
+                    ipRanges: [
+                      {
+                        description: 'Location 1',
+                        ipAddress: '15.15.15.15',
+                        range: 20,
+                      },
+                    ],
+                  },
+                });
+                console.log('✅ Successfully created the ACL.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error('❌ Failed to create the ACL:');
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/accessControlLists/{id}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: id
+        in: path
+        description: The ID of the access control list entry.
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - Access Control List
+      operationId: getAccessListById
+      summary: Get access control list
+      description: Return an access control list by its ID.
+      responses:
+        '200':
+          description: The returned access control list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessControlList'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The ID of the ACL to retrieve
+              const aclId = 'ACL_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.accessControlList.get({
+                  id: aclId,
+                });
+                console.log('✅ Successfully retrieved the ACL.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to retrieve the ACL with ID ${aclId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    put:
+      tags:
+        - Access Control List
+      summary: Update ACL
+      description: >-
+        Create an access control list entry with at least one IP address or IP
+        range.
+      operationId: updateAccessControlList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - name
+              properties:
+                name:
+                  type: string
+                  description: Your name for the access control list entry.
+                  example: LA Office
+                enabled:
+                  type: boolean
+                  description: >-
+                    Whether the access control list entry is enabled. You can
+                    use this to disable a list temporarily without deleting it.
+                  default: true
+                ipRanges:
+                  type: array
+                  description: An array of all the IP ranges to update.
+                  items:
+                    $ref: '#/components/schemas/IpRange'
+            examples:
+              updateAcl:
+                $ref: '#/components/examples/updateAclReq'
+      responses:
+        '200':
+          description: The list of access control list entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessControlList'
+              examples:
+                updateAcl:
+                  $ref: '#/components/examples/updateAclRes'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The ID of the ACL to update
+              const aclId = 'ACL_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.accessControlList.update({
+                  id: aclId,
+                  updateAccessControlListRequestBody: {
+                    name: 'Updated ACL name',
+                    enabled: false,
+                  },
+                });
+                console.log('✅ Successfully updated the ACL.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to update the ACL with ID ${aclId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    delete:
+      description: Delete an access control list entry.
+      summary: Delete ACL
+      operationId: deleteAccessControlList
+      tags:
+        - Access Control List
+      responses:
+        '204':
+          description: No Content
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The ID of the ACL to delete
+              const aclId = 'ACL_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                await sinch.elasticSipTrunking.accessControlList.delete({
+                  id: aclId,
+                });
+                console.log(`✅ Successfully deleted the ACL with ID ${aclId}.`);
+              } catch (err) {
+                console.error(`❌ Failed to delete the ACL with ID ${aclId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/accessControlLists/{id}/trunks:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: id
+        in: path
+        description: The ID of the access control list entry.
+        required: true
+        schema:
+          type: string
+    get:
+      summary: Get trunks for ACL
+      description: >-
+        Returns a list of all trunks which use the specified access control
+        list.
+      operationId: trunksByACL
+      tags:
+        - Access Control List
+      responses:
+        '200':
+          description: The list of trunks which use the access control list.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      trunks:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SipTrunk'
+                  - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The ACL ID you want to list SIP Trunks for
+              const aclId = 'ACL_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.accessControlList.listTrunks({
+                  id: aclId,
+                });
+                if (response.data.length === 0) {
+                  console.log(`No SIP Trunks found for the ACL with ID ${aclId}.`);
+                  return;
+                }
+                console.log(`✅ Found ${response.data.length} SIP Trunks for the ACL with ID ${aclId}.`);
+                response.data.forEach((trunk) => {
+                  console.log(trunk);
+                });
+              } catch (err) {
+                console.error(`❌ Failed to list the SIP Trunks for the ACL with ID ${aclId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/accessControlLists/{accessControlListId}/ipRanges:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: accessControlListId
+        in: path
+        description: The ID of the access control list entry. that you want to work with
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: addIpRangeToAccessControlList
+      description: Add an IP range to an access control list entry.
+      summary: Add IP range to ACL
+      tags:
+        - Access Control List
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpRange'
+            examples:
+              addIpRange:
+                $ref: '#/components/examples/addIpRangeReq'
+      responses:
+        '200':
+          description: The list of IP ranges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpRange'
+              examples:
+                addIpRange:
+                  $ref: '#/components/examples/addIpRangeRes'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The ID of the ACL to which to add an IP range
+              const aclId = 'ACL_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.accessControlList.addIpRange({
+                  accessControlListId: aclId,
+                  addIpRangeRequestBody: {
+                    description: 'IP range name',
+                    ipAddress: '11.12.13.14',
+                    range: 27,
+                  },
+                });
+                console.log('✅ Successfully added IP range to ACL:');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to add IP range to the ACL with ID ${aclId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    get:
+      operationId: getIpRangesForAccessControlList
+      summary: List all IP ranges for ACL
+      description: Get all IP ranges for an access control list entry.
+      tags:
+        - Access Control List
+      responses:
+        '200':
+          description: The list of IP ranges
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      ipRanges:
+                        type: array
+                        description: The list of IP ranges
+                        items:
+                          $ref: '#/components/schemas/IpRange'
+                  - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The ID of the ACL to list the IP ranges from
+              const aclId = 'ACL_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.accessControlList.listIpRanges({
+                  accessControlListId: aclId,
+                });
+                if (response.data.length === 0) {
+                  console.log(`No IP ranges found for the ACL with ID ${aclId}.`);
+                  return;
+                }
+                console.log(`✅ Found ${response.data.length} IP ranges for ACL with ID ${aclId}.`);
+                response.data.forEach((ipRange) => {
+                  console.log(ipRange);
+                });
+              } catch (err) {
+                console.error(`❌ Failed to list the IP ranges for the ACL with ID ${aclId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/accessControlLists/{accessControlListId}/ipRanges/{ipRangeId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: accessControlListId
+        in: path
+        description: The ID of the access control list entry that you want to update.
+        required: true
+        schema:
+          type: string
+      - name: ipRangeId
+        in: path
+        description: The ID of the IP range that you want to update.
+        required: true
+        schema:
+          type: string
+    delete:
+      operationId: deleteIpRangeFromAccessControlList
+      summary: Delete IP range from ACL
+      tags:
+        - Access Control List
+      description: Remove an IP range to an access control list entry.
+      responses:
+        '204':
+          description: IP range deleted
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The ID of the ACL to delete the IP range from
+              const aclId = 'ACL_ID';
+              // The IP Range ID you want to delete from the ACL
+              const ipRangeId = 'IP_RANGE_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                await sinch.elasticSipTrunking.accessControlList.deleteIpRange({
+                  accessControlListId: aclId,
+                  ipRangeId: ipRangeId,
+                });
+                console.log(`✅ Successfully deleted the IP range ${ipRangeId} from the ACL with ID ${aclId}.`);
+              } catch (err) {
+                console.error(`❌ Failed to delete the IP range ${ipRangeId} from the ACL with ID ${aclId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    put:
+      description: Update an IP range to an access control list entry.
+      operationId: updateIpRangeFromAccessControlList
+      summary: Update IP range
+      tags:
+        - Access Control List
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpRange'
+            examples:
+              updateIpRange:
+                $ref: '#/components/examples/updateIpRangeReq'
+      responses:
+        '200':
+          description: The updated IP range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpRange'
+              examples:
+                updateIpRange:
+                  $ref: '#/components/examples/updateAclRes'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The ACL ID you want to update ACL from
+              const aclId = 'ACL_ID';
+              // The IP Range ID you want to update
+              const ipRangeId = 'IP_RANGE_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.accessControlList.updateIpRange({
+                  accessControlListId: aclId,
+                  ipRangeId: ipRangeId,
+                  updateIpRangeRequestBody: {
+                    ipAddress: '11.12.13.14',
+                    range: 27,
+                  },
+                });
+                console.log('✅ Successfully updated the IP Range.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to update the IP Range ${ipRangeId} in the ACL with ID ${aclId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/credentialLists/{id}:
+    get:
+      tags:
+        - Credential Lists
+      summary: Get credential list
+      description: Return a credential list by its specified ID.
+      operationId: getCredentialListById
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: id
+          in: path
+          required: true
+          description: The ID of the credential list to return.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialListResponse'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The credential list ID you want to retrieve
+              const credentialListId = 'CREDENTIAL_LIST_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.credentialLists.get({
+                  id: credentialListId,
+                });
+                console.log('✅ Successfully retrieved the credential list.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to retrieve the credential list with ID ${credentialListId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    put:
+      tags:
+        - Credential Lists
+      summary: Update a credential list
+      operationId: updateCredentialList
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: id
+          in: path
+          required: true
+          description: The ID of the credential list to update.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialListRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialListResponse'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The credential list ID you want to update
+              const credentialListId = 'CREDENTIAL_LIST_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.credentialLists.update({
+                  id: credentialListId,
+                  updateCredentialListRequestBody: {
+                    name: 'Updated credential list name',
+                  },
+                });
+                console.log(`✅ Successfully updated the credential list with ID ${credentialListId}.`);
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to update the credential list with ID ${credentialListId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    delete:
+      tags:
+        - Credential Lists
+      summary: Delete a credential list
+      operationId: deleteCredentialList
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: id
+          in: path
+          required: true
+          description: The ID of the credential list to delete.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The credential list ID you want to delete
+              const credentialListId = 'CREDENTIAL_LIST_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                await sinch.elasticSipTrunking.credentialLists.delete({
+                  id: credentialListId,
+                });
+                console.log(`✅ Successfully deleted the credential list with ID ${credentialListId}.`);
+              } catch (err) {
+                console.error(`❌ Failed to delete the credential list with ID ${credentialListId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/credentialLists/{credentialListId}/credentials/{username}:
+    put:
+      tags:
+        - Credential Lists
+      summary: Update the password for a credential
+      operationId: updateCredential
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: credentialListId
+          in: path
+          required: true
+          description: The ID of the credential list entry.
+          schema:
+            type: string
+        - name: username
+          in: path
+          required: true
+          description: The username of the credential.
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Credential'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Credential'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The credential list ID that contains the credential to update
+              const credentialListId = 'CREDENTIAL_LIST_ID';
+              // The username of the credential to update
+              const credentialUsername = 'CREDENTIAL_USERNAME';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.credentialLists.updateCredential({
+                  id: credentialListId,
+                  username: credentialUsername,
+                  updateCredentialPasswordRequestBody: {
+                    password: 'newSecurePassword123[]',
+                  },
+                });
+                console.log(`✅ Successfully updated the credential password for the username ${credentialUsername} in credential list ${credentialListId}.`);
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to update the credential password for the username ${credentialUsername} in credential list ${credentialListId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    delete:
+      tags:
+        - Credentials
+      summary: Delete a credential
+      operationId: deleteCredential
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: credentialListId
+          in: path
+          required: true
+          description: The ID of the credential list entry.
+          schema:
+            type: string
+        - name: username
+          in: path
+          required: true
+          description: The username of the credential.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The credential list ID that contains the credential to delete
+              const credentialListId = 'CREDENTIAL_LIST_ID';
+              // The username of the credential to delete
+              const credentialUsername = 'CREDENTIAL_USERNAME';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                await sinch.elasticSipTrunking.credentialLists.deleteCredential({
+                  id: credentialListId,
+                  username: credentialUsername,
+                });
+                console.log(`✅ Successfully deleted the credential with username ${credentialUsername} from credential list ${credentialListId}.`);
+              } catch (err) {
+                console.error(`❌ Failed to delete the credential with username ${credentialUsername} from credential list ${credentialListId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/trunks/{trunkId}/credentialLists/{credentialListId}:
+    delete:
+      tags:
+        - SIP Trunks
+      summary: Remove credential list from sip trunk
+      operationId: removeCredentialListFromTrunk
+      parameters:
+        - $ref: '#/components/parameters/ProjectId'
+        - name: trunkId
+          in: path
+          required: true
+          description: The ID of the trunk.
+          schema:
+            type: string
+        - name: credentialListId
+          in: path
+          required: true
+          description: The ID of the credential list entry.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to remove a credential list from
+              const sipTrunkId = 'SIP_TRUNK_ID';
+              // The credential list ID you want to remove from the SIP Trunk
+              const credentialListId = 'CREDENTIAL_LIST_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                await sinch.elasticSipTrunking.sipTrunks.deleteCredentialList({
+                  trunkId: sipTrunkId,
+                  credentialListId,
+                });
+                console.log(`✅ Successfully removed credential list ${credentialListId} from the SIP Trunk with ID ${sipTrunkId}.`);
+              } catch (err) {
+                console.error(`❌ Failed to remove credential list ${credentialListId} from the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/credentialLists/{id}/trunks:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: id
+        in: path
+        description: The ID of the credential list entry.
+        required: true
+        schema:
+          type: string
+    get:
+      description: >-
+        Returns a list of all the trunks which use the specified credential
+        list.
+      summary: Get trunks for credential list
+      operationId: trunksByCredentialList
+      tags:
+        - Credential Lists
+      responses:
+        '200':
+          description: The list of trunks which use the credential list.
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      trunks:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/SipTrunk'
+                  - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The credential list ID you want to list SIP Trunks for
+              const credentialListId = 'CREDENTIAL_LIST_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.credentialLists.listTrunks({
+                  id: credentialListId,
+                });
+                if (response.data.length === 0) {
+                  console.log(`No SIP Trunks found for the credential list with ID ${credentialListId}.`);
+                  return;
+                }
+                console.log(`✅ Found ${response.data.length} SIP Trunks for the credential list with ID ${credentialListId}.`);
+                response.data.forEach((trunk) => {
+                  console.log(trunk);
+                });
+              } catch (err) {
+                console.error(`❌ Failed to list the SIP Trunks for the credential list with ID ${credentialListId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/trunks/{trunkId}/accessControlLists:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: trunkId
+        in: path
+        description: The ID of the trunk that you want to work with
+        required: true
+        schema:
+          type: string
+    post:
+      operationId: addAccessControlListToTrunk
+      description: Add an access control list entry to a trunk.
+      summary: Add ACL to a trunk
+      tags:
+        - Access Control List
+        - SIP Trunks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accessControlListIds:
+                  type: array
+                  description: Array of AccessControlList ids
+                  items:
+                    type: string
+                    description: The ID of the access control list entry.
+            examples:
+              addAcl:
+                $ref: '#/components/examples/addTrunkAclReq'
+      responses:
+        '200':
+          description: The list of access control list entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      accessControlListIds:
+                        type: array
+                        description: Array of AccessControlList ids
+                        items:
+                          type: string
+                          description: >-
+                            The ID of the access control list entry on assigned
+                            to trunk after update.
+              examples:
+                addAcl:
+                  $ref: '#/components/examples/addTrunkAclRes'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to add ACLs to
+              const sipTrunkId = 'SIP_TRUNK_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try{
+                const response = await sinch.elasticSipTrunking.accessControlList.addToTrunk({
+                  trunkId: sipTrunkId,
+                  addAccessControlListToTrunkRequestBody: {
+                    accessControlListIds: [
+                      'AN_ACL_ID_TO_ADD',
+                      'ANOTHER_ACL_ID_TO_ADD',
+                    ],
+                  },
+                });
+                console.log('✅ Successfully added the ACLs to the SIP Trunk.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to add the ACLs to the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    get:
+      description: Get all access control list entries for a trunk.
+      summary: List all ACLs for a trunk
+      operationId: getAccessControlListsForTrunk
+      tags:
+        - Access Control List
+        - SIP Trunks
+      responses:
+        '200':
+          description: The list of access control list entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - type: object
+                    properties:
+                      accessControlListIds:
+                        type: array
+                        description: Array of AccessControlList ids
+                        items:
+                          type: string
+                          description: The ID of the access control list entry.
+                  - $ref: '#/components/schemas/Pagination'
+              examples:
+                listTrunkAcls:
+                  $ref: '#/components/examples/listTrunkAcls'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to list ACLs for
+              const sipTrunkId = 'SIP_TRUNK_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try{
+                const response = await sinch.elasticSipTrunking.accessControlList.listForTrunk({
+                  trunkId: sipTrunkId,
+                });
+                if (response.data.length === 0) {
+                  console.log(`No ACLs found for the SIP Trunk with ID ${sipTrunkId}.`);
+                  return;
+                }
+                console.log(`✅ Found ${response.data.length} ACLs for the SIP Trunk with ID ${sipTrunkId}.`);
+                response.data.forEach((acl) => {
+                  console.log(acl);
+                });
+              } catch (err) {
+                console.error(`❌ Failed to list the ACLs for the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/trunks/{trunkId}/credentialLists:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: trunkId
+        in: path
+        description: The ID of the trunk that you want to work with
+        required: true
+        schema:
+          type: string
+    get:
+      tags:
+        - SIP Trunks
+      summary: Get credential lists for SIP trunk
+      description: Return all the credential lists for a specified SIP trunk.
+      operationId: getCredentialListsForTrunk
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Size'
+        - $ref: '#/components/parameters/Sort'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/CredentialListIds'
+                  - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to list credential lists for
+              const sipTrunkId = 'SIP_TRUNK_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.sipTrunks.listCredentialLists({
+                  trunkId: sipTrunkId,
+                });
+                if (response.data.length === 0) {
+                  console.log(`No credential lists found for the SIP Trunk with ID ${sipTrunkId}.`);
+                  return;
+                }
+                console.log(`✅ Found ${response.data.length} credential lists for the SIP Trunk with ID ${sipTrunkId}.`);
+                response.data.forEach((credentialList) => {
+                  console.log(credentialList);
+                });
+              } catch (err) {
+                console.error(`❌ Failed to list the credential lists for the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    post:
+      tags:
+        - SIP Trunks
+      summary: Add credential lists to SIP trunk
+      description: Add credential lists to a specified SIP trunk.
+      operationId: addCredentialListToTrunk
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CredentialListIds'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CredentialListIds'
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to add credential lists to
+              const sipTrunkId = 'SIP_TRUNK_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.sipTrunks.addCredentialLists({
+                  trunkId: sipTrunkId,
+                  addCredentialListIdsToTrunkRequestBody: {
+                    credentialListIds: [
+                      'CREDENTIAL_LIST_ID_TO_ADD',
+                    ],
+                  },
+                });
+                console.log(`✅ Successfully added credential lists to the SIP Trunk with ID ${sipTrunkId}.`);
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to add credential lists to the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    put:
+      description: Update the list of credential list entries for a trunk.
+      summary: Bulk update credential lists for a trunk
+      operationId: bulkUpdateCredentialListsForTrunk
+      tags:
+        - SIP Trunks
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: array
+              description: Array of credential list IDs
+              items:
+                type: string
+                description: The ID of the credential list entry.
+            example:
+              - 01GNZ9MXEZ4K6S8GB7RW063VAN
+              - 01GNZ9MXEZ4K6S8GB7RW063VAN
+      responses:
+        '200':
+          description: The list of credential list entries
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  credentialListIds:
+                    type: array
+                    description: Array of credential list IDs
+                    items:
+                      type: string
+                      description: The ID of the credential list entry.
+              example:
+                credentialListIds:
+                  - 01GNZ9MXEZ4K6S8GB7RW063VAN
+                  - 01GNZ9MXEZ4K6S8GB7RW063VAN
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to update credential lists for
+              const sipTrunkId = 'SIP_TRUNK_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.sipTrunks.updateCredentialLists({
+                  trunkId: sipTrunkId,
+                  updateCredentialListIdsForTrunkRequestBody: {
+                    credentialListIds: [
+                      'CREDENTIAL_LIST_ID',
+                    ],
+                  },
+                });
+                console.log(`✅ Successfully updated credential lists for the SIP Trunk with ID ${sipTrunkId}.`);
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to update credential lists for the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/trunks/{trunkId}/accessControlLists/{accessControlListId}:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: trunkId
+        in: path
+        description: The ID of the trunk that you want to work with
+        required: true
+        schema:
+          type: string
+      - name: accessControlListId
+        in: path
+        description: >-
+          The ID of the access control list entry. that you want to remove from
+          trunk
+        required: true
+        schema:
+          type: string
+    delete:
+      tags:
+        - Access Control List
+        - SIP Trunks
+      operationId: deleteAccessControlListFromTrunk
+      summary: Delete ACL from trunk
+      description: Remove an access control list entry from a trunk.
+      responses:
+        '204':
+          description: Access control list entry deleted
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The SIP Trunk ID you want to delete the ACL from
+              const sipTrunkId = 'SIP_TRUNK_ID';
+              // The ACL ID you want to delete from the SIP Trunk
+              const aclId = 'ACL_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try{
+                await sinch.elasticSipTrunking.accessControlList.deleteFromTrunk({
+                  trunkId: sipTrunkId,
+                  accessControlListId: aclId,
+                });
+                console.log(`✅ Successfully deleted the ACL ${aclId} from the SIP Trunk with ID ${sipTrunkId}.`);
+              } catch (err) {
+                console.error(`❌ Failed to delete the ACL ${aclId} from the SIP Trunk with ID ${sipTrunkId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+  /v1/projects/{projectId}/addProjects:
+    parameters:
+      - $ref: '#/components/parameters/ProjectId'
+    post:
+      tags:
+        - Projects
+      operationId: addEstProjects
+      summary: Add additional projects to EST
+      description: >-
+        Programmatically add additional projects for use with Elastic SIP
+        Trunking. If you list a project ID which EST is already aware of, it
+        will be ignored.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+                - projectIds
+              type: object
+              properties:
+                projectIds:
+                  type: array
+                  description: The project IDs you want to add.
+                  example:
+                    - 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+                    - 879c4177-af8a-4534-8168-cc2f66a1f2c6
+                  items:
+                    type: string
+                    example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+      responses:
+        '200':
+          description: The list of added projects.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  addedProjects:
+                    type: array
+                    description: The added project IDs.
+                    example:
+                      - 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+                      - 879c4177-af8a-4534-8168-cc2f66a1f2c6
+                    items:
+                      type: string
+                      example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+      x-codeSamples:
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+
+              // The project ID you want to add to EST
+              const projectIdToAdd = '00000000-0000-0000-0000-000000000000';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret });
+
+              try {
+                const response = await sinch.elasticSipTrunking.projects.add({
+                  addProjectsRequestBody: {
+                    projectIds: [projectIdToAdd],
+                  },
+                });
+                console.log('✅ Successfully added additional projects to EST.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error('❌ Failed to add additional projects to EST:');
+                console.error(err);
+              }
+            }
+
+            main();
+components:
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: >-
+        The `projectId` is a required parameter you must include when making any
+        API calls. You can find your project ID on your [Build
+        dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+    Page:
+      in: query
+      name: page
+      description: >-
+        The page you want to fetch, can set to 1 for first page, or omitted for
+        first page
+      schema:
+        type: integer
+        default: 1
+    Size:
+      in: query
+      name: size
+      description: The size of each page to fetch
+      schema:
+        type: integer
+        default: 500
+        minimum: 1
+        maximum: 500
+    Sort:
+      name: sort
+      in: query
+      description: >-
+        An array setting the sorting criteria in the format of
+        `property,(ascending/descending)`
+      schema:
+        type: array
+        items:
+          type: string
+    SipEndpointIdQuery:
+      name: sipEndpointId
+      in: query
+      description: The ID of the SIP endpoint to search for.
+      required: false
+      schema:
+        minimum: 0
+        type: integer
+        format: int64
+    SipTrunkIdQuery:
+      name: sipTrunkId
+      in: query
+      description: The ID of the SIP trunk to search for.
+      required: false
+      schema:
+        minimum: 0
+        type: integer
+        format: int64
+    SipEndpointId:
+      name: sipEndpointId
+      in: path
+      description: The ID of the SIP endpoint.
+      required: true
+      schema:
+        minimum: 0
+        type: integer
+        format: int64
+    SipTrunkId:
+      name: sipTrunkId
+      in: path
+      description: The ID of the SIP trunk.
+      required: true
+      schema:
+        type: string
+    PhoneNumber:
+      name: phoneNumber
+      in: path
+      description: The phone number you want to search for. Must be in E.164 format.
+      required: true
+      schema:
+        type: string
+        example: '+12225559999'
+    PhoneNumberId:
+      name: phoneNumberId
+      in: path
+      required: true
+      description: The ID of the phone number.
+      schema:
+        type: string
+    Domain:
+      name: domain
+      in: path
+      required: true
+      description: The fully qualified domain name you you want to search for.
+      schema:
+        type: string
+  examples:
+    aclListResponse:
+      summary: List ACLs
+      description: List all access control lists for the project.
+      value:
+        accessControlLists:
+          - name: My Access Control List
+            projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+            enabled: true
+            id: 01HA2E80QCBX185VVP21PJG9CT
+            createTime: '2023-09-11T15:37:30'
+            updateTime: '2023-09-11T15:38:14'
+            ipRanges:
+              - description: Location 1
+                ipAddress: 54.172.60.0
+                range: 30
+                projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+                accessControlListId: 01HA2E80QCBX185VVP21PJG9CT
+                id: 01HA2E80QMJS5G7MD576GJQD2X
+                createTime: '2023-09-11T15:37:30'
+                updateTime: ''
+              - description: Location 2
+                ipAddress: 54.244.51.0
+                range: 30
+                projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+                accessControlListId: 01HA2E80QCBX185VVP21PJG9CT
+                id: 01HA2E98KCZ1CNN0JP22F4JF3T
+                createTime: '2023-09-11T15:38:11'
+                updateTime: ''
+          - name: My ACL 2
+            projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+            enabled: true
+            id: 01H7ZSW728SHB9984CDGFV37RM
+            createTime: '2023-08-16T18:31:39'
+            updateTime: '2023-08-25T07:51:40'
+            ipRanges:
+              - description: Location 1
+                ipAddress: 137.192.80.69
+                range: 32
+                projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+                accessControlListId: 01H8Y95DBJT31F104PWFVV9H8B
+                id: 01H8Y95DBSPQAN4MD4298TY05Y
+                createTime: '2023-08-28T14:36:02'
+                updateTime: '2023-09-05T10:45:53'
+              - description: Location 2
+                ipAddress: 137.192.78.69
+                range: 32
+                projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+                accessControlListId: 01H8Y95DBJT31F104PWFVV9H8B
+                id: 01H8YC0JTSXXVPBECC289QZG0J
+                createTime: '2023-08-28T15:25:50'
+                updateTime: '2023-09-05T07:59:07'
+              - description: Location 3
+                ipAddress: 20.20.20.20
+                range: 24
+                projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+                accessControlListId: 01H8Y95DBJT31F104PWFVV9H8B
+                id: 01HA1ZPH6E2BTSG0MFM38BRYF6
+                createTime: '2023-09-11T11:23:17'
+                updateTime: ''
+        pageNumber: '1'
+        size: 1000
+        totalItems: 2
+    createAclReq:
+      summary: Create ACL
+      description: Create a new access control list.
+      value:
+        name: My new ACL
+        enabled: true
+        ipRanges:
+          - description: Location 1
+            ipAddress: 15.15.15.15
+            range: 20
+    createAclRes:
+      summary: Create ACL
+      description: The newly created access control list.
+      value:
+        name: My new ACL
+        projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+        enabled: true
+        id: 01HA9BRJW4J3QE4WBKVC337V4E
+        createTime: '2023-09-14T08:08:48.264185988'
+        updateTime: null,
+        ipRanges:
+          - description: Location 1
+            ipAddress: 15.15.15.15
+            range: 20
+            projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+            accessControlListId: 01HA9BRJW4J3QE4WBKVC337V4E
+            id: 01HA9BRJYR9Q7ZBDYMXHVWT8S8
+            createTime: '2023-09-14T08:08:48.346874339'
+            updateTime: ''
+    updateAclReq:
+      summary: Update ACL
+      description: Update an access control list.
+      value:
+        name: Test Prague 5
+        enabled: false
+        ipRanges:
+          - description: Location 1
+            ipAddress: 15.15.15.16
+            range: 20
+    updateAclRes:
+      summary: Update ACL
+      description: The updated access control list.
+      value:
+        name: Test Prague 5
+        projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+        enabled: false
+        id: 01HA9BRJW4J3QE4WBKVC337V4E
+        createTime: '2023-09-14T08:08:48'
+        updateTime: '2023-09-14T08:10:10.187513334'
+        ipRanges:
+          - description: Hradcany
+            ipAddress: 15.15.15.15
+            range: 20
+            projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+            accessControlListId: 01HA9BRJW4J3QE4WBKVC337V4E
+            id: 01HA9BRJYR9Q7ZBDYMXHVWT8S8
+            createTime: '2023-09-14T08:08:48'
+            updateTime: ''
+    addIpRangeReq:
+      summary: Add IP range
+      description: Request to add an IP range to an access control list.
+      value:
+        description: IP range name
+        ipAddress: 11.12.13.14
+        range: 27
+    addIpRangeRes:
+      summary: Add IP range
+      description: The added IP range.
+      value:
+        description: IP range name
+        ipAddress: 11.12.13.14
+        range: 27
+        projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+        accessControlListId: 01H8Y95DBJT31F104PWFVV9H8B
+        id: 01HA9BYAH3J5TFDGK62991YYWC
+        createTime: '2023-09-14T08:11:56.324855024'
+        updateTime: ''
+    updateIpRangeReq:
+      summary: Update IP range
+      description: Request to update an IP range for an access control list.
+      value:
+        ipAddress: 11.12.13.14
+        range: 27
+    updateIpRangeRes:
+      summary: Update IP range
+      description: The updated IP range.
+      value:
+        description: IP range name
+        ipAddress: 11.12.13.14
+        range: 27
+        projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+        accessControlListId: 01H8Y95DBJT31F104PWFVV9H8B
+        id: 01HA9BYAH3J5TFDGK62991YYWC
+        createTime: '2023-09-14T08:11:56.324855024'
+        updateTime: ''
+    listTrunkAcls:
+      summary: List ACLs assigned to a trunk
+      description: All access control lists assigned to a trunk.
+      value:
+        accessControlListIds:
+          - 01HA2E80QCBX185VVP21PJG9CT
+        pageNumber: 1
+        size: 1000
+        totalItems: 1
+    addTrunkAclReq:
+      summary: Add ACLs to trunk
+      description: Request to add access control lists to a trunk.
+      value:
+        accessControlListIds:
+          - 01HA2E80QCBX185VVP21PJG9CT
+          - 01H8Y95DBJT31F104PWFVV9H8B
+    addTrunkAclRes:
+      summary: Add ACLs to trunk
+      description: The access control lists added to a trunk.
+      value:
+        accessControlListIds:
+          - 01HA2E80QCBX185VVP21PJG9CT
+          - 01H8Y95DBJT31F104PWFVV9H8B
+  requestBodies:
+    AddPhoneNumberRequest:
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              sipTrunkId:
+                type: string
+                description: The SIP trunk ID to which you are adding the number.
+                example: 01GNZ9MXEZ4K6S8GB7RW063VAN
+              phoneNumber:
+                type: string
+                description: The phone number you are adding to the SIP trunk.
+                example: '+12225559999'
+          examples:
+            addNumber:
+              summary: Add phone number
+              description: Add a phone number to a SIP trunk.
+              value:
+                sipTrunkId: 01GNZ9MXEZ4K6S8GB7RW063VAN
+                phoneNumber: '+12225559999'
+            removeNumber:
+              summary: Remove phone number
+              description: Remove a phone number from a SIP trunk.
+              value:
+                sipTrunkId: ''
+                phoneNumber: '+12225559999'
+  schemas:
+    AccessControlList:
+      type: object
+      required:
+        - name
+        - ipRanges
+      properties:
+        id:
+          type: string
+          description: The ID of the access control list entry.
+          readOnly: true
+        name:
+          type: string
+          description: Your name for the access control list entry.
+          example: LA Office
+        enabled:
+          type: boolean
+          description: >-
+            Whether the access control list entry is enabled. You can use this
+            to disable an list temporarily without deleting it.
+          default: true
+        ipRanges:
+          type: array
+          minItems: 1
+          description: >-
+            The associated IP ranges. When creating you need to submit at least
+            one IP range.
+          items:
+            $ref: '#/components/schemas/IpRange'
+        trunks:
+          type: array
+          readOnly: true
+          description: The associated SIP trunks ID.
+          items:
+            type: string
+            description: The ID of the SIP trunk.
+        createTime:
+          x-version: 1
+          readOnly: true
+          x-PII: false
+          x-v1: true
+          type: string
+          format: date-time
+          description: The time the call was created.
+          example: '2021-11-01T23:20:50Z'
+        updateTime:
+          readOnly: true
+          x-version: 1
+          x-PII: false
+          x-v1: true
+          type: string
+          format: date-time
+          description: The time the call was created.
+          example: '2021-11-01T23:20:50Z'
+        projectId:
+          x-version: 1
+          readOnly: true
+          type: string
+          description: The ID of the project.
+    IpRange:
+      type: object
+      description: A single or range of IP addresses.
+      properties:
+        id:
+          type: string
+          description: The ID of the IP range.
+          readOnly: true
+        description:
+          type: string
+          description: A description of the IP range.
+          example: West wing of office
+        ipAddress:
+          type: string
+          description: The start of the IP range.
+          example: 10.0.1.1
+        range:
+          type: integer
+          description: >-
+            A range, also known as a CIDR, represents the number of leading bits
+            that define the network portion of an IP address in CIDR notation.
+            The range is specified after a slash (/) at the end of the IP
+            address. The remaining bits define specific hosts within the
+            network.
+
+            - 10.0.0.0/8: Represents all IP addresses from 10.0.0.0 to
+            10.255.255.255, allowing for over 16 million unique host addresses.
+
+            - 172.16.0.0/16: Includes all IP addresses from 172.16.0.0 to
+            172.16.255.255, providing up to 65,536 unique host addresses.
+
+            - 192.168.1.0/24: Encompasses all IP addresses from 192.168.1.0 to
+            192.168.1.255, offering 256 unique host addresses.
+
+            - 192.168.1.0/32: Encompasses one ip address
+          default: 32
+          example: 32
+        createTime:
+          x-version: 1
+          readOnly: true
+          x-PII: false
+          x-v1: true
+          type: string
+          format: date-time
+          description: The time the call was created.
+          example: '2021-11-01T23:20:50Z'
+        updateTime:
+          readOnly: true
+          x-version: 1
+          x-PII: false
+          x-v1: true
+          type: string
+          format: date-time
+          description: The time the call was created.
+          example: '2021-11-01T23:20:50Z'
+        projectId:
+          x-version: 1
+          readOnly: true
+          type: string
+          description: The ID of the project.
+        accessControlListId:
+          x-version: 1
+          readOnly: true
+          type: string
+          description: The ID of the access control list.
+    Call:
+      description: >-
+        The call resource represents an inbound or outbound connection between
+        Sinch and a supported device
+      type: object
+      properties:
+        callId:
+          type: string
+          description: The unique identifier of the call.
+          format: ULID
+        to:
+          x-version: 1
+          x-PII: true
+          type: string
+          description: >-
+            For `INBOUND` calls, this is the Sinch number the phone dialed.
+
+            For `OUTBOUND` calls, this is the phone number you want to make a
+            call to.
+
+            Formatted according e164 format.
+        from:
+          x-version: 1
+          x-PII: true
+          x-v1: breaking
+          type: string
+          x-mvp-description: >-
+            The call's origination, formatted according to the call's
+            `callType`. For calls to the telephone network, this is a phone
+            number in
+            [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537)
+            format, including the leading `+`.
+
+            <b>Note:</b> If you do not include the `from` property, the call is
+            made from the number or identifier configured as the default for
+            your application or service.
+          description: >-
+            For `INBOUND` calls, this is the number of the person calling. When
+            making an outbound call set this to the your Sinch number you want
+            to show up as Caller Id.
+
+            The call's origination, formatted according to the call's
+            `callType`. For calls in the telephone network,
+
+            this is a phone number in
+            [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537)
+            format, including the leading `+`.
+          format: phoneNumber
+          example: '+14155553434'
+        direction:
+          x-version: 1
+          type: string
+          enum:
+            - INBOUND
+            - OUTBOUND
+          readOnly: true
+          x-PII: false
+          x-v1: false
+          description: >-
+            Describes whether the call was `INBOUND` *to* your Sinch number or
+            was `OUTBOUND` and made *from* your Sinch number.
+          x-enumDescriptions:
+            INBOUND: Someone called your Sinch number.
+            OUTBOUND: Someone called from your SIP device.
+        answerTime:
+          x-version: 1
+          readOnly: true
+          x-PII: false
+          x-V1: breaking
+          type: string
+          format: date-time
+          description: Time when call was answered
+          example: '2021-11-01T23:26:50Z'
+        endTime:
+          x-version: 1
+          readOnly: true
+          type: string
+          format: date-time
+          x-PII: false
+          x-V1: breaking
+          description: The time the call ended
+          example: '2021-11-01T23:29:50Z'
+        durationSeconds:
+          x-version: 1
+          x-PII: false
+          x-V1: breaking
+          description: >-
+            The duration of the call in seconds. For inbound calls, this is the
+            time from when the call started until the call ended. For outbound
+            calls, this is the time from when the call was answered until the
+            call ended.
+          readOnly: true
+          type: integer
+          example: 45
+        callResult:
+          $ref: '#/components/schemas/CallResult'
+        pricePerMinute:
+          description: The price per minute for this call.
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          readOnly: true
+        billingDurationSeconds:
+          x-version: 1
+          readOnly: true
+          description: The duration of the call adjusted with the billing period.
+          type: integer
+          example: 60
+        price:
+          x-version: 1
+          description: >-
+            The total price for this call. This field is populated when the call
+            ends.
+          allOf:
+            - $ref: '#/components/schemas/Money'
+          readOnly: true
+        createTime:
+          x-version: 1
+          readOnly: true
+          x-PII: false
+          x-v1: true
+          type: string
+          format: date-time
+          description: The time the call was created.
+          example: '2021-11-01T23:20:50Z'
+        projectId:
+          x-version: 1
+          type: string
+          description: The ID of the project that the call belongs to.
+        trunkId:
+          x-version: 1
+          example: dFeDe67-09d5-49d5-b469-e1fc2cb163c7
+          type: string
+          description: The ID of the trunk that the call was made through.
+        pcapId:
+          type: string
+          description: >-
+            The ID of the PCAP that can be retrieved. PCAPs are only stored for
+            10 days.
+          example: 0a81e938-07bd-1240-8487-0ecf41868d11
+    SipTrunk:
+      required:
+        - name
+        - hostName
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: The SIP trunk id.
+          example: ''
+        hostName:
+          type: string
+          description: The host of the domain you would like to have for you trunk.
+          example: acme-domain-1
+        topLevelDomain:
+          readOnly: true
+          type: string
+          description: The top level domain to which the SIP trunk belongs.
+          example: .elastic-sip.sinch.com
+        domain:
+          readOnly: true
+          type: string
+          description: >-
+            The fully qualified name of the domain, which is a combination of
+            your 'hostName' and the 'topLevelDomain'.
+          example: acme-domain-1.elastic-sip.sinch.com
+        name:
+          type: string
+          description: The friendly name of your SIP trunk.
+          example: Acme Trunk
+        callsPerSecond:
+          minimum: 1
+          readOnly: true
+          type: integer
+          description: >-
+            Number of calls started per second, to increase this please contact
+            your account manager.
+          example: 100
+          default: 1
+        enableCallerName:
+          type: boolean
+          description: Enable caller name lookup for incoming calls. US and canada only.
+          example: true
+          default: false
+        callForwardNumber:
+          type: string
+          description: >-
+            The valid E.164 phone number that will be dialed on inbound calls
+            when no SIP endpoints are available. Required if `enableCallForward`
+            property is `true`.
+          example: '+17208511190'
+          default: ''
+        enableCallForward:
+          type: boolean
+          description: >-
+            When enabled, if an inbound call can not be delivered to a SIP
+            endpoint, calls will be forwarded to the configured
+            `callForwardNumber`. To forward all calls without trying SIP, simply
+            disable (or delete) all SIP endpoints on this trunk. Logs (and
+            billing) will be created for 2 calls (inbound and outbound). 
+
+            **Note:** Since there is no SIP connection, PCAPs will not be
+            generated.
+          example: true
+          default: false
+        createTime:
+          type: string
+          readOnly: true
+          description: The date and time that the SIP trunk was created.
+          format: date-time
+          example: '2022-01-01T00:00:00Z'
+        updateTime:
+          type: string
+          description: The date and time that the SIP trunk was last modified.
+          format: date-time
+          readOnly: true
+          example: '2022-01-01T00:00:00Z'
+        projectId:
+          type: string
+          readOnly: true
+          description: The ID of the account.
+          example: 1bf62742-7b84-4666-9cbe-8e5734fd57d0
+      description: A created SIP trunk.
+    Money:
+      type: object
+      readOnly: true
+      properties:
+        currencyCode:
+          readOnly: true
+          description: The 3-letter currency code defined in ISO 4217.
+          type: string
+          example: USD
+        amount:
+          readOnly: true
+          description: The amount with 4 decimals and decimal delimiter `.`.
+          type: string
+          example: '0.0040'
+    CallResult:
+      description: The result of the call.
+      readOnly: true
+      type: string
+      example: COMPLETED
+      enum:
+        - COMPLETED
+        - NO_ANSWER
+        - CANCEL
+        - BUSY
+        - FAILED
+      x-enumDescriptions:
+        COMPLETED: The call was completed successfully.
+        NO_ANSWER: The call timeout before the recipient answered.
+        CANCEL: The call was canceled.
+        BUSY: The recipient was busy.
+        FAILED: The call failed.
+    Number:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: The ID of the phone number.
+          example: 01ARZ3NDEKTSV4RRFFQ69G5FAV
+        sipTrunkId:
+          type: string
+          readOnly: true
+          example: 5RTRZ3NDEKTSV4RRFFQ69G5EWS
+          description: The ID of the SIP trunk to which the phone number is assigned.
+        phoneNumber:
+          description: >-
+            A Sinch phone number on your account and configured for Elastic SIP
+            Trunking.
+          allOf:
+            - $ref: '#/components/schemas/PhoneNumber'
+          example: '+15552229999'
+        countryCode:
+          readOnly: true
+          type: string
+          description: The country code of the phone number in ISO 3166-1 alpha-2 format.
+          example: US
+        createTime:
+          type: string
+          description: The date and time that the number was assigned to the SIP trunk.
+          format: date-time
+          readOnly: true
+          example: '2022-01-01T00:00:00Z'
+        updateTime:
+          type: string
+          description: The date and time that the phone number was last modified.
+          format: date-time
+          readOnly: true
+          example: '2022-01-01T00:00:00Z'
+      description: >-
+        A Sinch phone number assigned to a SIP trunk. This must be a number you
+        own and configured for Elastic SIP Trunking.
+    StaticEndpoint:
+      required:
+        - address
+      properties:
+        address:
+          type: string
+          description: >-
+            The address of the SIP endpoint can be an IP address or a domain
+            name. EST uses IP authentication and will only accept calls from the
+            specified address or domain.
+          example: 127.0.0.1
+        port:
+          maximum: 65535
+          minimum: 1
+          type: integer
+          description: The port of the SIP endpoint.
+          format: int32
+          example: 5060
+          default: 5060
+    RegisteredEndpoint:
+      required:
+        - isRegistered
+        - credentialUsername
+      properties:
+        isRegistered:
+          type: boolean
+          description: >-
+            This property determines whether the endpoint is static or
+            registered. If registered, this must be set to `true`.
+          example: true
+        credentialUsername:
+          type: string
+          description: >-
+            The username for the credential list you want to use to register the
+            endpoint.
+          example: MyCLUserName
+    SipEndpoint:
+      required:
+        - name
+        - priority
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/StaticEndpoint'
+        - $ref: '#/components/schemas/RegisteredEndpoint'
+      properties:
+        id:
+          type: string
+          description: The ID of the SIP endpoint.
+          readOnly: true
+        sipTrunkId:
+          type: string
+          description: The ID of the SIP trunk to which the endpoint is assigned.
+          readOnly: true
+          example: bbc55c4c-fe25-11ec-8482-d2e74e85a66f
+        name:
+          type: string
+          description: The friendly name of the SIP endpoint.
+          example: Acme Endpoint
+        transport:
+          type: string
+          description: The transport protocol of the SIP endpoint.
+          example: UDP
+          x-enumDescriptions:
+            TCP: >-
+              [Transmission Control
+              Protocol](https://community.sinch.com/t5/Glossary/TCP/ta-p/7741)
+            UDP: >-
+              [User Datagram
+              Protocol](https://community.sinch.com/t5/Glossary/UDP/ta-p/7778)
+            TLS: >-
+              [Transport Layer
+              Security](https://community.sinch.com/t5/Glossary/TLS/ta-p/7757)
+          enum:
+            - TCP
+            - UDP
+            - TLS
+          default: UDP
+        priority:
+          minimum: 1
+          type: integer
+          description: >-
+            Inbound call routing priority. If two or more endpoints have the
+            same priority, calls will be routed to them using a round-robin
+            strategy.
+
+
+            Lower priority endpoints will be routed to first. Equal priority
+            endpoints will round-robin calls between them.
+          format: int32
+          example: 1
+        enabled:
+          type: boolean
+          description: Sets whether the SIP endpoint is enabled or not.
+          default: true
+        createTime:
+          readOnly: true
+          type: string
+          description: The date and time that the SIP endpoint was created.
+          format: date-time
+          example: '2022-01-01T00:00:00Z'
+        updateTime:
+          readOnly: true
+          type: string
+          description: The date and time that the SIP endpoint was last modified.
+          format: date-time
+          example: '2022-01-01T00:00:00Z'
+      description: >-
+        A SIP endpoint which is the address of your SIP infrastructure. SIP
+        endpoints can be one of two types: static endpoints or registered
+        endpoints.
+
+
+        | Endpoint | Description |
+
+        | -------- | ----------- |
+
+        | Static endpoints | Static endpoints are defined by a static value
+        which can either be an IP address or a domain name. |
+
+        | Registered endpoints | Registered endpoints use a credential list to
+        determine the endpoint. |
+
+
+        ---
+    CountryPermission:
+      description: >-
+        With country permissions you can control which countries can be dialed
+        from your account. For beta only, countries supported are US,CA and * if
+        you would like to allow international dialing.
+      type: object
+      required:
+        - enabled
+      properties:
+        isoCode:
+          description: >-
+            The [ISO code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) of
+            the country
+          type: string
+          readOnly: true
+          maxLength: 2
+          example: US
+        name:
+          description: Country name in english
+          type: string
+          example: United States/Canada
+          readOnly: true
+        continent:
+          description: Continent of the country
+          type: string
+          example: North America
+          readOnly: true
+        countryDialingCodes:
+          description: >-
+            The country calling codes as an array, most countries have only one
+            but some have multiple like the San Marino, China, and a few others.
+          type: array
+          readOnly: true
+          items:
+            type: string
+            description: The country calling code
+            example: '+1'
+        enabled:
+          readOnly: false
+          type: boolean
+          description: >-
+            If the country is enabled or not. When this is enabled regular
+            numbers can be dialed from the account.
+          default: true
+          example: true
+    DomainExists:
+      type: object
+      description: >-
+        Displays whether the specified domain exists as a SIP trunk, and if so,
+        the SIP Trunk ID.
+      properties:
+        exists:
+          type: boolean
+          description: >-
+            This value returns true if the domain exists as a SIP trunk, and
+            false if it does not.
+          example: true
+        sipTrunkId:
+          type: string
+          description: If the domain exists as a SIP trunk, this is the ID.
+    CallBlockingRule:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name for the call blocking rule.
+          example: My Call Block Rule
+        direction:
+          type: string
+          description: >-
+            The direction of the call blocking rule. Can be either INBOUND or
+            OUTBOUND.
+          enum:
+            - INBOUND
+            - OUTBOUND
+          x-enumDescriptions:
+            INBOUND: Targets incoming calls.
+            OUTBOUND: Targets outgoing calls.
+          example: INBOUND
+        callerCountry:
+          type: string
+          description: The country code of the inbound call.
+          example: US
+        calleeCountry:
+          type: string
+          description: The country code of the outbound call.
+          example: CA
+        callerMatch:
+          type: string
+          description: >-
+            Use this field to match the prefixes of an inbound call's phone
+            number.
+          example: '123'
+        calleeMatch:
+          type: string
+          description: >-
+            Use this field to match the prefixes of an outbound call's phone
+            number.
+          example: '456'
+        id:
+          type: string
+          description: The ID of the call blocking rule.
+          example: 01KG5BN8Z0HSR2P9GM3K9YA8RE
+      required:
+        - direction
+    CredentialListIds:
+      type: object
+      properties:
+        credentialListIds:
+          type: array
+          items:
+            type: string
+            description: The ID of the credential list.
+            example: 01GNZ9MXEZ4K6S8GB7RW063VAN
+      required:
+        - credentialListIds
+    CredentialListRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the credential list.
+          example: My Credential List
+      required:
+        - name
+    CredentialListResponse:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the credential list.
+          example: My Credential List
+        id:
+          type: string
+          description: The ID of the credential list.
+          example: 01GNZ9MXEZ4K6S8GB7RW063VAN
+    Credential:
+      type: object
+      properties:
+        password:
+          type: string
+          format: password
+          description: The password for the credential.
+          example: SecurePassword!234
+    PhoneNumber:
+      type: string
+      description: >-
+        A phone number in
+        [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format,
+        including the leading '+'.
+      example: '+15551239898'
+    Error:
+      description: >-
+        An error response. The `code` field is a unique identifier for the
+        error. The `message` field is a human-readable description of the error.
+      type: object
+      properties:
+        code:
+          description: HTTP status code or error code
+          readOnly: true
+          type: integer
+          format: int32
+          example: 400
+        status:
+          description: Response status name.
+          readOnly: true
+          type: string
+          example: INVALID_ARGUMENT
+        message:
+          type: string
+          readOnly: true
+          description: A developer-facing error message
+          example: Bad request.
+        details:
+          readOnly: true
+          description: Details of the errors
+          type: array
+          items:
+            $ref: '#/components/schemas/ErrorDetail'
+    ErrorDetail:
+      type: object
+      anyOf:
+        - $ref: '#/components/schemas/BadRequestDetail'
+        - $ref: '#/components/schemas/RequestInfoDetail'
+        - $ref: '#/components/schemas/QuotaFailureDetail'
+        - $ref: '#/components/schemas/ErrorInfo'
+      discriminator:
+        propertyName: type
+        mapping:
+          BadRequest: '#/components/schemas/BadRequestDetail'
+          RequestInfo: '#/components/schemas/RequestInfoDetail'
+          QuotaFailure: '#/components/schemas/QuotaFailureDetail'
+          ErrorInfo: '#/components/schemas/ErrorInfo'
+    BadRequestDetail:
+      type: object
+      description: The request was malformed on one or more fields.
+      x-internal: >-
+        https://github.com/googleapis/googleapis/blob/f79d6e85a9a6b913a5e9cb0067e846e7f087dbc8/google/rpc/error_details.proto#L169
+      properties:
+        type:
+          type: string
+          description: The request was malformed on one or more fields.
+          readOnly: true
+          example: BadRequest
+          default: BadRequest
+        fieldViolations:
+          description: The field violation(s).
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldViolation'
+    FieldViolation:
+      type: object
+      properties:
+        field:
+          type: string
+          readOnly: true
+          description: Request field.
+          example: to
+        description:
+          type: string
+          readOnly: true
+          description: Description of why the request field was considered invalid.
+          example: Phone number was not in the expected format.
+    RequestInfoDetail:
+      description: Information on why a request failed.
+      type: object
+      x-internal: >-
+        https://github.com/googleapis/googleapis/blob/f79d6e85a9a6b913a5e9cb0067e846e7f087dbc8/google/rpc/error_details.proto#L187
+      properties:
+        type:
+          type: string
+          description: Information on why a request failed.
+          readOnly: true
+          example: RequestInfo
+          default: RequestInfo
+        requestId:
+          type: string
+          example: 879c4177-af8a-4534-8168-cc2f66a1f2c6
+          description: The ID of the request.
+        data:
+          type: object
+          description: The data sent to to the API when the error occurred.
+    QuotaFailureDetail:
+      type: object
+      description: >-
+        Describes how a quota check failed. For example if the total number of
+        `IN_PROGRESS` call was reached
+      properties:
+        type:
+          type: string
+          description: >-
+            Describes how a quota check failed. For example if the total number
+            of `IN_PROGRESS` call was reached
+          readOnly: true
+          example: QuotaFailure
+          default: QuotaFailure
+        violations:
+          description: A list of quota violations
+          type: array
+          items:
+            $ref: '#/components/schemas/QuotaFailure'
+    QuotaFailure:
+      type: object
+      description: >-
+        Description of quota failure, example not enough credit, maximum calls
+        per minute
+      properties:
+        subject:
+          type: string
+          description: On what part the quota failed, example ip address, CPS.
+        description:
+          description: >-
+            A description of how the quota check failed. You can can use this
+
+            description to find more about the quota configuration in the
+            service's
+
+            public documentation
+    ErrorInfo:
+      description: |-
+        Describes the cause of the error with structured details.
+        Example of an error when trying to make a call to blocked destination:
+
+             { "reason": "DESTINATION_BLOCKED"
+               "domain": "VOICE"
+               "metadata": {
+                 "country": "Bermuda",
+               }
+             }
+      type: object
+      properties:
+        type:
+          type: string
+          description: >-
+            Describes the cause of the error with structured details.
+
+            Example of an error when trying to make a call to blocked
+            destination:
+
+
+            ```
+                { "reason": "DESTINATION_BLOCKED"
+                  "domain": "VOICE"
+                  "metadata": {
+                    "country": "Bermuda",
+                  }
+                }
+            ```
+          default: ErrorInfo
+          example: ErrorInfo
+        reason:
+          type: string
+          description: >-
+            The reason of the error. This is a constant value that identifies
+            the
+
+            proximate cause of the error. Error reasons are unique. Max 63
+            characters and match
+             /[A-Z0-9_]+/.
+          maxLength: 63
+        domain:
+          type: string
+          description: Domain for error, for voice its always sinch.voice
+        metaData:
+          description: >-
+            Additional structured details about this error. key value pair of
+            strings
+          type: object
+    Pagination:
+      type: object
+      readOnly: true
+      properties:
+        totalItems:
+          type: integer
+          readOnly: true
+          format: int32
+          description: Total size of the result.
+          example: 10000
+        pageNumber:
+          readOnly: true
+          type: string
+          description: The token to be used for listing the next page
+          example: '1'
+        size:
+          type: integer
+          readOnly: true
+          format: int32
+          description: The number of items per page. default is 1000
+          example: 2000
+  securitySchemes:
+    Basic:
+      type: http
+      description: >-
+        To use basic authentication, use your Access Key ID as your username and
+        your Access Key Secret as your password. To read about more basic
+        authentication, see the [Basic
+        Authentication](https://developers.sinch.com/docs/est/api-reference/est#basic)
+        section.
+      scheme: basic
+    OAuth2.0:
+      type: oauth2
+      description: >-
+        To use OAuth 2.0 authentication, use your Access Key ID and Access Key
+        Secret to obtain your bearer token. For detailed instructions on how to
+        do this, see the [OAuth
+        Authentication](https://developers.sinch.com/docs/est/api-reference/est#oauth)
+        section.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

@@ -1,12 +1,9 @@
 openapi: 3.1.0
 info:
   title: Sinch SMS API
-  description: >-
-    The Sinch SMS API enables developers to send and receive SMS messages
-    globally at scale. It supports batch messaging with scheduled delivery,
-    message templates, delivery reports, and inbound message handling via
-    webhooks. The API provides group management for organizing recipients,
-    automatic message encoding optimization, and supports both transactional
+  description: The Sinch SMS API enables developers to send and receive SMS messages globally at scale. It supports batch
+    messaging with scheduled delivery, message templates, delivery reports, and inbound message handling via webhooks. The
+    API provides group management for organizing recipients, automatic message encoding optimization, and supports both transactional
     and marketing use cases across carriers worldwide.
   version: '1.0'
   contact:
@@ -17,49 +14,42 @@ externalDocs:
   description: Sinch SMS API Documentation
   url: https://developers.sinch.com/docs/sms
 servers:
-  - url: https://us.sms.api.sinch.com
-    description: US Production Server
-  - url: https://eu.sms.api.sinch.com
-    description: EU Production Server
-  - url: https://au.sms.api.sinch.com
-    description: Australia Production Server
-  - url: https://br.sms.api.sinch.com
-    description: Brazil Production Server
-  - url: https://ca.sms.api.sinch.com
-    description: Canada Production Server
+- url: https://us.sms.api.sinch.com
+  description: US Production Server
+- url: https://eu.sms.api.sinch.com
+  description: EU Production Server
+- url: https://au.sms.api.sinch.com
+  description: Australia Production Server
+- url: https://br.sms.api.sinch.com
+  description: Brazil Production Server
+- url: https://ca.sms.api.sinch.com
+  description: Canada Production Server
 tags:
-  - name: Batches
-    description: >-
-      Batches are sets of SMS messages. You can send a single message or many
-      messages at once. Batches are queued and sent at the rate limit in
-      first-in-first-out order.
-  - name: Delivery Reports
-    description: >-
-      Delivery reports provide the status of sent messages. Reports can be
-      retrieved via the API or delivered via webhook callbacks.
-  - name: Groups
-    description: >-
-      Groups are sets of phone numbers (MSISDNs) that can be used as targets
-      when sending SMS. A phone number can only occur once in a group.
-  - name: Inbounds
-    description: >-
-      Inbound messages (Mobile Originated) are incoming messages sent to your
-      short codes or long numbers from mobile phones.
+- name: Batches
+  description: Batches are sets of SMS messages. You can send a single message or many messages at once. Batches are queued
+    and sent at the rate limit in first-in-first-out order.
+- name: Delivery Reports
+  description: Delivery reports provide the status of sent messages. Reports can be retrieved via the API or delivered via
+    webhook callbacks.
+- name: Groups
+  description: Groups are sets of phone numbers (MSISDNs) that can be used as targets when sending SMS. A phone number can
+    only occur once in a group.
+- name: Inbounds
+  description: Inbound messages (Mobile Originated) are incoming messages sent to your short codes or long numbers from mobile
+    phones.
 security:
-  - bearerAuth: []
+- bearerAuth: []
 paths:
   /xms/v1/{service_plan_id}/batches:
     post:
       operationId: sendBatch
       summary: Send a Batch Message
-      description: >-
-        Sends a batch of SMS messages. A batch can contain one or more messages
-        to one or more recipients. The API supports scheduled delivery,
-        parameterized messages, and delivery report configuration.
+      description: Sends a batch of SMS messages. A batch can contain one or more messages to one or more recipients. The
+        API supports scheduled delivery, parameterized messages, and delivery report configuration.
       tags:
-        - Batches
+      - Batches
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/ServicePlanId'
       requestBody:
         required: true
         content:
@@ -80,38 +70,37 @@ paths:
     get:
       operationId: listBatches
       summary: List Batches
-      description: >-
-        Returns a list of batches with pagination support. You can filter
-        batches by various criteria including start date and end date.
+      description: Returns a list of batches with pagination support. You can filter batches by various criteria including
+        start date and end date.
       tags:
-        - Batches
+      - Batches
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - name: page
-          in: query
-          description: The page number to retrieve
-          schema:
-            type: integer
-            default: 0
-        - name: page_size
-          in: query
-          description: The number of batches per page
-          schema:
-            type: integer
-            default: 30
-            maximum: 100
-        - name: from
-          in: query
-          description: Filter batches sent from this date
-          schema:
-            type: string
-            format: date-time
-        - name: to
-          in: query
-          description: Filter batches sent up to this date
-          schema:
-            type: string
-            format: date-time
+      - $ref: '#/components/parameters/ServicePlanId'
+      - name: page
+        in: query
+        description: The page number to retrieve
+        schema:
+          type: integer
+          default: 0
+      - name: page_size
+        in: query
+        description: The number of batches per page
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+      - name: from
+        in: query
+        description: Filter batches sent from this date
+        schema:
+          type: string
+          format: date-time
+      - name: to
+        in: query
+        description: Filter batches sent up to this date
+        schema:
+          type: string
+          format: date-time
       responses:
         '200':
           description: List of batches
@@ -125,13 +114,12 @@ paths:
     get:
       operationId: getBatch
       summary: Get a Batch
-      description: >-
-        Returns the details of a specific batch identified by the batch ID.
+      description: Returns the details of a specific batch identified by the batch ID.
       tags:
-        - Batches
+      - Batches
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - $ref: '#/components/parameters/BatchId'
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
       responses:
         '200':
           description: Batch details
@@ -146,14 +134,12 @@ paths:
     post:
       operationId: updateBatch
       summary: Update a Batch
-      description: >-
-        Updates a batch message. Only batches that have not yet been delivered
-        can be updated.
+      description: Updates a batch message. Only batches that have not yet been delivered can be updated.
       tags:
-        - Batches
+      - Batches
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - $ref: '#/components/parameters/BatchId'
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
       requestBody:
         required: true
         content:
@@ -175,14 +161,13 @@ paths:
     put:
       operationId: cancelBatch
       summary: Cancel a Batch
-      description: >-
-        Cancels a batch that has not yet been delivered. A batch can only be
-        canceled if it has not yet started sending.
+      description: Cancels a batch that has not yet been delivered. A batch can only be canceled if it has not yet started
+        sending.
       tags:
-        - Batches
+      - Batches
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - $ref: '#/components/parameters/BatchId'
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
       responses:
         '200':
           description: Batch canceled
@@ -198,15 +183,13 @@ paths:
     post:
       operationId: dryRunBatch
       summary: Dry Run a Batch
-      description: >-
-        Performs a dry run of a batch without actually sending messages. This
-        can be used to validate the batch configuration and estimate the number
-        of recipients.
+      description: Performs a dry run of a batch without actually sending messages. This can be used to validate the batch
+        configuration and estimate the number of recipients.
       tags:
-        - Batches
+      - Batches
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - $ref: '#/components/parameters/BatchId'
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
       responses:
         '200':
           description: Dry run result
@@ -220,22 +203,21 @@ paths:
     get:
       operationId: getBatchDeliveryReport
       summary: Retrieve a Batch Delivery Report
-      description: >-
-        Returns the aggregate delivery report for a specific batch. The report
-        contains status counts and details about message delivery.
+      description: Returns the aggregate delivery report for a specific batch. The report contains status counts and details
+        about message delivery.
       tags:
-        - Delivery Reports
+      - Delivery Reports
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - $ref: '#/components/parameters/BatchId'
-        - name: type
-          in: query
-          description: The type of delivery report to retrieve
-          schema:
-            type: string
-            enum:
-              - summary
-              - full
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
+      - name: type
+        in: query
+        description: The type of delivery report to retrieve
+        schema:
+          type: string
+          enum:
+          - summary
+          - full
       responses:
         '200':
           description: Delivery report
@@ -251,19 +233,18 @@ paths:
     get:
       operationId: getRecipientDeliveryReport
       summary: Retrieve a Recipient Delivery Report
-      description: >-
-        Returns the delivery report for a specific recipient in a batch.
+      description: Returns the delivery report for a specific recipient in a batch.
       tags:
-        - Delivery Reports
+      - Delivery Reports
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - $ref: '#/components/parameters/BatchId'
-        - name: recipient_msisdn
-          in: path
-          required: true
-          description: The phone number of the recipient
-          schema:
-            type: string
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/BatchId'
+      - name: recipient_msisdn
+        in: path
+        required: true
+        description: The phone number of the recipient
+        schema:
+          type: string
       responses:
         '200':
           description: Recipient delivery report
@@ -279,25 +260,24 @@ paths:
     get:
       operationId: listDeliveryReports
       summary: List Delivery Reports
-      description: >-
-        Returns a list of delivery reports with pagination support.
+      description: Returns a list of delivery reports with pagination support.
       tags:
-        - Delivery Reports
+      - Delivery Reports
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - name: page
-          in: query
-          description: The page number to retrieve
-          schema:
-            type: integer
-            default: 0
-        - name: page_size
-          in: query
-          description: The number of reports per page
-          schema:
-            type: integer
-            default: 30
-            maximum: 100
+      - $ref: '#/components/parameters/ServicePlanId'
+      - name: page
+        in: query
+        description: The page number to retrieve
+        schema:
+          type: integer
+          default: 0
+      - name: page_size
+        in: query
+        description: The number of reports per page
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
       responses:
         '200':
           description: List of delivery reports
@@ -311,13 +291,11 @@ paths:
     post:
       operationId: createGroup
       summary: Create a Group
-      description: >-
-        Creates a new group of phone numbers that can be used as recipients
-        when sending SMS batches.
+      description: Creates a new group of phone numbers that can be used as recipients when sending SMS batches.
       tags:
-        - Groups
+      - Groups
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/ServicePlanId'
       requestBody:
         required: true
         content:
@@ -338,25 +316,24 @@ paths:
     get:
       operationId: listGroups
       summary: List Groups
-      description: >-
-        Returns a list of groups with pagination support.
+      description: Returns a list of groups with pagination support.
       tags:
-        - Groups
+      - Groups
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - name: page
-          in: query
-          description: The page number to retrieve
-          schema:
-            type: integer
-            default: 0
-        - name: page_size
-          in: query
-          description: The number of groups per page
-          schema:
-            type: integer
-            default: 30
-            maximum: 100
+      - $ref: '#/components/parameters/ServicePlanId'
+      - name: page
+        in: query
+        description: The page number to retrieve
+        schema:
+          type: integer
+          default: 0
+      - name: page_size
+        in: query
+        description: The number of groups per page
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
       responses:
         '200':
           description: List of groups
@@ -370,13 +347,12 @@ paths:
     get:
       operationId: getGroup
       summary: Get a Group
-      description: >-
-        Returns the details of a specific group.
+      description: Returns the details of a specific group.
       tags:
-        - Groups
+      - Groups
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/GroupId'
       responses:
         '200':
           description: Group details
@@ -391,14 +367,12 @@ paths:
     post:
       operationId: updateGroup
       summary: Update a Group
-      description: >-
-        Updates an existing group by adding or removing members or changing
-        the group name.
+      description: Updates an existing group by adding or removing members or changing the group name.
       tags:
-        - Groups
+      - Groups
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/GroupId'
       requestBody:
         required: true
         content:
@@ -419,13 +393,12 @@ paths:
     delete:
       operationId: deleteGroup
       summary: Delete a Group
-      description: >-
-        Deletes a group and all its members.
+      description: Deletes a group and all its members.
       tags:
-        - Groups
+      - Groups
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/GroupId'
       responses:
         '200':
           description: Group deleted
@@ -437,13 +410,12 @@ paths:
     get:
       operationId: getGroupMembers
       summary: Get Group Members
-      description: >-
-        Returns the list of phone numbers that are members of the specified group.
+      description: Returns the list of phone numbers that are members of the specified group.
       tags:
-        - Groups
+      - Groups
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - $ref: '#/components/parameters/GroupId'
+      - $ref: '#/components/parameters/ServicePlanId'
+      - $ref: '#/components/parameters/GroupId'
       responses:
         '200':
           description: List of group members
@@ -461,43 +433,42 @@ paths:
     get:
       operationId: listInboundMessages
       summary: List Inbound Messages
-      description: >-
-        Returns a list of inbound (Mobile Originated) messages with pagination
-        support. Messages can be filtered by start date and end date.
+      description: Returns a list of inbound (Mobile Originated) messages with pagination support. Messages can be filtered
+        by start date and end date.
       tags:
-        - Inbounds
+      - Inbounds
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - name: page
-          in: query
-          description: The page number to retrieve
-          schema:
-            type: integer
-            default: 0
-        - name: page_size
-          in: query
-          description: The number of messages per page
-          schema:
-            type: integer
-            default: 30
-            maximum: 100
-        - name: to
-          in: query
-          description: Filter by destination number
-          schema:
-            type: string
-        - name: start_date
-          in: query
-          description: Filter messages received after this date
-          schema:
-            type: string
-            format: date-time
-        - name: end_date
-          in: query
-          description: Filter messages received before this date
-          schema:
-            type: string
-            format: date-time
+      - $ref: '#/components/parameters/ServicePlanId'
+      - name: page
+        in: query
+        description: The page number to retrieve
+        schema:
+          type: integer
+          default: 0
+      - name: page_size
+        in: query
+        description: The number of messages per page
+        schema:
+          type: integer
+          default: 30
+          maximum: 100
+      - name: to
+        in: query
+        description: Filter by destination number
+        schema:
+          type: string
+      - name: start_date
+        in: query
+        description: Filter messages received after this date
+        schema:
+          type: string
+          format: date-time
+      - name: end_date
+        in: query
+        description: Filter messages received before this date
+        schema:
+          type: string
+          format: date-time
       responses:
         '200':
           description: List of inbound messages
@@ -511,18 +482,17 @@ paths:
     get:
       operationId: getInboundMessage
       summary: Get an Inbound Message
-      description: >-
-        Returns the details of a specific inbound message.
+      description: Returns the details of a specific inbound message.
       tags:
-        - Inbounds
+      - Inbounds
       parameters:
-        - $ref: '#/components/parameters/ServicePlanId'
-        - name: inbound_id
-          in: path
-          required: true
-          description: The unique identifier of the inbound message
-          schema:
-            type: string
+      - $ref: '#/components/parameters/ServicePlanId'
+      - name: inbound_id
+        in: path
+        required: true
+        description: The unique identifier of the inbound message
+        schema:
+          type: string
       responses:
         '200':
           description: Inbound message details
@@ -539,8 +509,7 @@ components:
     bearerAuth:
       type: http
       scheme: bearer
-      description: >-
-        API token sent in the Authorization header preceded by Bearer.
+      description: API token sent in the Authorization header preceded by Bearer.
   parameters:
     ServicePlanId:
       name: service_plan_id
@@ -567,9 +536,9 @@ components:
     SendBatchRequest:
       type: object
       required:
-        - to
-        - from
-        - body
+      - to
+      - from
+      - body
       properties:
         to:
           type: array
@@ -585,16 +554,16 @@ components:
         type:
           type: string
           enum:
-            - mt_text
-            - mt_binary
+          - mt_text
+          - mt_binary
           description: The type of batch message
         delivery_report:
           type: string
           enum:
-            - none
-            - summary
-            - full
-            - per_recipient
+          - none
+          - summary
+          - full
+          - per_recipient
           description: The type of delivery report requested
         send_at:
           type: string
@@ -700,10 +669,10 @@ components:
         delivery_report:
           type: string
           enum:
-            - none
-            - summary
-            - full
-            - per_recipient
+          - none
+          - summary
+          - full
+          - per_recipient
           description: Updated delivery report type
     DryRunResponse:
       type: object
@@ -929,3 +898,7 @@ components:
           description: List of inbound message objects
           items:
             $ref: '#/components/schemas/InboundMessage'
+x-ae-provenance: origin unrecorded (catalog pass before 2026-09); NOT a provider-published document. Kept on 2026-10-08 because
+  its /xms/v1/{service_plan_id}/... paths match the SMS REST API reference nav at https://developers.sinch.com/docs/sms/api-reference
+  (Batches, Delivery reports, Groups, Inbounds), which publishes no downloadable OpenAPI bundle (searched 2026-10-08). Moved
+  out of _original/ because _original asserts provider publication.

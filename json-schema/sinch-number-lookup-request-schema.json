@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-number-lookup-request-schema.json",
+  "title": "NumberLookupRequest",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-number-lookup-api-openapi.yml#/components/schemas/NumberLookupRequest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "number"
+  ],
+  "properties": {
+    "number": {
+      "type": "string",
+      "description": "MSISDN in E.164 format to query.",
+      "minLength": 1
+    },
+    "features": {
+      "type": "array",
+      "description": "Contains requested features. Fallback to LineType if not provided.",
+      "items": {
+        "$ref": "#/$defs/ApiFeature"
+      }
+    },
+    "rndFeatureOptions": {
+      "description": "Required when RND feature is requested.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/RndFeatureOptions"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "ApiFeature": {
+      "type": "string",
+      "description": "",
+      "x-enumNames": [
+        "LineType",
+        "SimSwap",
+        "VoIPDetection",
+        "RND"
+      ],
+      "enum": [
+        "LineType",
+        "SimSwap",
+        "VoIPDetection",
+        "RND"
+      ],
+      "x-enumDescriptions": {
+        "LineType": "Use to return line type information for the phone number.",
+        "SimSwap": "Use to determine whether the phone number is SIM swapped.",
+        "VoIPDetection": "Use to determine if the carrier is associated with a VoIP provider (alpha).",
+        "RND": "Use to determine whether the phone number has been disconnected (alpha)."
+      }
+    },
+    "RndFeatureOptions": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "contactDate": {
+          "type": "string",
+          "description": "Last contact date in YYYY-MM-DD format.",
+          "format": "date"
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-get-conversation-flow-response-schema.json",
+  "title": "GetConversationFlowResponse",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-chatlayer-analytics-api-openapi.yml#/components/schemas/GetConversationFlowResponse",
+  "type": "object",
+  "properties": {
+    "bot_id": {
+      "type": "string"
+    },
+    "conversation_id": {
+      "type": "string"
+    },
+    "user_id": {
+      "type": "string"
+    },
+    "transitions": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/FlowTransition"
+      }
+    }
+  },
+  "$defs": {
+    "FlowTransition": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "from_step": {
+          "$ref": "#/$defs/Step"
+        },
+        "to_step": {
+          "$ref": "#/$defs/Step"
+        },
+        "depth": {
+          "type": "integer",
+          "format": "int64"
+        },
+        "timestamp": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "Step": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

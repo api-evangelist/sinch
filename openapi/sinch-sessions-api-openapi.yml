@@ -1,0 +1,2572 @@
+openapi: 3.2.0
+info:
+  title: Sinch Sessions API
+  version: 2.0.58
+  contact:
+    name: Sinch Support
+    url: https://sinch.com/help-center/
+    email: support@sinch.com
+  license:
+    name: Sinch License
+    url: https://www.sinch.com/legal/
+  termsOfService: https://www.sinch.com/terms-of-service/
+  x-sinch-standards-version: standards-2026-03-31
+  description: 'Operations tagged Sessions across 2 of this provider''s published API definitions: sinch-voice-api-v2-openapi.yaml, sinch-voice-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
+servers:
+- url: https://voice.api.sinch.com
+  description: Endpoint which enables consuming the Voice API globally - Redirected by Sinch to the closest region.
+- url: https://us1.voice.api.sinch.com
+  description: North America 1 - East
+- url: https://br1.voice.api.sinch.com
+  description: South America 1 - East
+- url: https://eu1.voice.api.sinch.com
+  description: Europe 1 - Central
+- url: https://sg1.voice.api.sinch.com
+  description: Asia Pacific 1 - Southeast
+- url: https://au1.voice.api.sinch.com
+  description: Australia & Oceania 1 - Southeast
+security:
+- BasicAuth: []
+- SinchOAuth2: []
+tags:
+- name: Sessions
+  description: A session represents a single interaction between a user and the Sinch Voice API. Sessions can be used to track the state of a call, including its duration, participants, and any associated metadata.
+paths:
+  /v2/projects/{projectId}/sessions/{sessionId}:
+    get:
+      tags:
+      - Sessions
+      summary: Get a session details by the session ID
+      description: Retrieve detailed information about a specific session, including all associated calls and their current states. Sessions represent the complete interaction lifecycle and can contain multiple related calls.
+      operationId: getSessionById
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/sessionId'
+      responses:
+        '200':
+          description: A session object
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/session'
+              example:
+                sessionId: 01BX5ZZKBKACTAV9WEVGEMMVRB
+                projectId: 5c5bf2b1-35ae-4825-ab89-457e07bb60e6
+                serviceId: 6e124178-c29d-46a5-943c-5c2ae544aade
+                state: COMPLETED
+                createTime: '2025-02-10T09:00:00Z'
+                updateTime: '2025-02-10T09:00:47Z'
+                endTime: '2025-02-10T09:00:47Z'
+                calls:
+                - callId: 01ARZ3NDEKTSV4RRFFQ69G5FAA
+                  projectId: 5c5bf2b1-35ae-4825-ab89-457e07bb60e6
+                  serviceId: 6e124178-c29d-46a5-943c-5c2ae544aade
+                  sessionId: 01BX5ZZKBKACTAV9WEVGEMMVRB
+                  direction: OUTBOUND
+                  originationType: SERVER
+                  callType: PHONE
+                  callResult: COMPLETED
+                  callReason: CALLEE_HANGUP
+                  startTime: '2025-02-10T09:00:00Z'
+                  answerTime: '2025-02-10T09:00:05Z'
+                  endTime: '2025-02-10T09:00:47Z'
+                  callDurationSeconds: 42
+                  from:
+                    type: PHONE
+                    phone:
+                      number: '+15551234567'
+                  to:
+                    type: PHONE
+                    phone:
+                      number: '+15559876543'
+                  callRate:
+                    currencyCode: USD
+                    amount: '0.0123'
+                  callResourceUrl: https://voice.api.sinch.com/v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      x-codeSamples:
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\n\nfrom dotenv import load_dotenv\n\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n)\n\n# The ID of the session to retrieve\nsession_id = \"SESSION_ID\"\n\nresponse = sinch_client.voice.v2.sessions.get(session_id=session_id)\n\nprint(f\"Successfully retrieved session.\\n{response}\")\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ID of the session to retrieve\n  const sessionId = 'SESSION_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.voice.v2.sessions.get({\n      sessionId,\n    });\n    console.log(`✅ Successfully retrieved the session with ID ${sessionId}.`);\n    console.log(`Response:\\n${JSON.stringify(response, null, 2)}`);\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the session with ID ${sessionId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+    servers:
+    - url: https://voice.api.sinch.com
+      description: Endpoint which enables consuming the Voice API globally - Redirected by Sinch to the closest region.
+    - url: https://us1.voice.api.sinch.com
+      description: North America 1 - East
+    - url: https://br1.voice.api.sinch.com
+      description: South America 1 - East
+    - url: https://eu1.voice.api.sinch.com
+      description: Europe 1 - Central
+    - url: https://sg1.voice.api.sinch.com
+      description: Asia Pacific 1 - Southeast
+    - url: https://au1.voice.api.sinch.com
+      description: Australia & Oceania 1 - Southeast
+components:
+  schemas:
+    unauthorized:
+      title: Unauthorized
+      description: Returned when authentication fails — the token is missing, invalid, or expired.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/unauthorized
+          title:
+            const: Unauthorized
+          detail:
+            example: The token is missing, invalid, or has expired.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
+    problemDetails:
+      title: Problem Details
+      description: Base error response schema following [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) (Problem Details for HTTP APIs). All error responses use this structure.
+      x-category: response
+      x-usage: http-response
+      type: object
+      additionalProperties: false
+      required:
+      - type
+      - title
+      - detail
+      - instance
+      properties:
+        type:
+          type: string
+          description: URI that identifies the problem type and links to the corresponding error documentation.
+        title:
+          type: string
+          description: Human-readable short summary of the problem type.
+        detail:
+          type: string
+          description: Human-readable explanation of the specific problem occurrence.
+        instance:
+          type: string
+          description: URI reference that identifies the specific occurrence of the problem (typically the request path).
+    sessionStates:
+      title: Session States
+      description: The state of the current session. Sessions can either be in a "transitional" or "final" state.  Sessions in a transitional state are ongoing. Sessions in a final state have will not send any  more events.
+      readOnly: true
+      type: string
+      enum:
+      - QUEUED
+      - IN_PROGRESS
+      - COMPLETED
+      - EXPIRED
+      x-enumDescriptions:
+        QUEUED: The session is queued, no calls have been initiated for this session. This is a transitional state.
+        IN_PROGRESS: At least one call has been initiated or received for this session. This is a transitional state.
+        COMPLETED: The session was completed. This is a final state.
+        EXPIRED: The call session was not initiated before the batch time-to-live (TTL) elapsed. This is a final state.
+      examples:
+      - COMPLETED
+    projectId:
+      title: Project ID
+      type: string
+      format: uuid
+      description: The `Id` of the project associated with the call.
+      examples:
+      - 5c5bf2b1-35ae-4825-ab89-457e07bb60e6
+    originationType:
+      title: Origination Type
+      x-category: call
+      x-usage: call
+      type: string
+      description: 'Indicates the origin/source of the call.
+
+
+        This describes **how the call was initiated** (PSTN or via the API).'
+      enum:
+      - PHONE
+      - SIP
+      - SERVER
+      x-enumDescriptions:
+        PHONE: The call originated from the telephone network (PSTN).
+        SIP: The call originated from a SIP trunk.
+        SERVER: The call originated through the Sinch API.
+      examples:
+      - PHONE
+    sipFrom:
+      type: object
+      additionalProperties: false
+      title: SIP Origin
+      required:
+      - type
+      - sip
+      properties:
+        type:
+          type: string
+          const: SIP
+          description: Indicates the call originated from a SIP (Session Initiation Protocol) endpoint.
+        sip:
+          type: object
+          additionalProperties: false
+          required:
+          - endpoint
+          properties:
+            endpoint:
+              type: string
+              description: SIP URI of the originating endpoint. Both `sip:` (unencrypted) and `sips:` (TLS-encrypted) schemes are supported.
+              format: uri
+              pattern: '^sips?:'
+              maxLength: 192
+            displayName:
+              type: string
+              description: Display name presented to the called party as the caller identity. Transmitted as the display name part of the SIP `From` header (for example, `Alice <sip:alice@example.com>`).
+              maxLength: 64
+              example: Alice
+      examples:
+      - type: SIP
+        sip:
+          endpoint: sip:user@example.com
+          displayName: Alice
+    to:
+      title: To
+      description: Call destination - Phone Number or Stream URI
+      oneOf:
+      - $ref: '#/components/schemas/phone'
+      - $ref: '#/components/schemas/sip'
+      - $ref: '#/components/schemas/stream'
+      - $ref: '#/components/schemas/voiceRelay'
+      discriminator:
+        propertyName: type
+        mapping:
+          PHONE: '#/components/schemas/phone'
+          SIP: '#/components/schemas/sip'
+          STREAM: '#/components/schemas/stream'
+          VOICE_RELAY: '#/components/schemas/voiceRelay'
+    notFound:
+      title: Not Found
+      description: Returned when the requested resource does not exist.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/not-found
+          title:
+            const: Not Found
+          detail:
+            example: The requested resource was not found.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
+    callResult:
+      title: Call Result
+      description: 'The outcome/state of the call.
+
+
+        This field includes both **transitional** states (during call setup and execution) and **final** states (when the call has ended).'
+      type: string
+      enum:
+      - QUEUED
+      - INITIATED
+      - IN_PROGRESS
+      - COMPLETED
+      - REJECTED
+      - NO_ANSWER
+      - CANCEL
+      - BUSY
+      - FAILED
+      x-enumDescriptions:
+        QUEUED: The call is queued for initiation. This is a transitional state.
+        INITIATED: The call is connecting but the recipient has not yet answered. This is a transitional state.
+        IN_PROGRESS: The call has been answered and is in progress. This is a transitional state.
+        COMPLETED: The call was answered and is ended. This is a final state.
+        REJECTED: The call was rejected by the recipient.
+        NO_ANSWER: The call was not answered by the recipient.
+        CANCEL: The call was cancelled.
+        BUSY: The call was not answered because the recipient was busy.
+        FAILED: The call could not be completed.
+      examples:
+      - IN_PROGRESS
+    stream:
+      type: object
+      additionalProperties: false
+      title: Stream
+      description: Routes the call to a WebSocket stream endpoint for real-time audio processing.
+      required:
+      - type
+      - stream
+      properties:
+        type:
+          type: string
+          const: STREAM
+          description: Routes the call to a WebSocket stream endpoint for real-time audio processing.
+        stream:
+          type: object
+          additionalProperties: false
+          required:
+          - endpoint
+          properties:
+            endpoint:
+              type: string
+              description: WebSocket endpoint that will accept the incoming connection for real-time audio streaming. Must be a valid WebSocket URL using either `ws://` or `wss://` (recommended). The URL must be reachable from the public internet and capable of handling the negotiated stream protocol.
+              example: wss://example.com
+            streamOptions:
+              type: object
+              additionalProperties: false
+              properties:
+                version:
+                  type: integer
+                  description: Defines the version of the stream protocol.
+                  default: 1
+                  example: 1
+                codec:
+                  type: string
+                  const: PCM
+                  description: 'Defines the audio codec/format used for the stream audio payload.
+
+
+                    Currently, only `PCM` is supported (uncompressed raw audio). Use `sampleRate` to configure the sampling rate for the stream.'
+                sampleRate:
+                  type: integer
+                  description: "Defines the audio sampling rate (Hz) used for the stream.\n\nFor calls that traverse the PSTN, audio is typically sampled at 8 kHz, so using a higher value will not improve perceived quality. \nHigher sample rates can be useful for non-PSTN scenarios (for example, SIP/streaming paths), but will increase bandwidth usage and processing load."
+                  enum:
+                  - 8000
+                  - 16000
+                  - 24000
+                  - 44100
+                  - 48000
+                  - 96000
+                  x-enumDescriptions:
+                    '8000': 8 kHz (standard for PSTN calls)
+                    '16000': 16 kHz (wideband audio)
+                    '24000': 24 kHz (super-wideband audio)
+                    '44100': 44.1 kHz (CD quality audio)
+                    '48000': 48 kHz (professional audio quality)
+                    '96000': 96 kHz (high-resolution audio)
+                  default: 8000
+                  example: 16000
+            callHeaders:
+              $ref: '#/components/schemas/callHeaders'
+          examples:
+          - endpoint: wss://example.com
+            streamOptions:
+              version: 1
+              codec: PCM
+              sampleRate: 8000
+            callHeaders:
+            - key: my-key
+              value: my-key-value
+      examples:
+      - type: STREAM
+        stream:
+          endpoint: wss://example.com
+          streamOptions:
+            version: 1
+            codec: PCM
+            sampleRate: 16000
+          callHeaders:
+          - key: my-key
+            value: my-key-value
+    money:
+      title: Money
+      description: A monetary amount with an associated currency code.
+      type: object
+      additionalProperties: false
+      required:
+      - currencyCode
+      - amount
+      properties:
+        currencyCode:
+          type: string
+          description: The 3-letter currency code defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html).
+          example: USD
+        amount:
+          type: string
+          pattern: ^\d+(\.\d{1,4})?$
+          description: The monetary amount as a string to preserve precision. Supports up to 4 decimal places (e.g., "10.5000", "0.9999").
+          example: '0.0123'
+    session:
+      x-category: session
+      x-usage: session
+      type: object
+      additionalProperties: false
+      title: Session Resource
+      description: "A session represents the complete lifecycle of a voice interaction initiated through the Voice API.\n\nA session can contain one or more related call legs (for example, an original outbound call plus additional dials or transfers triggered by SVAML commands). \nUse the `calls` array to inspect all call legs associated with the session and `state` to determine whether the session is still ongoing or has reached a final state."
+      required:
+      - sessionId
+      - projectId
+      - serviceId
+      - calls
+      - createTime
+      - state
+      properties:
+        sessionId:
+          $ref: '#/components/schemas/sessionId'
+        projectId:
+          $ref: '#/components/schemas/projectId'
+        serviceId:
+          $ref: '#/components/schemas/serviceId'
+        calls:
+          type: array
+          items:
+            $ref: '#/components/schemas/call'
+        createTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: Timestamp (RFC 3339) indicating when the session was created.
+          example: '2025-01-01 00:00:00+00:00'
+        updateTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: 'Timestamp (RFC 3339) indicating when the session was last updated.
+
+
+            Omitted if no updates were performed on this session.'
+          example: '2025-01-01 00:00:00+00:00'
+        endTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: 'Timestamp (RFC 3339) indicating when the session ended.
+
+
+            Omitted for ongoing sessions.'
+          example: '2025-01-01 00:00:00+00:00'
+        state:
+          $ref: '#/components/schemas/sessionStates'
+    batchId:
+      title: Batch ID
+      type: string
+      format: ulid
+      description: The ID of the batch.
+      examples:
+      - 01BX5ZZKBKACTAV9WEVGEMMVRC
+    sip:
+      type: object
+      additionalProperties: false
+      title: SIP Endpoint
+      required:
+      - type
+      - sip
+      properties:
+        type:
+          type: string
+          const: SIP
+          description: Routes the call to a SIP (Session Initiation Protocol) endpoint.
+        sip:
+          type: object
+          additionalProperties: false
+          required:
+          - endpoint
+          properties:
+            endpoint:
+              type: string
+              description: SIP URI of the destination endpoint. Both `sip:` (unencrypted) and `sips:` (TLS-encrypted) schemes are supported.
+              format: uri
+              maxLength: 256
+              pattern: '^sips?:'
+            transport:
+              type: string
+              description: 'Transport protocol to use for the SIP signalling channel.
+
+
+                If omitted, the platform selects a default based on the URI scheme: `UDP` for `sip:` and `TLS` for `sips:`. Setting this explicitly overrides that default — for example, to force `TCP` for a `sip:` URI or to use `TLS` without switching to the `sips:` scheme.'
+              enum:
+              - UDP
+              - TCP
+              - TLS
+              x-enumDescriptions:
+                UDP: Connectionless transport. Lowest overhead; suitable for most standard SIP deployments.
+                TCP: Connection-oriented transport. More reliable for large SIP messages or NAT traversal scenarios.
+                TLS: Encrypted transport. Provides confidentiality and integrity for SIP signalling.
+            callHeaders:
+              $ref: '#/components/schemas/sipCallHeaders'
+      examples:
+      - type: SIP
+        sip:
+          endpoint: sip:user@example.com
+          transport: TCP
+          callHeaders:
+          - key: X-Correlation-Id
+            value: '12345'
+          - key: X-Call-Routing
+            value: forwarded
+    voiceRelay:
+      type: object
+      additionalProperties: false
+      title: Voice Relay
+      description: Routes the call through the Voice Relay service, enabling real-time speech-to-text (STT) and text-to-speech (TTS) via a WebSocket connection to the application backend.
+      required:
+      - type
+      - voiceRelay
+      properties:
+        type:
+          type: string
+          const: VOICE_RELAY
+          description: Connects to the Voice Relay service to enable STT and TTS services...
+        voiceRelay:
+          type: object
+          additionalProperties: false
+          required:
+          - endpoint
+          - ttsVoice
+          - sttLanguage
+          properties:
+            endpoint:
+              type: string
+              format: uri
+              description: URL to the server that will accept the web-socket request
+              example: wss://acme.com/agent
+            enableInterruptions:
+              type: boolean
+              description: 'Allow "barge-in" during text-to-speech (TTS) playback.
+
+
+                When `true`, TTS playback is interrupted as soon as inbound speech is detected, unless the currently playing content is marked as uninterruptible.
+
+
+                When `false`, TTS playback continues uninterrupted, but an interruption signal is still sent over the WebSocket so the client application can choose to stop playback manually if needed.'
+              default: true
+              example: true
+            ttsVoice:
+              description: "Name of the voice to be used when synthesizing speech. \n\nThis is the default voice used, if no override voice is provided in the web-socket TTS message."
+              $ref: '#/components/schemas/voiceName'
+            sttLanguage:
+              type: string
+              pattern: ^[a-z]{2,3}(-[A-Z][a-z]{3})?(-([A-Z]{2}|[0-9]{3}))?$
+              description: 'BCP-47 language tag used for speech-to-text transcription of the inbound audio.
+
+
+                This value determines which language model is used for transcription.'
+              example: en-US
+            callHeaders:
+              $ref: '#/components/schemas/callHeaders'
+      examples:
+      - type: VOICE_RELAY
+        voiceRelay:
+          endpoint: wss://acme.com/agent
+          enableInterruptions: true
+          ttsVoice: Emma
+          sttLanguage: en-US
+          callHeaders:
+          - key: my-key
+            value: my-key-value
+    badRequest:
+      title: Bad Request
+      description: Returned when the request is malformed or contains invalid parameters.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/bad-request
+          title:
+            const: Bad Request
+          detail:
+            example: The request body is invalid or malformed.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
+    serviceId:
+      title: Service ID
+      type: string
+      format: uuid
+      description: The ID of the service used.
+      examples:
+      - 6e124178-c29d-46a5-943c-5c2ae544aade
+    phone:
+      type: object
+      additionalProperties: false
+      title: Phone
+      description: Routes the call to a phone number on the Public Switched Telephone Network (PSTN).
+      required:
+      - type
+      - phone
+      properties:
+        type:
+          type: string
+          const: PHONE
+          description: Routes the call to a phone number on the Public Switched Telephone Network (PSTN). The number must be in E.164 format.
+        phone:
+          type: object
+          additionalProperties: false
+          required:
+          - number
+          properties:
+            number:
+              $ref: '#/components/schemas/phoneNumber'
+      examples:
+      - type: PHONE
+        phone:
+          number: '+4673522488'
+    callReason:
+      title: Call Reason
+      description: 'Reason explaining **why** the call ended in the given `callResult`.
+
+
+        `callResult` describes **what** happened (state/outcome). `callReason` provides additional context about the
+
+        underlying cause (for example, who terminated the call, routing issues, or validation errors).'
+      type: string
+      enum:
+      - OK
+      - NOT_AVAILABLE
+      - CALLER_HANGUP
+      - CALLEE_HANGUP
+      - MANAGER_HANGUP
+      - DID_NOT_FOUND
+      - INVALID_SCRIPT
+      - UNKNOWN_PRODUCT
+      - NO_MORE_ROUTES
+      - ERROR
+      x-enumDescriptions:
+        OK: The call was completed successfully.
+        NOT_AVAILABLE: The callee was not available.
+        CALLER_HANGUP: The caller hung up the call.
+        CALLEE_HANGUP: The callee hung up the call.
+        MANAGER_HANGUP: The call was ended by the call manager.
+        DID_NOT_FOUND: The DID number was not found.
+        INVALID_SCRIPT: The SVAML script was invalid.
+        UNKNOWN_PRODUCT: The product associated with the call is unknown.
+        NO_MORE_ROUTES: There are no more routes to complete the call.
+        ERROR: An error occurred during the call.
+      examples:
+      - OK
+    forbidden:
+      title: Forbidden
+      description: Returned when the authenticated identity does not have permission to perform the requested operation.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/forbidden
+          title:
+            const: Forbidden
+          detail:
+            example: The request was rejected.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
+    voiceName:
+      type: string
+      description: Sinch Voice Name to use for text-to-speech. Each voice is tied to a specific language variant, gender, and pricing model (Free/Standard or Paid/Generative). See [https://developers.sinch.com/docs/voice-2.0/api-reference/text-to-speech-voices#text-to-speech-voices](https://developers.sinch.com/docs/voice-2.0/api-reference/text-to-speech-voices#currently-available-languages) for details
+      example: Emma
+      enum:
+      - Aarav
+      - Aarav_2
+      - Aarohi
+      - Aarti
+      - Aarti_2
+      - Aarti_3
+      - Aashi
+      - Abbi
+      - Abdullah
+      - Abeo
+      - Abril
+      - Achara
+      - Ada
+      - Ada_2
+      - Adam
+      - Adam_2
+      - Aditi
+      - Adri
+      - Adriano
+      - Agnieszka
+      - Ahmet
+      - Aigul
+      - Ainhoa
+      - Alain
+      - Alba
+      - Aled
+      - Aleksandar
+      - Alessio
+      - Alessio_2
+      - Alex
+      - Alfie
+      - Ali
+      - Alina
+      - Alloy
+      - Alloy_2
+      - Alonso
+      - Alvaro
+      - Amal
+      - Amala
+      - Amanda
+      - Amany
+      - Amber
+      - Ambre
+      - Ameha
+      - Amina
+      - Amy
+      - Amy_2
+      - Amy_3
+      - Ana
+      - Anahit
+      - Ananya
+      - Ananya_2
+      - Anbu
+      - Ander
+      - Andre
+      - Andre_2
+      - Andrea
+      - Andres
+      - Andrew
+      - Andrew_2
+      - Andrew_3
+      - Andrew_4
+      - Angelo
+      - Anila
+      - Annette
+      - Antoine
+      - Antonin
+      - Antonio
+      - Anu
+      - Aoi
+      - Arabella
+      - Ardi
+      - Aria
+      - Aria_2
+      - Ariane
+      - Arjun
+      - Arjun_2
+      - Arjun_3
+      - Arlet
+      - Arnau
+      - Arnaud
+      - Arthur
+      - Arya
+      - Arya_2
+      - Asad
+      - Ashley
+      - Asilia
+      - Astrid
+      - Athina
+      - Ava
+      - Ava_2
+      - Ava_3
+      - Avri
+      - Ayanda
+      - Ayanda_2
+      - Aysha
+      - Babek
+      - Banu
+      - Bashkar
+      - Bassel
+      - Bataa
+      - Beatrice
+      - Beatriz
+      - Belkys
+      - Bella
+      - Benigno
+      - Bernd
+      - Bianca
+      - Bianca_2
+      - Bianca_3
+      - Blessica
+      - BongJin
+      - Borislav
+      - Brandon
+      - Brandon_2
+      - Bree
+      - Brenda
+      - Brian
+      - Brian_2
+      - Brian_3
+      - Brigitte
+      - Bryan
+      - Bryan_2
+      - Bryan_3
+      - Burcu
+      - Calimero
+      - Camila
+      - Camilla
+      - Camilla_2
+      - Camilla_3
+      - Candela
+      - Carla
+      - Carlos
+      - Carlota
+      - Carly
+      - Carmen
+      - Cataldo
+      - Catalina
+      - Cecilio
+      - Celeste
+      - Celine
+      - Celine_2
+      - Chantal
+      - Chanthavong
+      - Charline
+      - Chilemba
+      - Christel
+      - Christoph
+      - Christopher
+      - Christopher_2
+      - Clara
+      - Claude
+      - Colette
+      - Colm
+      - Conchita
+      - Connor
+      - Conrad
+      - Cora
+      - Cora_2
+      - Coralie
+      - Cristiano
+      - Daichi
+      - Dalia
+      - Dalia_2
+      - Daniel
+      - Daniel_2
+      - Danielle
+      - Danielle_2
+      - Dario
+      - Dariya
+      - Darren
+      - Daudi
+      - Daulet
+      - Davis
+      - Davis_2
+      - Davis_3
+      - Dena
+      - Denise
+      - Derek
+      - Dhwani
+      - Diego
+      - Dilara
+      - Dimas
+      - Dmitry
+      - Donato
+      - Dora
+      - Duarte
+      - Duncan
+      - Dustin
+      - Echo
+      - Eka
+      - Elena
+      - Elias
+      - Elimu
+      - Elin
+      - Elizabeth
+      - Elke
+      - Elliot
+      - Eloise
+      - Elsa
+      - Elsie
+      - Elvira
+      - Elza
+      - Emel
+      - Emil
+      - Emilio
+      - Emily
+      - Emma
+      - Emma_2
+      - Emma_3
+      - Emma_4
+      - Enric
+      - Enrique
+      - Eric
+      - Estrella
+      - Ethan
+      - Evelyn
+      - Everita
+      - Ewa
+      - Ewa_2
+      - Ezinne
+      - Fabio
+      - Fabiola
+      - Fable
+      - Fabrice
+      - Fahed
+      - Farid
+      - Fatima
+      - Federico
+      - Fenna
+      - Fernanda
+      - Fiamma
+      - Filiz
+      - Finn
+      - Florian
+      - Florian_2
+      - Florin
+      - Francisca
+      - Freya
+      - Gabrielle
+      - Gabrielle_2
+      - Gabrijela
+      - Gadis
+      - Gagan
+      - Gemma
+      - Gemma_2
+      - Geraint
+      - Gerard
+      - Gerardo
+      - Gianni
+      - Giorgi
+      - Giorgio
+      - Giovanna
+      - Gisela
+      - Giuseppe
+      - Giuseppe_2
+      - Gonzalo
+      - GookMin
+      - Goran
+      - Grace
+      - Gregory
+      - Gudrun
+      - Gul
+      - GulNawaz
+      - Gunnar
+      - Guy
+      - Gwyneth
+      - Hala
+      - Hamdan
+      - Hamed
+      - Hannah
+      - Hannah_2
+      - Hans
+      - Harri
+      - Hayk
+      - Hedi
+      - Hemkala
+      - Henri
+      - Hila
+      - Hillevi
+      - HiuGaai
+      - Hiujin
+      - HiuMaan
+      - HoaiMy
+      - Hollie
+      - HsiaoChen
+      - HsiaoYu
+      - Humberto
+      - Hyunsu
+      - Hyunsu_2
+      - Hyunsu_3
+      - Ida
+      - Ilir
+      - Iman
+      - Imani
+      - Imelda
+      - Ines
+      - Ines_2
+      - Ingrid
+      - InJoon
+      - Irene
+      - Irma
+      - Isabella
+      - Isabella_2
+      - Isabella_3
+      - Isabelle
+      - Isabelle_2
+      - Iselin
+      - Isidora
+      - Ismael
+      - Ivy
+      - Ivy_2
+      - Jacek
+      - Jacob
+      - Jacqueline
+      - Jajang
+      - Jamal
+      - James
+      - Jan
+      - Jane
+      - Jane_2
+      - Jann
+      - Jasmine
+      - Jasmine_2
+      - Jason
+      - Javier
+      - Jean
+      - Jenny
+      - Jenny_2
+      - Jenny_3
+      - Jeppe
+      - Jerome
+      - Jihye
+      - JiMin
+      - Jimmie
+      - Jitka
+      - Joana
+      - Joanna
+      - Joanna_2
+      - Joanna_3
+      - Joanne
+      - Joey
+      - Joey_2
+      - Jonas
+      - Jorge
+      - Jorge_2
+      - Joseph
+      - Josephine
+      - Juan
+      - Julio
+      - Justin
+      - Justin_2
+      - Kai
+      - Kajal
+      - Kajal_2
+      - Kalina
+      - Kani
+      - Karina
+      - Karl
+      - Karla
+      - Kasper
+      - Katja
+      - Kavya
+      - Kavya_2
+      - Kazuha
+      - Keita
+      - Ken
+      - Kendra
+      - Kendra_2
+      - Keomany
+      - Kert
+      - Kevin
+      - Killian
+      - Kim
+      - Kimberly
+      - Kimberly_2
+      - Klarissa
+      - Klaus
+      - Kumar
+      - Kunal
+      - Kunal_2
+      - Laia
+      - Laila
+      - Laith
+      - Larissa
+      - Latifa
+      - Laura
+      - Laura_2
+      - Layla
+      - Lea
+      - Lea_2
+      - Lea_3
+      - Leah
+      - Leila
+      - Leni
+      - Lennart
+      - Leonas
+      - Leticia
+      - Lewis
+      - Lia
+      - Liam
+      - Lian
+      - Lian_2
+      - Libby
+      - Liberto
+      - Lisa
+      - Lisa_2
+      - Lisandro
+      - Liv
+      - Livia
+      - Livia_2
+      - Lola
+      - Lorena
+      - Lorenzio
+      - Lorenzo
+      - Lotte
+      - Louisa
+      - Lucia
+      - Lucia_2
+      - Lucia_3
+      - Luciano
+      - Lucien
+      - Luis
+      - Lukas
+      - Luke
+      - Luna
+      - Luna_2
+      - Lupe
+      - Lupe_2
+      - Lupe_3
+      - Maarten
+      - Macerio
+      - Macerio_2
+      - Madhur
+      - Madina
+      - Mads
+      - Maisie
+      - Maja
+      - Manohar
+      - Manuel
+      - Manuela
+      - Marcello
+      - Marcelo
+      - Marek
+      - Margarita
+      - Maria
+      - Marija
+      - Marina
+      - Mario
+      - Marlene
+      - Marta
+      - Maryam
+      - Masaru
+      - Mateo
+      - Mathieu
+      - Matthew
+      - Matthew_2
+      - Matthew_3
+      - Mattias
+      - Maurice
+      - Maxim
+      - Maya
+      - Mayu
+      - Mekdes
+      - Mia
+      - Mia_2
+      - Mia_3
+      - Michelle
+      - Midhun
+      - Miguel
+      - Mitchell
+      - Mizuki
+      - Moaz
+      - Mohan
+      - Molly
+      - Monica
+      - Mouna
+      - Muuse
+      - Nabanita
+      - Naja
+      - NamMinh
+      - Nanami
+      - Nanami_2
+      - Nancy
+      - Nancy_2
+      - Naoki
+      - Natasha
+      - Neerja
+      - Neerja_2
+      - Neil
+      - Nestoras
+      - Nia
+      - Niamh
+      - Niamh_2
+      - Nicholas
+      - Nicholas_2
+      - Nicolau
+      - Nicole
+      - Nil
+      - Nilar
+      - Nils
+      - Niranjan
+      - Niwat
+      - Noah
+      - Noemi
+      - Noora
+      - Noura
+      - Nova
+      - Nova_2
+      - Nuria
+      - Ojas
+      - Ola
+      - Ola_2
+      - Oliver
+      - Olivia
+      - Ollie
+      - Ollie_2
+      - Omar
+      - Ona
+      - Onyx
+      - Orla
+      - Osman
+      - Ostap
+      - Pallavi
+      - Palmira
+      - Paloma
+      - Paola
+      - Pedro
+      - Pedro_2
+      - Pelayo
+      - Penelope
+      - Pernille
+      - Petra
+      - Phoebe
+      - Phoebe_2
+      - Pierina
+      - Piseth
+      - Polina
+      - Prabhat
+      - Prabhat_2
+      - Pradeep
+      - Premwadee
+      - Priyom
+      - Rafiki
+      - Ralf
+      - Rami
+      - Ramona
+      - Rana
+      - Raquel
+      - Raveena
+      - Reem
+      - Rehaan
+      - Rehaan_2
+      - Rehema
+      - Remi
+      - Remi_2
+      - Remy
+      - Remy_2
+      - Renata
+      - Ricardo
+      - Rinaldo
+      - Roberto
+      - Rodrigo
+      - Roger
+      - Roi
+      - Rok
+      - Rosa
+      - Ruben
+      - Russell
+      - Ruth
+      - Ruth_2
+      - Ryan
+      - Ryan_2
+      - Sabela
+      - Sabrina
+      - Sabrina_2
+      - Sagar
+      - Saleh
+      - Salli
+      - Salli_2
+      - Salli_3
+      - Salma
+      - Salman
+      - Salome
+      - Sam
+      - Sameera
+      - Samuel
+      - Sana
+      - Sapna
+      - Sara
+      - Saranya
+      - Sardor
+      - Saul
+      - Sebastian
+      - Selma
+      - SeoHyeon
+      - Seoyeon
+      - Seoyeon_2
+      - Seoyeon_3
+      - Seraphina
+      - Seraphina_2
+      - Serena
+      - Serena_2
+      - Sergio
+      - Sergio_2
+      - Shakir
+      - Shimmer
+      - Shiori
+      - Shruti
+      - Siqiniq
+      - Siqiniq_2
+      - Siti
+      - Sobhana
+      - Soffie
+      - Sofia
+      - Sofie
+      - Sonia
+      - SoonBok
+      - Sophie
+      - Sophie_2
+      - Srecko
+      - Sreymom
+      - Steffan
+      - Steffan_2
+      - Steffan_3
+      - Stephen
+      - Stephen_2
+      - Subhasini
+      - Sukant
+      - SunHi
+      - SunHi_2
+      - Surya
+      - Suvi
+      - Svetlana
+      - Swara
+      - Sylvie
+      - Sylvie_2
+      - Taim
+      - Takumi
+      - Takumi_2
+      - Tamas
+      - Tania
+      - Tanishaa
+      - Tanja
+      - Taqqiq
+      - Taqqiq_2
+      - Tatyana
+      - Teo
+      - Teresa
+      - Thalita
+      - Thalita_2
+      - Thalita_3
+      - Thando
+      - Themba
+      - Thiago
+      - Thierry
+      - Thierry_2
+      - Thiha
+      - Thilini
+      - Thomas
+      - Tiana
+      - Tiffany
+      - Tim
+      - Tina
+      - Tomas
+      - Tomoko
+      - Tony
+      - Triana
+      - Tristan
+      - Tristan_ES
+      - Tristan_ES_2
+      - Tuti
+      - Tyler
+      - Ubax
+      - Uzma
+      - Vaani
+      - Valentina
+      - Valerio
+      - Valluvar
+      - Venba
+      - Vera
+      - Vesna
+      - Vicki
+      - Vicki_2
+      - Vicki_3
+      - Victor
+      - Viktoria
+      - Vitoria
+      - Vitoria_2
+      - Vivienne
+      - Vivienne_2
+      - Vlasta
+      - WanLung
+      - Wayne
+      - Willem
+      - William
+      - William_2
+      - Xiaochen
+      - Xiaochen_2
+      - Xiaochen_3
+      - Xiaochen_4
+      - Xiaohan
+      - Xiaohan_2
+      - Xiaomeng
+      - XiaoMin
+      - Xiaomo
+      - Xiaoqiu
+      - Xiaorou
+      - Xiaorui
+      - Xiaoshuang
+      - Xiaoshuang_2
+      - Xiaoshuang_3
+      - Xiaotong
+      - Xiaoxiao
+      - Xiaoxiao_2
+      - Xiaoxiao_3
+      - Xiaoxiao_4
+      - Xiaoxiao_5
+      - Xiaoyan
+      - Xiaoyi
+      - Xiaoyi_2
+      - Xiaoyou
+      - Xiaoyou_2
+      - Xiaoyou_3
+      - Xiaoyu
+      - Xiaoyu_2
+      - Xiaozhen
+      - Ximena
+      - Ximena_ES
+      - Ximena_ES_2
+      - Ximena_ES_3
+      - Yago
+      - Yan
+      - Yara
+      - Yashica
+      - Yasmin
+      - Yesui
+      - Yolanda
+      - YuJin
+      - Yundeng
+      - Yunfan
+      - Yunfan_2
+      - Yunfeng
+      - Yunhan
+      - Yunhao
+      - YunJhe
+      - Yunjian
+      - Yunjie
+      - YunSong
+      - Yunxi
+      - Yunxi_2
+      - Yunxia
+      - Yunxia_2
+      - Yunxiang
+      - Yunxiao
+      - Yunxiao_2
+      - Yunyang
+      - Yunye
+      - Yunye_2
+      - Yunyi
+      - Yunyi_2
+      - Yunze
+      - Yunzhe
+      - Yves
+      - Yvette
+      - Zariyah
+      - Zayd
+      - Zeina
+      - Zhiyu
+      - Zhiyu_2
+      - Zofia
+      - Zuri
+      x-enumDescriptions:
+        Aarav: Male voice for Hindi (India) (Free voice)
+        Aarav_2: Male voice for English (India) (Free voice)
+        Aarohi: Female voice for Marathi (India) (Free voice)
+        Aarti: Female voice for Hindi (India) (Free voice)
+        Aarti_2: Female voice for English (India) (Free voice)
+        Aarti_3: Female voice for English (India) (Free voice)
+        Aashi: Female voice for English (India) (Free voice)
+        Abbi: Female voice for English (United Kingdom) (Free voice)
+        Abdullah: Male voice for Arabic (Oman) (Free voice)
+        Abeo: Male voice for English (Nigeria) (Free voice)
+        Abril: Female voice for Spanish (Spain) (Free voice)
+        Achara: Female voice for Thai (Thailand) (Free voice)
+        Ada: Female voice for English (United Kingdom) (Free voice)
+        Ada_2: Female voice for English (United Kingdom) (Paid voice)
+        Adam: Male voice for English (United States) (Free voice)
+        Adam_2: Male voice for English (United States) (Paid voice)
+        Aditi: Female voice for English (India) (Free voice)
+        Adri: Female voice for Afrikaans (South Africa) (Free voice)
+        Adriano: Male voice for Italian (Italy) (Free voice)
+        Agnieszka: Female voice for Polish (Poland) (Free voice)
+        Ahmet: Male voice for Turkish (Türkiye) (Free voice)
+        Aigul: Female voice for Kazakh (Kazakhstan) (Free voice)
+        Ainhoa: Female voice for Basque (Free voice)
+        Alain: Male voice for French (France) (Free voice)
+        Alba: Female voice for Catalan (Free voice)
+        Aled: Male voice for Welsh (United Kingdom) (Free voice)
+        Aleksandar: Male voice for Macedonian (North Macedonia) (Free voice)
+        Alessio: Male voice for Italian (Italy) (Free voice)
+        Alessio_2: Male voice for Italian (Italy) (Paid voice)
+        Alex: Male voice for Spanish (Peru) (Free voice)
+        Alfie: Male voice for English (United Kingdom) (Free voice)
+        Ali: Male voice for Arabic (Bahrain) (Free voice)
+        Alina: Female voice for Romanian (Romania) (Free voice)
+        Alloy: Male voice for English (United States) (Free voice)
+        Alloy_2: Male voice for English (United States) (Paid voice)
+        Alonso: Male voice for Spanish (United States) (Free voice)
+        Alvaro: Male voice for Spanish (Spain) (Free voice)
+        Amal: Female voice for Arabic (Qatar) (Free voice)
+        Amala: Female voice for German (Germany) (Free voice)
+        Amanda: Female voice for English (United States) (Free voice)
+        Amany: Female voice for Arabic (Syria) (Free voice)
+        Amber: Female voice for English (United States) (Free voice)
+        Ambre: Female voice for French (France) (Paid voice)
+        Ameha: Male voice for Amharic (Ethiopia) (Free voice)
+        Amina: Female voice for Arabic (Algeria) (Free voice)
+        Amy: Female voice for English (United Kingdom) (Free voice)
+        Amy_2: Female voice for English (United Kingdom) (Free voice)
+        Amy_3: Female voice for English (United Kingdom) (Paid voice)
+        Ana: Female voice for English (United States) (Free voice)
+        Anahit: Female voice for Armenian (Armenia) (Free voice)
+        Ananya: Female voice for Hindi (India) (Free voice)
+        Ananya_2: Female voice for English (India) (Free voice)
+        Anbu: Male voice for Tamil (Singapore) (Free voice)
+        Ander: Male voice for Basque (Free voice)
+        Andre: Male voice for Spanish (Mexico) (Free voice)
+        Andre_2: Male voice for Spanish (Mexico) (Paid voice)
+        Andrea: Female voice for Spanish (Ecuador) (Free voice)
+        Andres: Male voice for Spanish (Guatemala) (Free voice)
+        Andrew: Male voice for English (United States) (Free voice)
+        Andrew_2: Male voice for English (United States) (Free voice)
+        Andrew_3: Male voice for English (United States) (Paid voice)
+        Andrew_4: Male voice for English (United States) (Paid voice)
+        Angelo: Male voice for Filipino (Philippines) (Free voice)
+        Anila: Female voice for Albanian (Albania) (Free voice)
+        Annette: Female voice for English (Australia) (Free voice)
+        Antoine: Male voice for French (Canada) (Free voice)
+        Antonin: Male voice for Czech (Czechia) (Free voice)
+        Antonio: Male voice for Portuguese (Brazil) (Free voice)
+        Anu: Female voice for Estonian (Estonia) (Free voice)
+        Aoi: Female voice for Japanese (Japan) (Free voice)
+        Arabella: Female voice for Spanish (Spain) (Free voice)
+        Ardi: Male voice for Indonesian (Indonesia) (Free voice)
+        Aria: Female voice for English (United States) (Free voice)
+        Aria_2: Female voice for English (United States) (Paid voice)
+        Ariane: Female voice for French (Switzerland) (Free voice)
+        Arjun: Male voice for English (India) (Free voice)
+        Arjun_2: Male voice for English (India) (Free voice)
+        Arjun_3: Male voice for Hindi (India) (Free voice)
+        Arlet: Female voice for Catalan (Free voice)
+        Arnau: Male voice for Spanish (Spain) (Free voice)
+        Arnaud: Male voice for Dutch (Belgium) (Free voice)
+        Arthur: Male voice for English (United Kingdom) (Free voice)
+        Arya: Female voice for English (New Zealand) (Free voice)
+        Arya_2: Female voice for English (New Zealand) (Paid voice)
+        Asad: Male voice for Urdu (Pakistan) (Free voice)
+        Ashley: Female voice for English (United States) (Free voice)
+        Asilia: Female voice for English (Kenya) (Free voice)
+        Astrid: Female voice for Swedish (Sweden) (Free voice)
+        Athina: Female voice for Greek (Greece) (Free voice)
+        Ava: Female voice for English (United States) (Free voice)
+        Ava_2: Female voice for English (United States) (Free voice)
+        Ava_3: Female voice for English (United States) (Paid voice)
+        Avri: Male voice for Hebrew (Israel) (Free voice)
+        Ayanda: Female voice for English (South Africa) (Free voice)
+        Ayanda_2: Female voice for English (South Africa) (Paid voice)
+        Aysha: Female voice for Arabic (Oman) (Free voice)
+        Babek: Male voice for Azerbaijani (Latin, Azerbaijan) (Free voice)
+        Banu: Female voice for Azerbaijani (Latin, Azerbaijan) (Free voice)
+        Bashkar: Male voice for Bengali (India) (Free voice)
+        Bassel: Male voice for Arabic (Iraq) (Free voice)
+        Bataa: Male voice for Mongolian (Mongolia) (Free voice)
+        Beatrice: Female voice for Italian (Italy) (Paid voice)
+        Beatriz: Female voice for Spanish (Mexico) (Free voice)
+        Belkys: Female voice for Spanish (Cuba) (Free voice)
+        Bella: Female voice for English (United Kingdom) (Free voice)
+        Benigno: Male voice for Italian (Italy) (Free voice)
+        Bernd: Male voice for German (Germany) (Free voice)
+        Bianca: Female voice for Italian (Italy) (Free voice)
+        Bianca_2: Female voice for Italian (Italy) (Free voice)
+        Bianca_3: Female voice for Italian (Italy) (Paid voice)
+        Blessica: Female voice for Filipino (Philippines) (Free voice)
+        BongJin: Male voice for Korean (Korea) (Free voice)
+        Borislav: Male voice for Bulgarian (Bulgaria) (Free voice)
+        Brandon: Male voice for English (United States) (Free voice)
+        Brandon_2: Male voice for English (United States) (Free voice)
+        Bree: Female voice for English (United States) (Paid voice)
+        Brenda: Female voice for Portuguese (Brazil) (Free voice)
+        Brian: Male voice for English (United States) (Free voice)
+        Brian_2: Male voice for English (United States) (Free voice)
+        Brian_3: Male voice for English (United States) (Paid voice)
+        Brigitte: Female voice for French (France) (Free voice)
+        Bryan: Male voice for English (United Kingdom) (Free voice)
+        Bryan_2: Male voice for English (United Kingdom) (Free voice)
+        Bryan_3: Male voice for English (United Kingdom) (Paid voice)
+        Burcu: Female voice for Turkish (Türkiye) (Free voice)
+        Calimero: Male voice for Italian (Italy) (Free voice)
+        Camila: Female voice for Spanish (Peru) (Free voice)
+        Camilla: Female voice for Portuguese (Brazil) (Free voice)
+        Camilla_2: Female voice for Portuguese (Brazil) (Free voice)
+        Camilla_3: Female voice for Portuguese (Brazil) (Paid voice)
+        Candela: Female voice for Spanish (Mexico) (Free voice)
+        Carla: Female voice for Italian (Italy) (Free voice)
+        Carlos: Male voice for Spanish (Honduras) (Free voice)
+        Carlota: Female voice for Spanish (Mexico) (Free voice)
+        Carly: Female voice for English (Australia) (Free voice)
+        Carmen: Female voice for Romanian (Romania) (Free voice)
+        Cataldo: Male voice for Italian (Italy) (Free voice)
+        Catalina: Female voice for Spanish (Chile) (Free voice)
+        Cecilio: Male voice for Spanish (Mexico) (Free voice)
+        Celeste: Female voice for French (France) (Free voice)
+        Celine: Female voice for French (France) (Free voice)
+        Celine_2: Female voice for French (France) (Paid voice)
+        Chantal: Female voice for French (Canada) (Free voice)
+        Chanthavong: Male voice for Lao (Laos) (Free voice)
+        Charline: Female voice for French (Belgium) (Free voice)
+        Chilemba: Male voice for English (Kenya) (Free voice)
+        Christel: Female voice for Danish (Denmark) (Free voice)
+        Christoph: Male voice for German (Germany) (Free voice)
+        Christopher: Male voice for English (United States) (Free voice)
+        Christopher_2: Male voice for English (United States) (Free voice)
+        Clara: Female voice for English (Canada) (Free voice)
+        Claude: Male voice for French (France) (Free voice)
+        Colette: Female voice for Dutch (Netherlands) (Free voice)
+        Colm: Male voice for Irish (Ireland) (Free voice)
+        Conchita: Female voice for Spanish (Castilian) (Free voice)
+        Connor: Male voice for English (Ireland) (Free voice)
+        Conrad: Male voice for German (Germany) (Free voice)
+        Cora: Female voice for English (United States) (Free voice)
+        Cora_2: Female voice for English (United States) (Free voice)
+        Coralie: Female voice for French (France) (Free voice)
+        Cristiano: Male voice for Portuguese (Brazil) (Free voice)
+        Daichi: Male voice for Japanese (Japan) (Free voice)
+        Dalia: Female voice for Spanish (Mexico) (Free voice)
+        Dalia_2: Female voice for Spanish (Mexico) (Free voice)
+        Daniel: Male voice for German (Germany) (Free voice)
+        Daniel_2: Male voice for German (Germany) (Paid voice)
+        Danielle: Female voice for English (United States) (Free voice)
+        Danielle_2: Female voice for English (United States) (Paid voice)
+        Dario: Male voice for Spanish (Spain) (Free voice)
+        Dariya: Female voice for Russian (Russia) (Free voice)
+        Darren: Male voice for English (Australia) (Free voice)
+        Daudi: Male voice for Swahili (Tanzania) (Free voice)
+        Daulet: Male voice for Kazakh (Kazakhstan) (Free voice)
+        Davis: Male voice for English (United States) (Free voice)
+        Davis_2: Male voice for English (United States) (Free voice)
+        Davis_3: Male voice for English (United States) (Paid voice)
+        Dena: Female voice for Dutch (Belgium) (Free voice)
+        Denise: Female voice for French (France) (Free voice)
+        Derek: Male voice for English (United States) (Free voice)
+        Dhwani: Female voice for Gujarati (India) (Free voice)
+        Diego: Male voice for Italian (Italy) (Free voice)
+        Dilara: Female voice for Persian (Iran) (Free voice)
+        Dimas: Male voice for Javanese (Latin, Indonesia) (Free voice)
+        Dmitry: Male voice for Russian (Russia) (Free voice)
+        Donato: Male voice for Portuguese (Brazil) (Free voice)
+        Dora: Female voice for Icelandic (Iceland) (Free voice)
+        Duarte: Male voice for Portuguese (Portugal) (Free voice)
+        Duncan: Male voice for English (Australia) (Free voice)
+        Dustin: Male voice for English (United States) (Free voice)
+        Echo: Male voice for English (United States) (Free voice)
+        Eka: Female voice for Georgian (Georgia) (Free voice)
+        Elena: Female voice for Spanish (Argentina) (Free voice)
+        Elias: Male voice for Spanish (Spain) (Free voice)
+        Elimu: Male voice for English (Tanzania) (Free voice)
+        Elin: Female voice for Swedish (Sweden) (Free voice)
+        Elizabeth: Female voice for English (United States) (Free voice)
+        Elke: Female voice for German (Germany) (Free voice)
+        Elliot: Male voice for English (United Kingdom) (Free voice)
+        Eloise: Female voice for French (France) (Free voice)
+        Elsa: Female voice for Italian (Italy) (Free voice)
+        Elsie: Female voice for English (Australia) (Free voice)
+        Elvira: Female voice for Spanish (Spain) (Free voice)
+        Elza: Female voice for Portuguese (Brazil) (Free voice)
+        Emel: Female voice for Turkish (Türkiye) (Free voice)
+        Emil: Male voice for Romanian (Romania) (Free voice)
+        Emilio: Male voice for Spanish (Dominican Republic) (Free voice)
+        Emily: Female voice for English (Ireland) (Free voice)
+        Emma: Female voice for English (United States) (Free voice)
+        Emma_2: Female voice for English (United States) (Free voice)
+        Emma_3: Female voice for English (United States) (Paid voice)
+        Emma_4: Female voice for English (United States) (Paid voice)
+        Enric: Male voice for Catalan (Free voice)
+        Enrique: Male voice for Spanish (Castilian) (Free voice)
+        Eric: Male voice for English (United States) (Free voice)
+        Estrella: Female voice for Spanish (Spain) (Free voice)
+        Ethan: Male voice for English (United Kingdom) (Free voice)
+        Evelyn: Female voice for English (United States) (Free voice)
+        Everita: Female voice for Latvian (Latvia) (Free voice)
+        Ewa: Female voice for Polish (Poland) (Free voice)
+        Ewa_2: Female voice for Polish (Poland) (Paid voice)
+        Ezinne: Female voice for English (Nigeria) (Free voice)
+        Fabio: Male voice for Portuguese (Brazil) (Free voice)
+        Fabiola: Female voice for Italian (Italy) (Free voice)
+        Fable: Neutral voice for English (United States) (Free voice)
+        Fabrice: Male voice for French (Switzerland) (Free voice)
+        Fahed: Male voice for Arabic (Kuwait) (Free voice)
+        Farid: Male voice for Persian (Iran) (Free voice)
+        Fatima: Female voice for Arabic (United Arab Emirates) (Free voice)
+        Federico: Male voice for Spanish (Nicaragua) (Free voice)
+        Fenna: Female voice for Dutch (Netherlands) (Free voice)
+        Fernanda: Female voice for Portuguese (Portugal) (Free voice)
+        Fiamma: Female voice for Italian (Italy) (Free voice)
+        Filiz: Female voice for Turkish (Türkiye) (Free voice)
+        Finn: Male voice for Norwegian (Norway) (Free voice)
+        Florian: Male voice for German (Germany) (Free voice)
+        Florian_2: Male voice for German (Germany) (Paid voice)
+        Florin: Male voice for French (France) (Paid voice)
+        Francisca: Female voice for Portuguese (Brazil) (Free voice)
+        Freya: Female voice for English (Australia) (Free voice)
+        Gabrielle: Female voice for French (Canada) (Free voice)
+        Gabrielle_2: Female voice for French (Canada) (Paid voice)
+        Gabrijela: Female voice for Croatian (Croatia) (Free voice)
+        Gadis: Female voice for Indonesian (Indonesia) (Free voice)
+        Gagan: Male voice for Kannada (India) (Free voice)
+        Gemma: Female voice for English (United Kingdom) (Free voice)
+        Gemma_2: Female voice for English (United Kingdom) (Free voice)
+        Geraint: Male voice for Welsh (United Kingdom) (Free voice)
+        Gerard: Male voice for French (Belgium) (Free voice)
+        Gerardo: Male voice for Spanish (Mexico) (Free voice)
+        Gianni: Male voice for Italian (Italy) (Free voice)
+        Giorgi: Male voice for Georgian (Georgia) (Free voice)
+        Giorgio: Male voice for Italian (Italy) (Free voice)
+        Giovanna: Female voice for Portuguese (Brazil) (Free voice)
+        Gisela: Female voice for German (Germany) (Free voice)
+        Giuseppe: Male voice for Italian (Italy) (Free voice)
+        Giuseppe_2: Male voice for Italian (Italy) (Free voice)
+        Gonzalo: Male voice for Spanish (Colombia) (Free voice)
+        GookMin: Male voice for Korean (Korea) (Free voice)
+        Goran: Male voice for Bosnian (Bosnia and Herzegovina) (Free voice)
+        Grace: Female voice for Maltese (Malta) (Free voice)
+        Gregory: Male voice for English (United States) (Free voice)
+        Gudrun: Female voice for Icelandic (Iceland) (Free voice)
+        Gul: Female voice for Urdu (India) (Free voice)
+        GulNawaz: Male voice for Pashto (Afghanistan) (Free voice)
+        Gunnar: Male voice for Icelandic (Iceland) (Free voice)
+        Guy: Male voice for English (United States) (Free voice)
+        Gwyneth: Female voice for Welsh (United Kingdom) (Free voice)
+        Hala: Female voice for Arabic (Saudi Arabia) (Free voice)
+        Hamdan: Male voice for Arabic (United Arab Emirates) (Free voice)
+        Hamed: Male voice for Arabic (Saudi Arabia) (Free voice)
+        Hannah: Female voice for German (Austria) (Free voice)
+        Hannah_2: Female voice for German (Austria) (Paid voice)
+        Hans: Male voice for German (Germany) (Free voice)
+        Harri: Male voice for Finnish (Finland) (Free voice)
+        Hayk: Male voice for Armenian (Armenia) (Free voice)
+        Hedi: Male voice for Arabic (Tunisia) (Free voice)
+        Hemkala: Female voice for Nepali (Nepal) (Free voice)
+        Henri: Male voice for French (France) (Free voice)
+        Hila: Female voice for Hebrew (Israel) (Free voice)
+        Hillevi: Female voice for Swedish (Sweden) (Free voice)
+        HiuGaai: Female voice for Chinese (Cantonese, Traditional) (Free voice)
+        Hiujin: Female voice for Chinese (Cantonese) (Free voice)
+        HiuMaan: Female voice for Chinese (Cantonese, Traditional) (Free voice)
+        HoaiMy: Female voice for Vietnamese (Vietnam) (Free voice)
+        Hollie: Female voice for English (United Kingdom) (Free voice)
+        HsiaoChen: Female voice for Chinese (Taiwanese Mandarin, Traditional) (Free voice)
+        HsiaoYu: Female voice for Chinese (Taiwanese Mandarin, Traditional) (Free voice)
+        Humberto: Male voice for Portuguese (Brazil) (Free voice)
+        Hyunsu: Male voice for Korean (Korea) (Free voice)
+        Hyunsu_2: Male voice for Korean (Korea) (Free voice)
+        Hyunsu_3: Male voice for Korean (Korea) (Paid voice)
+        Ida: Female voice for Norwegian (Norway) (Free voice)
+        Ilir: Male voice for Albanian (Albania) (Free voice)
+        Iman: Female voice for Arabic (Libya) (Free voice)
+        Imani: Female voice for English (Tanzania) (Free voice)
+        Imelda: Female voice for Italian (Italy) (Free voice)
+        Ines: Female voice for Portuguese (Brazil) (Free voice)
+        Ines_2: Female voice for Portuguese (Brazil) (Free voice)
+        Ingrid: Female voice for German (Austria) (Free voice)
+        InJoon: Male voice for Korean (Korea) (Free voice)
+        Irene: Female voice for Spanish (Spain) (Free voice)
+        Irma: Female voice for Italian (Italy) (Free voice)
+        Isabella: Female voice for Italian (Italy) (Free voice)
+        Isabella_2: Female voice for Italian (Italy) (Free voice)
+        Isabella_3: Female voice for Italian (Italy) (Paid voice)
+        Isabelle: Female voice for French (Belgium) (Free voice)
+        Isabelle_2: Female voice for French (Belgium) (Paid voice)
+        Iselin: Female voice for Norwegian (Norway) (Free voice)
+        Isidora: Female voice for Spanish (Spain) (Free voice)
+        Ismael: Male voice for Arabic (Algeria) (Free voice)
+        Ivy: Female voice for English (United States) (Free voice)
+        Ivy_2: Female voice for English (United States) (Free voice)
+        Jacek: Male voice for Polish (Poland) (Free voice)
+        Jacob: Male voice for English (United States) (Free voice)
+        Jacqueline: Female voice for French (France) (Free voice)
+        Jajang: Male voice for Sundanese (Indonesia) (Free voice)
+        Jamal: Male voice for Arabic (Morocco) (Free voice)
+        James: Male voice for English (Philippines) (Free voice)
+        Jan: Male voice for German (Switzerland) (Free voice)
+        Jane: Female voice for English (United States) (Free voice)
+        Jane_2: Female voice for English (United States) (Paid voice)
+        Jann: Male voice for Polish (Poland) (Free voice)
+        Jasmine: Female voice for English (Singapore) (Free voice)
+        Jasmine_2: Female voice for English (Singapore) (Paid voice)
+        Jason: Male voice for English (United States) (Free voice)
+        Javier: Male voice for Spanish (Equatorial Guinea) (Free voice)
+        Jean: Male voice for French (Canada) (Free voice)
+        Jenny: Female voice for English (United States) (Free voice)
+        Jenny_2: Female voice for English (United States) (Free voice)
+        Jenny_3: Female voice for English (United States) (Paid voice)
+        Jeppe: Male voice for Danish (Denmark) (Free voice)
+        Jerome: Male voice for French (France) (Free voice)
+        Jihye: Female voice for Korean (Korea) (Free voice)
+        JiMin: Female voice for Korean (Korea) (Free voice)
+        Jimmie: Male voice for English (United States) (Free voice)
+        Jitka: Female voice for Czech (Czechia) (Free voice)
+        Joana: Female voice for Catalan (Free voice)
+        Joanna: Female voice for English (United States) (Free voice)
+        Joanna_2: Female voice for English (United States) (Free voice)
+        Joanna_3: Female voice for English (United States) (Paid voice)
+        Joanne: Female voice for English (Australia) (Free voice)
+        Joey: Male voice for English (United States) (Free voice)
+        Joey_2: Male voice for English (United States) (Free voice)
+        Jonas: Male voice for German (Austria) (Free voice)
+        Jorge: Male voice for Spanish (Mexico) (Free voice)
+        Jorge_2: Male voice for Spanish (Mexico) (Free voice)
+        Joseph: Male voice for Maltese (Malta) (Free voice)
+        Josephine: Female voice for French (France) (Free voice)
+        Juan: Male voice for Spanish (Costa Rica) (Free voice)
+        Julio: Male voice for Portuguese (Brazil) (Free voice)
+        Justin: Male voice for English (United States) (Free voice)
+        Justin_2: Male voice for English (United States) (Free voice)
+        Kai: Male voice for English (United States) (Free voice)
+        Kajal: Female voice for English (India) (Free voice)
+        Kajal_2: Female voice for English (India) (Paid voice)
+        Kalina: Female voice for Bulgarian (Bulgaria) (Free voice)
+        Kani: Female voice for Tamil (Malaysia) (Free voice)
+        Karina: Female voice for Spanish (Puerto Rico) (Free voice)
+        Karl: Male voice for Icelandic (Iceland) (Free voice)
+        Karla: Female voice for Spanish (Honduras) (Free voice)
+        Kasper: Male voice for German (Germany) (Free voice)
+        Katja: Female voice for German (Germany) (Free voice)
+        Kavya: Female voice for Hindi (India) (Free voice)
+        Kavya_2: Female voice for English (India) (Free voice)
+        Kazuha: Female voice for Japanese (Japan) (Free voice)
+        Keita: Male voice for Japanese (Japan) (Free voice)
+        Ken: Male voice for English (Australia) (Free voice)
+        Kendra: Female voice for English (United States) (Free voice)
+        Kendra_2: Female voice for English (United States) (Free voice)
+        Keomany: Female voice for Lao (Laos) (Free voice)
+        Kert: Male voice for Estonian (Estonia) (Free voice)
+        Kevin: Male voice for English (United States) (Free voice)
+        Killian: Male voice for German (Germany) (Free voice)
+        Kim: Female voice for English (Australia) (Free voice)
+        Kimberly: Female voice for English (United States) (Free voice)
+        Kimberly_2: Female voice for English (United States) (Free voice)
+        Klarissa: Female voice for German (Germany) (Free voice)
+        Klaus: Male voice for German (Germany) (Free voice)
+        Kumar: Male voice for Tamil (Sri Lanka) (Free voice)
+        Kunal: Male voice for Hindi (India) (Free voice)
+        Kunal_2: Male voice for English (India) (Free voice)
+        Laia: Female voice for Spanish (Spain) (Free voice)
+        Laila: Female voice for Arabic (Bahrain) (Free voice)
+        Laith: Male voice for Arabic (Syria) (Free voice)
+        Larissa: Female voice for Spanish (Mexico) (Free voice)
+        Latifa: Female voice for Pashto (Afghanistan) (Free voice)
+        Laura: Female voice for Dutch (Netherlands) (Free voice)
+        Laura_2: Female voice for Dutch (Netherlands) (Paid voice)
+        Layla: Female voice for Arabic (Lebanon) (Free voice)
+        Lea: Female voice for French (France) (Free voice)
+        Lea_2: Female voice for French (France) (Free voice)
+        Lea_3: Female voice for French (France) (Paid voice)
+        Leah: Female voice for English (South Africa) (Free voice)
+        Leila: Female voice for Portuguese (Brazil) (Free voice)
+        Leni: Female voice for German (Switzerland) (Free voice)
+        Lennart: Male voice for German (Germany) (Paid voice)
+        Leonas: Male voice for Lithuanian (Lithuania) (Free voice)
+        Leticia: Female voice for Portuguese (Brazil) (Free voice)
+        Lewis: Male voice for English (United States) (Free voice)
+        Lia: Female voice for Spanish (Spain) (Free voice)
+        Liam: Male voice for English (Canada) (Free voice)
+        Lian: Male voice for French (Canada) (Free voice)
+        Lian_2: Male voice for French (Canada) (Paid voice)
+        Libby: Female voice for English (United Kingdom) (Free voice)
+        Liberto: Male voice for Spanish (Mexico) (Free voice)
+        Lisa: Female voice for Dutch (Belgium) (Free voice)
+        Lisa_2: Female voice for Dutch (Belgium) (Paid voice)
+        Lisandro: Male voice for Italian (Italy) (Free voice)
+        Liv: Female voice for Norwegian (Norway) (Free voice)
+        Livia: Female voice for English (Australia) (Free voice)
+        Livia_2: Female voice for English (Australia) (Paid voice)
+        Lola: Female voice for English (United States) (Free voice)
+        Lorena: Female voice for Spanish (El Salvador) (Free voice)
+        Lorenzio: Male voice for Italian (Italy) (Paid voice)
+        Lorenzo: Male voice for Spanish (Chile) (Free voice)
+        Lotte: Female voice for Dutch (Netherlands) (Free voice)
+        Louisa: Female voice for German (Germany) (Free voice)
+        Lucia: Female voice for Spanish (Castilian) (Free voice)
+        Lucia_2: Female voice for Spanish (Castilian) (Free voice)
+        Lucia_3: Female voice for Spanish (Castilian) (Paid voice)
+        Luciano: Male voice for Spanish (Mexico) (Free voice)
+        Lucien: Male voice for French (France) (Free voice)
+        Luis: Male voice for Spanish (Ecuador) (Free voice)
+        Lukas: Male voice for Slovak (Slovakia) (Free voice)
+        Luke: Male voice for English (South Africa) (Free voice)
+        Luna: Female voice for English (Singapore) (Free voice)
+        Luna_2: Female voice for English (United States) (Free voice)
+        Lupe: Female voice for Spanish (United States) (Free voice)
+        Lupe_2: Female voice for Spanish (United States) (Free voice)
+        Lupe_3: Female voice for Spanish (United States) (Paid voice)
+        Maarten: Male voice for Dutch (Netherlands) (Free voice)
+        Macerio: Male voice for Portuguese (Brazil) (Free voice)
+        Macerio_2: Male voice for Portuguese (Brazil) (Paid voice)
+        Madhur: Male voice for Hindi (India) (Free voice)
+        Madina: Female voice for Uzbek (Latin, Uzbekistan) (Free voice)
+        Mads: Male voice for Danish (Denmark) (Free voice)
+        Maisie: Female voice for English (United Kingdom) (Free voice)
+        Maja: Female voice for German (Germany) (Free voice)
+        Manohar: Male voice for Marathi (India) (Free voice)
+        Manuel: Male voice for Spanish (Cuba) (Free voice)
+        Manuela: Female voice for Portuguese (Brazil) (Free voice)
+        Marcello: Male voice for Italian (Italy) (Free voice)
+        Marcelo: Male voice for Spanish (Bolivia) (Free voice)
+        Marek: Male voice for Polish (Poland) (Free voice)
+        Margarita: Female voice for Spanish (Panama) (Free voice)
+        Maria: Female voice for Spanish (Costa Rica) (Free voice)
+        Marija: Female voice for Macedonian (North Macedonia) (Free voice)
+        Marina: Female voice for Spanish (Mexico) (Free voice)
+        Mario: Male voice for Spanish (Paraguay) (Free voice)
+        Marlene: Female voice for German (Germany) (Free voice)
+        Marta: Female voice for Spanish (Guatemala) (Free voice)
+        Maryam: Female voice for Arabic (Yemen) (Free voice)
+        Masaru: Male voice for Japanese (Japan) (Paid voice)
+        Mateo: Male voice for Spanish (Uruguay) (Free voice)
+        Mathieu: Male voice for French (France) (Free voice)
+        Matthew: Male voice for English (United States) (Free voice)
+        Matthew_2: Male voice for English (United States) (Free voice)
+        Matthew_3: Male voice for English (United States) (Paid voice)
+        Mattias: Male voice for Swedish (Sweden) (Free voice)
+        Maurice: Male voice for French (France) (Free voice)
+        Maxim: Male voice for Russian (Russia) (Free voice)
+        Maya: Female voice for Polish (Poland) (Free voice)
+        Mayu: Female voice for Japanese (Japan) (Free voice)
+        Mekdes: Female voice for Amharic (Ethiopia) (Free voice)
+        Mia: Female voice for Spanish (Mexico) (Free voice)
+        Mia_2: Female voice for Spanish (Mexico) (Free voice)
+        Mia_3: Female voice for Spanish (Mexico) (Paid voice)
+        Michelle: Female voice for English (United States) (Free voice)
+        Midhun: Male voice for Malayalam (India) (Free voice)
+        Miguel: Male voice for Spanish (United States) (Free voice)
+        Mitchell: Male voice for English (New Zealand) (Free voice)
+        Mizuki: Female voice for Japanese (Japan) (Free voice)
+        Moaz: Male voice for Arabic (Qatar) (Free voice)
+        Mohan: Male voice for Telugu (India) (Free voice)
+        Molly: Female voice for English (New Zealand) (Free voice)
+        Monica: Female voice for English (United States) (Free voice)
+        Mouna: Female voice for Arabic (Morocco) (Free voice)
+        Muuse: Male voice for Somali (Somalia) (Free voice)
+        Nabanita: Female voice for Bangla (Bangladesh) (Free voice)
+        Naja: Female voice for Danish (Denmark) (Free voice)
+        NamMinh: Male voice for Vietnamese (Vietnam) (Free voice)
+        Nanami: Female voice for Japanese (Japan) (Free voice)
+        Nanami_2: Female voice for Japanese (Japan) (Paid voice)
+        Nancy: Female voice for English (United States) (Free voice)
+        Nancy_2: Female voice for English (United States) (Free voice)
+        Naoki: Male voice for Japanese (Japan) (Free voice)
+        Natasha: Female voice for English (Australia) (Free voice)
+        Neerja: Female voice for English (India) (Free voice)
+        Neerja_2: Female voice for English (India) (Free voice)
+        Neil: Male voice for English (Australia) (Free voice)
+        Nestoras: Male voice for Greek (Greece) (Free voice)
+        Nia: Female voice for Welsh (United Kingdom) (Free voice)
+        Niamh: Female voice for English (Ireland) (Free voice)
+        Niamh_2: Female voice for English (Ireland) (Paid voice)
+        Nicholas: Male voice for Serbian (Cyrillic, Serbia) (Free voice)
+        Nicholas_2: Male voice for Serbian (Latin, Serbia) (Free voice)
+        Nicolau: Male voice for Portuguese (Brazil) (Free voice)
+        Nicole: Female voice for English (Australia) (Free voice)
+        Nil: Male voice for Spanish (Spain) (Free voice)
+        Nilar: Female voice for Burmese (Myanmar) (Free voice)
+        Nils: Male voice for Latvian (Latvia) (Free voice)
+        Niranjan: Male voice for Gujarati (India) (Free voice)
+        Niwat: Male voice for Thai (Thailand) (Free voice)
+        Noah: Male voice for English (United Kingdom) (Free voice)
+        Noemi: Female voice for Hungarian (Hungary) (Free voice)
+        Noora: Female voice for Finnish (Finland) (Free voice)
+        Noura: Female voice for Arabic (Kuwait) (Free voice)
+        Nova: Female voice for English (United States) (Free voice)
+        Nova_2: Female voice for English (United States) (Paid voice)
+        Nuria: Female voice for Spanish (Mexico) (Free voice)
+        Ojas: Male voice for Punjabi (India) (Free voice)
+        Ola: Female voice for Polish (Poland) (Free voice)
+        Ola_2: Female voice for Polish (Poland) (Paid voice)
+        Oliver: Male voice for English (United Kingdom) (Free voice)
+        Olivia: Female voice for English (United Kingdom) (Free voice)
+        Ollie: Male voice for English (United Kingdom) (Free voice)
+        Ollie_2: Male voice for English (United Kingdom) (Paid voice)
+        Omar: Male voice for Arabic (Libya) (Free voice)
+        Ona: Female voice for Lithuanian (Lithuania) (Free voice)
+        Onyx: Male voice for English (United States) (Free voice)
+        Orla: Female voice for Irish (Ireland) (Free voice)
+        Osman: Male voice for Malay (Malaysia) (Free voice)
+        Ostap: Male voice for Ukrainian (Ukraine) (Free voice)
+        Pallavi: Female voice for Tamil (India) (Free voice)
+        Palmira: Female voice for Italian (Italy) (Free voice)
+        Paloma: Female voice for Spanish (United States) (Free voice)
+        Paola: Female voice for Spanish (Venezuela) (Free voice)
+        Pedro: Male voice for Spanish (United States) (Free voice)
+        Pedro_2: Male voice for Spanish (United States) (Paid voice)
+        Pelayo: Male voice for Spanish (Mexico) (Free voice)
+        Penelope: Female voice for Spanish (United States) (Free voice)
+        Pernille: Female voice for Norwegian (Norway) (Free voice)
+        Petra: Female voice for Slovenian (Slovenia) (Free voice)
+        Phoebe: Female voice for English (United States) (Free voice)
+        Phoebe_2: Female voice for English (United States) (Paid voice)
+        Pierina: Female voice for Italian (Italy) (Free voice)
+        Piseth: Male voice for Khmer (Cambodia) (Free voice)
+        Polina: Female voice for Ukrainian (Ukraine) (Free voice)
+        Prabhat: Male voice for English (India) (Free voice)
+        Prabhat_2: Male voice for English (India) (Free voice)
+        Pradeep: Male voice for Bangla (Bangladesh) (Free voice)
+        Premwadee: Female voice for Thai (Thailand) (Free voice)
+        Priyom: Male voice for Assamese (India) (Free voice)
+        Rafiki: Male voice for Swahili (Kenya) (Free voice)
+        Ralf: Male voice for German (Germany) (Free voice)
+        Rami: Male voice for Arabic (Lebanon) (Free voice)
+        Ramona: Female voice for Spanish (Dominican Republic) (Free voice)
+        Rana: Female voice for Arabic (Iraq) (Free voice)
+        Raquel: Female voice for Portuguese (Portugal) (Free voice)
+        Raveena: Female voice for English (India) (Free voice)
+        Reem: Female voice for Arabic (Tunisia) (Free voice)
+        Rehaan: Male voice for Hindi (India) (Free voice)
+        Rehaan_2: Male voice for English (India) (Free voice)
+        Rehema: Female voice for Swahili (Tanzania) (Free voice)
+        Remi: Male voice for French (France) (Free voice)
+        Remi_2: Male voice for French (France) (Paid voice)
+        Remy: Male voice for French (France) (Free voice)
+        Remy_2: Male voice for French (France) (Paid voice)
+        Renata: Female voice for Spanish (Mexico) (Free voice)
+        Ricardo: Male voice for Portuguese (Brazil) (Free voice)
+        Rinaldo: Male voice for Italian (Italy) (Free voice)
+        Roberto: Male voice for Spanish (Panama) (Free voice)
+        Rodrigo: Male voice for Spanish (El Salvador) (Free voice)
+        Roger: Male voice for English (United States) (Free voice)
+        Roi: Male voice for Galician (Free voice)
+        Rok: Male voice for Slovenian (Slovenia) (Free voice)
+        Rosa: Female voice for English (Philippines) (Free voice)
+        Ruben: Male voice for Dutch (Netherlands) (Free voice)
+        Russell: Male voice for English (Australia) (Free voice)
+        Ruth: Female voice for English (United States) (Free voice)
+        Ruth_2: Female voice for English (United States) (Paid voice)
+        Ryan: Male voice for English (United States) (Free voice)
+        Ryan_2: Male voice for English (United Kingdom) (Free voice)
+        Sabela: Female voice for Galician (Free voice)
+        Sabrina: Female voice for German (Switzerland) (Free voice)
+        Sabrina_2: Female voice for German (Switzerland) (Paid voice)
+        Sagar: Male voice for Nepali (Nepal) (Free voice)
+        Saleh: Male voice for Arabic (Yemen) (Free voice)
+        Salli: Female voice for English (United States) (Free voice)
+        Salli_2: Female voice for English (United States) (Free voice)
+        Salli_3: Female voice for English (United States) (Paid voice)
+        Salma: Female voice for Arabic (Egypt) (Free voice)
+        Salman: Male voice for Urdu (India) (Free voice)
+        Salome: Female voice for Spanish (Colombia) (Free voice)
+        Sam: Male voice for English (Hong Kong SAR) (Free voice)
+        Sameera: Male voice for Sinhala (Sri Lanka) (Free voice)
+        Samuel: Male voice for English (United States) (Free voice)
+        Sana: Female voice for Arabic (Jordan) (Free voice)
+        Sapna: Female voice for Kannada (India) (Free voice)
+        Sara: Female voice for English (United States) (Free voice)
+        Saranya: Female voice for Tamil (Sri Lanka) (Free voice)
+        Sardor: Male voice for Uzbek (Latin, Uzbekistan) (Free voice)
+        Saul: Male voice for Spanish (Spain) (Free voice)
+        Sebastian: Male voice for Spanish (Venezuela) (Free voice)
+        Selma: Female voice for Finnish (Finland) (Free voice)
+        SeoHyeon: Female voice for Korean (Korea) (Free voice)
+        Seoyeon: Female voice for Korean (Korea) (Free voice)
+        Seoyeon_2: Female voice for Korean (Korea) (Free voice)
+        Seoyeon_3: Female voice for Korean (Korea) (Paid voice)
+        Seraphina: Female voice for German (Germany) (Free voice)
+        Seraphina_2: Female voice for German (Germany) (Paid voice)
+        Serena: Female voice for English (United States) (Free voice)
+        Serena_2: Female voice for English (United States) (Paid voice)
+        Sergio: Male voice for Spanish (Castilian) (Free voice)
+        Sergio_2: Male voice for Spanish (Castilian) (Paid voice)
+        Shakir: Male voice for Arabic (Egypt) (Free voice)
+        Shimmer: Female voice for English (United States) (Free voice)
+        Shiori: Female voice for Japanese (Japan) (Free voice)
+        Shruti: Female voice for Telugu (India) (Free voice)
+        Siqiniq: Female voice for Inuktitut (Syllabics, Canada) (Free voice)
+        Siqiniq_2: Female voice for Inuktitut (Latin, Canada) (Free voice)
+        Siti: Female voice for Javanese (Latin, Indonesia) (Free voice)
+        Sobhana: Female voice for Malayalam (India) (Free voice)
+        Soffie: Female voice for Danish (Denmark) (Free voice)
+        Sofia: Female voice for Spanish (Bolivia) (Free voice)
+        Sofie: Female voice for Swedish (Sweden) (Free voice)
+        Sonia: Female voice for English (United Kingdom) (Free voice)
+        SoonBok: Female voice for Korean (Korea) (Free voice)
+        Sophie: Female voice for Serbian (Cyrillic, Serbia) (Free voice)
+        Sophie_2: Female voice for Serbian (Latin, Serbia) (Free voice)
+        Srecko: Male voice for Croatian (Croatia) (Free voice)
+        Sreymom: Female voice for Khmer (Cambodia) (Free voice)
+        Steffan: Male voice for English (United States) (Free voice)
+        Steffan_2: Male voice for English (United States) (Free voice)
+        Steffan_3: Male voice for English (United States) (Paid voice)
+        Stephen: Male voice for English (United States) (Free voice)
+        Stephen_2: Male voice for English (United States) (Paid voice)
+        Subhasini: Female voice for Odia (India) (Free voice)
+        Sukant: Male voice for Odia (India) (Free voice)
+        SunHi: Female voice for Korean (Korea) (Free voice)
+        SunHi_2: Female voice for Korean (Korea) (Paid voice)
+        Surya: Male voice for Tamil (Malaysia) (Free voice)
+        Suvi: Female voice for Finnish (Finland) (Free voice)
+        Svetlana: Female voice for Russian (Russia) (Free voice)
+        Swara: Female voice for Hindi (India) (Free voice)
+        Sylvie: Female voice for French (Canada) (Free voice)
+        Sylvie_2: Female voice for French (Canada) (Paid voice)
+        Taim: Male voice for Arabic (Jordan) (Free voice)
+        Takumi: Male voice for Japanese (Japan) (Free voice)
+        Takumi_2: Male voice for Japanese (Japan) (Free voice)
+        Tamas: Male voice for Hungarian (Hungary) (Free voice)
+        Tania: Female voice for Spanish (Paraguay) (Free voice)
+        Tanishaa: Female voice for Bengali (India) (Free voice)
+        Tanja: Female voice for German (Germany) (Free voice)
+        Taqqiq: Male voice for Inuktitut (Syllabics, Canada) (Free voice)
+        Taqqiq_2: Male voice for Inuktitut (Latin, Canada) (Free voice)
+        Tatyana: Female voice for Russian (Russia) (Free voice)
+        Teo: Male voice for Spanish (Spain) (Free voice)
+        Teresa: Female voice for Spanish (Equatorial Guinea) (Free voice)
+        Thalita: Female voice for Portuguese (Brazil) (Free voice)
+        Thalita_2: Female voice for Portuguese (Brazil) (Free voice)
+        Thalita_3: Female voice for Portuguese (Brazil) (Paid voice)
+        Thando: Female voice for Zulu (South Africa) (Free voice)
+        Themba: Male voice for Zulu (South Africa) (Free voice)
+        Thiago: Male voice for Portuguese (Brazil) (Free voice)
+        Thierry: Male voice for French (Canada) (Free voice)
+        Thierry_2: Male voice for French (Canada) (Paid voice)
+        Thiha: Male voice for Burmese (Myanmar) (Free voice)
+        Thilini: Female voice for Sinhala (Sri Lanka) (Free voice)
+        Thomas: Male voice for English (United Kingdom) (Free voice)
+        Tiana: Female voice for English (United States) (Free voice)
+        Tiffany: Female voice for English (United States) (Paid voice)
+        Tim: Male voice for English (Australia) (Free voice)
+        Tina: Female voice for English (Australia) (Free voice)
+        Tomas: Male voice for Spanish (Argentina) (Free voice)
+        Tomoko: Female voice for Japanese (Japan) (Free voice)
+        Tony: Male voice for English (United States) (Free voice)
+        Triana: Female voice for Spanish (Spain) (Free voice)
+        Tristan: Male voice for Spanish (Mexico) (Paid voice)
+        Tristan_ES: Male voice for Spanish (Spain) (Free voice)
+        Tristan_ES_2: Male voice for Spanish (Spain) (Paid voice)
+        Tuti: Female voice for Sundanese (Indonesia) (Free voice)
+        Tyler: Male voice for English (United States) (Free voice)
+        Ubax: Female voice for Somali (Somalia) (Free voice)
+        Uzma: Female voice for Urdu (Pakistan) (Free voice)
+        Vaani: Female voice for Punjabi (India) (Free voice)
+        Valentina: Female voice for Spanish (Uruguay) (Free voice)
+        Valerio: Male voice for Portuguese (Brazil) (Free voice)
+        Valluvar: Male voice for Tamil (India) (Free voice)
+        Venba: Female voice for Tamil (Singapore) (Free voice)
+        Vera: Female voice for Spanish (Spain) (Free voice)
+        Vesna: Female voice for Bosnian (Bosnia and Herzegovina) (Free voice)
+        Vicki: Female voice for German (Germany) (Free voice)
+        Vicki_2: Female voice for German (Germany) (Free voice)
+        Vicki_3: Female voice for German (Germany) (Paid voice)
+        Victor: Male voice for Spanish (Puerto Rico) (Free voice)
+        Viktoria: Female voice for Slovak (Slovakia) (Free voice)
+        Vitoria: Female voice for Portuguese (Brazil) (Free voice)
+        Vitoria_2: Female voice for Portuguese (Brazil) (Free voice)
+        Vivienne: Female voice for French (France) (Free voice)
+        Vivienne_2: Female voice for French (France) (Paid voice)
+        Vlasta: Female voice for Czech (Czechia) (Free voice)
+        WanLung: Male voice for Chinese (Cantonese, Traditional) (Free voice)
+        Wayne: Male voice for English (Singapore) (Free voice)
+        Willem: Male voice for Afrikaans (South Africa) (Free voice)
+        William: Male voice for English (Australia) (Free voice)
+        William_2: Male voice for English (Australia) (Free voice)
+        Xiaochen: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaochen_2: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaochen_3: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaochen_4: Female voice for Chinese (Mandarin, Simplified) (Paid voice)
+        Xiaohan: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaohan_2: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaomeng: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        XiaoMin: Female voice for Chinese (Cantonese, Simplified) (Free voice)
+        Xiaomo: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoqiu: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaorou: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaorui: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoshuang: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoshuang_2: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoshuang_3: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaotong: Female voice for Chinese (Wu, Simplified) (Free voice)
+        Xiaoxiao: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoxiao_2: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoxiao_3: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoxiao_4: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoxiao_5: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoyan: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoyi: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoyi_2: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoyou: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoyou_2: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoyou_3: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoyu: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaoyu_2: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Xiaozhen: Female voice for Chinese (Mandarin, Simplified) (Free voice)
+        Ximena: Female voice for Spanish (Mexico) (Paid voice)
+        Ximena_ES: Female voice for Spanish (Spain) (Free voice)
+        Ximena_ES_2: Female voice for Spanish (Spain) (Free voice)
+        Ximena_ES_3: Female voice for Spanish (Spain) (Paid voice)
+        Yago: Male voice for Spanish (Mexico) (Free voice)
+        Yan: Female voice for English (Hong Kong SAR) (Free voice)
+        Yara: Female voice for Portuguese (Brazil) (Free voice)
+        Yashica: Female voice for Assamese (India) (Free voice)
+        Yasmin: Female voice for Malay (Malaysia) (Free voice)
+        Yesui: Female voice for Mongolian (Mongolia) (Free voice)
+        Yolanda: Female voice for Spanish (Nicaragua) (Free voice)
+        YuJin: Female voice for Korean (Korea) (Free voice)
+        Yundeng: Male voice for Chinese (Zhongyuan Mandarin Henan, Simplified) (Free voice)
+        Yunfan: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunfan_2: Male voice for Chinese (Mandarin, Simplified) (Paid voice)
+        Yunfeng: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunhan: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunhao: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        YunJhe: Male voice for Chinese (Taiwanese Mandarin, Traditional) (Free voice)
+        Yunjian: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunjie: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        YunSong: Male voice for Chinese (Cantonese, Simplified) (Free voice)
+        Yunxi: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunxi_2: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunxia: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunxia_2: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunxiang: Male voice for Chinese (Jilu Mandarin, Simplified) (Free voice)
+        Yunxiao: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunxiao_2: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunyang: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunye: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunye_2: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunyi: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunyi_2: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunze: Male voice for Chinese (Mandarin, Simplified) (Free voice)
+        Yunzhe: Male voice for Chinese (Wu, Simplified) (Free voice)
+        Yves: Male voice for French (France) (Free voice)
+        Yvette: Female voice for French (France) (Free voice)
+        Zariyah: Female voice for Arabic (Saudi Arabia) (Free voice)
+        Zayd: Male voice for Arabic (Saudi Arabia) (Free voice)
+        Zeina: Female voice for Arabic (Saudi Arabia) (Free voice)
+        Zhiyu: Female voice for Chinese (Mandarin) (Free voice)
+        Zhiyu_2: Female voice for Chinese (Mandarin) (Free voice)
+        Zofia: Female voice for Polish (Poland) (Free voice)
+        Zuri: Female voice for Swahili (Kenya) (Free voice)
+    callType:
+      title: Call Type
+      x-category: call
+      x-usage: call
+      type: string
+      description: 'The type of channel used for the call.
+
+
+        This value indicates what kind of endpoint the call is connected to (PSTN phone number or WebSocket stream).'
+      enum:
+      - PHONE
+      - SIP
+      - STREAM
+      - VOICE_RELAY
+      x-enumDescriptions:
+        PHONE: A call from or to the telephone network.
+        SIP: A call from or to a SIP endpoint.
+        STREAM: A call to a stream.
+        VOICE_RELAY: A call to voice relay service.
+      examples:
+      - PHONE
+    callId:
+      title: Call ID
+      type: string
+      format: ulid
+      description: The `Id`` of the call.
+      examples:
+      - 01ARZ3NDEKTSV4RRFFQ69G5FAA
+    call:
+      type: object
+      additionalProperties: false
+      title: Call Resource
+      description: Call details
+      required:
+      - callId
+      - projectId
+      - serviceId
+      - sessionId
+      - direction
+      - originationType
+      - callType
+      - callResult
+      - startTime
+      - callRate
+      - callResourceUrl
+      properties:
+        callId:
+          $ref: '#/components/schemas/callId'
+        projectId:
+          $ref: '#/components/schemas/projectId'
+        serviceId:
+          $ref: '#/components/schemas/serviceId'
+        sessionId:
+          $ref: '#/components/schemas/sessionId'
+        callName:
+          type: string
+          minLength: 1
+          maxLength: 32
+          pattern: ^\S+$
+          description: 'The name identifying this call leg within the session, as assigned by the `callName` property in the `dial` command or in the SVAML response to an incoming call webhook.
+
+
+            Omitted for calls that were not assigned a name.'
+          example: origin
+        bridgeName:
+          type: string
+          description: The name of the bridge the call belongs to. Omitted for calls not assigned to any bridge.
+          example: my-bridge
+        batchId:
+          $ref: '#/components/schemas/batchId'
+        from:
+          $ref: '#/components/schemas/from'
+        to:
+          $ref: '#/components/schemas/to'
+        startTime:
+          type: string
+          format: date-time
+          description: Timestamp (RFC 3339) indicating when the call was created and call setup was initiated (start of the call attempt).
+          example: '2025-01-01 00:00:00+00:00'
+        updateTime:
+          type: string
+          format: date-time
+          description: 'Timestamp (RFC 3339) indicating when the call was last updated.
+
+
+            Omitted if no updates were performed on this call.'
+          example: '2025-01-01 00:00:00+00:00'
+        callType:
+          $ref: '#/components/schemas/callType'
+        direction:
+          $ref: '#/components/schemas/callDirection'
+        answerTime:
+          type: string
+          format: date-time
+          description: 'Timestamp (RFC 3339) indicating when the call was answered.
+
+
+            Omitted if the call was not answered.'
+          example: '2025-01-01 00:00:00+00:00'
+        endTime:
+          type: string
+          format: date-time
+          description: 'Timestamp (RFC 3339) indicating when the call ended.
+
+
+            Omitted for ongoing calls.'
+          example: '2025-01-01 00:00:00+00:00'
+        callDurationSeconds:
+          type: integer
+          description: Duration of the call in seconds
+          example: 42
+        callResult:
+          $ref: '#/components/schemas/callResult'
+        callReason:
+          $ref: '#/components/schemas/callReason'
+        originationType:
+          $ref: '#/components/schemas/originationType'
+        callRate:
+          $ref: '#/components/schemas/money'
+          description: The rate charged for this call, expressed as a monetary amount **per minute** in the specified currency.
+        callResourceUrl:
+          type: string
+          format: uri
+          description: Absolute URI to this call resource. Use this URL to retrieve the call details
+          example: https://voice.api.sinch.com/v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01AN4Z07BY79KA1307SR9X4MV3
+    callHeaders:
+      type: array
+      description: Custom headers to be sent in the call setup.
+      maxItems: 16
+      items:
+        type: object
+        additionalProperties: false
+        required:
+        - key
+        properties:
+          key:
+            type: string
+            minLength: 1
+            maxLength: 255
+            pattern: '[\x20-\x7e\t]+$'
+            description: Name of the header.
+            example: headerKey
+          value:
+            type: string
+            maxLength: 255
+            pattern: '[\x20-\x7e\t]*$'
+            description: Value of the header.
+            example: headerValue
+      examples:
+      - - key: headerKey
+          value: headerValue
+        - key: anotherKey
+          value: anotherValue
+    sipCallHeaders:
+      type: array
+      description: Custom SIP headers to be sent in the call setup.
+      maxItems: 16
+      items:
+        type: object
+        additionalProperties: false
+        required:
+        - key
+        properties:
+          key:
+            type: string
+            minLength: 1
+            maxLength: 255
+            pattern: ^[-A-Za-z0-9.!%*_+`'~]+$
+            description: Name of the SIP header.
+            example: X-Correlation-Id
+          value:
+            type: string
+            maxLength: 255
+            description: Value of the SIP header.
+            example: '12345'
+      examples:
+      - - key: X-Correlation-Id
+          value: '12345'
+        - key: X-Call-Routing
+          value: forwarded
+    sessionId:
+      title: Session ID
+      type: string
+      format: ulid
+      description: The ID of the session.
+      examples:
+      - 01BX5ZZKBKACTAV9WEVGEMMVRB
+    phoneNumber:
+      title: Phone Number
+      type: string
+      pattern: ^\+[1-9]\d{1,14}$
+      minLength: 3
+      maxLength: 16
+      description: E.164 Phone number
+      examples:
+      - '+4673522488'
+    from:
+      description: Call origin - Phone Number or SIP endpoint
+      oneOf:
+      - $ref: '#/components/schemas/phone'
+      - $ref: '#/components/schemas/sipFrom'
+      discriminator:
+        propertyName: type
+        mapping:
+          PHONE: '#/components/schemas/phone'
+          SIP: '#/components/schemas/sipFrom'
+    callDirection:
+      title: Call Direction
+      type: string
+      description: Indicates the direction of the call.
+      enum:
+      - INBOUND
+      - OUTBOUND
+      x-enumDescriptions:
+        INBOUND: A call initiated towards the Sinch Calling Platform.
+        OUTBOUND: A call initiated from the Sinch Calling Platform.
+      examples:
+      - OUTBOUND
+    tooManyRequests:
+      title: Too Many Requests
+      description: Returned when the request rate limit has been exceeded. Retry after the duration indicated in the `Retry-After` response header.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/too-many-requests
+          title:
+            const: Too Many Requests
+          detail:
+            example: Rate limit exceeded. Please slow down your request rate and retry after the indicated period.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls
+    internalServerError:
+      title: Internal Server Error
+      description: Returned when an unexpected error occurs on the server.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/internal-server-error
+          title:
+            const: Internal Server Error
+          detail:
+            example: An unexpected error occurred on the server.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
+  responses:
+    '400':
+      description: Invalid request parameters.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/badRequest'
+    '404':
+      description: Resource not found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/notFound'
+    '500':
+      description: Internal server error occurred.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/internalServerError'
+    '403':
+      description: Forbidden.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/forbidden'
+    '401':
+      description: Authentication failed — token missing, invalid, or expired.
+      headers:
+        WWW-Authenticate:
+          description: RFC 7235 challenge. Indicates the required authentication scheme and, for expired tokens, provides an error hint.
+          schema:
+            type: string
+            example: Bearer realm="sinch", error="invalid_token", error_description="Token has expired"
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/unauthorized'
+    '429':
+      description: Too many requests — rate limit exceeded.
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          required: false
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tooManyRequests'
+  parameters:
+    projectId:
+      name: projectId
+      description: The ID of the project.
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/projectId'
+    sessionId:
+      name: sessionId
+      description: The ID of the session.
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/sessionId'
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: 'Use HTTP Basic authentication.
+
+
+        - **Username**: the **Access Key ID**
+
+        - **Password**: the **Access Key Secret**
+
+
+        Send credentials in the `Authorization` header:
+
+
+        `Authorization: Basic <base64(AccessKeyId:AccessKeySecret)>`
+
+
+        Create and manage access keys in the Dashboard:
+
+        https://dashboard.sinch.com/settings/access-keys'
+    SinchOAuth2:
+      type: oauth2
+      description: 'OAuth 2.0 **Client Credentials** grant (recommended for production).
+
+
+        Exchange the **Access Key ID** (`client_id`) and **Access Key Secret**
+
+        (`client_secret`) for a short-lived Bearer token.
+
+
+        Tokens typically expire after **3600 seconds**. When the token expires,
+
+        request a new one using the same `tokenUrl`. There is no separate
+
+        refresh token in the client credentials flow — simply re-authenticate.
+
+
+        Access keys are managed in the Dashboard: https://dashboard.sinch.com/settings/access-keys'
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          refreshUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+x-refined-from:
+- sinch-voice-api-v2-openapi.yaml
+- sinch-voice-api-v2-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

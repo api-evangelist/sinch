@@ -1,0 +1,92 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-list-campaign-response-schema.json",
+  "title": "ListCampaignResponse",
+  "description": "List of campaigns object",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-us-shortcode-campaigns-api-openapi.yml#/components/schemas/ListCampaignResponse",
+  "properties": {
+    "campaigns": {
+      "description": "List of campaigns",
+      "items": {
+        "$ref": "#/$defs/BasicCampaign"
+      },
+      "type": "array"
+    },
+    "nextPageToken": {
+      "description": "Token to request the next page of results.",
+      "type": "string"
+    },
+    "totalSize": {
+      "description": "Total count of campaigns matching provided search criteria",
+      "format": "int32",
+      "type": "integer"
+    }
+  },
+  "type": "object",
+  "$defs": {
+    "BasicCampaign": {
+      "description": "List of campaigns returns a subset of data from campaign object",
+      "properties": {
+        "campaignId": {
+          "description": "Campaign ID",
+          "type": "string"
+        },
+        "name": {
+          "description": "Campaign name",
+          "type": "string"
+        },
+        "shortcode": {
+          "$ref": "#/$defs/Shortcode"
+        },
+        "status": {
+          "$ref": "#/$defs/CampaignStatus"
+        },
+        "createdAt": {
+          "description": "Campaign creation date",
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "description": "Campaign update date",
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "type": "object"
+    },
+    "CampaignStatus": {
+      "description": "Campaign status",
+      "enum": [
+        "DRAFT",
+        "PENDING_REVIEW",
+        "REVIEWING",
+        "READY_CARRIER_SUBMISSION",
+        "CARRIER_SUBMITTED",
+        "COMPLETED",
+        "CANCELLED",
+        "DEPROVISIONED",
+        "AWAITING_CLIENT_UPDATE"
+      ],
+      "x-enumDescriptions": {
+        "DRAFT": "A working draft campaign, not submitted for review",
+        "PENDING_REVIEW": "Submitted campaign, waiting for review",
+        "REVIEWING": "An agent is actively reviewing the campaign",
+        "READY_CARRIER_SUBMISSION": "Agent has completed review and is ready to submit to carriers",
+        "CARRIER_SUBMITTED": "Campaign information has been submitted to carriers (at this point follow carrier order status updates)",
+        "COMPLETED": "Campaign has been approved by all carriers and is ready for use",
+        "CANCELLED": "Campaign has been cancelled",
+        "DEPROVISIONED": "An approved campaign that has been deprovisioned and is no longer in use",
+        "AWAITING_CLIENT_UPDATE": "Some information must be edited or added to the campaign to continue the review process"
+      },
+      "format": "enum",
+      "type": "string"
+    },
+    "Shortcode": {
+      "description": "Short codes configured for the campaign. Short code must be provided when sc_requested is false. There are two options (1) if customers have their own short code (sc_requested=true), we would ask that they provide the short code number in this field and also attach a copy of their latest short code receipt upon submitting the campaign. (2) If customers have elected that Sinch lease the code (sc_requested=false), this field should be blank, and Sinch will fill it once short code has been procured.",
+      "type": "string"
+    }
+  }
+}

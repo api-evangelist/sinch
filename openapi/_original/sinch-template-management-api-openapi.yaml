@@ -1,0 +1,1982 @@
+openapi: 3.1.0
+info:
+  contact:
+    email: support@sinch.com
+    name: support at sinch
+  description: >
+    # Overview
+
+    The Template Management API offers a way to manage templates that can be
+    used together with the Conversation API. Note that you may also use the
+    Message Composer tool on the [Sinch Customer
+    Dashboard](https://dashboard.sinch.com/convapi/message-composer) to [manage
+    templates](https://community.sinch.com/t5/Conversation-API/How-do-I-use-Message-Composer-to-create-omni-channel-message/ta-p/9890).
+
+
+    One can view a template as a pre-defined message that can optionally contain
+    some parameters to facilitate some customization of the pre-defined message.
+    This feature can, for instance, be used to construct a generic customer
+    welcome message where the customer's name can be injected via a parameter.
+    It's also possible to provide translations to different languages when
+    creating a template to make it possible to reuse one template for different
+    languages.
+
+
+    ## Base URL
+
+
+    The following URLs can be used when making calls to the Template Management
+    API.
+
+
+    |Server|URL|
+
+    |------|---|
+
+    |Template Management API (US
+    Production)|`https://us.template.api.sinch.com`|
+
+    |Template Management API (EU
+    Production)|`https://eu.template.api.sinch.com`|
+
+    |Template Management API (BR
+    Production)|`https://br.template.api.sinch.com`|
+
+
+    ## Template Management API Version 2
+
+
+    {% admonition type="info" name="Note:" %}
+
+
+    As of January 31, 2026, Version 1 endpoints for managing message templates
+    have been deprecated and are no longer accessible. Version 2 is recommended
+    and is the only version currently accessible.
+
+
+    {% /admonition %}
+
+
+    Version 2 of the Template Management API was released on September 4, 2023.
+    We recommend using this version of the Template Management API for all
+    template management activities via API calls. In addition to the feature set
+    included with Version 1, Version 2 also includes:
+
+      - Strongly typed `translations` field content, allowing the user to define the message using the same JSON structure used to define messages in a [send message request](https://developers.sinch.com/docs/conversation/api-reference/conversation/messages/messages_sendmessage#messages/messages_sendmessage/t=request&path=correlation_id)
+      - Improved validation
+      - The option to override the omni-channel template configuration with a channel-specific template (for channels on which channel-specific templates can be created) using the `channel_template_overrides` field
+
+    ## Accessing the Template Management API
+
+
+    The first step towards interacting with the Template Management API is to
+    create an account on the [Sinch Customer
+    Dashboard](https://dashboard.sinch.com). The next step is to create an
+    Access Key under the Settings tab and note down the provided Key ID and Key
+    Secret in a secure location. Also make sure to remember the Project ID since
+    your template will be placed under the provided Project ID.
+
+
+    The Key ID and the Key Secret are then used in the following way to obtain a
+    valid OAuth2 Access Token that will be used to authenticate towards the
+    Template Management API.
+
+    ```console
+
+    curl https://us.auth.sinch.com/oauth2/token -d grant_type=client_credentials
+    --user <key_id>:<key_secret>
+
+    ```
+
+
+    The obtained Access Token is then used in the following way to interact with
+    the Template Management API:
+
+    ```console
+
+    curl https://us.template.api.sinch.com/v1/projects/<Project ID>/templates -H
+    "Authorization: Bearer <Access Token>"
+
+    ```
+
+
+    Note that the obtained token above is only valid when interacting with the
+    Template Management API in the US region. Another Access Token must be
+    obtained from the FQDN eu.auth.sinch.com to interact with the Template
+    Management API in the EU region(FQDN eu.template.api.sinch.com).
+  title: Template Management API
+  version: '2.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+security:
+  - Basic: []
+  - oAuth2: []
+paths:
+  /v2/projects/{project_id}/templates:
+    get:
+      tags:
+        - Templates V2
+      summary: List all templates belonging to a project ID.
+      operationId: Templates_v2_ListTemplates
+      parameters:
+        - description: Required. The project ID.
+          name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v2ListTemplatesResponse'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-codeSamples:
+        - lang: Java
+          source: >
+            /**
+             * Sinch Java Snippet
+             *
+             * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java
+             *
+             * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details
+             */
+            package conversation.templates.v2;
+
+
+            import com.sinch.sdk.SinchClient;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.api.v2.TemplatesV2Service;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.models.v2.response.TemplatesV2ListResponse;
+
+            import com.sinch.sdk.models.Configuration;
+
+            import com.sinch.sdk.models.ConversationRegion;
+
+            import java.util.logging.Logger;
+
+            import utils.Settings;
+
+
+            public class List {
+
+              private static final Logger LOGGER = Logger.getLogger(List.class.getName());
+
+              public static void main(String[] args) {
+
+                String projectId = Settings.getProjectId().orElse("MY_PROJECT_ID");
+                String keyId = Settings.getKeyId().orElse("MY_KEY_ID");
+                String keySecret = Settings.getKeySecret().orElse("MY_KEY_SECRET");
+                String conversationRegion = Settings.getConversationRegion().orElse("MY_CONVERSATION_REGION");
+
+                Configuration configuration =
+                    Configuration.builder()
+                        .setProjectId(projectId)
+                        .setKeyId(keyId)
+                        .setKeySecret(keySecret)
+                        .setConversationRegion(ConversationRegion.from(conversationRegion))
+                        .build();
+
+                SinchClient client = new SinchClient(configuration);
+
+                TemplatesV2Service templatesServiceV2 = client.conversation().templates().v2();
+
+                LOGGER.info("List templates V2");
+
+                TemplatesV2ListResponse result = templatesServiceV2.list();
+
+                LOGGER.info("Response: ");
+                result.iterator().forEachRemaining(f -> LOGGER.info(String.format("- %s: %s", f.getId(), f)));
+              }
+            }
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+              const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });
+
+              try {
+                const response = await sinch.conversation.templatesV2.list({});
+                if (!response.templates?.length) {
+                  console.log('No Templates found.');
+                  return;
+                }
+                console.log(`✅ Found ${response.templates.length} Templates.`);
+                response.templates.forEach((template) => {
+                  console.log(template);
+                });
+              } catch (err) {
+                console.error('❌ Failed to list the Templates:');
+                console.error(err);
+              }
+            }
+
+            main();
+    post:
+      tags:
+        - Templates V2
+      summary: Creates a template
+      operationId: Templates_v2_CreateTemplate
+      parameters:
+        - description: Required. The project ID.
+          name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2Template'
+              required:
+                - default_translation
+                - translations
+            examples:
+              createTemplate:
+                $ref: '#/components/examples/createTemplateV2'
+        description: Required. The template to create.
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v2Template'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-codeSamples:
+        - lang: Java
+          source: >
+            /**
+             * Sinch Java Snippet
+             *
+             * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java
+             *
+             * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details
+             */
+            package conversation.templates.v2;
+
+
+            import com.sinch.sdk.SinchClient;
+
+            import
+            com.sinch.sdk.domains.conversation.models.v1.messages.types.text.TextMessage;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.api.v2.TemplatesV2Service;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.models.v2.TemplateTranslation;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.models.v2.TemplateV2;
+
+            import com.sinch.sdk.models.Configuration;
+
+            import com.sinch.sdk.models.ConversationRegion;
+
+            import java.util.Collections;
+
+            import java.util.logging.Logger;
+
+            import utils.Settings;
+
+
+            public class Create {
+
+              private static final Logger LOGGER = Logger.getLogger(Create.class.getName());
+
+              public static void main(String[] args) {
+
+                String projectId = Settings.getProjectId().orElse("MY_PROJECT_ID");
+                String keyId = Settings.getKeyId().orElse("MY_KEY_ID");
+                String keySecret = Settings.getKeySecret().orElse("MY_KEY_SECRET");
+                String conversationRegion = Settings.getConversationRegion().orElse("MY_CONVERSATION_REGION");
+
+                Configuration configuration =
+                    Configuration.builder()
+                        .setProjectId(projectId)
+                        .setKeyId(keyId)
+                        .setKeySecret(keySecret)
+                        .setConversationRegion(ConversationRegion.from(conversationRegion))
+                        .build();
+
+                SinchClient client = new SinchClient(configuration);
+
+                TemplatesV2Service templatesServiceV2 = client.conversation().templates().v2();
+                TemplateV2 request =
+                    TemplateV2.builder()
+                        .setDefaultTranslation("en-US")
+                        .setTranslations(
+                            Collections.singletonList(
+                                TemplateTranslation.builder()
+                                    .setLanguageCode("en-US")
+                                    .setMessage(
+                                        TextMessage.builder().setText("my text from V2 template").build())
+                                    .build()))
+                        .build();
+
+                LOGGER.info("Create template");
+
+                TemplateV2 response = templatesServiceV2.create(request);
+
+                LOGGER.info("Response: " + response);
+              }
+            }
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+              const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });
+
+              try {
+                const response = await sinch.conversation.templatesV2.create({
+                  createTemplateRequestBody: {
+                    default_translation: 'en-US',
+                    translations: [
+                      {
+                        language_code: 'en-US',
+                        version: '1',
+                        location_message: {
+                          title: 'Title',
+                          coordinates: { latitude: 59.3360453, longitude: 18.0117363 },
+                        },
+                      },
+                    ],
+                  },
+                });
+                console.log('✅ Successfully created the Template.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error('❌ Failed to create the Template:');
+                console.error(err);
+              }
+            }
+
+            main();
+  /v2/projects/{project_id}/templates/{template_id}/translations:
+    get:
+      tags:
+        - Templates V2
+      summary: List translations for a template
+      operationId: Templates_v2_ListTranslations
+      parameters:
+        - description: Required. The project ID.
+          name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: Required. The ID of the template to fetch.
+          name: template_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: Optional. The translation's language code.
+          name: language_code
+          in: query
+          required: false
+          schema:
+            type: string
+        - description: Optional. The translation's version.
+          name: translation_version
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v2ListTranslationsResponse'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-codeSamples:
+        - lang: Java
+          source: >
+            /**
+             * Sinch Java Snippet
+             *
+             * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java
+             *
+             * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details
+             */
+            package conversation.templates.v2;
+
+
+            import com.sinch.sdk.SinchClient;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.api.v2.TemplatesV2Service;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.models.v2.response.TranslationsV2ListResponse;
+
+            import com.sinch.sdk.models.Configuration;
+
+            import com.sinch.sdk.models.ConversationRegion;
+
+            import java.util.logging.Logger;
+
+            import utils.Settings;
+
+
+            public class ListTranslations {
+
+              private static final Logger LOGGER = Logger.getLogger(ListTranslations.class.getName());
+
+              public static void main(String[] args) {
+
+                String projectId = Settings.getProjectId().orElse("MY_PROJECT_ID");
+                String keyId = Settings.getKeyId().orElse("MY_KEY_ID");
+                String keySecret = Settings.getKeySecret().orElse("MY_KEY_SECRET");
+                String conversationRegion = Settings.getConversationRegion().orElse("MY_CONVERSATION_REGION");
+
+                // The ID of the template to retrieve translations for
+                String conversationTemplateId = "TEMPLATE_ID";
+
+                Configuration configuration =
+                    Configuration.builder()
+                        .setProjectId(projectId)
+                        .setKeyId(keyId)
+                        .setKeySecret(keySecret)
+                        .setConversationRegion(ConversationRegion.from(conversationRegion))
+                        .build();
+
+                SinchClient client = new SinchClient(configuration);
+
+                TemplatesV2Service templatesServiceV2 = client.conversation().templates().v2();
+
+                LOGGER.info(
+                    String.format("List translations for template with ID '%s'", conversationTemplateId));
+
+                TranslationsV2ListResponse response =
+                    templatesServiceV2.listTranslations(conversationTemplateId, null);
+
+                LOGGER.info("Response: ");
+
+                response.iterator().forEachRemaining(f -> LOGGER.info(String.format("- %s", f)));
+              }
+            }
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+              const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';
+
+              // The ID of the Template to list Translations for
+              const templateId = 'TEMPLATE_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });
+
+              try {
+                const response = await sinch.conversation.templatesV2.listTranslations({
+                  template_id: templateId,
+                });
+                if (!response.translations?.length) {
+                  console.log(`No Translations found for Template with ID ${templateId}.`);
+                  return;
+                }
+                console.log(`✅ Found ${response.translations.length} Translations.`);
+                response.translations.forEach((translation) => {
+                  console.log(translation);
+                });
+              } catch (err) {
+                console.error('❌ Failed to list the Translations:');
+                console.error(err);
+              }
+            }
+
+            main();
+  /v2/projects/{project_id}/templates/{template_id}:
+    put:
+      tags:
+        - Templates V2
+      summary: Updates a template.
+      operationId: Templates_v2_UpdateTemplate
+      parameters:
+        - description: Required. The project ID.
+          name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: >-
+            The id of the template to be updated. Specified or automatically
+            generated during template creation. Unique per project.
+          name: template_id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v2Template'
+              required:
+                - id
+                - version
+            examples:
+              updateTemplate:
+                $ref: '#/components/examples/updateTemplateV2'
+        description: Required. The updated template.
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v2Template'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-codeSamples:
+        - lang: Java
+          source: >
+            /**
+             * Sinch Java Snippet
+             *
+             * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java
+             *
+             * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details
+             */
+            package conversation.templates.v2;
+
+
+            import com.sinch.sdk.SinchClient;
+
+            import
+            com.sinch.sdk.domains.conversation.models.v1.messages.types.text.TextMessage;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.api.v2.TemplatesV2Service;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.models.v2.TemplateTranslation;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.models.v2.TemplateV2;
+
+            import com.sinch.sdk.models.Configuration;
+
+            import com.sinch.sdk.models.ConversationRegion;
+
+            import java.util.Collections;
+
+            import java.util.logging.Logger;
+
+            import utils.Settings;
+
+
+            public class Update {
+
+              private static final Logger LOGGER = Logger.getLogger(Update.class.getName());
+
+              public static void main(String[] args) {
+
+                String projectId = Settings.getProjectId().orElse("MY_PROJECT_ID");
+                String keyId = Settings.getKeyId().orElse("MY_KEY_ID");
+                String keySecret = Settings.getKeySecret().orElse("MY_KEY_SECRET");
+                String conversationRegion = Settings.getConversationRegion().orElse("MY_CONVERSATION_REGION");
+
+                // The ID of the template to update
+                String conversationTemplateId = "TEMPLATE_ID";
+
+                Configuration configuration =
+                    Configuration.builder()
+                        .setProjectId(projectId)
+                        .setKeyId(keyId)
+                        .setKeySecret(keySecret)
+                        .setConversationRegion(ConversationRegion.from(conversationRegion))
+                        .build();
+
+                SinchClient client = new SinchClient(configuration);
+
+                TemplatesV2Service templatesServiceV2 = client.conversation().templates().v2();
+
+                TemplateV2 request =
+                    TemplateV2.builder()
+                        .setDescription("Updated description from V2 API")
+                        .setVersion(2)
+                        .setDefaultTranslation("en-US")
+                        .setTranslations(
+                            Collections.singletonList(
+                                TemplateTranslation.builder()
+                                    .setVersion("1")
+                                    .setLanguageCode("en-US")
+                                    .setMessage(
+                                        TextMessage.builder()
+                                            .setText("my updated text from V2 template")
+                                            .build())
+                                    .build()))
+                        .build();
+
+                LOGGER.info(String.format("Update template with ID '%s'", conversationTemplateId));
+
+                TemplateV2 response = templatesServiceV2.update(conversationTemplateId, request);
+
+                LOGGER.info("Response: " + response);
+              }
+            }
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+              const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';
+
+              // The ID of the Template to update
+              const templateId = 'TEMPLATE_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });
+
+              try {
+                const response = await sinch.conversation.templatesV2.update({
+                  template_id: templateId,
+                  updateTemplateRequestBody: {
+                    description: 'Updated description from Templates V1 API',
+                    default_translation: 'en-US',
+                    translations: [
+                      {
+                        language_code: 'en-US',
+                        version: '2',
+                        variables: [
+                          {
+                            key: 'name',
+                            preview_value: 'Professor Jones',
+                          },
+                        ],
+                        text_message: {
+                          text: 'Hello ${name}. Text message template created with V2 API',
+                        },
+                      },
+                    ],
+                  },
+                });
+                console.log('✅ Successfully updated the Template.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to update the Template with ID ${templateId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    get:
+      tags:
+        - Templates V2
+      summary: Get a template
+      operationId: Templates_v2_GetTemplate
+      parameters:
+        - description: Required. The project ID.
+          name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: Required. The ID of the template to fetch.
+          name: template_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/v2Template'
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-codeSamples:
+        - lang: Java
+          source: >
+            /**
+             * Sinch Java Snippet
+             *
+             * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java
+             *
+             * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details
+             */
+            package conversation.templates.v2;
+
+
+            import com.sinch.sdk.SinchClient;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.api.v2.TemplatesV2Service;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.models.v2.TemplateV2;
+
+            import com.sinch.sdk.models.Configuration;
+
+            import com.sinch.sdk.models.ConversationRegion;
+
+            import java.util.logging.Logger;
+
+            import utils.Settings;
+
+
+            public class Get {
+
+              private static final Logger LOGGER = Logger.getLogger(Get.class.getName());
+
+              public static void main(String[] args) {
+
+                String projectId = Settings.getProjectId().orElse("MY_PROJECT_ID");
+                String keyId = Settings.getKeyId().orElse("MY_KEY_ID");
+                String keySecret = Settings.getKeySecret().orElse("MY_KEY_SECRET");
+                String conversationRegion = Settings.getConversationRegion().orElse("MY_CONVERSATION_REGION");
+
+                // The ID of the template to retrieve
+                String conversationTemplateId = "TEMPLATE_ID";
+
+                Configuration configuration =
+                    Configuration.builder()
+                        .setProjectId(projectId)
+                        .setKeyId(keyId)
+                        .setKeySecret(keySecret)
+                        .setConversationRegion(ConversationRegion.from(conversationRegion))
+                        .build();
+
+                SinchClient client = new SinchClient(configuration);
+
+                TemplatesV2Service templatesServiceV2 = client.conversation().templates().v2();
+
+                LOGGER.info(
+                    String.format("Get information about template with ID '%s'", conversationTemplateId));
+
+                TemplateV2 response = templatesServiceV2.get(conversationTemplateId);
+
+                LOGGER.info("Response: " + response);
+              }
+            }
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+              const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';
+
+              // The ID of the Template to retrieve
+              const templateId = 'TEMPLATE_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });
+
+              try {
+                const response = await sinch.conversation.templatesV2.get({
+                  template_id: templateId,
+                });
+                console.log('✅ Successfully retrieved the Template.');
+                console.log(JSON.stringify(response, null, 2));
+              } catch (err) {
+                console.error(`❌ Failed to retrieve the Template with ID ${templateId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+    delete:
+      tags:
+        - Templates V2
+      summary: Delete a template.
+      operationId: Templates_v2_DeleteTemplate
+      parameters:
+        - description: Required. The project ID.
+          name: project_id
+          in: path
+          required: true
+          schema:
+            type: string
+        - description: Required. The ID of the template to delete.
+          name: template_id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema: {}
+        default:
+          description: An unexpected error response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/runtimeError'
+      x-codeSamples:
+        - lang: Java
+          source: >
+            /**
+             * Sinch Java Snippet
+             *
+             * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java
+             *
+             * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details
+             */
+            package conversation.templates.v2;
+
+
+            import com.sinch.sdk.SinchClient;
+
+            import
+            com.sinch.sdk.domains.conversation.templates.api.v2.TemplatesV2Service;
+
+            import com.sinch.sdk.models.Configuration;
+
+            import com.sinch.sdk.models.ConversationRegion;
+
+            import java.util.logging.Logger;
+
+            import utils.Settings;
+
+
+            public class Delete {
+
+              private static final Logger LOGGER = Logger.getLogger(Delete.class.getName());
+
+              public static void main(String[] args) {
+
+                String projectId = Settings.getProjectId().orElse("MY_PROJECT_ID");
+                String keyId = Settings.getKeyId().orElse("MY_KEY_ID");
+                String keySecret = Settings.getKeySecret().orElse("MY_KEY_SECRET");
+                String conversationRegion = Settings.getConversationRegion().orElse("MY_CONVERSATION_REGION");
+
+                // The ID of the template to delete
+                String conversationTemplateId = "TEMPLATE_ID";
+
+                Configuration configuration =
+                    Configuration.builder()
+                        .setProjectId(projectId)
+                        .setKeyId(keyId)
+                        .setKeySecret(keySecret)
+                        .setConversationRegion(ConversationRegion.from(conversationRegion))
+                        .build();
+
+                SinchClient client = new SinchClient(configuration);
+
+                TemplatesV2Service templatesServiceV2 = client.conversation().templates().v2();
+
+                LOGGER.info(String.format("Deleting template with ID '%s'", conversationTemplateId));
+
+                templatesServiceV2.delete(conversationTemplateId);
+
+                LOGGER.info("Done");
+              }
+            }
+        - lang: Node.js
+          source: |
+            /**
+             * Sinch Node.js Snippet
+             * See: https://github.com/sinch/sinch-sdk-node/examples/snippets
+             */
+            import { SinchClient } from '@sinch/sdk-core';
+            import * as dotenv from 'dotenv';
+            dotenv.config();
+
+            async function main() {
+              const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';
+              const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';
+              const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';
+              const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';
+
+              // The ID of the Template to delete
+              const templateId = 'TEMPLATE_ID';
+
+              const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });
+
+              try {
+                await sinch.conversation.templatesV2.delete({
+                  template_id: templateId,
+                });
+                console.log(`✅ Successfully deleted the Template with ID ${templateId}.`);
+              } catch (err) {
+                console.error(`❌ Failed to delete the Template with ID ${templateId}:`);
+                console.error(err);
+              }
+            }
+
+            main();
+tags:
+  - description: >-
+      Version 2 endpoints for managing message templates. Recommended version
+      for all users. Includes strongly typed `translations` field (allowing for
+      message definition using JSON structures also used in the send message
+      request of the Conversation API), improved validation, and the ability to
+      override omni-channel templates in favor of channel-specific templates
+      (where available).
+    name: Templates V2
+x-explorer-enabled: false
+x-samples-languages:
+  - curl
+  - java
+  - csharp
+  - node
+  - php
+servers:
+  - url: https://{region}.template.api.sinch.com
+    variables:
+      region:
+        default: us
+        enum:
+          - us
+          - eu
+          - br
+    description: >-
+      The {region} variable must be set to us, eu, or br, and it must match the
+      region in which you created your Conversation API app.
+components:
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: >-
+        For more information about basic authentication, see [Basic
+        Authentication](https://developers.sinch.com/docs/conversation/api-reference#authentication).
+    oAuth2:
+      type: oauth2
+      description: >-
+        The user name and password are your client_id and key_secret from the
+        [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+  examples:
+    createTemplateV2:
+      summary: Create a Conversation API V2 template.
+      value:
+        description: >-
+          English text template with one parameter using Conversation API
+          generic format.
+        default_translation: en-US
+        translations:
+          - language_code: en-US
+            version: '1'
+            variables:
+              - key: name
+                preview_value: Mr Jones
+            text_message:
+              text: Hi ${name}
+            channel_template_overrides:
+              WHATSAPP:
+                template_reference:
+                  template_id: <referenced template id>
+                  version: '1'
+                  language_code: en-US
+                  parameters:
+                    body[1]text: defaultValue
+                parameter_mappings:
+                  body[1]text: name
+    updateTemplateV2:
+      summary: Updates a Conversation API V2 template.
+      value:
+        id: <template id>
+        description: >-
+          English text template with one parameter using Conversation API
+          generic format.
+        version: 1
+        default_translation: en-US
+        translations:
+          - language_code: en-US
+            version: '1'
+            variables:
+              - key: name
+                preview_value: Mr Jones
+            text_message:
+              text: Hi ${name}
+            channel_template_overrides:
+              WHATSAPP:
+                template_reference:
+                  template_id: <referenced template id>
+                  version: '1'
+                  language_code: en-US
+                  parameters:
+                    body[1]text: defaultValue
+                parameter_mappings:
+                  body[1]text: name
+  schemas:
+    ChannelTemplateOverridesMap:
+      description: >-
+        Field to override the omnichannel template by referring to a
+        channel-specific template.
+
+        The key in the map must point to a valid conversation channel.
+
+        Currently only `WHATSAPP` and `KAKAOTALK` are supported
+      type: object
+      additionalProperties:
+        $ref: '#/components/schemas/ChannelTemplateOverride'
+    ChannelTemplateOverride:
+      type:
+        - object
+      properties:
+        template_reference:
+          $ref: '#/components/schemas/TemplateReference'
+        parameter_mappings:
+          description: >-
+            A mapping between omni-template variables and the channel specific
+            parameters.
+          type:
+            - object
+          additionalProperties:
+            type: string
+    typeTemplateVariable:
+      type: object
+      properties:
+        key:
+          type: string
+        preview_value:
+          type: string
+    v2ListTemplatesResponse:
+      type:
+        - object
+      properties:
+        templates:
+          type:
+            - array
+          items:
+            $ref: '#/components/schemas/v2Template'
+    v2ListTranslationsResponse:
+      type:
+        - object
+      properties:
+        translations:
+          type:
+            - array
+          items:
+            $ref: '#/components/schemas/v2TemplateTranslation'
+    v2Template:
+      type:
+        - object
+      properties:
+        id:
+          description: |-
+            The id of the template. Specify this yourself during creation.
+            Otherwise, we will generate an ID for you. This must be unique
+            for a given project.
+          type:
+            - string
+          example: id_string
+        description:
+          description: The description of the template.
+          type:
+            - string
+          example: Template description
+        version:
+          description: >-
+            The version of the template. While creating a template, this will be
+            defaulted to 1.
+
+            When updating a template, you must supply the latest version of the
+            template in order for the update to be successful.
+          type:
+            - integer
+          example: 1
+        default_translation:
+          type:
+            - string
+          description: >-
+            The default translation to use if not specified.
+
+            Specified as a BCP-47 `language_code` and the `language_code` must
+            exist
+
+            in the translations list.
+          example: en-US
+        translations:
+          type: array
+          items:
+            $ref: '#/components/schemas/v2TemplateTranslation'
+        create_time:
+          description: Timestamp of when the template was created.
+          type:
+            - string
+          format: date-time
+          readOnly: true
+        update_time:
+          description: Timestamp when the template was updated.
+          type:
+            - string
+          format: date-time
+          readOnly: true
+    v2TemplateTranslation:
+      type: object
+      required:
+        - language_code
+        - message
+      allOf:
+        - $ref: '#/components/schemas/v2MessageCommonProps'
+        - $ref: '#/components/schemas/v2MessageTypes'
+    v2MessageCommonProps:
+      type: object
+      properties:
+        language_code:
+          description: >-
+            The BCP-47 language code, such as `en-US` or `sr-Latn`. For more
+            information,
+
+            see https://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+          type:
+            - string
+        version:
+          description: The version of the translation.
+          type:
+            - string
+          example: '1'
+        channel_template_overrides:
+          $ref: '#/components/schemas/ChannelTemplateOverridesMap'
+        variables:
+          description: List of expected variables. Can be used for request validation.
+          type:
+            - array
+          items:
+            $ref: '#/components/schemas/typeTemplateVariable'
+        create_time:
+          description: Timestamp when the translation was created.
+          type:
+            - string
+          format: date-time
+          readOnly: true
+        update_time:
+          description: Timestamp of when the translation was updated.
+          type:
+            - string
+          format: date-time
+          readOnly: true
+    v2MessageTypes:
+      type: object
+      description: >-
+        Must be one of the following: [text_message, card_message,
+        carousel_message,
+
+        choice_message, location_message, media_message, template_message,
+        list_message]
+      oneOf:
+        - $ref: '#/components/schemas/CardMessageField'
+        - $ref: '#/components/schemas/CarouselMessageField'
+        - $ref: '#/components/schemas/ChoiceMessageField'
+        - $ref: '#/components/schemas/LocationMessageField'
+        - $ref: '#/components/schemas/MediaMessageField'
+        - $ref: '#/components/schemas/TemplateMessageField'
+        - $ref: '#/components/schemas/TextMessageField'
+        - $ref: '#/components/schemas/ListMessageField'
+        - $ref: '#/components/schemas/ContactInfoMessageField'
+    protobufAny:
+      type: object
+      properties:
+        type_url:
+          type: string
+        value:
+          type: string
+          format: byte
+    runtimeError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/protobufAny'
+            message:
+              type: string
+            status:
+              type: string
+    TemplateReference:
+      type: object
+      title: Template reference with concrete parameter values
+      description: >-
+        The referenced template can be an omnichannel template stored in
+        Conversation API Template Store as an AppMessage. You may also reference
+        external channel-specific templates, such as a WhatsApp Business
+        Template. Note that channel-specific template references are not
+        supported when populating the `explicit_channel_omni_message` field.
+      required:
+        - template_id
+      properties:
+        version:
+          type: string
+          description: >-
+            Used to specify what version of a template to use. Required when
+            using `omni_channel_override` and `omni_template` fields.
+
+            This will be used in conjunction with `language_code`. Note that,
+            when referencing omni-channel templates using the [Sinch Customer
+            Dashboard](https://dashboard.sinch.com/), the latest version of a
+            given omni-template can be identified by populating this field with
+            `latest`.
+        language_code:
+          description: >-
+            The BCP-47 language code, such as `en_US` or `sr_Latn`.
+
+            For more information, see
+            http://www.unicode.org/reports/tr35/#Unicode_locale_identifier.
+            English is the default `language_code`.
+
+            Note that, while many API calls involving templates accept either
+            the dashed format (`en-US`) or the underscored format (`en_US`),
+            some channel specific templates (for example, WhatsApp
+            channel-specific templates) only accept the underscored format. Note
+            that this field is required for WhatsApp channel-specific templates.
+          type: string
+        parameters:
+          description: |-
+            Required if the template has parameters. Concrete values must
+            be present for all defined parameters
+            in the template. Parameters can be different for
+            different versions and/or languages of the template.
+          type: object
+          additionalProperties:
+            type: string
+        template_id:
+          description: >-
+            The ID of the template. Note that, in the case of WhatsApp
+            channel-specific templates, this field must be populated by the name
+            of the template.
+          type: string
+    CallMessageField:
+      description: Message for triggering a call.
+      type: object
+      title: Call
+      properties:
+        call_message:
+          title: Call Message
+          type: object
+          required:
+            - phone_number
+            - title
+          properties:
+            phone_number:
+              description: Phone number in E.164 with leading +.
+              type: string
+              example: '+15551231234'
+            title:
+              description: |-
+                Title shown close to the phone number.
+                The title is clickable in some cases.
+              type: string
+              example: Message text
+    Coordinates:
+      type: object
+      title: Geographic coordinates
+      required:
+        - latitude
+        - longitude
+      properties:
+        latitude:
+          description: The latitude.
+          type: number
+          format: float
+        longitude:
+          description: The longitude.
+          type: number
+          format: float
+    LocationMessageField:
+      type: object
+      description: Message containing geographic location.
+      title: Location
+      properties:
+        location_message:
+          title: Location Message
+          type: object
+          required:
+            - coordinates
+            - title
+          properties:
+            coordinates:
+              $ref: '#/components/schemas/Coordinates'
+            label:
+              description: Label or name for the position.
+              type: string
+            title:
+              description: >-
+                The title is shown close to the button or link that leads to a
+                map showing the location. The title can be clickable in some
+                cases.
+              type: string
+    TextMessageField:
+      type: object
+      title: Text
+      description: A message containing only text.
+      properties:
+        text_message:
+          type: object
+          title: Text Message
+          required:
+            - text
+          properties:
+            text:
+              description: The text to be sent.
+              type: string
+    UrlMessageField:
+      description: A generic URL message.
+      type: object
+      title: URL
+      properties:
+        url_message:
+          title: URL Message
+          type: object
+          required:
+            - title
+            - url
+          properties:
+            title:
+              description: >-
+                The title shown close to the URL. The title can be clickable in
+                some cases.
+              type: string
+            url:
+              description: The url to show.
+              type: string
+    CalendarMessageField:
+      description: Message containing details about a calendar event.
+      type: object
+      title: Calendar
+      properties:
+        calendar_message:
+          title: Calendar message
+          type: object
+          required:
+            - title
+            - event_start
+            - event_end
+            - event_title
+            - fallback_url
+          properties:
+            title:
+              description: >-
+                The title is shown close to the button that leads to open a user
+                calendar.
+              type: string
+            event_start:
+              description: The timestamp defines start of a calendar event.
+              type: string
+              format: date-time
+              example: '2025-11-30T10:00:00Z'
+            event_end:
+              description: The timestamp defines end of a calendar event.
+              type: string
+              format: date-time
+              example: '2025-11-30T11:00:00Z'
+            event_title:
+              description: Title of a calendar event.
+              type: string
+            event_description:
+              description: Description of a calendar event.
+              type: string
+            fallback_url:
+              description: >-
+                The URL that is opened when the user cannot open a calendar
+                event directly or channel does not have support for this type.
+              type: string
+    ShareLocationMessageField:
+      description: Message requesting location from a user.
+      type: object
+      title: Request location
+      properties:
+        share_location_message:
+          title: Share Location Message
+          type: object
+          required:
+            - title
+            - fallback_url
+          properties:
+            title:
+              description: >-
+                The title is shown close to the button that leads to open a map
+                to share a location.
+              type: string
+            fallback_url:
+              description: >-
+                The URL that is opened when channel does not have support for
+                this type.
+              type: string
+    choiceTypes:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/CallMessageField'
+        - $ref: '#/components/schemas/LocationMessageField'
+        - $ref: '#/components/schemas/TextMessageField'
+        - $ref: '#/components/schemas/UrlMessageField'
+        - $ref: '#/components/schemas/CalendarMessageField'
+        - $ref: '#/components/schemas/ShareLocationMessageField'
+    DisplayMode:
+      description: >-
+        Controls the display behavior of a choice. Only supported for Choice
+        Message on the RCS channel. Has no effect on other channels or message
+        types, except for a carousel's outer choices, where it is rejected
+        outright.
+      type: string
+      x-enumDescriptions:
+        DISPLAY_MODE_UNSPECIFIED: Default. Transient — choice disappears when new messages arrive.
+        PERSISTENT: Persistent — choice remains visible in the message bubble.
+      enum:
+        - DISPLAY_MODE_UNSPECIFIED
+        - PERSISTENT
+    choiceCommonProps:
+      type: object
+      properties:
+        postback_data:
+          description: >-
+            An optional field. This data will be returned in the
+            ChoiceResponseMessage. The default is message_id_{text, title}.
+        display_mode:
+          $ref: '#/components/schemas/DisplayMode'
+    Choice:
+      description: >-
+        A choice is an action the user can take such as buttons for quick
+        replies or other call to actions.
+      type: object
+      title: Choice message
+      allOf:
+        - $ref: '#/components/schemas/choiceTypes'
+        - $ref: '#/components/schemas/choiceCommonProps'
+    CardHeight:
+      description: You can set the desired size of the card in the message.
+      type: string
+      x-enumDescriptions:
+        UNSPECIFIED_HEIGHT: The height of the card is unspecified.
+        SHORT: The shortest card height.
+        MEDIUM: Medium card height.
+        TALL: The tallest card height.
+      enum:
+        - UNSPECIFIED_HEIGHT
+        - SHORT
+        - MEDIUM
+        - TALL
+    MediaProperties:
+      title: Media Properties
+      type: object
+      required:
+        - url
+      properties:
+        thumbnail_url:
+          type: string
+          description: An optional parameter. Will be used where it is natively supported.
+        url:
+          description: Url to the media file.
+          type: string
+        filename_override:
+          description: Overrides the media file name.
+          type: string
+    CardMessage:
+      description: Message containing text, media and choices.
+      title: Card Message
+      type: object
+      properties:
+        choices:
+          description: >-
+            You may include choices in your Card Message. The number of choices
+            is limited to 10.
+          type: array
+          items:
+            $ref: '#/components/schemas/Choice'
+        description:
+          description: >-
+            This is an optional description field that is displayed below the
+            title on the card.
+          type: string
+        height:
+          $ref: '#/components/schemas/CardHeight'
+        title:
+          description: The title of the card message.
+          type: string
+        media_message:
+          type: object
+          description: A message containing a media component.
+          allOf:
+            - $ref: '#/components/schemas/MediaProperties'
+        message_properties:
+          type: object
+          description: Optional additional properties.
+          properties:
+            whatsapp_header:
+              description: >-
+                Optional. Sets the header for the footer of a WhatsApp reply
+                button message, if there is no media in the message. Ignored for
+                other channels. Ignored if not transcoded to a native WhatsApp
+                message with reply buttons.
+              type: string
+    CardMessageField:
+      description: Field containing a Card Message
+      type: object
+      title: Card
+      properties:
+        card_message:
+          $ref: '#/components/schemas/CardMessage'
+    CarouselMessageField:
+      description: >-
+        Message containing a list of cards often rendered horizontally on
+        supported channels.
+      type: object
+      title: Carousel
+      properties:
+        carousel_message:
+          title: Carousel Message
+          type: object
+          required:
+            - cards
+          properties:
+            cards:
+              description: A list of up to 10 cards.
+              type: array
+              items:
+                $ref: '#/components/schemas/CardMessage'
+            choices:
+              description: >-
+                Optional. Outer choices on the carousel level. The number of
+                outer choices is limited to 3.
+              type: array
+              items:
+                $ref: '#/components/schemas/Choice'
+    Choices:
+      type: object
+      properties:
+        choices:
+          type: array
+          description: The number of choices is limited to 10.
+          items:
+            $ref: '#/components/schemas/Choice'
+    ChoiceMessagePropertiesField:
+      type: object
+      title: Properties
+      description: Additional properties for the message.
+      properties:
+        message_properties:
+          type: object
+          properties:
+            whatsapp_footer:
+              description: >-
+                Optional. Sets the text for the footer of a WhatsApp reply
+                button or URL button message. Ignored for other channels.
+              type: string
+    ChoiceMessageField:
+      description: Message containing choices/actions.
+      type: object
+      title: Choice
+      properties:
+        choice_message:
+          title: Choice Message
+          type: object
+          required:
+            - choices
+          allOf:
+            - description: A message containing choices.
+            - $ref: '#/components/schemas/Choices'
+            - $ref: '#/components/schemas/TextMessageField'
+            - $ref: '#/components/schemas/ChoiceMessagePropertiesField'
+    MediaMessageField:
+      type: object
+      title: Media Message
+      description: >-
+        A message containing a media component, such as an image, document, or
+        video.
+      properties:
+        media_message:
+          $ref: '#/components/schemas/MediaProperties'
+    TemplateReferenceWithVersion:
+      type: object
+      allOf:
+        - required:
+            - version
+        - $ref: '#/components/schemas/TemplateReference'
+    TemplateMessageField:
+      type: object
+      description: Message referring to predefined template
+      title: Template Message
+      properties:
+        template_message:
+          type: object
+          title: Template Message
+          properties:
+            channel_template:
+              description: >-
+                Optional. Channel specific template reference with parameters
+                per channel.
+
+                The channel template if exists overrides the omnichannel
+                template.
+
+                At least one of `channel_template` or `omni_template` needs to
+                be present.
+
+                The key in the map must point to a valid conversation channel as
+
+                defined by the enum ConversationChannel.
+              type: object
+              additionalProperties:
+                $ref: '#/components/schemas/TemplateReference'
+            omni_template:
+              $ref: '#/components/schemas/TemplateReferenceWithVersion'
+    ChoiceItem:
+      type: object
+      title: Choice
+      description: A message component for interactive messages, containing a choice.
+      required:
+        - title
+      properties:
+        title:
+          type: string
+          description: Required parameter. Title for the choice item.
+        description:
+          type: string
+          description: >-
+            Optional parameter. The description (or subtitle) of this choice
+            item.
+        media:
+          description: Optional parameter. The media of this choice item.
+          allOf:
+            - $ref: '#/components/schemas/MediaProperties'
+        postback_data:
+          type: string
+          description: >-
+            Optional parameter. Postback data that will be returned in the MO if
+            the user selects this option.
+    ProductItem:
+      type: object
+      title: Product
+      description: A message component for interactive messages, containing a product.
+      required:
+        - id
+        - marketplace
+      properties:
+        id:
+          type: string
+          description: Required parameter. The ID for the product.
+        marketplace:
+          type: string
+          description: Required parameter. The marketplace to which the product belongs.
+          example: FACEBOOK
+        quantity:
+          type: integer
+          format: int32
+          description: Output only. The quantity of the chosen product.
+        item_price:
+          type: number
+          format: float
+          description: Output only. The price for one unit of the chosen product.
+        currency:
+          type: string
+          description: Output only. The currency of the item_price.
+    ListItem:
+      type: object
+      title: List Item
+      description: Item containing either choiceItem or ProductItem
+      oneOf:
+        - required:
+            - choice
+          type: object
+          properties:
+            choice:
+              $ref: '#/components/schemas/ChoiceItem'
+          title: Choice
+        - required:
+            - product
+          type: object
+          properties:
+            product:
+              $ref: '#/components/schemas/ProductItem'
+          title: Product
+    ListSection:
+      type: object
+      title: List Section
+      description: Section for interactive WhatsApp messages containing ListItem
+      required:
+        - items
+      properties:
+        title:
+          description: Optional parameter. Title for list section.
+          type: string
+        items:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListItem'
+    ListMessageField:
+      type: object
+      title: List
+      description: >-
+        A message containing a list of options to choose from. All items must be
+        of the same type.
+      properties:
+        list_message:
+          title: List Message
+          type: object
+          required:
+            - title
+            - sections
+          properties:
+            title:
+              description: >-
+                A title for the message that is displayed near the products or
+                choices.
+              type: string
+            description:
+              description: >-
+                This is an optional field, containing a description for the
+                message.
+              type: string
+            media:
+              $ref: '#/components/schemas/MediaProperties'
+            sections:
+              description: >-
+                List of ListSection objects containing choices to be presented
+                in the list message.
+              type: array
+              items:
+                $ref: '#/components/schemas/ListSection'
+            message_properties:
+              description: >-
+                Additional properties for the message. Required if sending a
+                product list message.
+              properties:
+                catalog_id:
+                  description: >-
+                    Required if sending a product list message. The ID of the
+                    catalog to which the products belong.
+                  type: string
+                menu:
+                  description: >-
+                    Optional. Sets the text for the menu of a choice list
+                    message.
+                  type: string
+                whatsapp_header:
+                  description: >-
+                    Optional. Sets the text for the header of a WhatsApp choice
+                    list message. Ignored for other channels.
+                  type: string
+    NameInfo:
+      type: object
+      title: Name of the contact
+      description: Name information of the contact.
+      required:
+        - full_name
+      properties:
+        full_name:
+          description: Full name of the contact
+          type: string
+        first_name:
+          description: First name.
+          type: string
+        last_name:
+          description: Last name.
+          type: string
+        middle_name:
+          description: Middle name.
+          type: string
+        prefix:
+          description: Prefix before the name. e.g. Mr, Mrs, Dr etc.
+          type: string
+        suffix:
+          description: Suffix after the name.
+          type: string
+    PhoneNumberInfo:
+      type: object
+      title: Phone number
+      description: Phone numbers of the contact.
+      required:
+        - phone_number
+      properties:
+        phone_number:
+          description: Phone number with country code included.
+          type: string
+        type:
+          description: Phone number type, e.g. WORK or HOME.
+          type: string
+    AddressInfo:
+      type: object
+      title: Address information
+      description: Physical addresses of the contact.
+      properties:
+        city:
+          description: City Name
+          type: string
+        country:
+          description: Country Name
+          type: string
+        state:
+          description: Name of a state or region of a country.
+          type: string
+        zip:
+          description: Zip/postal code
+          type: string
+        type:
+          description: Address type, e.g. WORK or HOME
+          type: string
+        country_code:
+          description: Two letter country code.
+          type: string
+    EmailInfo:
+      type: object
+      title: Email information
+      description: Email addresses of the contact.
+      required:
+        - email_address
+      properties:
+        email_address:
+          description: Email address.
+          type: string
+        type:
+          description: Email address type. e.g. WORK or HOME.
+          type: string
+    OrganizationInfo:
+      type: object
+      title: Organization information
+      description: Organization information of the contact.
+      properties:
+        company:
+          description: Company name
+          type: string
+        department:
+          description: Department at the company
+          type: string
+        title:
+          description: Corporate title, e.g. Software engineer
+          type: string
+    UrlInfo:
+      type: object
+      title: URL Info
+      description: A URL/website
+      required:
+        - url
+      properties:
+        url:
+          description: The URL to be referenced
+          type: string
+        type:
+          description: Optional. URL type, e.g. Org or Social
+          type: string
+    ContactInfoMessageField:
+      type: object
+      description: Message containing contact information.
+      title: Contact Info
+      properties:
+        contact_info_message:
+          title: Contact Info Message
+          type: object
+          required:
+            - name
+            - phone_numbers
+          properties:
+            name:
+              $ref: '#/components/schemas/NameInfo'
+            phone_numbers:
+              description: Phone numbers of the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/PhoneNumberInfo'
+            addresses:
+              description: Physical addresses of the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/AddressInfo'
+            email_addresses:
+              description: Email addresses of the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/EmailInfo'
+            organization:
+              $ref: '#/components/schemas/OrganizationInfo'
+            urls:
+              description: URLs/websites associated with the contact
+              type: array
+              items:
+                $ref: '#/components/schemas/UrlInfo'
+            birthday:
+              description: Date of birth in YYYY-MM-DD format.
+              type: string
+x-proxy-enabled: true
+x-samples-enabled: true

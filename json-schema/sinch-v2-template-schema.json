@@ -1,0 +1,1051 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-v2-template-schema.json",
+  "title": "v2Template",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-template-management-api-openapi.yml#/components/schemas/v2Template",
+  "type": [
+    "object"
+  ],
+  "properties": {
+    "id": {
+      "description": "The id of the template. Specify this yourself during creation.\nOtherwise, we will generate an ID for you. This must be unique\nfor a given project.",
+      "type": [
+        "string"
+      ]
+    },
+    "description": {
+      "description": "The description of the template.",
+      "type": [
+        "string"
+      ]
+    },
+    "version": {
+      "description": "The version of the template. While creating a template, this will be defaulted to 1.\nWhen updating a template, you must supply the latest version of the template in order for the update to be successful.",
+      "type": [
+        "integer"
+      ]
+    },
+    "default_translation": {
+      "type": [
+        "string"
+      ],
+      "description": "The default translation to use if not specified.\nSpecified as a BCP-47 `language_code` and the `language_code` must exist\nin the translations list."
+    },
+    "translations": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/v2TemplateTranslation"
+      }
+    },
+    "create_time": {
+      "description": "Timestamp of when the template was created.",
+      "type": [
+        "string"
+      ],
+      "format": "date-time",
+      "readOnly": true
+    },
+    "update_time": {
+      "description": "Timestamp when the template was updated.",
+      "type": [
+        "string"
+      ],
+      "format": "date-time",
+      "readOnly": true
+    }
+  },
+  "$defs": {
+    "AddressInfo": {
+      "type": "object",
+      "title": "Address information",
+      "description": "Physical addresses of the contact.",
+      "properties": {
+        "city": {
+          "description": "City Name",
+          "type": "string"
+        },
+        "country": {
+          "description": "Country Name",
+          "type": "string"
+        },
+        "state": {
+          "description": "Name of a state or region of a country.",
+          "type": "string"
+        },
+        "zip": {
+          "description": "Zip/postal code",
+          "type": "string"
+        },
+        "type": {
+          "description": "Address type, e.g. WORK or HOME",
+          "type": "string"
+        },
+        "country_code": {
+          "description": "Two letter country code.",
+          "type": "string"
+        }
+      }
+    },
+    "CalendarMessageField": {
+      "description": "Message containing details about a calendar event.",
+      "type": "object",
+      "title": "Calendar",
+      "properties": {
+        "calendar_message": {
+          "title": "Calendar message",
+          "type": "object",
+          "required": [
+            "title",
+            "event_start",
+            "event_end",
+            "event_title",
+            "fallback_url"
+          ],
+          "properties": {
+            "title": {
+              "description": "The title is shown close to the button that leads to open a user calendar.",
+              "type": "string"
+            },
+            "event_start": {
+              "description": "The timestamp defines start of a calendar event.",
+              "type": "string",
+              "format": "date-time"
+            },
+            "event_end": {
+              "description": "The timestamp defines end of a calendar event.",
+              "type": "string",
+              "format": "date-time"
+            },
+            "event_title": {
+              "description": "Title of a calendar event.",
+              "type": "string"
+            },
+            "event_description": {
+              "description": "Description of a calendar event.",
+              "type": "string"
+            },
+            "fallback_url": {
+              "description": "The URL that is opened when the user cannot open a calendar event directly or channel does not have support for this type.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "CallMessageField": {
+      "description": "Message for triggering a call.",
+      "type": "object",
+      "title": "Call",
+      "properties": {
+        "call_message": {
+          "title": "Call Message",
+          "type": "object",
+          "required": [
+            "phone_number",
+            "title"
+          ],
+          "properties": {
+            "phone_number": {
+              "description": "Phone number in E.164 with leading +.",
+              "type": "string"
+            },
+            "title": {
+              "description": "Title shown close to the phone number.\nThe title is clickable in some cases.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "CardHeight": {
+      "description": "You can set the desired size of the card in the message.",
+      "type": "string",
+      "x-enumDescriptions": {
+        "UNSPECIFIED_HEIGHT": "The height of the card is unspecified.",
+        "SHORT": "The shortest card height.",
+        "MEDIUM": "Medium card height.",
+        "TALL": "The tallest card height."
+      },
+      "enum": [
+        "UNSPECIFIED_HEIGHT",
+        "SHORT",
+        "MEDIUM",
+        "TALL"
+      ]
+    },
+    "CardMessage": {
+      "description": "Message containing text, media and choices.",
+      "title": "Card Message",
+      "type": "object",
+      "properties": {
+        "choices": {
+          "description": "You may include choices in your Card Message. The number of choices is limited to 10.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/Choice"
+          }
+        },
+        "description": {
+          "description": "This is an optional description field that is displayed below the title on the card.",
+          "type": "string"
+        },
+        "height": {
+          "$ref": "#/$defs/CardHeight"
+        },
+        "title": {
+          "description": "The title of the card message.",
+          "type": "string"
+        },
+        "media_message": {
+          "type": "object",
+          "description": "A message containing a media component.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/MediaProperties"
+            }
+          ]
+        },
+        "message_properties": {
+          "type": "object",
+          "description": "Optional additional properties.",
+          "properties": {
+            "whatsapp_header": {
+              "description": "Optional. Sets the header for the footer of a WhatsApp reply button message, if there is no media in the message. Ignored for other channels. Ignored if not transcoded to a native WhatsApp message with reply buttons.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "CardMessageField": {
+      "description": "Field containing a Card Message",
+      "type": "object",
+      "title": "Card",
+      "properties": {
+        "card_message": {
+          "$ref": "#/$defs/CardMessage"
+        }
+      }
+    },
+    "CarouselMessageField": {
+      "description": "Message containing a list of cards often rendered horizontally on supported channels.",
+      "type": "object",
+      "title": "Carousel",
+      "properties": {
+        "carousel_message": {
+          "title": "Carousel Message",
+          "type": "object",
+          "required": [
+            "cards"
+          ],
+          "properties": {
+            "cards": {
+              "description": "A list of up to 10 cards.",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/CardMessage"
+              }
+            },
+            "choices": {
+              "description": "Optional. Outer choices on the carousel level. The number of outer choices is limited to 3.",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/Choice"
+              }
+            }
+          }
+        }
+      }
+    },
+    "ChannelTemplateOverride": {
+      "type": [
+        "object"
+      ],
+      "properties": {
+        "template_reference": {
+          "$ref": "#/$defs/TemplateReference"
+        },
+        "parameter_mappings": {
+          "description": "A mapping between omni-template variables and the channel specific parameters.",
+          "type": [
+            "object"
+          ],
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "ChannelTemplateOverridesMap": {
+      "description": "Field to override the omnichannel template by referring to a channel-specific template.\nThe key in the map must point to a valid conversation channel.\nCurrently only `WHATSAPP` and `KAKAOTALK` are supported",
+      "type": "object",
+      "additionalProperties": {
+        "$ref": "#/$defs/ChannelTemplateOverride"
+      }
+    },
+    "Choice": {
+      "description": "A choice is an action the user can take such as buttons for quick replies or other call to actions.",
+      "type": "object",
+      "title": "Choice message",
+      "allOf": [
+        {
+          "$ref": "#/$defs/choiceTypes"
+        },
+        {
+          "$ref": "#/$defs/choiceCommonProps"
+        }
+      ]
+    },
+    "ChoiceItem": {
+      "type": "object",
+      "title": "Choice",
+      "description": "A message component for interactive messages, containing a choice.",
+      "required": [
+        "title"
+      ],
+      "properties": {
+        "title": {
+          "type": "string",
+          "description": "Required parameter. Title for the choice item."
+        },
+        "description": {
+          "type": "string",
+          "description": "Optional parameter. The description (or subtitle) of this choice item."
+        },
+        "media": {
+          "description": "Optional parameter. The media of this choice item.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/MediaProperties"
+            }
+          ]
+        },
+        "postback_data": {
+          "type": "string",
+          "description": "Optional parameter. Postback data that will be returned in the MO if the user selects this option."
+        }
+      }
+    },
+    "ChoiceMessageField": {
+      "description": "Message containing choices/actions.",
+      "type": "object",
+      "title": "Choice",
+      "properties": {
+        "choice_message": {
+          "title": "Choice Message",
+          "type": "object",
+          "required": [
+            "choices"
+          ],
+          "allOf": [
+            {
+              "description": "A message containing choices."
+            },
+            {
+              "$ref": "#/$defs/Choices"
+            },
+            {
+              "$ref": "#/$defs/TextMessageField"
+            },
+            {
+              "$ref": "#/$defs/ChoiceMessagePropertiesField"
+            }
+          ]
+        }
+      }
+    },
+    "ChoiceMessagePropertiesField": {
+      "type": "object",
+      "title": "Properties",
+      "description": "Additional properties for the message.",
+      "properties": {
+        "message_properties": {
+          "type": "object",
+          "properties": {
+            "whatsapp_footer": {
+              "description": "Optional. Sets the text for the footer of a WhatsApp reply button or URL button message. Ignored for other channels.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "Choices": {
+      "type": "object",
+      "properties": {
+        "choices": {
+          "type": "array",
+          "description": "The number of choices is limited to 10.",
+          "items": {
+            "$ref": "#/$defs/Choice"
+          }
+        }
+      }
+    },
+    "ContactInfoMessageField": {
+      "type": "object",
+      "description": "Message containing contact information.",
+      "title": "Contact Info",
+      "properties": {
+        "contact_info_message": {
+          "title": "Contact Info Message",
+          "type": "object",
+          "required": [
+            "name",
+            "phone_numbers"
+          ],
+          "properties": {
+            "name": {
+              "$ref": "#/$defs/NameInfo"
+            },
+            "phone_numbers": {
+              "description": "Phone numbers of the contact",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/PhoneNumberInfo"
+              }
+            },
+            "addresses": {
+              "description": "Physical addresses of the contact",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/AddressInfo"
+              }
+            },
+            "email_addresses": {
+              "description": "Email addresses of the contact",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/EmailInfo"
+              }
+            },
+            "organization": {
+              "$ref": "#/$defs/OrganizationInfo"
+            },
+            "urls": {
+              "description": "URLs/websites associated with the contact",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/UrlInfo"
+              }
+            },
+            "birthday": {
+              "description": "Date of birth in YYYY-MM-DD format.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "Coordinates": {
+      "type": "object",
+      "title": "Geographic coordinates",
+      "required": [
+        "latitude",
+        "longitude"
+      ],
+      "properties": {
+        "latitude": {
+          "description": "The latitude.",
+          "type": "number",
+          "format": "float"
+        },
+        "longitude": {
+          "description": "The longitude.",
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "DisplayMode": {
+      "description": "Controls the display behavior of a choice. Only supported for Choice Message on the RCS channel. Has no effect on other channels or message types, except for a carousel's outer choices, where it is rejected outright.",
+      "type": "string",
+      "x-enumDescriptions": {
+        "DISPLAY_MODE_UNSPECIFIED": "Default. Transient — choice disappears when new messages arrive.",
+        "PERSISTENT": "Persistent — choice remains visible in the message bubble."
+      },
+      "enum": [
+        "DISPLAY_MODE_UNSPECIFIED",
+        "PERSISTENT"
+      ]
+    },
+    "EmailInfo": {
+      "type": "object",
+      "title": "Email information",
+      "description": "Email addresses of the contact.",
+      "required": [
+        "email_address"
+      ],
+      "properties": {
+        "email_address": {
+          "description": "Email address.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Email address type. e.g. WORK or HOME.",
+          "type": "string"
+        }
+      }
+    },
+    "ListItem": {
+      "type": "object",
+      "title": "List Item",
+      "description": "Item containing either choiceItem or ProductItem",
+      "oneOf": [
+        {
+          "required": [
+            "choice"
+          ],
+          "type": "object",
+          "properties": {
+            "choice": {
+              "$ref": "#/$defs/ChoiceItem"
+            }
+          },
+          "title": "Choice"
+        },
+        {
+          "required": [
+            "product"
+          ],
+          "type": "object",
+          "properties": {
+            "product": {
+              "$ref": "#/$defs/ProductItem"
+            }
+          },
+          "title": "Product"
+        }
+      ]
+    },
+    "ListMessageField": {
+      "type": "object",
+      "title": "List",
+      "description": "A message containing a list of options to choose from. All items must be of the same type.",
+      "properties": {
+        "list_message": {
+          "title": "List Message",
+          "type": "object",
+          "required": [
+            "title",
+            "sections"
+          ],
+          "properties": {
+            "title": {
+              "description": "A title for the message that is displayed near the products or choices.",
+              "type": "string"
+            },
+            "description": {
+              "description": "This is an optional field, containing a description for the message.",
+              "type": "string"
+            },
+            "media": {
+              "$ref": "#/$defs/MediaProperties"
+            },
+            "sections": {
+              "description": "List of ListSection objects containing choices to be presented in the list message.",
+              "type": "array",
+              "items": {
+                "$ref": "#/$defs/ListSection"
+              }
+            },
+            "message_properties": {
+              "description": "Additional properties for the message. Required if sending a product list message.",
+              "properties": {
+                "catalog_id": {
+                  "description": "Required if sending a product list message. The ID of the catalog to which the products belong.",
+                  "type": "string"
+                },
+                "menu": {
+                  "description": "Optional. Sets the text for the menu of a choice list message.",
+                  "type": "string"
+                },
+                "whatsapp_header": {
+                  "description": "Optional. Sets the text for the header of a WhatsApp choice list message. Ignored for other channels.",
+                  "type": "string"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "ListSection": {
+      "type": "object",
+      "title": "List Section",
+      "description": "Section for interactive WhatsApp messages containing ListItem",
+      "required": [
+        "items"
+      ],
+      "properties": {
+        "title": {
+          "description": "Optional parameter. Title for list section.",
+          "type": "string"
+        },
+        "items": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ListItem"
+          }
+        }
+      }
+    },
+    "LocationMessageField": {
+      "type": "object",
+      "description": "Message containing geographic location.",
+      "title": "Location",
+      "properties": {
+        "location_message": {
+          "title": "Location Message",
+          "type": "object",
+          "required": [
+            "coordinates",
+            "title"
+          ],
+          "properties": {
+            "coordinates": {
+              "$ref": "#/$defs/Coordinates"
+            },
+            "label": {
+              "description": "Label or name for the position.",
+              "type": "string"
+            },
+            "title": {
+              "description": "The title is shown close to the button or link that leads to a map showing the location. The title can be clickable in some cases.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "MediaMessageField": {
+      "type": "object",
+      "title": "Media Message",
+      "description": "A message containing a media component, such as an image, document, or video.",
+      "properties": {
+        "media_message": {
+          "$ref": "#/$defs/MediaProperties"
+        }
+      }
+    },
+    "MediaProperties": {
+      "title": "Media Properties",
+      "type": "object",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "thumbnail_url": {
+          "type": "string",
+          "description": "An optional parameter. Will be used where it is natively supported."
+        },
+        "url": {
+          "description": "Url to the media file.",
+          "type": "string"
+        },
+        "filename_override": {
+          "description": "Overrides the media file name.",
+          "type": "string"
+        }
+      }
+    },
+    "NameInfo": {
+      "type": "object",
+      "title": "Name of the contact",
+      "description": "Name information of the contact.",
+      "required": [
+        "full_name"
+      ],
+      "properties": {
+        "full_name": {
+          "description": "Full name of the contact",
+          "type": "string"
+        },
+        "first_name": {
+          "description": "First name.",
+          "type": "string"
+        },
+        "last_name": {
+          "description": "Last name.",
+          "type": "string"
+        },
+        "middle_name": {
+          "description": "Middle name.",
+          "type": "string"
+        },
+        "prefix": {
+          "description": "Prefix before the name. e.g. Mr, Mrs, Dr etc.",
+          "type": "string"
+        },
+        "suffix": {
+          "description": "Suffix after the name.",
+          "type": "string"
+        }
+      }
+    },
+    "OrganizationInfo": {
+      "type": "object",
+      "title": "Organization information",
+      "description": "Organization information of the contact.",
+      "properties": {
+        "company": {
+          "description": "Company name",
+          "type": "string"
+        },
+        "department": {
+          "description": "Department at the company",
+          "type": "string"
+        },
+        "title": {
+          "description": "Corporate title, e.g. Software engineer",
+          "type": "string"
+        }
+      }
+    },
+    "PhoneNumberInfo": {
+      "type": "object",
+      "title": "Phone number",
+      "description": "Phone numbers of the contact.",
+      "required": [
+        "phone_number"
+      ],
+      "properties": {
+        "phone_number": {
+          "description": "Phone number with country code included.",
+          "type": "string"
+        },
+        "type": {
+          "description": "Phone number type, e.g. WORK or HOME.",
+          "type": "string"
+        }
+      }
+    },
+    "ProductItem": {
+      "type": "object",
+      "title": "Product",
+      "description": "A message component for interactive messages, containing a product.",
+      "required": [
+        "id",
+        "marketplace"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Required parameter. The ID for the product."
+        },
+        "marketplace": {
+          "type": "string",
+          "description": "Required parameter. The marketplace to which the product belongs."
+        },
+        "quantity": {
+          "type": "integer",
+          "format": "int32",
+          "description": "Output only. The quantity of the chosen product."
+        },
+        "item_price": {
+          "type": "number",
+          "format": "float",
+          "description": "Output only. The price for one unit of the chosen product."
+        },
+        "currency": {
+          "type": "string",
+          "description": "Output only. The currency of the item_price."
+        }
+      }
+    },
+    "ShareLocationMessageField": {
+      "description": "Message requesting location from a user.",
+      "type": "object",
+      "title": "Request location",
+      "properties": {
+        "share_location_message": {
+          "title": "Share Location Message",
+          "type": "object",
+          "required": [
+            "title",
+            "fallback_url"
+          ],
+          "properties": {
+            "title": {
+              "description": "The title is shown close to the button that leads to open a map to share a location.",
+              "type": "string"
+            },
+            "fallback_url": {
+              "description": "The URL that is opened when channel does not have support for this type.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "TemplateMessageField": {
+      "type": "object",
+      "description": "Message referring to predefined template",
+      "title": "Template Message",
+      "properties": {
+        "template_message": {
+          "type": "object",
+          "title": "Template Message",
+          "properties": {
+            "channel_template": {
+              "description": "Optional. Channel specific template reference with parameters per channel.\nThe channel template if exists overrides the omnichannel template.\nAt least one of `channel_template` or `omni_template` needs to be present.\nThe key in the map must point to a valid conversation channel as\ndefined by the enum ConversationChannel.",
+              "type": "object",
+              "additionalProperties": {
+                "$ref": "#/$defs/TemplateReference"
+              }
+            },
+            "omni_template": {
+              "$ref": "#/$defs/TemplateReferenceWithVersion"
+            }
+          }
+        }
+      }
+    },
+    "TemplateReference": {
+      "type": "object",
+      "title": "Template reference with concrete parameter values",
+      "description": "The referenced template can be an omnichannel template stored in Conversation API Template Store as an AppMessage. You may also reference external channel-specific templates, such as a WhatsApp Business Template. Note that channel-specific template references are not supported when populating the `explicit_channel_omni_message` field.",
+      "required": [
+        "template_id"
+      ],
+      "properties": {
+        "version": {
+          "type": "string",
+          "description": "Used to specify what version of a template to use. Required when using `omni_channel_override` and `omni_template` fields.\nThis will be used in conjunction with `language_code`. Note that, when referencing omni-channel templates using the [Sinch Customer Dashboard](https://dashboard.sinch.com/), the latest version of a given omni-template can be identified by populating this field with `latest`."
+        },
+        "language_code": {
+          "description": "The BCP-47 language code, such as `en_US` or `sr_Latn`.\nFor more information, see http://www.unicode.org/reports/tr35/#Unicode_locale_identifier. English is the default `language_code`.\nNote that, while many API calls involving templates accept either the dashed format (`en-US`) or the underscored format (`en_US`), some channel specific templates (for example, WhatsApp channel-specific templates) only accept the underscored format. Note that this field is required for WhatsApp channel-specific templates.",
+          "type": "string"
+        },
+        "parameters": {
+          "description": "Required if the template has parameters. Concrete values must\nbe present for all defined parameters\nin the template. Parameters can be different for\ndifferent versions and/or languages of the template.",
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        },
+        "template_id": {
+          "description": "The ID of the template. Note that, in the case of WhatsApp channel-specific templates, this field must be populated by the name of the template.",
+          "type": "string"
+        }
+      }
+    },
+    "TemplateReferenceWithVersion": {
+      "type": "object",
+      "allOf": [
+        {
+          "required": [
+            "version"
+          ]
+        },
+        {
+          "$ref": "#/$defs/TemplateReference"
+        }
+      ]
+    },
+    "TextMessageField": {
+      "type": "object",
+      "title": "Text",
+      "description": "A message containing only text.",
+      "properties": {
+        "text_message": {
+          "type": "object",
+          "title": "Text Message",
+          "required": [
+            "text"
+          ],
+          "properties": {
+            "text": {
+              "description": "The text to be sent.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "UrlInfo": {
+      "type": "object",
+      "title": "URL Info",
+      "description": "A URL/website",
+      "required": [
+        "url"
+      ],
+      "properties": {
+        "url": {
+          "description": "The URL to be referenced",
+          "type": "string"
+        },
+        "type": {
+          "description": "Optional. URL type, e.g. Org or Social",
+          "type": "string"
+        }
+      }
+    },
+    "UrlMessageField": {
+      "description": "A generic URL message.",
+      "type": "object",
+      "title": "URL",
+      "properties": {
+        "url_message": {
+          "title": "URL Message",
+          "type": "object",
+          "required": [
+            "title",
+            "url"
+          ],
+          "properties": {
+            "title": {
+              "description": "The title shown close to the URL. The title can be clickable in some cases.",
+              "type": "string"
+            },
+            "url": {
+              "description": "The url to show.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "choiceCommonProps": {
+      "type": "object",
+      "properties": {
+        "postback_data": {
+          "description": "An optional field. This data will be returned in the ChoiceResponseMessage. The default is message_id_{text, title}."
+        },
+        "display_mode": {
+          "$ref": "#/$defs/DisplayMode"
+        }
+      }
+    },
+    "choiceTypes": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/CallMessageField"
+        },
+        {
+          "$ref": "#/$defs/LocationMessageField"
+        },
+        {
+          "$ref": "#/$defs/TextMessageField"
+        },
+        {
+          "$ref": "#/$defs/UrlMessageField"
+        },
+        {
+          "$ref": "#/$defs/CalendarMessageField"
+        },
+        {
+          "$ref": "#/$defs/ShareLocationMessageField"
+        }
+      ]
+    },
+    "typeTemplateVariable": {
+      "type": "object",
+      "properties": {
+        "key": {
+          "type": "string"
+        },
+        "preview_value": {
+          "type": "string"
+        }
+      }
+    },
+    "v2MessageCommonProps": {
+      "type": "object",
+      "properties": {
+        "language_code": {
+          "description": "The BCP-47 language code, such as `en-US` or `sr-Latn`. For more information,\nsee https://www.unicode.org/reports/tr35/#Unicode_locale_identifier.",
+          "type": [
+            "string"
+          ]
+        },
+        "version": {
+          "description": "The version of the translation.",
+          "type": [
+            "string"
+          ]
+        },
+        "channel_template_overrides": {
+          "$ref": "#/$defs/ChannelTemplateOverridesMap"
+        },
+        "variables": {
+          "description": "List of expected variables. Can be used for request validation.",
+          "type": [
+            "array"
+          ],
+          "items": {
+            "$ref": "#/$defs/typeTemplateVariable"
+          }
+        },
+        "create_time": {
+          "description": "Timestamp when the translation was created.",
+          "type": [
+            "string"
+          ],
+          "format": "date-time",
+          "readOnly": true
+        },
+        "update_time": {
+          "description": "Timestamp of when the translation was updated.",
+          "type": [
+            "string"
+          ],
+          "format": "date-time",
+          "readOnly": true
+        }
+      }
+    },
+    "v2MessageTypes": {
+      "type": "object",
+      "description": "Must be one of the following: [text_message, card_message, carousel_message,\nchoice_message, location_message, media_message, template_message, list_message]",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/CardMessageField"
+        },
+        {
+          "$ref": "#/$defs/CarouselMessageField"
+        },
+        {
+          "$ref": "#/$defs/ChoiceMessageField"
+        },
+        {
+          "$ref": "#/$defs/LocationMessageField"
+        },
+        {
+          "$ref": "#/$defs/MediaMessageField"
+        },
+        {
+          "$ref": "#/$defs/TemplateMessageField"
+        },
+        {
+          "$ref": "#/$defs/TextMessageField"
+        },
+        {
+          "$ref": "#/$defs/ListMessageField"
+        },
+        {
+          "$ref": "#/$defs/ContactInfoMessageField"
+        }
+      ]
+    },
+    "v2TemplateTranslation": {
+      "type": "object",
+      "required": [
+        "language_code",
+        "message"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/v2MessageCommonProps"
+        },
+        {
+          "$ref": "#/$defs/v2MessageTypes"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-subproject-schema.json",
+  "title": "Subproject",
+  "description": "Subprojects are used to logically group a set of product services.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-subprojects-api-openapi.yml#/components/schemas/Subproject",
+  "type": "object",
+  "required": [
+    "subprojectId",
+    "displayName",
+    "parentProjectId",
+    "createTime",
+    "updateTime",
+    "deleted"
+  ],
+  "properties": {
+    "createTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date/time the subproject was created. ISO 8601 format.",
+      "readOnly": true
+    },
+    "deleted": {
+      "type": "boolean",
+      "description": "The current deleted state of the subproject.",
+      "readOnly": true
+    },
+    "displayName": {
+      "type": "string",
+      "minLength": 1,
+      "maxLength": 255,
+      "description": "The display name of the subproject. You cannot have a null value. It does not have to be unique."
+    },
+    "labels": {
+      "type": "object",
+      "maxProperties": 255,
+      "additionalProperties": {
+        "type": "string",
+        "minLength": 1,
+        "maxLength": 255,
+        "description": "A map of labels. String, key-value pairs that are completely customizable to allow for your metadata. Both the key and the value can be modified. Example: `\"region\": \"US-Northwest\"`"
+      },
+      "propertyNames": {
+        "minLength": 1,
+        "maxLength": 255
+      }
+    },
+    "parentProjectId": {
+      "type": "string",
+      "description": "The parent project ID the subproject belongs to. Set from the URL path on creation; a value sent in the request body is ignored.",
+      "readOnly": true
+    },
+    "subprojectId": {
+      "description": "The unique subproject identifier. Not to be confused with the `parentProjectId`; the `subprojectId` is a new ID related to your parent project.",
+      "type": "string",
+      "readOnly": true
+    },
+    "updateTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date/time the subproject was updated. ISO 8601 format.",
+      "readOnly": true
+    }
+  }
+}

@@ -1,21 +1,207 @@
 openapi: 3.2.0
 info:
-  title: Sinch Voice Conferences API
-  description: The Sinch Voice API is a programmable voice platform that allows developers to make, receive, and manage voice calls over PSTN, SIP, and in-app channels. It supports text-to-speech in over 115 languages, interactive voice response (IVR) menus, call recording, transcription, number masking, and conferencing. The API enables outbound and inbound calling with real-time call control through callbacks and SVAML instructions.
+  title: Sinch Conferences API
   version: '1.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  description: 'Operations tagged Conferences across 2 of this provider''s published API definitions: sinch-voice-api-openapi.yaml, original-sinch-voice-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://calling.api.sinch.com
-  description: Global Production Server
-security:
-- basicAuth: []
+  description: redirected by Sinch to an appropriate region
+- url: https://calling-use1.api.sinch.com
+  description: United States
+- url: https://calling-euc1.api.sinch.com
+  description: Europe
+- url: https://calling-sae1.api.sinch.com
+  description: South America
+- url: https://calling-apse1.api.sinch.com
+  description: Southeast Asia 1
+- url: https://calling-apse2.api.sinch.com
+  description: Southeast Asia 2
 tags:
 - name: Conferences
-  description: Manage ongoing conferences including retrieving conference info, muting or unmuting participants, and removing participants.
+  description: Using the Conferences endpoint, you can perform tasks like retrieving information about an on-going conference, muting or unmuting participants, or removing participants from a conference.
 paths:
+  /calling/v1/callouts:
+    post:
+      tags:
+      - Conferences
+      description: Makes a call out to a phone number. The types of callouts currently supported are conference callouts, text-to-speech callouts, and custom callouts. The custom callout is the most flexible, but text-to-speech and conference callouts are more convenient.
+      summary: Callout Request
+      operationId: Callouts
+      requestBody:
+        $ref: '#/components/requestBodies/calloutRequest'
+      responses:
+        '200':
+          description: A success response, or an [Error](https://developers.sinch.com/docs/voice/api-reference/errors/).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getCalloutResponseObj'
+              example:
+                callId: adf92089-df2a-4f14-a377-1e975f588fe4
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage voice.callouts;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.voice.api.v1.CalloutsService;\nimport com.sinch.sdk.domains.voice.models.v1.callouts.request.CalloutRequestTTS;\nimport com.sinch.sdk.domains.voice.models.v1.destination.DestinationPstn;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Call {\n\n  private static final Logger LOGGER = Logger.getLogger(Call.class.getName());\n\n  public static void main(String[] args) {\n\n    String applicationKey = Settings.getApplicationKey().orElse(\"MY_APPLICATION_KEY\");\n    String applicationSecret = Settings.getApplicationSecret().orElse(\"MY_APPLICATION_SECRET\");\n\n    // The phone number you want to call, in E.164 format (e.g., +12025550123)\n    String recipientPhoneNumber = \"RECIPIENT_PHONE_NUMBER\";\n    String textToSpeech = \"Hello, this is a call initiated from Sinch Java SDK. Goodbye.\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setApplicationKey(applicationKey)\n            .setApplicationSecret(applicationSecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    CalloutsService calloutsService = client.voice().v1().callouts();\n\n    LOGGER.info(String.format(\"Calling phone number '%s'\", recipientPhoneNumber));\n\n    CalloutRequestTTS request =\n        CalloutRequestTTS.builder()\n            .setDestination(DestinationPstn.from(recipientPhoneNumber))\n            .setText(textToSpeech)\n            .build();\n\n    String response = calloutsService.call(request);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const applicationKey = process.env.SINCH_APPLICATION_KEY ?? 'MY_APPLICATION_KEY';\n  const applicationSecret = process.env.SINCH_APPLICATION_SECRET ?? 'MY_APPLICATION_SECRET';\n\n  // The phone number you want to call, in E.164 format (e.g., +12025550123)\n  const recipientPhoneNumber = 'RECIPIENT_PHONE_NUMBER';\n  // The text you want to convert to speech and play during the call\n  const textToSpeech = 'Hello, this is a call initiated from the Sinch Node.js SDK. Goodbye.';\n\n  const sinch = new SinchClient({ applicationKey, applicationSecret });\n\n  try {\n    const response = await sinch.voice.callouts.tts({\n      ttsCalloutRequestBody: {\n        method: 'ttsCallout',\n        ttsCallout: {\n          destination: {\n            type: 'number',\n            endpoint: recipientPhoneNumber,\n          },\n          text: textToSpeech,\n        },\n      },\n    });\n    console.log(`✅ Successfully initiated TTS call to ${recipientPhoneNumber}:`);\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to initiate TTS call to ${recipientPhoneNumber}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - Signed: []
+    servers:
+    - url: https://calling.api.sinch.com
+      description: redirected by Sinch to an appropriate region
+    - url: https://calling-use1.api.sinch.com
+      description: United States
+    - url: https://calling-euc1.api.sinch.com
+      description: Europe
+    - url: https://calling-sae1.api.sinch.com
+      description: South America
+    - url: https://calling-apse1.api.sinch.com
+      description: Southeast Asia 1
+    - url: https://calling-apse2.api.sinch.com
+      description: Southeast Asia 2
+  /calling/v1/conferences/id/{conferenceId}:
+    parameters:
+    - $ref: '#/components/parameters/conferenceId'
+    get:
+      tags:
+      - Conferences
+      summary: Get Conference Info
+      description: Returns information about a conference that matches the provided conference ID.
+      operationId: Calling_GetConferenceInfo
+      responses:
+        '200':
+          description: A success response, or an [Error](https://developers.sinch.com/docs/voice/api-reference/errors/).
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/getConferenceInfoResponse'
+              example:
+                participants:
+                - cli: '+46708168731'
+                  id: myConfId1
+                  duration: 14
+                  muted: false
+                  onhold: false
+                - cli: myUserName
+                  id: myConfId2
+                  duration: 12
+                  muted: false
+                  onhold: false
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage voice.conferences;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.voice.api.v1.ConferencesService;\nimport com.sinch.sdk.domains.voice.models.v1.conferences.response.GetConferenceInfoResponse;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Get {\n\n  private static final Logger LOGGER = Logger.getLogger(Get.class.getName());\n\n  public static void main(String[] args) {\n\n    String applicationKey = Settings.getApplicationKey().orElse(\"MY_APPLICATION_KEY\");\n    String applicationSecret = Settings.getApplicationSecret().orElse(\"MY_APPLICATION_SECRET\");\n\n    // The ID of the conference to retrieve\n    String conferenceId = \"CONFERENCE_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setApplicationKey(applicationKey)\n            .setApplicationSecret(applicationSecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConferencesService conferencesService = client.voice().v1().conferences();\n\n    LOGGER.info(String.format(\"Get info for conference with ID '%s'\", conferenceId));\n\n    GetConferenceInfoResponse response = conferencesService.get(conferenceId);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const applicationKey = process.env.SINCH_APPLICATION_KEY ?? 'MY_APPLICATION_KEY';\n  const applicationSecret = process.env.SINCH_APPLICATION_SECRET ?? 'MY_APPLICATION_SECRET';\n\n  // The ID of the conference to retrieve\n  const conferenceId = 'CONFERENCE_ID';\n\n  const sinch = new SinchClient({ applicationKey, applicationSecret });\n\n  try {\n    const response = await sinch.voice.conferences.get({ conferenceId });\n    console.log('✅ Successfully retrieved conference information.');\n    console.log(`Response:\\n${JSON.stringify(response, null, 2)}`);\n  } catch (err) {\n    console.error(`❌ Failed to retrieve information for conference with ID ${conferenceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - Signed: []
+    delete:
+      tags:
+      - Conferences
+      summary: Kick Conference All
+      description: Removes all participants from a conference.
+      operationId: Calling_KickConferenceAll
+      responses:
+        '204':
+          description: A success response, or an [Error](https://developers.sinch.com/docs/voice/api-reference/errors/).
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage voice.conferences;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.voice.api.v1.ConferencesService;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class KickAll {\n\n  private static final Logger LOGGER = Logger.getLogger(KickAll.class.getName());\n\n  public static void main(String[] args) {\n\n    String applicationKey = Settings.getApplicationKey().orElse(\"MY_APPLICATION_KEY\");\n    String applicationSecret = Settings.getApplicationSecret().orElse(\"MY_APPLICATION_SECRET\");\n\n    // The ID of the conference to remove all participants from\n    String conferenceId = \"CONFERENCE_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setApplicationKey(applicationKey)\n            .setApplicationSecret(applicationSecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConferencesService conferencesService = client.voice().v1().conferences();\n\n    LOGGER.info(String.format(\"Kick all participants from conference with ID '%s'\", conferenceId));\n\n    conferencesService.kickAll(conferenceId);\n\n    LOGGER.info(\"Done\");\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const applicationKey = process.env.SINCH_APPLICATION_KEY ?? 'MY_APPLICATION_KEY';\n  const applicationSecret = process.env.SINCH_APPLICATION_SECRET ?? 'MY_APPLICATION_SECRET';\n\n  // The ID of the conference to remove all participants from\n  const conferenceId = 'CONFERENCE_ID';\n\n  const sinch = new SinchClient({ applicationKey, applicationSecret });\n\n  try {\n    await sinch.voice.conferences.kickAll({ conferenceId });\n    console.log(`✅ Successfully kicked all participants from conference with ID ${conferenceId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to kick all participants from conference with ID ${conferenceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - Signed: []
+    servers:
+    - url: https://calling.api.sinch.com
+      description: redirected by Sinch to an appropriate region
+    - url: https://calling-use1.api.sinch.com
+      description: United States
+    - url: https://calling-euc1.api.sinch.com
+      description: Europe
+    - url: https://calling-sae1.api.sinch.com
+      description: South America
+    - url: https://calling-apse1.api.sinch.com
+      description: Southeast Asia 1
+    - url: https://calling-apse2.api.sinch.com
+      description: Southeast Asia 2
+  /calling/v1/conferences/id/{conferenceId}/{callId}:
+    parameters:
+    - $ref: '#/components/parameters/callId'
+    - $ref: '#/components/parameters/conferenceId'
+    patch:
+      tags:
+      - Conferences
+      summary: Manage Conference Participant
+      description: 'Manages conference participant in a specified conference:
+
+        * mute / unmute
+
+        * put on hold / resume.'
+      operationId: Calling_ManageConferenceParticipant
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/manageConferenceParticipantRequest'
+            examples:
+              mute:
+                $ref: '#/components/examples/muteParticipant'
+              unmute:
+                $ref: '#/components/examples/unmuteParticipant'
+              hold:
+                $ref: '#/components/examples/onHoldParticipant'
+              resume:
+                $ref: '#/components/examples/resumeParticipant'
+      responses:
+        '200':
+          description: A success response, or an [Error](https://developers.sinch.com/docs/voice/api-reference/errors/).
+          content:
+            application/json:
+              example:
+                content: Successful response
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage voice.conferences;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.voice.api.v1.ConferencesService;\nimport com.sinch.sdk.domains.voice.models.v1.MusicOnHold;\nimport com.sinch.sdk.domains.voice.models.v1.conferences.request.ManageConferenceParticipantRequest;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class ManageParticipant {\n\n  private static final Logger LOGGER = Logger.getLogger(ManageParticipant.class.getName());\n\n  public static void main(String[] args) {\n\n    String applicationKey = Settings.getApplicationKey().orElse(\"MY_APPLICATION_KEY\");\n    String applicationSecret = Settings.getApplicationSecret().orElse(\"MY_APPLICATION_SECRET\");\n\n    // The ID of the conference to manage a participant in\n    String conferenceId = \"CONFERENCE_ID\";\n    // The Call ID of the participant to manage in the conference\n    String callId = \"CALL_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setApplicationKey(applicationKey)\n            .setApplicationSecret(applicationSecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConferencesService conferencesService = client.voice().v1().conferences();\n\n    ManageConferenceParticipantRequest.CommandEnum command =\n        ManageConferenceParticipantRequest.CommandEnum.MUTE;\n    MusicOnHold moh = MusicOnHold.MUSIC1;\n\n    LOGGER.info(\n        String.format(\n            \"Manage participant with ID '%s' for conference with ID '%s'. Setting command to '%s'\"\n                + \" and music on hold to '%s'\",\n            callId, conferenceId, command, moh));\n\n    ManageConferenceParticipantRequest request =\n        ManageConferenceParticipantRequest.builder()\n            .setCommand(command)\n            .setMusicOnHold(moh)\n            .build();\n\n    conferencesService.manageParticipant(conferenceId, callId, request);\n\n    LOGGER.info(\"Done\");\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const applicationKey = process.env.SINCH_APPLICATION_KEY ?? 'MY_APPLICATION_KEY';\n  const applicationSecret = process.env.SINCH_APPLICATION_SECRET ?? 'MY_APPLICATION_SECRET';\n\n  // The ID of the conference to manage a participant in\n  const conferenceId = 'CONFERENCE_ID';\n  // The Call ID of the participant to manage in the conference\n  const callId = 'PARTICIPANT_CALL_ID';\n\n  const sinch = new SinchClient({ applicationKey, applicationSecret });\n\n  try {\n    await sinch.voice.conferences.manageParticipant({\n      conferenceId,\n      callId,\n      manageParticipantRequestBody: {\n        command: 'onhold',\n        moh: 'music1',\n      },\n    });\n    console.log(`✅ Successfully managed participant with Call ID ${callId} in conference with ID ${conferenceId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to manage participant with Call ID ${callId} in conference with ID ${conferenceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - Signed: []
+    delete:
+      tags:
+      - Conferences
+      summary: Kick Conference Participant
+      description: Remove a specified conference participant from a specified conference.
+      operationId: Calling_KickConferenceParticipant
+      responses:
+        '200':
+          description: A success response, or an [Error](https://developers.sinch.com/docs/voice/api-reference/errors/).
+          content:
+            application/json:
+              example:
+                content: 200 Successful response
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage voice.conferences;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.voice.api.v1.ConferencesService;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class KickParticipant {\n\n  private static final Logger LOGGER = Logger.getLogger(KickParticipant.class.getName());\n\n  public static void main(String[] args) {\n\n    String applicationKey = Settings.getApplicationKey().orElse(\"MY_APPLICATION_KEY\");\n    String applicationSecret = Settings.getApplicationSecret().orElse(\"MY_APPLICATION_SECRET\");\n\n    // The ID of the conference to remove a participant from\n    String conferenceId = \"CONFERENCE_ID\";\n    // The Call ID of the participant to remove from the conference\n    String callId = \"CALL_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setApplicationKey(applicationKey)\n            .setApplicationSecret(applicationSecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConferencesService conferencesService = client.voice().v1().conferences();\n\n    LOGGER.info(\n        String.format(\n            \"Kick participant with call ID '%s' for conference with ID '%s'\",\n            callId, conferenceId));\n\n    conferencesService.kickParticipant(conferenceId, callId);\n\n    LOGGER.info(\"Done\");\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const applicationKey = process.env.SINCH_APPLICATION_KEY ?? 'MY_APPLICATION_KEY';\n  const applicationSecret = process.env.SINCH_APPLICATION_SECRET ?? 'MY_APPLICATION_SECRET';\n\n  // The ID of the conference to remove a participant from\n  const conferenceId = 'CONFERENCE_ID';\n  // The Call ID of the participant to remove from the conference\n  const callId = 'PARTICIPANT_CALL_ID';\n\n  const sinch = new SinchClient({ applicationKey, applicationSecret });\n\n  try {\n    await sinch.voice.conferences.kickParticipant({\n      conferenceId,\n      callId,\n    });\n    console.log(`✅ Successfully kicked participant with Call ID ${callId} from conference with ID ${conferenceId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to kick participant with Call ID ${callId} from conference with ID ${conferenceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - Signed: []
+    servers:
+    - url: https://calling.api.sinch.com
+      description: redirected by Sinch to an appropriate region
+    - url: https://calling-use1.api.sinch.com
+      description: United States
+    - url: https://calling-euc1.api.sinch.com
+      description: Europe
+    - url: https://calling-sae1.api.sinch.com
+      description: South America
+    - url: https://calling-apse1.api.sinch.com
+      description: Southeast Asia 1
+    - url: https://calling-apse2.api.sinch.com
+      description: Southeast Asia 2
   /calling/v1/conferences/id/{conference_id}:
     get:
       operationId: getConference
@@ -36,6 +222,8 @@ paths:
           description: Unauthorized
         '404':
           description: Conference not found
+      security:
+      - basicAuth: []
     delete:
       operationId: kickAllFromConference
       summary: Kick All Participants from Conference
@@ -51,6 +239,11 @@ paths:
           description: Unauthorized
         '404':
           description: Conference not found
+      security:
+      - basicAuth: []
+    servers:
+    - url: https://calling.api.sinch.com
+      description: Global Production Server
   /calling/v1/conferences/id/{conference_id}/{call_id}:
     patch:
       operationId: manageConferenceParticipant
@@ -74,6 +267,8 @@ paths:
           description: Unauthorized
         '404':
           description: Conference or participant not found
+      security:
+      - basicAuth: []
     delete:
       operationId: kickParticipantFromConference
       summary: Kick Participant from Conference
@@ -90,23 +285,435 @@ paths:
           description: Unauthorized
         '404':
           description: Conference or participant not found
+      security:
+      - basicAuth: []
+    servers:
+    - url: https://calling.api.sinch.com
+      description: Global Production Server
 components:
-  parameters:
-    ConferenceId:
-      name: conference_id
-      in: path
-      required: true
-      description: The unique conference identifier
-      schema:
-        type: string
-    CallId:
-      name: call_id
-      in: path
-      required: true
-      description: The unique call identifier
-      schema:
-        type: string
   schemas:
+    destinationMxp:
+      type: object
+      description: The type of device and number or endpoint to call.
+      required:
+      - type
+      - endpoint
+      properties:
+        type:
+          $ref: '#/components/schemas/mxpDestination'
+        endpoint:
+          type: string
+          description: For type `userName` the value is the username for a data endpoint.
+          format: user name
+          example: myUserName
+    conferenceCallout:
+      type: object
+      description: The conference callout calls a phone number or a user. When the call is answered, it's connected to a conference room.
+      required:
+      - destination
+      - conferenceId
+      allOf:
+      - $ref: '#/components/schemas/calloutRequestBase'
+      - type: object
+        properties:
+          destination:
+            oneOf:
+            - $ref: '#/components/schemas/destinationPstn'
+            - $ref: '#/components/schemas/destinationMxp'
+            - $ref: '#/components/schemas/destinationSip'
+          conferenceId:
+            type: string
+            description: The conferenceId of the conference to which you want the callee to join. If the conferenceId doesn't exist a conference room will be created.
+          conferenceDtmfOptions:
+            $ref: '#/components/schemas/conferenceDtmfOptions'
+          maxDuration:
+            type: integer
+          enableAce:
+            type: boolean
+            description: If `enableAce` is set to true and the application has a callback URL specified, you will receive an ACE callback when the call is answered. When the callback is received, your platform must respond with a svamlet containing the `connectConf` action in order to add the call to a conference or create the conference if it's the first call. If it's set to false, no ACE event will be sent to your backend.<br><b>Note </b> if the call is towards an InApp destination `type:` `username`, then no ACE will be issued when the call is connected, even if `enableAce` is present in the callout request.
+            default: false
+            example: false
+          enableDice:
+            type: boolean
+            description: If `enableDice` is set to true and the application has a callback URL specified, you will receive a DiCE callback when the call is disconnected. If it's set to false, no DiCE event will be sent to your backend.<br><b>Note</b> if the call is towards an InApp destination `type:` `username`, then no DICE will be issued at the end of the call, even if `enableDice` is present in the callout request.
+            default: false
+            example: false
+          enablePie:
+            type: boolean
+            description: If `enablePie` is set to true and the application has a callback URL specified, you will receive a PIE callback after a `runMenu` action, with the information of the action that the user took. If it's set to false, no PIE event will be sent to your backend.
+            default: false
+            example: false
+          locale:
+            type: string
+            format: ISO 639
+            description: The voice and language you want to use for the prompts. This can either be defined by the ISO 639 locale and language code or by specifying a particular voice. Supported languages and voices are detailed [here](https://developers.sinch.com/docs/voice/api-reference/voice-locales/)
+            default: en-US
+            example: en-US
+          greeting:
+            type: string
+            description: The text that will be spoken as a greeting.
+            example: Welcome to the conference
+          mohClass:
+            description: Means "music-on-hold." It's an optional parameter that specifies what the first participant should listen to while they're alone in the conference, waiting for other participants to join. It can take one of these pre-defined values:<ul><li>`ring` (progress tone)</li><li>`music1` (music file)</li><li>`music2` (music file)</li><li>`music3` (music file)</li></ul><br>If no “music-on-hold” is specified, the user will only hear silence.
+            allOf:
+            - $ref: '#/components/schemas/musicOnHold'
+            example: ring
+          domain:
+            description: can be either “pstn” for PSTN endpoint or “mxp” for data (app or web) clients.
+            allOf:
+            - $ref: '#/components/schemas/domain'
+    pstnDestination:
+      type: string
+      description: Type `number` used for PSTN endpoints.
+      x-enumDescriptions:
+        number: A e.164 formatted number for PSTN endpoints.
+        Number: A e.164 formatted number for PSTN endpoints.
+      enum:
+      - number
+      - Number
+      example: number
+    CalloutRequest:
+      type: object
+      description: 'Currently three types of callouts are supported: conference callouts, text-to-speech callouts and custom callouts. The custom callout is the most flexible, but text-to-speech and conference callouts are more convenient.'
+      required:
+      - method
+      oneOf:
+      - $ref: '#/components/schemas/conferenceCalloutRequest'
+      - $ref: '#/components/schemas/ttsCalloutRequest'
+      - $ref: '#/components/schemas/customCalloutRequest'
+      discriminator:
+        propertyName: method
+        mapping:
+          conferenceCallout: '#/components/schemas/conferenceCalloutRequest'
+          ttsCallout: '#/components/schemas/ttsCalloutRequest'
+          customCallout: '#/components/schemas/customCalloutRequest'
+    manageConferenceParticipantRequest:
+      type: object
+      example:
+        command: unmute
+      description: ''
+      required:
+      - command
+      properties:
+        command:
+          type: string
+          description: Action to apply on conference participant.
+          x-enumDescriptions:
+            mute: Mutes participant.
+            unmute: Unmutes participant.
+            onhold: Puts participant on hold.
+            resume: Returns participant to conference.
+          enum:
+          - mute
+          - unmute
+          - onhold
+          - resume
+        moh:
+          description: Means "music on hold". If this optional parameter is included, plays music to the first participant in a conference while they're alone and waiting for other participants to join. If `moh` isn't specified, the user will only hear silence while alone in the conference. This property is only available to use with the `onhold` command.
+          allOf:
+          - $ref: '#/components/schemas/musicOnHold'
+    customCallout:
+      type: object
+      description: The custom callout, the server initiates a call from the servers that can be controlled by specifying how the call should progress at each call event.
+      properties:
+        cli:
+          type: string
+          format: e.164
+          description: The number that will be displayed as the incoming caller, to set your own CLI, you may use your verified number or your Dashboard virtual number, it must be in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format.
+          example: '+14155552223333'
+        destination:
+          oneOf:
+          - $ref: '#/components/schemas/destinationPstn'
+          - $ref: '#/components/schemas/destinationMxp'
+          - $ref: '#/components/schemas/destinationSip'
+        dtmf:
+          type: string
+          description: When the destination picks up, this DTMF tones will be played to the callee. Valid characters in the string are "0"-"9", "#", and "w". A "w" will render a 500 ms pause. For example, "ww1234#w#" will render a 1s pause, the DTMF tones "1", "2", "3", "4" and "#" followed by a 0.5s pause and finally the DTMF tone for "#". This can be used if the callout destination for instance require a conference PIN code or an extension to be entered.
+          example: ww1234#w#
+        custom:
+          type: string
+          description: Can be used to input custom data.
+        maxDuration:
+          type: integer
+          description: The maximum amount of time in seconds that the call will last.
+          example: 600
+        ice:
+          type: string
+          description: 'You can set a new callback URL or use inline [SVAML](https://developers.sinch.com/docs/voice/api-reference/svaml/) to replace a predefined callback URL, when using custom callouts. Ensure that the JSON object is escaped correctly. If inline ICE SVAML is passed, exclude *cli* and *destination* properties from the *customCallout* request body.
+
+            '
+          example: ' ```"ice":"{\"action\":{\"name\":\"connectPstn\",\"number\":\"46000000001\",\"maxDuration\":90}}"``` '
+        ace:
+          type: string
+          description: 'You can set a new callback URL or use inline [SVAML](https://developers.sinch.com/docs/voice/api-reference/svaml/) to replace a predefined callback URL, when using custom callouts. Ensure that the JSON object is escaped correctly.
+
+            '
+          example: ' ```"ace":"{\"action\": {\"name\": \"RunMenu\",\"locale\": \"en-US\",\"menus\": [{\"id\": \"main\",\"mainPrompt\": \"#tts[ Welcome to the main menu. Press 1 for a callback or 2 for a cancel<\/speak>]\",\"timeoutMills\": 5000,\"options\": [ {\"dtmf\": \"1\",\"action\": \"return(callback)\"}, {\"dtmf\": \"2\",\"action\": \"return(cancel)\"}]}]}}"``` '
+        pie:
+          type: string
+          description: '<b>Note:</b> PIE callbacks are not available for DATA Calls; only PSTN and SIP calls.
+
+
+            You can set a new callback URL or use inline [SVAML](https://developers.sinch.com/docs/voice/api-reference/svaml/) to replace a predefined callback URL, when using custom callouts. Ensure that the JSON object is escaped correctly. A PIE event will contain a value chosen from an IVR choice. Usually a PIE event wil contain a URL to a callback sever that will receive the choice and be able to parse it. This could result in further SVAML or some other application logic function.
+
+            '
+          example: ' ```"pie":"https://your-application-server-host/menu_endpoint"``` '
+        dice:
+          type: string
+          description: 'You can use it to set a new callback URL in case you wish to replace your voice application configured callback URL.
+
+            '
+          example: ' ```"dice":"https://your-application-server-host/new_endpoint"``` '
+    conferenceDtmfOptions:
+      type: object
+      description: Options to control how DTMF signals are used by the participant in the conference. For information on how to use this feature, read more [here](https://developers.sinch.com/docs/voice/api-reference/conference-dtmf).
+      properties:
+        mode:
+          type: string
+          description: Determines what DTMF mode the participant will use in the call.
+          x-enumDescriptions:
+            ignore: Nothing is done with the participant's DTMF signals. This is the default mode. Any DTMF signals that the participant sends can still be heard by all participants, but no action will be performed.
+            forward: The participant's DTMF signals are forwarded to all other participants in the conference.
+            detect: The participant's DTMF signals are detected by the conference and sent to your backend server using a [Prompt Input Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/pie) (PIE) callback.
+          enum:
+          - ignore
+          - forward
+          - detect
+          default: ignore
+        maxDigits:
+          type: integer
+          description: "The maximum number of accepted digits before sending the collected input via a PIE callback. The default value is `1`. If the value is greater than `1`, the PIE callback is triggered by one of the three following events:\n  - No additional digit is entered before the `timeoutMills` timeout period has elapsed.\n  - The `#` character is entered.\n  - The maximum number of digits has been entered."
+          default: 1
+        timeoutMills:
+          type: integer
+          description: The number of milliseconds that the system will wait between entered digits before triggering the PIE callback. The default value is `3000`.
+          default: 3000
+    destinationSip:
+      type: object
+      description: The type of device and number or endpoint to call.
+      required:
+      - type
+      - endpoint
+      properties:
+        type:
+          $ref: '#/components/schemas/sipDestination'
+        endpoint:
+          type: string
+          description: For type `sip` the value is the SIP address for a SIP endpoint.
+          format: sip address
+          example: +19876543210@example.sip.sinch.com
+    customCalloutRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          x-enumDescriptions:
+            customCallout: Define `customCallout` request
+          enum:
+          - customCallout
+        customCallout:
+          $ref: '#/components/schemas/customCallout'
+    destinationPstn:
+      type: object
+      description: The type of device and number or endpoint to call.
+      required:
+      - type
+      - endpoint
+      properties:
+        type:
+          $ref: '#/components/schemas/pstnDestination'
+        endpoint:
+          type: string
+          description: If the type is `number` the value of the endpoint is a phone number.
+          format: e164 for numbers
+          example: '+12125550123'
+    ttsCalloutRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          x-enumDescriptions:
+            ttsCallout: Define `ttsC allout` request
+          enum:
+          - ttsCallout
+        ttsCallout:
+          $ref: '#/components/schemas/ttsCallout'
+    ttsCallout:
+      type: object
+      description: The text-to-speech callout calls a phone number and plays a synthesized text messages or pre-recorded sound files.
+      required:
+      - destination
+      properties:
+        cli:
+          type: string
+          format: e.164
+          description: The number that will be displayed as the incoming caller. To set your own CLI, you may use your verified number or your Dashboard number. The number must be in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format.
+          example: '+14155552223333'
+        destination:
+          oneOf:
+          - $ref: '#/components/schemas/destinationPstn'
+          - $ref: '#/components/schemas/destinationMxp'
+          - $ref: '#/components/schemas/destinationSip'
+        dtmf:
+          type: string
+          description: When the destination picks up, this DTMF tones will be played to the callee. Valid characters in the string are "0"-"9", "#", and "w". A "w" will render a 500 ms pause. For example, "ww1234#w#" will render a 1s pause, the DTMF tones "1", "2", "3", "4" and "#" followed by a 0.5s pause and finally the DTMF tone for "#". This can be used if the callout destination for instance require a conference PIN code or an extension to be entered.
+          example: ww1234#w#
+        domain:
+          $ref: '#/components/schemas/domain'
+        custom:
+          type: string
+          description: Can be used to input custom data.
+        locale:
+          type: string
+          description: The voice and language you want to use for the text-to-speech message. This can either be defined by the ISO 639 locale and language code or by specifying a particular voice. Supported languages and voices are detailed [here](https://developers.sinch.com/docs/voice/api-reference/voice-locales/).
+          example: en-US
+        text:
+          type: string
+          description: 'The text that will be spoken in the text-to-speech message.
+
+
+            _Every application''s default maximum characters allowed in text-to-speech is 600 characters. Contact support if you wish this limit to be changed._
+
+            '
+        prompts:
+          type: string
+          description: "An advanced alternative to using ```text```.\n\n__TTS__ _Text To Speech:_ The equivalent of text but within the prompt property.\n\nExample: _```#tts[Hello from Sinch]```_\n\n__TTS with SSML__ _Text To Speech with Speech Synthesis Markup Language (SSML)._ This is an XML-based markup language for assisting the generation of synthetic speech in the Web and other applications. AWS Polly supports a sub-set of SSML. This allows us to use SSML-enhanced text for additional control over how Polly generates speech from the text. Details and examples of supported tags are [here](https://docs.aws.amazon.com/polly/latest/dg/supportedtags.html)\n\n  __Externally hosted media:__ Provide a URL to your own hosted media.  Please check [here](https://developers.sinch.com/docs/voice/api-reference/supported-audio-formats/#limits) to read about audio content type and usage limits.\n\n_Every application's default maximum allowed in TTS or TTS SSML is 600 characters. Contact support if you wish this limit to be changed._\n_Several prompts can be used, separated by a semi-colon_ ```;```\n\nExample: _```#tts[Hello from Sinch];#ssml[<speak><break time=\\\"250ms\\\"/>Have a great day!</speak>]```_\n"
+        enableAce:
+          type: boolean
+          description: If `enableAce` is set to `true` and the application has a callback URL specified, you will receive an ACE callback when the call is answered. When the callback is received, your platform must respond with a svamlet, containing the “connectconf” action in order to add the call to a conference or create the conference if it's the first call. If it's set to `false`, no ACE event will be sent to your backend.
+          default: false
+          example: false
+        enableDice:
+          type: boolean
+          description: If `enableDice` is set to `true` and the application has a callback URL specified, you will receive a DiCE callback when the call is disconnected. If it's set to `false`, no DiCE event will be sent to your backend.
+          default: false
+          example: false
+        enablePie:
+          type: boolean
+          description: '<b>Note:</b> PIE callbacks are not available for DATA Calls; only PSTN and SIP calls.
+
+
+            If `enablePie` is set to `true` and the application has a callback URL specified, you will receive a PIE callback after the `runMenu` action executes and after the configured menu timeout has elapsed with no input. If it''s set to `false`, no PIE events will be sent to your backend.'
+    domain:
+      type: string
+      x-enumDescriptions:
+        pstn: A call on the Public Switched Telephone Network.
+        mxp: A data call.
+        PSTN: A call on the Public Switched Telephone Network.
+        MXP: A data call.
+      enum:
+      - pstn
+      - mxp
+      - PSTN
+      - MXP
+      description: Can be either `pstn` for PSTN endpoint or `mxp` for data (app or web) clients.
+      example: pstn
+    getConferenceInfoResponse:
+      type: object
+      description: The response returns information about the participants in the conference.
+      properties:
+        participants:
+          type: array
+          items:
+            type: object
+            properties:
+              cli:
+                type: string
+                description: The phone number of the PSTN participant that was connected in the conference, or whatever was passed as CLI for data originated/terminated calls.
+                example: '+46708168731'
+              id:
+                type: string
+                description: The callId of the call leg that the participant joined the conference.
+                example: abcabcabcabca
+              duration:
+                type: integer
+                description: The number of seconds that the participant has been connected to the conference.
+              muted:
+                type: boolean
+              onhold:
+                type: boolean
+    calloutRequestBase:
+      type: object
+      properties:
+        cli:
+          type: string
+          format: e.164
+          description: The number that will be displayed as the incoming caller. To set your own CLI, you may use your verified number or your Dashboard number. The number must be in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format.
+          example: '14151112223333'
+        dtmf:
+          type: string
+          description: 'When the destination picks up, this DTMF tones will be played to the callee. Valid characters in the string are "0"-"9", "#" and "w". A "w" will render a 500 ms pause. Example: "ww1234#w#" will render a 1s pause, the DTMF tones "1", "2", "3", "4" and "#" followed by a 0.5s pause and finally the DTMF tone for "#". This can be used if the callout destination for instance require a conference PIN code or an extension to be entered.'
+        custom:
+          type: string
+          description: Used to input custom data.
+    musicOnHold:
+      type: string
+      description: Available Music On Hold values
+      x-enumDescriptions:
+        ring: Plays a progress tone.
+        music1: Plays music choice 1.
+        music2: Plays music choice 2.
+        music3: Plays music choice 3.
+      enum:
+      - ring
+      - music1
+      - music2
+      - music3
+    getCalloutResponseObj:
+      type: object
+      description: The returned call ID.
+      properties:
+        callId:
+          type: string
+          description: The returned call identifier.
+          example: adf92089-d9e8-4f14-a377-1e975f588fe4
+    sipDestination:
+      type: string
+      description: Type `sip` for SIP infrastructures.
+      x-enumDescriptions:
+        sip: A SIP address for SIP infrastructures.
+      enum:
+      - sip
+      example: sip
+    mxpDestination:
+      type: string
+      description: Type `userName` used for data endpoints.
+      x-enumDescriptions:
+        username: A username for data endpoints.
+        Username: A username for data endpoints.
+      enum:
+      - username
+      - Username
+      example: username
+    conferenceCalloutRequest:
+      type: object
+      properties:
+        method:
+          type: string
+          x-enumDescriptions:
+            conferenceCallout: Define `conferenceCallout` request
+          enum:
+          - conferenceCallout
+        conferenceCallout:
+          $ref: '#/components/schemas/conferenceCallout'
+    Participant:
+      type: object
+      properties:
+        cli:
+          type: string
+          description: The participant caller ID
+        callId:
+          type: string
+          description: The participant call ID
+        duration:
+          type: integer
+          description: Duration in conference in seconds
+        muted:
+          type: boolean
+          description: Whether the participant is muted
+        onhold:
+          type: boolean
+          description: Whether the participant is on hold
     ConferenceInfo:
       type: object
       properties:
@@ -129,25 +736,150 @@ components:
           - onhold
           - resume
           description: The command to execute on the participant
-    Participant:
-      type: object
-      properties:
-        cli:
-          type: string
-          description: The participant caller ID
-        callId:
-          type: string
-          description: The participant call ID
-        duration:
-          type: integer
-          description: Duration in conference in seconds
-        muted:
-          type: boolean
-          description: Whether the participant is muted
-        onhold:
-          type: boolean
-          description: Whether the participant is on hold
+  examples:
+    customCalloutAMDRequest:
+      summary: Make a custom callout that enables AMD
+      description: An example of a custom callout that uses an ICE request to enable Answering Machine Detection
+      value:
+        method: customCallout
+        customCallout:
+          ice: '{"action": {"name": "connectPstn", "number": "+12233445566", "cli": "+12234325234", "amd": {"enabled": "true"}}}'
+          enableAce: true
+          enableDice: true
+    ttsCalloutRequestPrompt:
+      summary: Play a prompt with SSML
+      description: Place a phone call and use text to speech with SSML to convey a message.
+      value:
+        method: ttsCallout
+        ttsCallout:
+          cli: '+14045001000'
+          destination:
+            type: number
+            endpoint: '+14045005000'
+          locale: en-US
+          prompts: '#ssml[<speak><p>Your PIN code is <say-as interpret-as="digits">1234</say-as></p><p>Please enter it now</p></speak>]'
+    unmuteParticipant:
+      summary: Unmute a participant
+      value:
+        command: unmute
+    customCalloutRequest:
+      summary: Make a custom callout
+      description: An example of a custom callout to invoke an ICE and ACE request
+      value:
+        method: customCallout
+        pop: eu-central
+        customCallout:
+          ice: '{"action": {"name": "connectPstn", "number": "+12233445566", "cli": "+12234325234"}}'
+          ace: '{"instructions": [{"name": "say", "text": "Hello, this is a call from Sinch!"}], "action": {"name": "hangup"}}'
+    muteParticipant:
+      summary: Mute a participant
+      value:
+        command: mute
+    resumeParticipant:
+      summary: Return participant to conference
+      value:
+        command: resume
+    ttsCalloutRequestCall:
+      summary: Make a phone call
+      description: Place a phone call and use text to speech to convey a message.
+      value:
+        method: ttsCallout
+        ttsCallout:
+          cli: '+14045001000'
+          destination:
+            type: number
+            endpoint: '+14045005000'
+          locale: en-US
+          text: Hello, this is a call from Sinch.
+    ttsCalloutRequestPlayFile:
+      summary: Play a prompt with an external file
+      description: Place a phone call and use text to speech via an external file to convey a message. Please review the [External media support ](https://developers.sinch.com/docs/voice/api-reference/supported-audio-formats) page for Caching, Limits and Content-Type headers information.
+      value:
+        method: ttsCallout
+        ttsCallout:
+          cli: '+14045001000'
+          destination:
+            type: number
+            endpoint: '+14045005000'
+          locale: en-US
+          prompts: '#href[https://myhosting/myspeechfile.mp3]'
+    confCalloutRequest:
+      summary: Add a participant to a conference
+      value:
+        method: conferenceCallout
+        conferenceCallout:
+          cli: '+14045001000'
+          destination:
+            type: number
+            endpoint: '+14045005000'
+          locale: en-US
+          greeting: Welcome to my conference
+          conferenceId: MyConfId
+    onHoldParticipant:
+      summary: Place a participant on hold
+      value:
+        command: onhold
+        moh: music1
+  requestBodies:
+    calloutRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/CalloutRequest'
+          examples:
+            ttsCalloutRequestCall:
+              $ref: '#/components/examples/ttsCalloutRequestCall'
+            ttsCalloutRequestPrompt:
+              $ref: '#/components/examples/ttsCalloutRequestPrompt'
+            ttsCalloutRequestPlayFile:
+              $ref: '#/components/examples/ttsCalloutRequestPlayFile'
+            confCalloutRequest:
+              $ref: '#/components/examples/confCalloutRequest'
+            customCalloutRequest:
+              $ref: '#/components/examples/customCalloutRequest'
+            customCalloutAmdRequest:
+              $ref: '#/components/examples/customCalloutAMDRequest'
+  parameters:
+    conferenceId:
+      in: path
+      name: conferenceId
+      schema:
+        type: string
+      required: true
+      description: The unique identifier of the conference. The user sets this value.
+      example: MyConfId
+    callId:
+      in: path
+      name: callId
+      schema:
+        type: string
+      required: true
+      description: The unique identifier of the call. This value is generated by the system.
+      example: 4398599d1ba84ef3bde0a82dfb61abed
+    CallId:
+      name: call_id
+      in: path
+      required: true
+      description: The unique call identifier
+      schema:
+        type: string
+    ConferenceId:
+      name: conference_id
+      in: path
+      required: true
+      description: The unique conference identifier
+      schema:
+        type: string
   securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/voice/api-reference/authentication#basic-authentication).
+    Signed:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: For more information about signed request authentication, see [Request Signing](https://developers.sinch.com/docs/voice/api-reference/authentication/signed-request).
     basicAuth:
       type: http
       scheme: basic
@@ -155,3 +887,14 @@ components:
 externalDocs:
   description: Sinch Voice API Documentation
   url: https://developers.sinch.com/docs/voice
+x-refined-from:
+- sinch-voice-api-openapi.yaml
+- original-sinch-voice-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

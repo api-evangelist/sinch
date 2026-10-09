@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-number-lookup-response-schema.json",
+  "title": "NumberLookupResponse",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-number-lookup-api-openapi.yml#/components/schemas/NumberLookupResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "properties": {
+    "line": {
+      "description": "An object containing information about the line type of the number.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/LineResponse"
+        }
+      ]
+    },
+    "simSwap": {
+      "description": "An object containing information about the SimSwap verification performed on the number.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/SimSwapResponse"
+        }
+      ]
+    },
+    "voIPDetection": {
+      "description": "An object containing information about the VoIP detection performed on the number.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/VoIPDetectionResponse"
+        }
+      ]
+    },
+    "rnd": {
+      "description": "An object containing information whether number is disconnected.",
+      "type": [
+        "object",
+        "null"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/RndResponse"
+        }
+      ]
+    },
+    "countryCode": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 two-letter country identifier"
+    },
+    "traceId": {
+      "type": "string",
+      "description": "The identifier for a trace."
+    },
+    "number": {
+      "type": "string",
+      "description": "Requested MSISDN in E.164 format."
+    }
+  },
+  "$defs": {
+    "ApiLineType": {
+      "type": "string",
+      "description": "Represents the type of a phone line.",
+      "x-enumNames": [
+        "Landline",
+        "Mobile",
+        "VoIP",
+        "Special",
+        "Freephone",
+        "Other"
+      ],
+      "enum": [
+        "Landline",
+        "Mobile",
+        "VoIP",
+        "Special",
+        "Freephone",
+        "Other"
+      ],
+      "x-enumDescriptions": {
+        "Landline": "A landline phone number.",
+        "Mobile": "A mobile network phone number.",
+        "VoIP": "A Voice over IP phone number.",
+        "Special": "A specialty type of number, such as a satellite phone or fax line.",
+        "Freephone": "A freephone type phone number.",
+        "Other": "Another type."
+      }
+    },
+    "ApiSwapPeriod": {
+      "type": "string",
+      "description": "",
+      "x-enumNames": [
+        "Undefined",
+        "SP4H",
+        "SP12H",
+        "SP24H",
+        "SP48H",
+        "SP5D",
+        "SP7D",
+        "SP14D",
+        "SP30D",
+        "SPMAX"
+      ],
+      "enum": [
+        "Undefined",
+        "SP4H",
+        "SP12H",
+        "SP24H",
+        "SP48H",
+        "SP5D",
+        "SP7D",
+        "SP14D",
+        "SP30D",
+        "SPMAX"
+      ],
+      "x-enumDescriptions": {
+        "Undefined": "Undefined",
+        "SP4H": "4 Hours",
+        "SP12H": "12 Hours",
+        "SP24H": "24 Hours",
+        "SP48H": "48 Hours",
+        "SP5D": "5 Days",
+        "SP7D": "7 Days",
+        "SP14D": "14 Days",
+        "SP30D": "30 Days",
+        "SPMAX": "Maximum"
+      }
+    },
+    "ApiVoIPProbability": {
+      "type": "string",
+      "description": "",
+      "x-enumNames": [
+        "Unknown",
+        "Low",
+        "Likely",
+        "High"
+      ],
+      "enum": [
+        "Unknown",
+        "Low",
+        "Likely",
+        "High"
+      ],
+      "x-enumDescriptions": {
+        "Unknown": "Undefined",
+        "Low": "Low",
+        "Likely": "Likely",
+        "High": "High"
+      }
+    },
+    "ErrorResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "status": {
+          "type": "integer",
+          "description": "The error status code.",
+          "format": "int32"
+        },
+        "title": {
+          "type": "string",
+          "description": "A short, human-readable summary of the error type."
+        },
+        "detail": {
+          "type": "string",
+          "description": "A human-readable explanation specific to this occurrence of the error."
+        },
+        "type": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "A URI reference that identifies the error type."
+        }
+      }
+    },
+    "LineResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "carrier": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "Name of the carrier."
+        },
+        "type": {
+          "description": "Number type e.g. wireless, mobile, fixed.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/$defs/ApiLineType"
+            }
+          ]
+        },
+        "mobileCountryCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "A numeric code (MCC) that uniquely identifies a country within the international telecommunications network."
+        },
+        "mobileNetworkCode": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "description": "A distinct identifier assigned to a mobile network operator within a specific country, used in combination with MCC."
+        },
+        "ported": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Indicates if a phone number has been transferred from its original network to a different provider."
+        },
+        "portingDate": {
+          "type": [
+            "string",
+            "null"
+          ],
+          "format": "date-time",
+          "description": "Specifies the date, in ISO 8601 format, when a phone number was transferred from its original network to a new provider."
+        },
+        "error": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/$defs/ErrorResponse"
+            }
+          ]
+        }
+      }
+    },
+    "RndResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "disconnected": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Provides information whether the number was disconnected after provided last contact date."
+        },
+        "error": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/$defs/ErrorResponse"
+            }
+          ]
+        }
+      }
+    },
+    "SimSwapResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "swapped": {
+          "type": [
+            "boolean",
+            "null"
+          ],
+          "description": "Indicates whether SIM was changed."
+        },
+        "swapPeriod": {
+          "description": "Threshold for sim swap check.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/$defs/ApiSwapPeriod"
+            }
+          ]
+        },
+        "error": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/$defs/ErrorResponse"
+            }
+          ]
+        }
+      }
+    },
+    "VoIPDetectionResponse": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "probability": {
+          "description": "Probability of number being VoIP based on the AI analysis.",
+          "type": [
+            "string",
+            "null"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/$defs/ApiVoIPProbability"
+            }
+          ]
+        },
+        "error": {
+          "type": [
+            "object",
+            "null"
+          ],
+          "allOf": [
+            {
+              "$ref": "#/$defs/ErrorResponse"
+            }
+          ]
+        }
+      }
+    }
+  }
+}

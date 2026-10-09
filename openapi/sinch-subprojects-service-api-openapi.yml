@@ -1,0 +1,428 @@
+openapi: 3.2.0
+info:
+  title: Subprojects Service API
+  version: v1
+  description: An API to create, find, modify or delete subprojects of Sinch projects (parent projects).
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    email: support@sinch.com
+    name: Support at Sinch
+servers:
+- url: https://subproject.api.sinch.com
+  description: Placeholder Server
+security:
+- OAuth2.0: []
+- Basic: []
+tags:
+- name: Subprojects Service
+  description: Service to create, find, modify or delete subprojects of Sinch projects.
+paths:
+  /v1/projects/{parentProjectId}/subprojects:
+    post:
+      summary: Create a new subproject
+      description: 'Use this method to create a new subproject off of a parent project. A subproject is a great way to group resources together.
+
+
+        ### Limitations
+
+        - Subprojects cannot have their own billing account. The billing account is handled by the parent project.
+
+        - You cannot have a subproject created off of a subproject.'
+      operationId: SubprojectService_CreateSubproject
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subproject'
+        '400':
+          $ref: '#/components/responses/CreateBadRequest'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/parentProjectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              description: The request to create a new subproject.
+              required:
+              - displayName
+              properties:
+                displayName:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                  description: The display name of the subproject. You cannot have a null value. It does not have to be unique.
+                  example: Taco Time
+                labels:
+                  type: object
+                  maxProperties: 255
+                  additionalProperties:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                  propertyNames:
+                    minLength: 1
+                    maxLength: 255
+                  description: 'A map of labels. String, key-value pairs that are completely customizable to allow for your metadata. Both the key and the value can be modified. Examples: `"region": "US-Northwest"` or `"phoneNumber": "14051234567"`'
+            examples:
+              createFillIn:
+                $ref: '#/components/examples/createFillIn'
+              createDisplayAndLabels:
+                $ref: '#/components/examples/createDisplayAndLabels'
+        required: true
+      tags:
+      - Subprojects Service
+    get:
+      summary: List all subprojects
+      description: A list of all subprojects under a `projectId`.
+      operationId: SubprojectService_ListSubprojects
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSubprojectsResponse'
+        '400':
+          $ref: '#/components/responses/InvalidArgument'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+      parameters:
+      - $ref: '#/components/parameters/parentProjectId'
+      - name: pageSize
+        description: Optional. The maximum number of results to return in a single response.
+        in: query
+        required: false
+        schema:
+          type: integer
+          format: int32
+          minimum: 1
+          maximum: 1000
+          default: 100
+        example: 100
+      - name: pageToken
+        description: Optional. The pagination token returned in an earlier response.
+        in: query
+        required: false
+        schema:
+          type: string
+      - name: showDeleted
+        description: Optional. A flag specifying whether to return subprojects that have been deleted.
+        in: query
+        required: false
+        schema:
+          type: boolean
+        example: false
+      tags:
+      - Subprojects Service
+  /v1/subprojects/{subprojectId}:
+    get:
+      summary: Get a single subproject by ID
+      description: Using the `subprojectId`, get the details of one subproject.
+      operationId: SubprojectService_GetSubproject
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subproject'
+        '400':
+          $ref: '#/components/responses/InvalidArgument'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/subprojectId'
+      tags:
+      - Subprojects Service
+    patch:
+      summary: Update an existing subproject
+      description: Update the `displayName` or label information on an existing subproject.
+      operationId: SubprojectService_UpdateSubproject
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Subproject'
+        '400':
+          $ref: '#/components/responses/InvalidArgument'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/subprojectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                displayName:
+                  type: string
+                  minLength: 1
+                  maxLength: 255
+                  description: Nonempty, non-unique display name of the subproject.
+                  example: Not Yo Momma's Cookin'
+                labels:
+                  type: object
+                  maxProperties: 255
+                  additionalProperties:
+                    type: string
+                    minLength: 1
+                    maxLength: 255
+                    description: 'A map of labels. String, key-value pairs that are completely customizable to allow for your metadata. Both the key and the value can be modified. Example: `"region": "US-Northwest"`'
+                  propertyNames:
+                    minLength: 1
+                    maxLength: 255
+            examples:
+              updateFillIn:
+                $ref: '#/components/examples/updateFillIn'
+              updateDisplayName:
+                $ref: '#/components/examples/updateDisplayName'
+              updateLabels:
+                $ref: '#/components/examples/updateLabels'
+        required: true
+      tags:
+      - Subprojects Service
+    delete:
+      summary: Delete an existing subproject
+      description: When a subproject is no longer needed, delete it using this endpoint. The only parameter needed is the `subprojectId` for the project which you'd like to delete.
+      operationId: SubprojectService_DeleteSubproject
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                properties: {}
+        '400':
+          $ref: '#/components/responses/InvalidArgument'
+        '401':
+          $ref: '#/components/responses/Unauthenticated'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          $ref: '#/components/responses/NotFound'
+      parameters:
+      - $ref: '#/components/parameters/subprojectId'
+      tags:
+      - Subprojects Service
+components:
+  examples:
+    createDisplayAndLabels:
+      summary: Create a subproject with a display name and labels
+      value:
+        displayName: Taco Time
+        labels:
+          region: US-Northwest
+          size: 1000-5000
+          industry: restaurant
+    createFillIn:
+      summary: Create a subproject - fill in
+      value:
+        displayName: YOUR_customer's_business_name
+        labels:
+          YOUR_key1: YOUR_value1
+          YOUR_key2: YOUR_value2
+          YOUR_key3: YOUR_value3
+    updateDisplayName:
+      summary: Update the display name
+      value:
+        displayName: Newfangled Sassy Actuaries
+    updateFillIn:
+      summary: Update all parameters - fill in
+      value:
+        displayName: YOUR_customer's_updated_displayName
+        labels:
+          YOUR_new_key: YOUR_new_value2
+    updateLabels:
+      summary: Update the labels
+      value:
+        labels:
+          region: UK-London
+  parameters:
+    parentProjectId:
+      name: parentProjectId
+      in: path
+      schema:
+        type: string
+        pattern: '[^/]+'
+      description: the parent project ID the subproject belongs to.
+      required: true
+      example: dxxxxxba48b144xxxxx184b81e4xxxxx
+    subprojectId:
+      name: subprojectId
+      in: path
+      description: The unique subproject identifier. Not to be confused with the `parentProjectId`; the `subprojectId` is a new ID related to your parent project.
+      example: 01FC66621VHDBN119Z8PMXXXXX
+      schema:
+        type: string
+      required: true
+  responses:
+    InvalidArgument:
+      description: 'INVALID_ARGUMENT: The request doesn''t conform to the API.'
+      content:
+        application/json:
+          schema: {}
+          example:
+            error:
+              code: 400
+              message: ''
+              status: INVALID_ARGUMENT
+              details: []
+    PermissionDenied:
+      description: 'PERMISSION_DENIED: The request syntax is valid but can''t be performed. '
+      content:
+        application/json:
+          schema: {}
+          example:
+            error:
+              code: 403
+              message: ''
+              status: PERMISSION_DENIED
+              details: []
+    CreateBadRequest:
+      description: 'The request can''t be completed. The `status` field in the body distinguishes the cause:
+
+        - `INVALID_ARGUMENT`: the request doesn''t conform to the API (e.g. `displayName` is missing, empty, or longer than 255 characters).
+
+        - `FAILED_PRECONDITION`: the parent project is invalid or does not exist.'
+      content:
+        application/json:
+          schema: {}
+          examples:
+            invalidArgument:
+              summary: INVALID_ARGUMENT
+              value:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details: []
+            failedPrecondition:
+              summary: FAILED_PRECONDITION (invalid or non-existent parent project)
+              value:
+                error:
+                  code: 400
+                  message: ''
+                  status: FAILED_PRECONDITION
+                  details: []
+    Unauthenticated:
+      description: 'UNAUTHENTICATED: The authentication token is invalid. '
+      content:
+        application/json:
+          schema: {}
+          example:
+            error:
+              code: 401
+              message: ''
+              status: UNAUTHENTICATED
+              details: []
+    NotFound:
+      description: 'NOT_FOUND: The path is invalid or no resource exists with the given ID.'
+      content:
+        application/json:
+          schema: {}
+          example:
+            error:
+              code: 404
+              message: ''
+              status: NOT_FOUND
+              details: []
+  schemas:
+    Subproject:
+      type: object
+      description: Subprojects are used to logically group a set of product services.
+      required:
+      - subprojectId
+      - displayName
+      - parentProjectId
+      - createTime
+      - updateTime
+      - deleted
+      properties:
+        createTime:
+          type: string
+          format: date-time
+          description: The date/time the subproject was created. ISO 8601 format.
+          readOnly: true
+        deleted:
+          type: boolean
+          description: The current deleted state of the subproject.
+          readOnly: true
+          example: false
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: The display name of the subproject. You cannot have a null value. It does not have to be unique.
+          example: Your Customer's Business Name
+        labels:
+          type: object
+          maxProperties: 255
+          additionalProperties:
+            type: string
+            minLength: 1
+            maxLength: 255
+            description: 'A map of labels. String, key-value pairs that are completely customizable to allow for your metadata. Both the key and the value can be modified. Example: `"region": "US-Northwest"`'
+          propertyNames:
+            minLength: 1
+            maxLength: 255
+        parentProjectId:
+          type: string
+          description: The parent project ID the subproject belongs to. Set from the URL path on creation; a value sent in the request body is ignored.
+          readOnly: true
+        subprojectId:
+          description: The unique subproject identifier. Not to be confused with the `parentProjectId`; the `subprojectId` is a new ID related to your parent project.
+          type: string
+          readOnly: true
+        updateTime:
+          type: string
+          format: date-time
+          description: The date/time the subproject was updated. ISO 8601 format.
+          readOnly: true
+    ListSubprojectsResponse:
+      type: object
+      description: The response containing the subprojects.
+      properties:
+        nextPageToken:
+          type: string
+          description: The next pagination token or an empty value if no more results.
+        subprojects:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subproject'
+          description: Collection of subprojects.
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Authentication](https://developers.sinch.com/docs/subprojects/api-reference/index.md#authentication).
+    OAuth2.0:
+      type: oauth2
+      description: The username and password are your Key ID and Key Secret from the [Access keys section](https://dashboard.sinch.com/settings/access-keys) in the Sinch Customer Dashboard. Exchange these for a bearer token (access token).
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

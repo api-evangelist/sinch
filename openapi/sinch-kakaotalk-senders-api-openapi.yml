@@ -1,22 +1,1721 @@
 openapi: 3.2.0
 info:
-  title: Sinch Provisioning KakaoTalk Senders API
-  description: The Sinch Provisioning API allows developers to programmatically set up senders, accounts, and templates on the messaging platforms used by the Sinch Conversation API. It provides endpoints for configuring messaging channel integrations, managing sender identities, and setting up message templates for approval. This API streamlines the onboarding process for new messaging channels and automates the configuration that would otherwise require manual setup through dashboards.
+  title: Sinch KakaoTalk Senders API
   version: '1.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  description: 'Operations tagged KakaoTalk Senders across 2 of this provider''s published API definitions: sinch-provisioning-api-openapi.yaml, original-sinch-provisioning-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://provisioning.api.sinch.com
-  description: Global Production Server
-security:
-- oAuth2: []
-- basicAuth: []
+  description: Production server
 tags:
 - name: KakaoTalk Senders
-  description: Manage KakaoTalk sender identities for messaging through the Conversation API.
+  description: The KakaoTalk sender endpoint offers a way for you to manage your KakaoTalk senders that can be used with the Conversation API.
 paths:
+  /v1/projects/{projectId}/kakaotalk/senders:
+    get:
+      description: Returns a paginated list of senders for the specified project. If no page token is supplied then the first `50` will be returned.
+      operationId: KakaotalkSendersController_listSenders_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: pageToken
+        required: false
+        in: query
+        schema:
+          type: string
+        description: The page token if retrieving the next page from a previous query.
+      - name: pageSize
+        required: false
+        in: query
+        schema:
+          type: number
+          minimum: 1
+          maximum: 100
+        description: The page size requested.
+      - name: filterStates
+        required: false
+        in: query
+        description: Optionally query for sender by states.
+        x-enumDescriptions:
+          ACTIVE: The sender identity is active and ready to dispatch messages.
+          BLOCKED: The sender identity is blocked and cannot be used for any operations.
+          INACTIVE: The sender identity exists within the system but is currently not active.
+          SUSPENDED: The sender identity has been temporarily suspended due to administrative or policy reasons.
+          VERIFYING: The sender identity is currently undergoing the compliance and verification process.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkSenderStatesEnum'
+      - name: filterStatuses
+        required: false
+        in: query
+        description: Optionally query for sender by statuses.
+        x-enumDescriptions:
+          DRAFT: The modifications to the sender identity are saved as a draft only.
+          IN_PROGRESS: The modifications to the sender identity have been submitted and are still processing.
+          REJECTED: The modifications to the sender identity have been reviewed and rejected.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkSenderStatusesEnum'
+      responses:
+        '200':
+          description: List of senders
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkSenderListDto'
+              examples:
+                response:
+                  summary: List response
+                  description: "\n    Response with senders.\n    "
+                  value:
+                    totalSize: 2
+                    pageSize: 50
+                    senders:
+                    - id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                      plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                      state: ACTIVE
+                      details:
+                        adminPhoneNo: '+48777777777'
+                        name: Test Name
+                        logoImage: https://example-logo-image.com
+                        topLevelCategoryCode: 019
+                        midLevelCategoryCode: '0006'
+                        subLevelCategoryCode: '0001'
+                      created: '2023-02-23T11:28:51.194Z'
+                      modified: '2023-02-23T11:28:51.194Z'
+                    - id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                      plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                      changes:
+                        status: REJECTED
+                        details:
+                          adminPhoneNo: '+48777777777'
+                          name: Test Name
+                          logoImage: https://example-logo-image.com
+                          topLevelCategoryCode: 019
+                          midLevelCategoryCode: '0006'
+                          subLevelCategoryCode: '0001'
+                      created: '2023-02-23T11:28:51.194Z'
+                      modified: '2023-02-23T11:28:51.194Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                invalid_page_token-0:
+                  summary: InvalidPageTokenError
+                  value:
+                    errorCode: invalid_page_token
+                    message: Invalid page token.
+                    resolution: The page token to use is provided in the previous query response, for new queries simply leave this field undefined.
+                invalid_page_size-1:
+                  summary: InvalidPageSizeError
+                  value:
+                    errorCode: invalid_page_size
+                    message: Page size must be numeric.
+                    resolution: Use a integer value for pageSize parameter.
+                project_not_initialized-2:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                invalid_filter_states-3:
+                  summary: InvalidFilterStatesError
+                  value:
+                    errorCode: invalid_filter_states
+                    message: Invalid filterStates.
+                    resolution: Verify that the filterStates used are supported by the Provisioning API.
+                    additionalInformation:
+                      supportedCodes: ACTIVE, BLOCKED, INACTIVE, SUSPENDED, VERIFYING
+                invalid_filter_statuses-4:
+                  summary: InvalidFilterStatusesError
+                  value:
+                    errorCode: invalid_filter_statuses
+                    message: Invalid filter statuses.
+                    resolution: Verify that the filterStatuses used are supported by the Provisioning API.
+                    additionalInformation:
+                      supportedCodes: DRAFT, IN_PROGRESS, REJECTED
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: List all senders in project
+      tags:
+      - KakaoTalk Senders
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    post:
+      callbacks:
+        Active:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Sender state active
+              description: "\n        Received when sender verification is complete and sender is ready to use.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event, in this case `KAKAOTALK_SENDER_ACTIVE`.
+                          type: string
+                        payload:
+                          description: Sender at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/KakaotalkSenderDto'
+                        comment:
+                          description: Comment for sender.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                    example:
+                      type: KAKAOTALK_SENDER_ACTIVE
+                      payload:
+                        id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                        plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                        state: ACTIVE
+                        details:
+                          adminPhoneNo: '+48777777777'
+                          name: Test Name
+                          logoImage: https://example-logo-image.com
+                          topLevelCategoryCode: 019
+                          midLevelCategoryCode: '0006'
+                          subLevelCategoryCode: '0001'
+                        created: '2023-02-23T11:28:51.194Z'
+                        modified: '2023-02-23T11:28:51.194Z'
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+        Inactive:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Sender inactive
+              description: "\n        Received when a sender is inactivated.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event, in this case `KAKAOTALK_SENDER_INACTIVE`.
+                          type: string
+                        payload:
+                          description: Sender at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/KakaotalkSenderDto'
+                        comment:
+                          description: Comment for sender.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                    example:
+                      type: KAKAOTALK_SENDER_INACTIVE
+                      payload:
+                        id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                        plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                        state: INACTIVE
+                        details:
+                          adminPhoneNo: '+48777777777'
+                          name: Test Name
+                          logoImage: https://example-logo-image.com
+                          topLevelCategoryCode: 019
+                          midLevelCategoryCode: '0006'
+                          subLevelCategoryCode: '0001'
+                        created: '2023-02-23T11:28:51.194Z'
+                        modified: '2023-02-23T11:28:51.194Z'
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+        Rejected:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Sender rejected
+              description: "\n        Received when a sender is rejected.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event, in this case `KAKAOTALK_SENDER_REJECTED`.
+                          type: string
+                        payload:
+                          description: Sender at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/KakaotalkSenderDto'
+                        comment:
+                          description: Comment for sender.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                    example:
+                      type: KAKAOTALK_SENDER_REJECTED
+                      payload:
+                        id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                        plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                        changes:
+                          status: REJECTED
+                          details:
+                            adminPhoneNo: '+48777777777'
+                            name: Test Name
+                            logoImage: https://example-logo-image.com
+                            topLevelCategoryCode: 019
+                            midLevelCategoryCode: '0006'
+                            subLevelCategoryCode: '0001'
+                        created: '2023-02-23T11:28:51.194Z'
+                        modified: '2023-02-23T11:28:51.194Z'
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+        Comment:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Comment on sender
+              description: "\n        Received when a comment has been added to the sender.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event, in this case `KAKAOTALK_SENDER_COMMENT_ADDED`.
+                          type: string
+                        payload:
+                          description: Sender at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/KakaotalkSenderDto'
+                        comment:
+                          description: Comment for sender.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                      - comment
+                    example:
+                      type: KAKAOTALK_SENDER_COMMENT_ADDED
+                      payload:
+                        id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                        plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                        state: INACTIVE
+                        details:
+                          adminPhoneNo: '+48777777777'
+                          name: Test Name
+                          logoImage: https://example-logo-image.com
+                          topLevelCategoryCode: 019
+                          midLevelCategoryCode: '0006'
+                          subLevelCategoryCode: '0001'
+                        created: '2023-02-23T11:28:51.194Z'
+                        modified: '2023-02-23T11:28:51.194Z'
+                      comment: Example comment
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+      description: Creates a sender for a project.
+      operationId: KakaotalkSendersController_createSender_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Sender data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KakaotalkInputSenderDto'
+            examples:
+              full:
+                summary: Full body request
+                description: "\n      Example of full body to create a sender.\n      "
+                value:
+                  plusFriendId: plusFriendId
+                  status: SUBMIT
+                  saveDraftOnFailure: true
+                  details:
+                    adminPhoneNo: '+48777777777'
+                    name: Test Name
+                    logoImage: https://example-logo-image.com
+                    topLevelCategoryCode: 019
+                    midLevelCategoryCode: '0006'
+                    subLevelCategoryCode: '0001'
+              minimal:
+                summary: Minimal body request
+                description: "\n      Example of minimal body to create a sender.\n      "
+                value:
+                  plusFriendId: plusFriendId
+                  details:
+                    adminPhoneNo: '+48777777777'
+                    name: Test Name
+                    topLevelCategoryCode: 019
+                    midLevelCategoryCode: '0006'
+                    subLevelCategoryCode: '0001'
+      responses:
+        '201':
+          description: Sender
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkSenderDto'
+              examples:
+                response:
+                  summary: Create response
+                  description: "\n    Response when successfully creating a sender.\n    "
+                  value:
+                    id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                    plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                    changes:
+                      status: REJECTED
+                      details:
+                        adminPhoneNo: '+48777777777'
+                        name: Test Name
+                        logoImage: https://example-logo-image.com
+                        topLevelCategoryCode: 019
+                        midLevelCategoryCode: '0006'
+                        subLevelCategoryCode: '0001'
+                    created: '2023-02-23T11:28:51.194Z'
+                    modified: '2023-02-23T11:28:51.194Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                file_invalid_mime_type-0:
+                  summary: FileInvalidMimeTypeError
+                  value:
+                    errorCode: file_invalid_mime_type
+                    message: 'details.logoImage: invalid file mime type.'
+                    resolution: 'Try again with supported mime types: image/jpeg, image/png.'
+                sender_invalid_category_code-1:
+                  summary: SenderInvalidCategoryCodeError
+                  value:
+                    errorCode: sender_invalid_category_code
+                    message: Invalid sender category code(s).
+                    resolution: Verify that the sender category code(s) used is supported.
+                invalid_input-2:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - plusFriendId must be longer than or equal to 1 characters
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_found-0:
+                  summary: ProjectNotFoundError
+                  value:
+                    errorCode: project_not_found
+                    message: Project not found.
+                    resolution: Verify that the projectId is correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                account_exists-0:
+                  summary: AccountExistsError
+                  value:
+                    errorCode: account_exists
+                    message: Account already exists.
+                    resolution: There can only be one KakaoTalk account for each project.
+                account_not_updatable-1:
+                  summary: AccountNotUpdatableError
+                  value:
+                    errorCode: account_not_updatable
+                    message: Account is not updatable.
+                    resolution: Please contact support.
+                account_data_is_corrupt-2:
+                  summary: AccountDataIsCorruptError
+                  value:
+                    errorCode: account_data_is_corrupt
+                    message: Account data is corrupt.
+                    resolution: Please contact support.
+                file_not_found-3:
+                  summary: FileNotFoundError
+                  value:
+                    errorCode: file_not_found
+                    message: 'details.logoImage: file not found.'
+                    resolution: Verify that the url is correct.
+                file_unexpected_error-4:
+                  summary: FileUnexpectedErrorError
+                  value:
+                    errorCode: file_unexpected_error
+                    message: 'details.logoImage: file unexpected error.'
+                    resolution: The file cannot be handled properly. Please try with another one.
+                file_size_too_large-5:
+                  summary: FileSizeTooLargeError
+                  value:
+                    errorCode: file_size_too_large
+                    message: 'details.logoImage: file size is too large.'
+                    resolution: Try again with a smaller file. Max size for `image/jpeg` is 5MB.
+                plus_friend_id_used-6:
+                  summary: PlusFriendIdUsedError
+                  value:
+                    errorCode: plus_friend_id_used
+                    message: plusFriendId is already used.
+                    resolution: plusFriendId is already used by another Sender, verify that the parameters are correct.
+        '412':
+          description: PreconditionFailed
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                account_is_in_progress-0:
+                  summary: AccountIsInProgressError
+                  value:
+                    errorCode: account_is_in_progress
+                    message: Account creation is in progress.
+                    resolution: Please contact support.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Create sender for project
+      tags:
+      - KakaoTalk Senders
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}:
+    get:
+      description: Returns a sender for a project.
+      operationId: KakaotalkSendersController_getSender_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Sender
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkSenderDto'
+              examples:
+                response:
+                  summary: Get response
+                  description: "\n    Response with a sender.\n    "
+                  value:
+                    id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                    plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                    state: ACTIVE
+                    details:
+                      adminPhoneNo: '+48777777777'
+                      name: Test Name
+                      logoImage: https://example-logo-image.com
+                      topLevelCategoryCode: 019
+                      midLevelCategoryCode: '0006'
+                      subLevelCategoryCode: '0001'
+                    created: '2023-02-23T11:28:51.194Z'
+                    modified: '2023-02-23T11:28:51.194Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get sender for project
+      tags:
+      - KakaoTalk Senders
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    delete:
+      description: Marks a sender for removal. Once requested the sender will be active for 60 days to deliver final messages. After 60 days it will be removed.
+      operationId: KakaotalkSendersController_deleteSender_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Sender marked for delete after 60 days.
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_already_deleted-0:
+                  summary: SenderAlreadyDeletedError
+                  value:
+                    errorCode: sender_already_deleted
+                    message: The sender has been deleted within the last 60 days.
+                    resolution: Wait the required time.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Delete sender for project
+      tags:
+      - KakaoTalk Senders
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    patch:
+      description: Updates a draft sender in project.
+      operationId: KakaotalkSendersController_updateSender_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Supported sender fields to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KakaotalkInputUpdateSenderDto'
+            examples:
+              full:
+                summary: Full body request
+                description: "\n      Example of full body to update a sender.\n      "
+                value:
+                  status: SUBMIT
+                  details:
+                    adminPhoneNo: '+48777777777'
+                    name: Test Name
+                    logoImage: https://example-logo-image.com
+                    topLevelCategoryCode: 019
+                    midLevelCategoryCode: '0006'
+                    subLevelCategoryCode: '0001'
+      responses:
+        '200':
+          description: Updated sender in project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkSenderDto'
+              examples:
+                response:
+                  summary: Update response
+                  description: "\n    Response when successfully update a sender.\n    "
+                  value:
+                    id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                    plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                    state: ACTIVE
+                    changes:
+                      status: REJECTED
+                      details:
+                        adminPhoneNo: '+48777777777'
+                        name: Test Name
+                        logoImage: https://example-logo-image.com
+                        topLevelCategoryCode: 019
+                        midLevelCategoryCode: '0006'
+                        subLevelCategoryCode: '0001'
+                    details:
+                      adminPhoneNo: '+48777777777'
+                      name: Test Name
+                      logoImage: https://example-logo-image.com
+                      topLevelCategoryCode: 019
+                      midLevelCategoryCode: '0006'
+                      subLevelCategoryCode: '0001'
+                    created: '2023-02-23T11:28:51.194Z'
+                    modified: '2023-02-23T11:28:51.194Z'
+                responseSenderDraft:
+                  summary: Update response of a draft
+                  description: "\n    Response when successfully updating a sender draft.\n    "
+                  value:
+                    plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                    changes:
+                      status: REJECTED
+                      details:
+                        adminPhoneNo: '+48777777777'
+                        name: Test Name
+                        logoImage: https://example-logo-image.com
+                        topLevelCategoryCode: 019
+                        midLevelCategoryCode: '0006'
+                        subLevelCategoryCode: '0001'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                file_invalid_mime_type-0:
+                  summary: FileInvalidMimeTypeError
+                  value:
+                    errorCode: file_invalid_mime_type
+                    message: 'details.logoImage: invalid file mime type.'
+                    resolution: 'Try again with supported mime types: image/jpeg, image/png.'
+                invalid_input-1:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - Description of fields failing validation
+                project_not_initialized-2:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                no_fields_to_update-3:
+                  summary: NoFieldsToUpdateError
+                  value:
+                    errorCode: no_fields_to_update
+                    message: No fields to be updated.
+                    resolution: Supply at least one field to be updated.
+                sender_invalid_category_code-4:
+                  summary: SenderInvalidCategoryCodeError
+                  value:
+                    errorCode: sender_invalid_category_code
+                    message: Invalid sender category code(s).
+                    resolution: Verify that the sender category code(s) used is supported.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_found-0:
+                  summary: ProjectNotFoundError
+                  value:
+                    errorCode: project_not_found
+                    message: Project not found.
+                    resolution: Verify that the projectId is correct.
+                sender_not_found-1:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                file_not_found-0:
+                  summary: FileNotFoundError
+                  value:
+                    errorCode: file_not_found
+                    message: 'details.logoImage: file not found.'
+                    resolution: Verify that the url is correct.
+                file_unexpected_error-1:
+                  summary: FileUnexpectedErrorError
+                  value:
+                    errorCode: file_unexpected_error
+                    message: 'details.logoImage: file unexpected error.'
+                    resolution: The file cannot be handled properly. Please try with another one.
+                file_size_too_large-2:
+                  summary: FileSizeTooLargeError
+                  value:
+                    errorCode: file_size_too_large
+                    message: 'details.logoImage: file size is too large.'
+                    resolution: Try again with a smaller file. Max size for `image/jpeg` is 5MB.
+                sender_changes_not_updatable-3:
+                  summary: SenderChangesNotUpdatableError
+                  value:
+                    errorCode: sender_changes_not_updatable
+                    message: Sender is not updatable.
+                    resolution: 'Updates are only supported by sender changes with status: DRAFT'
+                sender_not_updatable-4:
+                  summary: SenderNotUpdatableError
+                  value:
+                    errorCode: sender_not_updatable
+                    message: Sender is not updatable.
+                    resolution: 'Updates are only supported by senders with state: ACTIVE.'
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Updates a draft sender in project
+      tags:
+      - KakaoTalk Senders
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}/activities:
+    get:
+      description: Paginated list of activities for sender. Ordered from the most recent one to the oldest one.
+      operationId: KakaotalkSendersController_listActivities_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      - name: pageSize
+        required: false
+        in: query
+        schema:
+          type: number
+          minimum: 1
+          maximum: 100
+        description: The page size requested.
+      - name: pageToken
+        required: false
+        in: query
+        schema:
+          type: string
+        description: The page token if retrieving the next page from a previous query.
+      responses:
+        '200':
+          description: Recent activities on sender
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkSenderNotificationListDto'
+              examples:
+                response:
+                  summary: List sender activities response
+                  description: Response for all sender activities.
+                  value:
+                    totalSize: 2
+                    pageSize: 50
+                    notifications:
+                    - type: CREATED
+                      created: '2023-12-20T15:00:11.310Z'
+                      author: Provisioning API user
+                    - type: COMMENT_ADDED
+                      created: '2023-12-20T15:00:10.303Z'
+                      comment: Example comment
+                      author: Provisioning API user
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                invalid_page_token-1:
+                  summary: InvalidPageTokenError
+                  value:
+                    errorCode: invalid_page_token
+                    message: Invalid page token.
+                    resolution: The page token to use is provided in the previous query response, for new queries simply leave this field undefined.
+                invalid_page_size-2:
+                  summary: InvalidPageSizeError
+                  value:
+                    errorCode: invalid_page_size
+                    message: Page size must be numeric.
+                    resolution: Use a integer value for pageSize parameter.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Lists activities on sender
+      tags:
+      - KakaoTalk Senders
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}/changes:
+    delete:
+      description: Delete pending or rejected changes to a sender.
+      operationId: KakaotalkSendersController_deleteChanges_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Sender changes deleted
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_changes_not_found-0:
+                  summary: SenderChangesNotFoundError
+                  value:
+                    errorCode: sender_changes_not_found
+                    message: Sender changes not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_changes_not_deletable-0:
+                  summary: SenderChangesNotDeletableError
+                  value:
+                    errorCode: sender_changes_not_deletable
+                    message: Sender changes is not deletable.
+                    resolution: Only DRAFT, REJECTED senders changes can be marked for deletion.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Delete pending or rejected changes to a sender
+      tags:
+      - KakaoTalk Senders
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}/comments:
+    post:
+      description: Creates a comment for a sender.
+      operationId: KakaotalkSendersController_createComment_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Comment data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KakaotalkCommentInputDto'
+            examples:
+              input:
+                summary: Body request
+                description: "\n        Example body request to create a comment.\n        "
+                value:
+                  comment: Example comment.
+      responses:
+        '201':
+          description: Created comment for a sender
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkCommentDto'
+              examples:
+                created:
+                  summary: Create response
+                  description: "\n        Response when successfully creating a comment.\n        "
+                  value:
+                    type: CREATED
+                    comment: Example comment
+                    created: '2023-01-19T13:11:08.204Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                invalid_input-0:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - details.buttons.0.name must be a string
+                project_not_initialized-1:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                invalid_payload-2:
+                  summary: InvalidPayloadError
+                  value:
+                    errorCode: invalid_payload
+                    message: Invalid payload.
+                    resolution: Correct payload and submit again.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Creates a comment for a sender in project
+      tags:
+      - KakaoTalk Senders
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}/register:
+    post:
+      description: Requests sender registration for a project.
+      operationId: KakaotalkSendersController_registerSender_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Sender
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkSenderDto'
+              examples:
+                response:
+                  summary: Register response
+                  description: "\n    Response when successfully registering a sender.\n    "
+                  value:
+                    id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                    plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                    state: VERIFYING
+                    details:
+                      adminPhoneNo: '+48777777777'
+                      name: Test Name
+                      logoImage: https://example-logo-image.com
+                      topLevelCategoryCode: 019
+                      midLevelCategoryCode: '0006'
+                      subLevelCategoryCode: '0001'
+                    created: '2023-02-23T11:28:51.194Z'
+                    modified: '2023-02-23T11:28:51.194Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                invalid_app_key-1:
+                  summary: InvalidAppKeyError
+                  value:
+                    errorCode: invalid_app_key
+                    message: Invalid app key.
+                    resolution: Please check if the app key is correct
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                not_allowed_register-0:
+                  summary: NotAllowedRegisterError
+                  value:
+                    errorCode: not_allowed_register
+                    message: Sender not allowed to be registered.
+                    resolution: Sender in "ACTIVE" state can't be registered.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Register sender for project
+      tags:
+      - KakaoTalk Senders
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}/verify:
+    post:
+      description: Verifies sender with the OTP code received after triggering registration.
+      operationId: KakaotalkSendersController_verifySender_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Verify sender data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KakaotalkInputVerifySenderDto'
+            examples:
+              input:
+                summary: Body request
+                description: "\n      Example body request to verify.\n      "
+                value:
+                  code: 123456
+      responses:
+        '200':
+          description: Sender
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkSenderDto'
+              examples:
+                response:
+                  summary: Verify response
+                  description: "\n    Response when successfully verified a sender.\n    "
+                  value:
+                    id: cf11794a-6a5e-4a12-b103-da79bd378bf1
+                    plusFriendId: 5WY5zKfY3pB56EmDVUPQ
+                    state: ACTIVE
+                    details:
+                      adminPhoneNo: '+48777777777'
+                      name: Test Name
+                      logoImage: https://example-logo-image.com
+                      topLevelCategoryCode: 019
+                      midLevelCategoryCode: '0006'
+                      subLevelCategoryCode: '0001'
+                    created: '2023-02-23T11:28:51.194Z'
+                    modified: '2023-02-23T11:28:51.194Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                not_allowed_verify-0:
+                  summary: NotAllowedVerifyError
+                  value:
+                    errorCode: not_allowed_verify
+                    message: Sender not allowed to be verified.
+                    resolution: Sender has to be in "VERIFYING" state to be verified.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Verify sender for project
+      tags:
+      - KakaoTalk Senders
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+      security:
+      - BasicAuth: []
+        BearerAuth: []
+        OAuth2Production: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Production server
   /v1/projects/{project_id}/kakaoTalk/senders:
     get:
       operationId: listKakaoTalkSenders
@@ -35,6 +1734,9 @@ paths:
                 $ref: '#/components/schemas/SenderList'
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
     post:
       operationId: createKakaoTalkSender
       summary: Create a Kakaotalk Sender
@@ -60,8 +1762,452 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://provisioning.api.sinch.com
+      description: Global Production Server
 components:
   schemas:
+    KakaotalkInputSenderDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            DRAFT: Saves the pending changes as a draft without submitting them to the system.
+            SUBMIT: Submits the pending changes directly for processing.
+          description: Create as draft or submit. Defaults to submit.
+          default: SUBMIT
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkActionsEnum'
+        saveDraftOnFailure:
+          type: boolean
+          default: false
+          description: Flag to save template as draft if submission fails. Defaults to false.
+          uniqueItems: false
+        plusFriendId:
+          type: string
+          description: PlusFriend ID
+          minLength: 1
+          maxLength: 30
+          uniqueItems: false
+        details:
+          description: Sender details and information. Not required for draft.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkInputSenderDetailsDto'
+      required:
+      - plusFriendId
+      - details
+    KakaotalkInputSenderDetailsDto:
+      type: object
+      properties:
+        adminPhoneNo:
+          type: string
+          minLength: 1
+          maxLength: 15
+          description: Admin phone  Not required for draft.
+          format: phone number
+          uniqueItems: false
+        name:
+          type: string
+          minLength: 1
+          maxLength: 512
+          description: Sender name Not required for draft.
+          uniqueItems: false
+        logoImage:
+          type: string
+          description: 'Sender logo
+
+            - Supported mime types: `image/jpeg` or `image/png`.
+
+            - Maximum file size: 5MB.'
+          format: url
+          uniqueItems: false
+        topLevelCategoryCode:
+          type: string
+          description: Top level category code, must consist of 3 digits (e.g. 001). Not required for draft.
+          uniqueItems: false
+        midLevelCategoryCode:
+          type: string
+          description: Mid level category code, must consist of 4 digits (e.g. 0001). Not required for draft.
+          uniqueItems: false
+        subLevelCategoryCode:
+          type: string
+          description: Sub level category code, must consist of 4 digits (e.g. 0001). Not required for draft.
+          uniqueItems: false
+      required:
+      - adminPhoneNo
+      - name
+      - topLevelCategoryCode
+      - midLevelCategoryCode
+      - subLevelCategoryCode
+    KakaotalkInputUpdateSenderDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            DRAFT: Saves the pending changes as a draft without submitting them to the system.
+            SUBMIT: Submits the pending changes directly for processing.
+          default: DRAFT
+          description: Create as draft or submit. Defaults to draft.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkActionsEnum'
+        details:
+          description: Sender details and information.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkInputUpdateSenderDetailsDto'
+    KakaotalkSenderDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ID of the sender.
+          uniqueItems: false
+        plusFriendId:
+          type: string
+          description: PlusFriend ID
+          uniqueItems: false
+        state:
+          x-enumDescriptions:
+            ACTIVE: The sender identity is active and ready to dispatch messages.
+            BLOCKED: The sender identity is blocked and cannot be used for any operations.
+            INACTIVE: The sender identity exists within the system but is currently not active.
+            SUSPENDED: The sender identity has been temporarily suspended due to administrative or policy reasons.
+            VERIFYING: The sender identity is currently undergoing the compliance and verification process.
+          description: The current state of the sender.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkSenderStatesEnum'
+        changes:
+          description: Any pending changes to the sender.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkSenderChangesDto'
+        details:
+          description: Sender details and information.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkSenderDetailsDto'
+        created:
+          type: string
+          description: The UTC Date Time in ISO 8601 for when the sender was created.
+          uniqueItems: false
+        modified:
+          type: string
+          description: The UTC Date Time in ISO 8601 for when the sender was last modified.
+          uniqueItems: false
+      required:
+      - plusFriendId
+    KakaotalkActionsEnum:
+      type: string
+      enum:
+      - DRAFT
+      - SUBMIT
+      description: Create as draft or submit. Defaults to submit.
+    KakaotalkSenderChangesDetailsDto:
+      type: object
+      properties:
+        adminPhoneNo:
+          type: string
+          description: Admin phone
+          uniqueItems: false
+        name:
+          type: string
+          description: Sender name
+          uniqueItems: false
+        logoImage:
+          type: string
+          description: Sender logo
+          uniqueItems: false
+        topLevelCategoryCode:
+          type: string
+          description: Top level category code, must consist of 3 digits (e.g. 001).
+          uniqueItems: false
+        midLevelCategoryCode:
+          type: string
+          description: Mid level category code, must consist of 4 digits (e.g. 0001).
+          uniqueItems: false
+        subLevelCategoryCode:
+          type: string
+          description: Sub level category code, must consist of 4 digits (e.g. 0001).
+          uniqueItems: false
+    KakaotalkSenderChangesDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            DRAFT: The modifications to the sender identity are saved as a draft only.
+            IN_PROGRESS: The modifications to the sender identity have been submitted and are still processing.
+            REJECTED: The modifications to the sender identity have been reviewed and rejected.
+          description: Current status of the pending changes.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkSenderStatusesEnum'
+        details:
+          oneOf:
+          - $ref: '#/components/schemas/KakaotalkSenderDetailsDto'
+            description: For newly created sender
+          - $ref: '#/components/schemas/KakaotalkSenderChangesDetailsDto'
+            description: For update sender
+          description: Sender details and information.
+          uniqueItems: false
+      required:
+      - status
+      - details
+    KakaotalkCommentTypeEnum:
+      type: string
+      const: CREATED
+    KakaotalkInputVerifySenderDto:
+      type: object
+      properties:
+        code:
+          type: number
+          examples:
+          - 123456
+          description: Numeric code to verify the sender.
+          uniqueItems: false
+      required:
+      - code
+    KakaotalkSenderNotificationListDto:
+      type: object
+      properties:
+        totalSize:
+          type: number
+          description: Total size of the entries matching the search query.
+          uniqueItems: false
+        pageSize:
+          type: number
+          description: Requested size of the page.
+          uniqueItems: false
+        previousPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch previous batch of entries.
+          uniqueItems: false
+        nextPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch next batch of entries.
+          uniqueItems: false
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkSenderNotificationDto'
+          uniqueItems: false
+      required:
+      - totalSize
+      - pageSize
+      - notifications
+    KakaotalkPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+    KakaotalkCommentInputDto:
+      type: object
+      properties:
+        comment:
+          type: string
+          minLength: 1
+          maxLength: 65535
+          uniqueItems: false
+      required:
+      - comment
+    KakaotalkSenderStatesEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - BLOCKED
+      - INACTIVE
+      - SUSPENDED
+      - VERIFYING
+      description: The current state of the sender.
+    KakaotalkSenderStatusesEnum:
+      type: string
+      enum:
+      - DRAFT
+      - IN_PROGRESS
+      - REJECTED
+      description: Current status of the pending changes.
+    KakaotalkSenderNotificationDto:
+      type: object
+      properties:
+        type:
+          x-enumDescriptions:
+            ACTIVE: The notification configuration is active and enabled.
+            COMMENT_ADDED: A new comment has been added to the notification trail.
+            CREATED: The notification configuration has been successfully created.
+            DRAFT: The notification configuration is currently in a draft state.
+            EDITED: The notification configuration has been edited or updated.
+            INACTIVE: The notification configuration is inactive or disabled.
+            IN_PROGRESS: The notification process is currently executing.
+            REJECTED: The notification configuration has been rejected.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkSenderNotificationTypeEnum'
+        created:
+          type: string
+          uniqueItems: false
+        author:
+          type: string
+          uniqueItems: false
+        comment:
+          type: string
+          uniqueItems: false
+      required:
+      - type
+    KakaotalkSenderDetailsDto:
+      type: object
+      properties:
+        adminPhoneNo:
+          type: string
+          description: Admin phone
+          uniqueItems: false
+        name:
+          type: string
+          description: Sender name
+          uniqueItems: false
+        logoImage:
+          type: string
+          description: Sender logo
+          uniqueItems: false
+        topLevelCategoryCode:
+          type: string
+          description: Top level category code, must consist of 3 digits (e.g. 001).
+          uniqueItems: false
+        midLevelCategoryCode:
+          type: string
+          description: Mid level category code, must consist of 4 digits (e.g. 0001).
+          uniqueItems: false
+        subLevelCategoryCode:
+          type: string
+          description: Sub level category code, must consist of 4 digits (e.g. 0001).
+          uniqueItems: false
+      required:
+      - adminPhoneNo
+      - name
+      - topLevelCategoryCode
+      - midLevelCategoryCode
+      - subLevelCategoryCode
+    KakaotalkSenderListDto:
+      type: object
+      properties:
+        totalSize:
+          type: number
+          description: Total size of the entries matching the search query.
+          uniqueItems: false
+        pageSize:
+          type: number
+          description: Requested size of the page.
+          uniqueItems: false
+        previousPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch previous batch of entries.
+          uniqueItems: false
+        nextPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch next batch of entries.
+          uniqueItems: false
+        senders:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkSenderDto'
+          description: List of senders.
+          uniqueItems: false
+      required:
+      - totalSize
+      - pageSize
+      - senders
+    KakaotalkSenderNotificationTypeEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - COMMENT_ADDED
+      - CREATED
+      - DRAFT
+      - EDITED
+      - IN_PROGRESS
+      - INACTIVE
+      - REJECTED
+    KakaotalkCommentDto:
+      type: object
+      properties:
+        type:
+          x-enumDescriptions:
+            CREATED: Indicates the comment has been successfully created and published.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkCommentTypeEnum'
+        comment:
+          type: string
+          uniqueItems: false
+        created:
+          type: string
+          uniqueItems: false
+      required:
+      - type
+      - comment
+    KakaotalkInputUpdateSenderDetailsDto:
+      type: object
+      properties:
+        adminPhoneNo:
+          type: string
+          minLength: 1
+          maxLength: 15
+          description: Admin phone
+          format: phone number
+          uniqueItems: false
+        name:
+          type: string
+          minLength: 1
+          maxLength: 512
+          description: Sender name
+          uniqueItems: false
+        logoImage:
+          type:
+          - string
+          - 'null'
+          description: Sender logo
+          format: url
+          uniqueItems: false
+        topLevelCategoryCode:
+          type: string
+          description: Top level category code, must consist of 3 digits (e.g. 001).
+          uniqueItems: false
+        midLevelCategoryCode:
+          type: string
+          description: Mid level category code, must consist of 4 digits (e.g. 0001).
+          uniqueItems: false
+        subLevelCategoryCode:
+          type: string
+          description: Sub level category code, must consist of 4 digits (e.g. 0001).
+          uniqueItems: false
     SenderList:
       type: object
       properties:
@@ -109,6 +2255,21 @@ components:
       schema:
         type: string
   securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
     oAuth2:
       type: oauth2
       description: OAuth 2.0 client credentials flow.
@@ -123,3 +2284,14 @@ components:
 externalDocs:
   description: Sinch Provisioning API Documentation
   url: https://developers.sinch.com/docs/provisioning-api
+x-refined-from:
+- sinch-provisioning-api-openapi.yaml
+- original-sinch-provisioning-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

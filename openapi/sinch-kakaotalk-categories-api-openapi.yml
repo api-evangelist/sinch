@@ -1,0 +1,760 @@
+openapi: 3.2.0
+info:
+  title: Provisioning KakaoTalk Categories API
+  description: The KakaoTalk categories endpoint offers a way for you to manage all of the KakaoTalk template categories that you can use with the Conversation API.
+  version: 1.2.117
+servers:
+- url: https://provisioning.api.sinch.com
+  description: Production server
+security:
+- BasicAuth: []
+  BearerAuth: []
+  OAuth2Production: []
+tags:
+- name: KakaoTalk Categories
+  description: The KakaoTalk categories endpoint offers a way for you to manage all of the KakaoTalk template categories that you can use with the Conversation API.
+paths:
+  /v1/projects/{projectId}/kakaotalk/categories/senders:
+    get:
+      description: Returns a list of sender categories.
+      operationId: KakaotalkCategoriesController_listSenderCategories_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of sender categories.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkSenderCategoryListDto'
+              examples:
+                response:
+                  summary: List response.
+                  description: "\n    Response with sender categories.\n    "
+                  value:
+                    categories:
+                    - parentCode: ''
+                      depth: 1
+                      code: '001'
+                      name: 건강
+                      subcategories:
+                      - parentCode: '001'
+                        depth: 2
+                        code: '0001'
+                        name: 병원
+                        subcategories:
+                        - parentCode: '0001'
+                          depth: 3
+                          code: '0001'
+                          name: 종합병원
+                          subcategories: []
+                        - parentCode: '0001'
+                          depth: 3
+                          code: '0002'
+                          name: 피부과
+                          subcategories: []
+                        - parentCode: '0001'
+                          depth: 3
+                          code: '0003'
+                          name: 성형외과
+                          subcategories: []
+                      - parentCode: '001'
+                        depth: 2
+                        code: '0002'
+                        name: 약국
+                        subcategories:
+                        - parentCode: '0002'
+                          depth: 3
+                          code: '0001'
+                          name: 약국
+                          subcategories: []
+                      - parentCode: '001'
+                        depth: 2
+                        code: '0003'
+                        name: 의료기기/의약품
+                        subcategories:
+                        - parentCode: '0003'
+                          depth: 3
+                          code: '0001'
+                          name: 의료기기/의약품
+                          subcategories: []
+                      - parentCode: '001'
+                        depth: 2
+                        code: '0004'
+                        name: 건강식품/건강정보
+                        subcategories:
+                        - parentCode: '0004'
+                          depth: 3
+                          code: '0001'
+                          name: 건강식품/건강정보
+                          subcategories: []
+                    - parentCode: ''
+                      depth: 1
+                      code: '002'
+                      name: 교육
+                      subcategories:
+                      - parentCode: '002'
+                        depth: 2
+                        code: '0001'
+                        name: 학교
+                        subcategories:
+                        - parentCode: '0001'
+                          depth: 3
+                          code: '0001'
+                          name: 유치원
+                          subcategories: []
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: List all sender categories
+      tags:
+      - KakaoTalk Categories
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/kakaotalk/categories/senders/{plusFriendId}/templates:
+    get:
+      description: Returns a list of template categories for the specified project.
+      operationId: KakaotalkCategoriesController_getTemplateCategories_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      - name: pageSize
+        required: false
+        in: query
+        schema:
+          type: number
+          minimum: 1
+          maximum: 100
+        description: The page size requested.
+      - name: pageToken
+        required: false
+        in: query
+        schema:
+          type: string
+        description: The page token if retrieving the next page from a previous query.
+      responses:
+        '200':
+          description: List of template categories
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkTemplateCategoryListDto'
+              examples:
+                response:
+                  summary: List response.
+                  description: "\n    Response with categories.\n    "
+                  value:
+                    totalSize: 2
+                    pageSize: 50
+                    categories:
+                    - name: 회원
+                      nameEnglish: Membership
+                      subcategories:
+                      - code: '001001'
+                        name: 회원가입
+                        nameEnglish: Join membership
+                        groupName: 회원
+                        inclusion: 회원가입 완료 내용의 템플릿이 대상입니다. 가입에 따른 축하적립금/쿠폰을 포함합니다.
+                        exclusion: 상품/서비스가입은 구매 > 상품가입 (002002)로 분류합니다.
+                      - code: '001002'
+                        name: 인증/비밀번호/로그인
+                        nameEnglish: Authentication/Password/Login
+                        groupName: 회원
+                        inclusion: OTP, 로그인여부, 임시비밀번호, 본인확인 용도의 템플릿이 대상입니다.
+                        exclusion: ''
+                      - code: '001003'
+                        name: 회원정보/회원혜택
+                        nameEnglish: Membership information/Member ship benefits
+                        groupName: 회원
+                        inclusion: 회원등급안내, 혜택안내, 생일/기념일 축하 동의 템플릿이 대상입니다.
+                        exclusion: ''
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                invalid_page_size-1:
+                  summary: InvalidPageSizeError
+                  value:
+                    errorCode: invalid_page_size
+                    message: Page size must be numeric.
+                    resolution: Use a integer value for pageSize parameter.
+                invalid_page_token-2:
+                  summary: InvalidPageTokenError
+                  value:
+                    errorCode: invalid_page_token
+                    message: Invalid page token.
+                    resolution: The page token to use is provided in the previous query response, for new queries simply leave this field undefined.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: List all template categories in project
+      tags:
+      - KakaoTalk Categories
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+components:
+  schemas:
+    KakaotalkTemplateCategoryDto:
+      type: object
+      properties:
+        name:
+          x-enumDescriptions:
+            구매: Indicates the content is reserved for transactional purchase confirmations and receipts.
+            기타: Indicates the content belongs to templates that do not align with any standard category.
+            리포팅: Indicates the content provides system reports, statements, and summary updates.
+            배송: Indicates the content covers logistics, shipping tracking, and delivery progress.
+            법적고지: Indicates the content handles regulatory, legal, or compliance-related notifications.
+            서비스이용: Indicates the content focuses on customer support, assistance, and service workflows.
+            업무알림: Indicates the content carries operational business notifications and transactional notices.
+            예약: Indicates the content handles booking confirmations and reservation-related logs.
+            쿠폰/포인트: Indicates the content distributes coupons, loyalty points, or similar promotional balance rewards.
+            회원: Indicates the content manages user accounts, loyalty registrations, and membership updates.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: 카테고리 이름.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateCategoryNamesEnum'
+        nameEnglish:
+          x-enumDescriptions:
+            Business notification: The English linguistic localization identifier for operational business notifications.
+            Coupon/Points: The English linguistic localization identifier for coupons, points, and promotional balance rewards.
+            Customer service: The English linguistic localization identifier for customer support and service workflows.
+            Legal notification: The English linguistic localization identifier for regulatory or compliance-related notices.
+            Membership: The English linguistic localization identifier for member accounts and loyalty programs.
+            Others: The English linguistic localization identifier for templates falling outside standard groups.
+            Purchase: The English linguistic localization identifier for transactional purchase statements.
+            Reports: The English linguistic localization identifier for analytical report definitions and summaries.
+            Reservation: The English linguistic localization identifier for booking actions and reservation entries.
+            Shipping: The English linguistic localization identifier for cargo routing and parcel delivery updates.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: English category name.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateCategoryEnglishNamesEnum'
+        subcategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkTemplateSubcategoryDto'
+          description: List of subcategories.
+          uniqueItems: false
+      required:
+      - name
+      - nameEnglish
+      - subcategories
+    KakaotalkTemplateSubcategoryNamesEnum:
+      type: string
+      enum:
+      - 인증/비밀번호/로그인
+      - 회원가입
+      - 회원정보/회원혜택
+      - 구매예약/입고알림
+      - 구매완료
+      - 구매취소
+      - 상품가입
+      - 진행상태
+      - 예약상태
+      - 예약알림/리마인드
+      - 예약완료/예약내역
+      - 예약취소
+      - 구매감사/이용확인
+      - 리마인드
+      - 방문서비스
+      - 신청접수
+      - 이용도구
+      - 이용안내/공지
+      - 처리완료
+      - 피드백 요청
+      - 거래알림
+      - 계약/견적
+      - 뉴스레터
+      - 안전/피해예방
+      - 요금청구
+      - 피드백
+      - 배송상태
+      - 배송실패
+      - 배송예정
+      - 배송완료
+      - 개인정보
+      - 수신동의
+      - 약관변경
+      - 휴면 관련
+      - 내부 업무 알림
+      - 주문/예약
+      - 쿠폰/포인트안내
+      - 쿠폰발급
+      - 쿠폰사용
+      - 포인트사용
+      - 포인트적립
+      - 기타
+      - UNRECOGNIZED
+      description: 하위 카테고리 이름.
+    KakaotalkTemplateSubcategoryEnglishNamesEnum:
+      type: string
+      enum:
+      - Authentication/Password/Login
+      - Join membership
+      - Membership information/Member ship benefits
+      - Pre-order/Stock alerts
+      - Product subscription
+      - Purchase cancellation
+      - Purchase completed
+      - Purchase status
+      - Completed reservations/Reservation history
+      - Notification/Reminder
+      - Reservation cancellation
+      - Reservation status
+      - Application reception
+      - Feedback request
+      - Greeting message/Order confirmation
+      - Information/Notification
+      - Notification for treated demands
+      - Reminder message
+      - Tools for use
+      - Visiting service
+      - Billing
+      - Contract/Quote
+      - Feedback
+      - Newsletter
+      - Safety/Damage prevention
+      - Transaction notification
+      - Failed shipment
+      - Shipping completed
+      - Shipping estimation
+      - Shipping status
+      - Change of terms and conditions
+      - Consent of reception
+      - Dormant account related
+      - Privacy
+      - Internal business notification
+      - Order/Reservation
+      - Coupon issuance
+      - Earn points
+      - Information coupon/Points
+      - Notification for coupon use
+      - Use of points
+      - Others
+      - UNRECOGNIZED
+      description: English subcategory name.
+    KakaotalkTemplateCategoryEnglishNamesEnum:
+      type: string
+      enum:
+      - Business notification
+      - Coupon/Points
+      - Customer service
+      - Legal notification
+      - Membership
+      - Others
+      - Purchase
+      - Reports
+      - Reservation
+      - Shipping
+      - UNRECOGNIZED
+      description: English category name.
+    KakaotalkTemplateCategoryListDto:
+      type: object
+      properties:
+        totalSize:
+          type: number
+          description: Total size of the entries matching the search query.
+          uniqueItems: false
+        pageSize:
+          type: number
+          description: Requested size of the page.
+          uniqueItems: false
+        previousPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch previous batch of entries.
+          uniqueItems: false
+        nextPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch next batch of entries.
+          uniqueItems: false
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkTemplateCategoryDto'
+          description: List of template categories.
+          uniqueItems: false
+      required:
+      - totalSize
+      - pageSize
+      - categories
+    KakaotalkSenderCategoryDto:
+      type: object
+      properties:
+        parentCode:
+          type: string
+          minLength: 0
+          maxLength: 4
+          description: The code of the parent category.
+          uniqueItems: false
+        depth:
+          type: number
+          maximum: 3
+          minimum: 1
+          description: The depth in category tree.
+          uniqueItems: false
+        code:
+          type: string
+          minLength: 3
+          maxLength: 4
+          description: The code of the category.
+          uniqueItems: false
+        name:
+          type: string
+          description: The name of the category.
+          uniqueItems: false
+        subcategories:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkSenderCategoryDto'
+          description: List of subcategories.
+          uniqueItems: false
+      required:
+      - parentCode
+      - depth
+      - code
+      - name
+      - subcategories
+    KakaotalkPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+    KakaotalkTemplateCategoryNamesEnum:
+      type: string
+      enum:
+      - 구매
+      - 기타
+      - 리포팅
+      - 배송
+      - 법적고지
+      - 서비스이용
+      - 업무알림
+      - 예약
+      - 쿠폰/포인트
+      - 회원
+      - UNRECOGNIZED
+      description: 카테고리 이름.
+    KakaotalkSenderCategoryListDto:
+      type: object
+      properties:
+        categories:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkSenderCategoryDto'
+          description: List of sender categories.
+          uniqueItems: false
+      required:
+      - categories
+    KakaotalkTemplateSubcategoryDto:
+      type: object
+      properties:
+        code:
+          type: string
+          description: Subcategory code (Used when registering/modifying templates).
+          uniqueItems: false
+        name:
+          x-enumDescriptions:
+            인증/비밀번호/로그인: Indicates the content handles user authentication, password resets, or secure login procedures.
+            회원가입: Indicates the content manages new user onboarding and loyalty program registrations.
+            회원정보/회원혜택: Indicates the content details account metadata, tier statuses, or specific membership benefits.
+            구매예약/입고알림: Indicates the content triggers pre-order confirmations or product inventory stock alerts.
+            구매완료: Indicates the content serves as a final transactional confirmation for completed purchases.
+            구매취소: Indicates the content documents the formal cancellation and reversal of a purchase transaction.
+            상품가입: Indicates the content processes recurrent product subscriptions and service lifecycle updates.
+            진행상태: Indicates the content tracks progressive changes in an active order lifecycle status.
+            예약상태: Indicates the content monitors progressive changes in an active booking or reservation lifecycle.
+            예약알림/리마인드: Indicates the content provides generic operational notifications or structural system reminders.
+            예약완료/예약내역: Indicates the content provides historical verification blocks for completed reservations.
+            예약취소: Indicates the content verifies the formal cancellation of a scheduled booking.
+            구매감사/이용확인: Indicates the content acts as an initialization welcome message or initial order ingestion receipt.
+            리마인드: Indicates the content acts as a time-bound reminder message for an upcoming event or deadline.
+            방문서비스: Indicates the content manages logistics and scheduling windows for physical on-site or visiting services.
+            신청접수: Indicates the content acknowledges the successful receipt and ingestion of a formal application form.
+            이용도구: Indicates the content contains operational instructions, utility metrics, or guides for specific software tools.
+            이용안내/공지: Indicates the content delivers standard informational notifications or transactional bulletins.
+            처리완료: Indicates the content signals that a previously submitted support ticket or user demand has been resolved.
+            피드백 요청: Indicates the content initiates a post-interaction feedback request or satisfaction survey.
+            거래알림: Indicates the content delivers standard accounting ledger notifications and financial transaction footprints.
+            계약/견적: Indicates the content transmits formal contracts, legal terms, or pricing quote documents.
+            뉴스레터: Indicates the content distributes regular updates, information articles, or community newsletters.
+            안전/피해예방: Indicates the content provides emergency safety notices, product recalls, or hazard damage prevention alerts.
+            요금청구: Indicates the content delivers invoice notifications, payment statements, or billing ledger logs.
+            피드백: Indicates the content processes user evaluation notes, product reviews, or generic feedback.
+            배송상태: Indicates the content tracks real-time progress updates for package shipping milestones.
+            배송실패: Indicates the content flags cargo shipping anomalies, courier failures, or missed delivery attempts.
+            배송예정: Indicates the content calculates scheduled delivery timelines and shipping estimation windows.
+            배송완료: Indicates the content verifies that a package or cargo asset has been successfully delivered.
+            개인정보: Indicates the content handles user data governance disclosures or privacy compliance changes.
+            수신동의: Indicates the content logs opt-in choices or formal data consent updates for inbound communication paths.
+            약관변경: Indicates the content details critical modifications to the application terms, service agreements, or conditions.
+            휴면 관련: Indicates the content manages alerts for inactive profiles or impending dormant account purges.
+            내부 업무 알림: Indicates the content routes internal operational notifications targeted at team personnel or system nodes.
+            주문/예약: Indicates the content relates to generic purchase orders or structured service reservation flows.
+            쿠폰/포인트안내: Indicates the content summarizes generic information regarding customer coupons or loyalty point balances.
+            쿠폰발급: Indicates the content acts as an automated delivery event for newly issued discount coupons.
+            쿠폰사용: Indicates the content triggers immediate event logs confirming the execution and use of a coupon.
+            포인트사용: Indicates the content documents an account balance debit event following the redemption of points.
+            포인트적립: Indicates the content documents an account balance credit event following the accumulation of loyalty points.
+            기타: Indicates the content belongs to subcategories that fall outside the standard defined taxonomy.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: 하위 카테고리 이름.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateSubcategoryNamesEnum'
+        nameEnglish:
+          x-enumDescriptions:
+            Authentication/Password/Login: The English linguistic localization identifier for authentication, password resets, or secure login workflows.
+            Join membership: The English linguistic localization identifier for new user onboarding and account registrations.
+            Membership information/Member ship benefits: The English linguistic localization identifier for membership account metadata, tier statuses, and program benefits.
+            Pre-order/Stock alerts: The English linguistic localization identifier for pre-order updates and inventory stock level alerts.
+            Product subscription: The English linguistic localization identifier for recurrent product subscriptions and service lifecycle events.
+            Purchase cancellation: The English linguistic localization identifier for the formal cancellation and reversal of a purchase transaction.
+            Purchase completed: The English linguistic localization identifier for final transactional confirmations of completed purchases.
+            Purchase status: The English linguistic localization identifier for tracking progressive state changes within an active order lifecycle.
+            Completed reservations/Reservation history: The English linguistic localization identifier for historical log entries of completed reservations.
+            Notification/Reminder: The English linguistic localization identifier for generic operational notifications or system-wide reminders.
+            Reservation cancellation: The English linguistic localization identifier for confirming the formal cancellation of a scheduled booking.
+            Reservation status: The English linguistic localization identifier for monitoring progressive lifecycle updates of an active reservation.
+            Application reception: The English linguistic localization identifier for acknowledging the successful receipt and ingestion of an application.
+            Feedback request: The English linguistic localization identifier for initiating post-interaction customer feedback requests or surveys.
+            Greeting message/Order confirmation: The English linguistic localization identifier for welcoming customers or confirming original order ingestion receipts.
+            Information/Notification: The English linguistic localization identifier for standard transactional notifications and informational bulletins.
+            Notification for treated demands: The English linguistic localization identifier for signaling that a previously submitted support ticket or user demand has been resolved.
+            Reminder message: The English linguistic localization identifier for time-bound reminders regarding upcoming events or action items.
+            Tools for use: The English linguistic localization identifier for operational instruction guides, user metrics, or specific software utilities.
+            Visiting service: The English linguistic localization identifier for logistics, scheduling windows, and updates for on-site services.
+            Billing: The English linguistic localization identifier for invoice notifications, payment statements, and billing ledger logs.
+            Contract/Quote: The English linguistic localization identifier for transmitting formal contracts, legal terms, or pricing quote documents.
+            Feedback: The English linguistic localization identifier for processing customer evaluation notes, product reviews, or general comments.
+            Newsletter: The English linguistic localization identifier for distributing periodic updates, informational articles, or community news.
+            Safety/Damage prevention: The English linguistic localization identifier for urgent safety announcements, product recalls, or hazard mitigation alerts.
+            Transaction notification: The English linguistic localization identifier for standard accounting logs and financial transaction updates.
+            Failed shipment: The English linguistic localization identifier for reporting cargo transit anomalies, courier exceptions, or missed delivery attempts.
+            Shipping completed: The English linguistic localization identifier for verifying that a package or cargo asset has been successfully delivered.
+            Shipping estimation: The English linguistic localization identifier for calculated transit timelines and estimated delivery date windows.
+            Shipping status: The English linguistic localization identifier for tracking real-time status milestones of an active package shipment.
+            Change of terms and conditions: The English linguistic localization identifier for documenting critical modifications to application terms or service agreements.
+            Consent of reception: The English linguistic localization identifier for logging opt-in updates and data consent changes for inbound communication channels.
+            Dormant account related: The English linguistic localization identifier for automated warning logs regarding inactive profiles or impending account purges.
+            Privacy: The English linguistic localization identifier for user data privacy governance updates and compliance disclosures.
+            Internal business notification: The English linguistic localization identifier for routing internal operational notifications to team personnel or system nodes.
+            Order/Reservation: The English linguistic localization identifier for tracking generic purchase orders or structured service reservation flows.
+            Coupon issuance: The English linguistic localization identifier for automated delivery events of newly issued discount coupons.
+            Earn points: The English linguistic localization identifier for credit event logs recording the accumulation of loyalty points.
+            Information coupon/Points: The English linguistic localization identifier for reporting general balance information regarding coupons or loyalty points.
+            Notification for coupon use: The English linguistic localization identifier for immediate transaction confirmations verifying a coupon redemption.
+            Use of points: The English linguistic localization identifier for account debit logs recording the redemption of loyalty points.
+            Others: The English linguistic localization identifier for templates categorized outside the standard platform taxonomy.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: English subcategory name.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateSubcategoryEnglishNamesEnum'
+        groupName:
+          type: string
+          description: Subcategory group name.
+          uniqueItems: false
+        inclusion:
+          type: string
+          description: Description of templates to which the subcategory applies.
+          uniqueItems: false
+        exclusion:
+          type: string
+          description: Description of templates to which the subcategory does not apply.
+          uniqueItems: false
+      required:
+      - code
+      - name
+      - nameEnglish
+      - groupName
+      - inclusion
+      - exclusion
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
+x-tagGroup-upscale:
+  name: Upscale
+  tags:
+  - Upscale Admin Feature Flag
+  - Upscale Admin Log Operation
+  - Upscale Admin Migrations
+  - Upscale Admin Sms
+  - Upscale Admin Upscales
+  - Internal
+  - Upscale Sms
+  - Upscale Upscales
+x-tagGroup-notification:
+  name: Notification
+  tags:
+  - Notification Admin Feature Flag
+  - Notification Admin Log Operation
+  - Internal
+x-tagGroups:
+- name: Webhook
+  tags:
+  - Webhooks
+- name: WhatsApp
+  tags:
+  - WhatsApp Accounts
+  - WhatsApp
+  - WhatsApp Flows
+  - WhatsApp Senders
+  - WhatsApp Solutions
+  - WhatsApp Templates
+- name: Bundles
+  tags:
+  - Bundles
+- name: KakaoTalk
+  tags:
+  - KakaoTalk Categories
+  - KakaoTalk Senders
+  - KakaoTalk Templates
+- name: Conversation
+  tags:
+  - Conversation
+- name: RCS
+  tags:
+  - RCS Accounts
+  - RCS Questionnaire
+  - RCS Senders
+- name: SMS
+  tags:
+  - SMS Apps

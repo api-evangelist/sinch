@@ -1,22 +1,297 @@
 openapi: 3.2.0
 info:
-  title: Sinch Fax Fax to Email API
-  description: The Sinch Fax API allows developers to send and receive faxes programmatically at scale. It supports sending faxes to single or multiple recipients, downloading received faxes, and managing fax numbers. The API is HIPAA, SOC 2 Type 1, and GDPR compliant, making it suitable for healthcare and other regulated industries that require secure document transmission. It integrates with the Sinch Numbers API for provisioning fax-capable phone numbers.
+  title: Sinch Fax to Email API
   version: '3.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  description: 'Operations tagged Fax to Email across 2 of this provider''s published API definitions: sinch-fax-api-openapi.yaml, original-sinch-fax-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
 - url: https://fax.api.sinch.com
-  description: Global Production Server
-security:
-- oAuth2: []
-- basicAuth: []
+  description: v3.0 of the Fax API
 tags:
 - name: Fax to Email
-  description: Configure fax-to-email forwarding for incoming faxes on a service.
+  description: The Emails endpoint allows you to configure the Fax to Email functionality.
 paths:
+  /v3/projects/{projectId}/services/{id}/numbers/{phoneNumber}/emails:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: phoneNumber
+      description: The phone number you want to get emails for.
+      required: true
+      in: path
+      schema:
+        type: string
+        description: A phone number in e.164 format.
+        example: '+15612600684'
+    - name: id
+      description: The serviceId containing the numbers you want to list.
+      required: true
+      in: path
+      schema:
+        type: string
+    get:
+      summary: List emails for a number
+      description: List any emails for a number.
+      operationId: getEmailsForNumber
+      tags:
+      - Fax to Email
+      parameters:
+      - name: page
+        in: query
+        description: The page to fetch. If not specified, the first page will be returned.
+        schema:
+          type: integer
+          default: 1
+          example: 1
+      - name: pageSize
+        in: query
+        schema:
+          type: integer
+          default: 100
+          example: 20
+          maximum: 1000
+        description: Number of items to return on each page.
+      responses:
+        '200':
+          description: A list of emails associated with the number.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    emails:
+                      description: List of emails numbers
+                      type: array
+                      items:
+                        type: string
+                        format: email
+                - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax Service ID you want to list emails associated with a phone number for\n  const serviceId = 'FAX_SERVICE_ID';\n  // The phone numbers you want to get emails for\n  const phoneNumber ='PHONE_NUMBER';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.faxToEmail.listForNumber({\n      serviceId,\n      phoneNumber,\n    });\n    if (response.data.length === 0) {\n      console.log('No Emails found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Emails.`);\n    response.data.forEach((email) => {\n      console.log(email);\n    });\n  } catch (err) {\n    console.error(`❌ Failed to list the configured Emails associated with the phone number ${phoneNumber} and to the Fax Service with ID ${serviceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: v3.0 of the Fax API
+  /v3/projects/{projectId}/services/{serviceId}/emails:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    get:
+      description: List emails for the project.
+      summary: List emails
+      operationId: getEmailsForProject
+      tags:
+      - Fax to Email
+      parameters:
+      - name: serviceId
+        in: path
+        description: The serviceId containing the emails you want to list.
+        required: true
+        schema:
+          type: string
+      - name: page
+        in: query
+        description: The page to fetch. If not specified, the first page will be returned.
+        schema:
+          type: integer
+          default: 1
+          example: 1
+      - name: pageSize
+        in: query
+        schema:
+          type: integer
+          default: 100
+          example: 20
+          maximum: 1000
+        description: Number of items to return on each page.
+      responses:
+        '200':
+          description: A list of emails associated with the project.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    emails:
+                      description: List of emails
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/Email'
+                - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax Service ID you want to list emails for\n  const serviceId = 'FAX_SERVICE_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.faxToEmail.list({ serviceId });\n    if (response.data.length === 0) {\n      console.log('No Emails found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Emails.`);\n    response.data.forEach((email) => {\n      console.log(email);\n    });\n  } catch (err) {\n    console.error(`❌ Failed to list Emails associated to the Fax Service with ID ${serviceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    post:
+      description: Add an email to the specified service to be used for sending and receiving faxes. Default settings for permissions parameter is `both`.
+      summary: Add an email
+      operationId: createEmailForProject
+      tags:
+      - Fax to Email
+      parameters:
+      - name: serviceId
+        in: path
+        description: The serviceId to which you want to add the email.
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Email'
+            example:
+              email: user@domain.com
+              phoneNumbers:
+              - number: '+14155552222'
+                permissions: both
+      responses:
+        '201':
+          description: The added email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Email'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax Service ID you want to add email for\n  const serviceId = 'FAX_SERVICE_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.faxToEmail.addToNumbers({\n      serviceId,\n      emailRequestBody: {\n        email: 'user@domain.com',\n        phoneNumbers: [\n          {\n            number: '+14155552222',\n            permissions: 'both',\n          },\n        ],\n      },\n    });\n    console.log('✅ Successfully added an Email to the Fax Service.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to add an Email to the Fax Service with ID ${serviceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: v3.0 of the Fax API
+  /v3/projects/{projectId}/services/{serviceId}/emails/{email}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: serviceId
+      description: The serviceId containing the email you want to work with.
+      required: true
+      in: path
+      schema:
+        type: string
+    - name: email
+      description: The email you want to work with.
+      required: true
+      in: path
+      schema:
+        type: string
+    put:
+      description: Set the numbers for an email.
+      operationId: updateEmail
+      summary: Update numbers for email
+      tags:
+      - Fax to Email
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - phoneNumbers
+              properties:
+                phoneNumbers:
+                  description: List of numbers
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Number'
+            example:
+              phoneNumbers:
+              - number: '+14155552222'
+                permissions: both
+      responses:
+        '200':
+          description: The added email
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Email'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax Service ID you want to update the email for\n  const serviceId = 'FAX_SERVICE_ID';\n  // The email address you want to update the phone numbers for\n  const email ='EMAIL_ADDRESS';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.faxToEmail.update({\n      serviceId,\n      email,\n      updateEmailRequestBody: {\n        phoneNumbers: [\n          {\n            number: '+14155552222',\n            permissions: 'both',\n          },\n        ],\n      },\n    });\n    console.log('✅ Successfully updated the Phone Numbers.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to update the Phone Numbers associated with the Email ${email} from the Fax Service with ID ${serviceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    delete:
+      tags:
+      - Fax to Email
+      summary: Remove email
+      description: Delete an email and associated numbers to that email to disable that email from sending and receiving faxes.
+      operationId: deleteEmail
+      responses:
+        '204':
+          description: 'No content: **The email was deleted**'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax Service ID you want to remove the email from\n  const serviceId = 'FAX_SERVICE_ID';\n  // The email you want to remove\n  const email ='EMAIL_ADDRESS';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    await sinch.fax.faxToEmail.delete({\n      serviceId,\n      email,\n    });\n    console.log(`✅ Successfully deleted the Email ${email} from the Fax Service with ID ${serviceId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete the Email ${email} from the Fax Service with ID ${serviceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: v3.0 of the Fax API
+  /v3/projects/{projectId}/services/{serviceId}/emails/{email}/numbers:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: serviceId
+      description: The serviceId containing the email you want to work with.
+      required: true
+      in: path
+      schema:
+        type: string
+    - name: email
+      description: The email you want to get numbers for.
+      required: true
+      in: path
+      schema:
+        type: string
+    - name: pageSize
+      in: query
+      schema:
+        type: integer
+        default: 20
+        example: 20
+        maximum: 1000
+      description: Number of items to return on each page.
+    - name: page
+      in: query
+      schema:
+        type: string
+      description: Optional. The page to fetch. If not specified, the first page will be returned.
+    get:
+      description: Get configured numbers for an email
+      summary: Get numbers for email
+      operationId: getNumbersByEmail
+      tags:
+      - Fax to Email
+      responses:
+        '200':
+          description: A list of numbers associated with the email
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    phoneNumbers:
+                      description: List of numbers
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/ServicePhoneNumber'
+                - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax Service ID you want to list phone numbers associated with an email address for\n  const serviceId = 'FAX_SERVICE_ID';\n  // The email address you want to get numbers for\n  const email ='EMAIL_ADDRESS';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.faxToEmail.listNumbers({\n      serviceId,\n      email,\n    });\n    if (response.data.length === 0) {\n      console.log('No Phone Numbers found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Phone Numbers.`);\n    response.data.forEach((servicePhoneNumber) => {\n      console.log(servicePhoneNumber);\n    });\n  } catch (err) {\n    console.error(`❌ Failed to list the configured Phone Numbers associated with the Email address ${email} and to the Fax Service with ID ${serviceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - OAuth2: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: v3.0 of the Fax API
   /v3/projects/{project_id}/services/{service_id}/emails:
     post:
       operationId: createFaxToEmail
@@ -25,7 +300,7 @@ paths:
       tags:
       - Fax to Email
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/ServiceId'
       requestBody:
         required: true
@@ -44,6 +319,9 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
     get:
       operationId: listFaxToEmails
       summary: List Fax-to-email Configurations
@@ -51,7 +329,7 @@ paths:
       tags:
       - Fax to Email
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/ServiceId'
       responses:
         '200':
@@ -62,6 +340,12 @@ paths:
                 $ref: '#/components/schemas/FaxToEmailList'
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: Global Production Server
   /v3/projects/{project_id}/services/{service_id}/emails/{email}:
     delete:
       operationId: deleteFaxToEmail
@@ -70,7 +354,7 @@ paths:
       tags:
       - Fax to Email
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ProjectId_2'
       - $ref: '#/components/parameters/ServiceId'
       - name: email
         in: path
@@ -86,20 +370,143 @@ paths:
           description: Unauthorized
         '404':
           description: Configuration not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://fax.api.sinch.com
+      description: Global Production Server
 components:
   schemas:
-    FaxToEmailRequest:
+    Pagination:
+      type: object
+      readOnly: true
+      properties:
+        page:
+          readOnly: true
+          type: integer
+          description: Current page
+        totalPages:
+          readOnly: true
+          type: integer
+          description: Total number of pages.
+        pageSize:
+          readOnly: true
+          type: integer
+          description: Number of items per page.
+        totalItems:
+          type: integer
+          readOnly: true
+          format: int32
+          description: Total size of the result.
+    Email:
       type: object
       required:
       - email
+      - phoneNumbers
       properties:
         email:
           type: string
           format: email
-          description: The email address for fax-to-email
-        phoneNumber:
+          example: user@domain.com
+        phoneNumbers:
+          description: Numbers you want to associate with this email.
+          type: array
+          items:
+            $ref: '#/components/schemas/Number'
+        projectId:
+          readOnly: true
+          x-version: 1
+          allOf:
+          - $ref: '#/components/schemas/ProjectId'
+        createdAt:
           type: string
-          description: Specific phone number to associate
+          format: date-time
+          readOnly: true
+          description: The date and time the email configuration was created.
+        updatedAt:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time the email configuration was last updated.
+    PhoneNumber:
+      x-PII: true
+      x-v1: true
+      type: string
+      format: phoneNumber
+      description: A phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format, including the leading '+'.
+      example: '+15551235656'
+    Number:
+      description: A phone number and its permissions.
+      type: object
+      properties:
+        number:
+          $ref: '#/components/schemas/PhoneNumber'
+        permissions:
+          type: string
+          description: Allows you to set permissions for sending and receiving faxes to this email/phone number combination. Default value is `both`.
+          x-enumDescriptions:
+            both: Allows the email to send and receive faxes to this email/phone number combination.
+            send: Allows the email to only send faxes to this email/phone number combination.
+            receive: Allows the email to only receive faxes from this email/phone number combination.
+          enum:
+          - both
+          - send
+          - receive
+          default: both
+    ProjectId:
+      type: string
+      x-PII: false
+      x-v1: false
+      description: The `Id` of the project associated with the call.
+      x-Internal: to support future account keys
+      readOnly: true
+      example: ae00f005-e392-44dc-b3f5-a657a2684dg3
+    ServicePhoneNumber:
+      type: object
+      properties:
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+        permissions:
+          type: string
+          description: Allows you to set permissions for sending and receiving faxes to this email/phone number combination. Default value is `both`.
+          x-enumDescriptions:
+            both: Allows the email to send and receive faxes to this email/phone number combination.
+            send: Allows the email to only send faxes to this email/phone number combination.
+            receive: Allows the email to only receive faxes from this email/phone number combination.
+          enum:
+          - both
+          - send
+          - receive
+          default: both
+        country:
+          readOnly: true
+          type: string
+          description: The country code of the phone number in ISO 3166-1 alpha-2 format.
+          example: US
+        suspended:
+          type: boolean
+          description: Specifies if a number is suspended or not.
+          example: true
+          readOnly: true
+        note:
+          type: string
+          description: An optional field providing context about the suspension.
+          example: Reason for suspending the number.
+          readOnly: true
+        projectId:
+          $ref: '#/components/schemas/ProjectId'
+          readOnly: true
+        serviceId:
+          $ref: '#/components/schemas/ServiceId'
+          readOnly: true
+    ServiceId:
+      x-PII: false
+      x-v1: true
+      readOnly: true
+      type: string
+      example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      description: ID of the fax service used.
     FaxToEmail:
       type: object
       properties:
@@ -116,6 +523,18 @@ components:
         projectId:
           type: string
           description: The project ID
+    FaxToEmailRequest:
+      type: object
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          format: email
+          description: The email address for fax-to-email
+        phoneNumber:
+          type: string
+          description: Specific phone number to associate
     FaxToEmailList:
       type: object
       properties:
@@ -125,6 +544,21 @@ components:
           items:
             $ref: '#/components/schemas/FaxToEmail'
   parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: The `projectId` is a required parameter you must include when making any API calls. You can find your project ID on your [Build dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+    ProjectId_2:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
     ServiceId:
       name: service_id
       in: path
@@ -132,14 +566,22 @@ components:
       description: The unique service identifier
       schema:
         type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   securitySchemes:
+    WebhookBasicAuth:
+      type: http
+      scheme: basic
+      description: 'You can validate whether a webhook is genuine by providing credentials you set and will check on your server side along with the callback URL, as in this example: `https://username:password@www.YourWebhookWebsite.com`'
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: The user name and password is your keyId and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+    OAuth2:
+      type: oauth2
+      description: The user name and password is your key id and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
     oAuth2:
       type: oauth2
       description: OAuth 2.0 client credentials flow.
@@ -154,3 +596,14 @@ components:
 externalDocs:
   description: Sinch Fax API Documentation
   url: https://developers.sinch.com/docs/fax
+x-refined-from:
+- sinch-fax-api-openapi.yaml
+- original-sinch-fax-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

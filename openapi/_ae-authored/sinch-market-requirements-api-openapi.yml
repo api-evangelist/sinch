@@ -1,0 +1,129 @@
+openapi: 3.2.0
+info:
+  title: Sinch Registration Market Requirements API
+  description: The Sinch Registration API provides endpoints for managing sender ID registrations required by various markets and regulatory bodies. It enables developers to retrieve market-specific requirements, create and submit registrations for sender IDs, and track the status of registration applications. This API helps businesses comply with local messaging regulations across different countries where sender registration is mandatory for SMS delivery.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://registration.api.sinch.com
+  description: Global Production Server
+security:
+- oAuth2: []
+tags:
+- name: Market Requirements
+  description: Retrieve market-specific requirements for sender ID registration in different countries.
+paths:
+  /v1/projects/{project_id}/markets:
+    get:
+      operationId: listMarkets
+      summary: List Markets
+      description: Returns a list of available markets with their sender ID registration requirements and supported sender types.
+      tags:
+      - Market Requirements
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      responses:
+        '200':
+          description: List of markets
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/MarketList'
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/markets/{market_id}:
+    get:
+      operationId: getMarket
+      summary: Get Market Requirements
+      description: Returns the detailed registration requirements for a specific market including required fields, supported sender types, and approval timelines.
+      tags:
+      - Market Requirements
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: market_id
+        in: path
+        required: true
+        description: The market identifier
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Market requirements
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Market'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Market not found
+components:
+  schemas:
+    MarketList:
+      type: object
+      properties:
+        markets:
+          type: array
+          description: List of markets
+          items:
+            $ref: '#/components/schemas/Market'
+    Market:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The market identifier
+        name:
+          type: string
+          description: The market name
+        countryCode:
+          type: string
+          description: The ISO 3166-1 alpha-2 country code
+        senderTypes:
+          type: array
+          description: Supported sender types
+          items:
+            type: string
+        requiredFields:
+          type: array
+          description: Fields required for registration
+          items:
+            type: object
+            properties:
+              name:
+                type: string
+                description: The field name
+              type:
+                type: string
+                description: The field type
+              required:
+                type: boolean
+                description: Whether the field is required
+              description:
+                type: string
+                description: Description of the field
+        estimatedApprovalTime:
+          type: string
+          description: Estimated time for approval
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+externalDocs:
+  description: Sinch Registration API Documentation
+  url: https://developers.sinch.com/docs/registration-api

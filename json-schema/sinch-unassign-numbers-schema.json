@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-unassign-numbers-schema.json",
+  "title": "unassignNumbers",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-voice-api-openapi.yml#/components/schemas/unassignNumbers",
+  "type": "object",
+  "properties": {
+    "number": {
+      "type": "string",
+      "description": "The phone number in E.164 format (https://community.sinch.com/t5/Glossary/E-164/ta-p/7537)"
+    },
+    "applicationkey": {
+      "description": "Indicates the application where the number(s) was assigned. If empty, the application key that is used to sign the request will be used.",
+      "type": "string"
+    },
+    "capability": {
+      "description": "(optional) indicates the DID capability that was assigned to the chosen application. Please note that the DID needs to support the selected capability.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/capability"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "capability": {
+      "type": "string",
+      "x-enumDescriptions": {
+        "voice": "Able to make Voice calls.",
+        "sms": "Able to send SMS messages."
+      },
+      "enum": [
+        "voice",
+        "sms"
+      ],
+      "description": "Valid values are `voice` and `sms`"
+    }
+  }
+}

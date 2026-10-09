@@ -1,0 +1,3468 @@
+openapi: 3.0.1
+info:
+  title: Registration
+  description: >-
+    Service for creating and listing US 10DLC brand and campaign registrations
+    and TFN Verifications.
+
+
+    The US  brand and campaign registration API is an asynchronous process. 
+    Most brands and campaign registrations will be completed in a few minutes,
+    but in some scenarios, the process can take several days.  The initial
+    release will not include a webhook service, therefore you will need to poll
+    the result of the brand and campaign registrations. We suggest doing this
+    every hour until the registration status is "Approved" or "Rejected".
+
+
+
+    <table><thead><tr><th><b>10DLC Registration
+    steps</b></th><th></th></tr></thead><tbody><tr><td><b>Client submits brand
+    registration</b></td><td>&#8594;</td><td>brandRegistrations</td><td>&#8594;</td><td>Sinch</td></tr><tr><td><b>Client
+    gets back
+    brandRegistrationId</b></td><td>&#8592;</td><td>{brandRegistrationId}</td><td>&#8592;</td><td>Sinch</td></tr><tr><td><b>Client
+    polls using
+    brandRegistrationId</b></td><td>&#8594;</td><td>brandRegistrations/{brandRegistrationId}</td><td>&#8594;</td><td>Sinch</td></tr><tr><td><b>Client
+    gets back TCR Brand
+    ID</b></td><td>&#8592;</td><td>{brandId}</td><td>&#8592;</td><td>Sinch</td></tr><tr><td><b>Client
+    checks
+    use-case</b></td><td>&#8594;</td><td>campaignRegistration:qualify</td><td>&#8594;</td><td>Sinch</td></tr><tr><td><b>Client
+    submits campaign
+    registration</b></td><td>&#8594;</td><td>campaignRegistration:submit</td><td>&#8594;</td><td>Sinch</td></tr><tr><td><b>Client
+    gets back
+    campaignRegistrationId</b></td><td>&#8592;</td><td>{campaignRegistrationId}</td><td>&#8592;</td><td>Sinch</td></tr><tr><td><b>Client
+    polls using
+    campaignRegistrationId</b></td><td>&#8594;</td><td>campaignRegistrations/{campaignRegistrationId}</td><td>&#8594;</td><td>Sinch</td></tr><tr><td><b>Client
+    gets back TCR campaign
+    ID</b></td><td>&#8592;</td><td>campaignId</td><td>&#8592;</td><td>Sinch</td></tr></tbody></table>
+    <br>
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+  - url: https://us10dlc.numbers.api.sinch.com
+    description: HTTP 10DLC API Server (Default(US))
+security:
+  - BasicAuth: []
+  - OAuth2: []
+tags:
+  - name: 10DLC Brand Registration
+    description: Create or look up brand registration for 10DLC virtual numbers
+  - name: 10DLC Campaign Registration
+    description: >-
+      10DLC is a system in the United States that allows businesses to send
+      Application-to-Person (A2P) messaging via 10-digit-long-codes (10DLC). It
+      uses a dedicated 10-digit telephone number allocated within the North
+      American Numbering Plan (NANP). 
+
+
+      In order to register for a 10DLC campaign, you need to have a 10DLC
+      enabled brand. Create a 10DLC enabled brand before you start, see [Brand
+      Registrations](https://developers.sinch.com/docs/10dlc-registration/api-reference/10dlc-registration/tag/Brand-Registration/)
+      for more info.
+
+
+      Before you launch your 10DLC message program, Sinch must review your
+      campaign. We make sure your message program aligns with carrier and
+      industry requirements. Principally we look for alignment with the [CTIA
+      2023 Messaging Principals & Best
+      Practices](https://community.sinch.com/t5/SMS/CTIA-Messaging-Principles-and-Best-Practices/ta-p/7087/highlight/true).
+      If your campaign does not meet these requirements, we will reject it. If
+      we do reject it, you will need to make changes to the campaign and
+      resubmit it for Sinch to review again.  
+
+
+      It's important to understand [10DLC compliance
+      requirements](https://community.sinch.com/t5/10DLC/10DLC-Compliance-Requirements-and-Guidance/ta-p/10706)
+      as well as other best practices. You should also know the [most common
+      reasons why Sinch may reject your
+      campaign](https://community.sinch.com/t5/10DLC/Why-was-my-campaign-rejected/ta-p/15408)
+      . We want to help you get your campaigns approved the first time. Then you
+      can get your message program up and running right away!    
+  - name: TFN Verification
+    description: Create or look up Verifications for Toll-Free Numbers
+paths:
+  /v1/projects/{projectId}/campaignRegistrations:submit:
+    post:
+      tags:
+        - 10DLC Campaign Registration
+      summary: Create new Campaign in TCR
+      description: >-
+        Create a 10DLC campaign at TCR (The Campaign Registry).<br><br> Campaign
+        fees and carrier requirements are determined by the brand and use-case
+        being used.  To check the campaign requirements, use the
+        campaign:qualify API.
+      operationId: CampaignRegistrationExternalService_CreateTcrCampaign
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTcrCampaignRequest'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTcrCampaignResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: useCase must not be blank
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: useCase
+                          description: must not be blank
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: >-
+                    Error while retrieving account mapped to the given project
+                    id.
+                  status: INTERNAL
+                  details:
+                    - type: ResourceInfo
+                      resourceType: Project
+                      resourceName: ec9f3e99-f7b1-474d-9dbd-ba3cef667d6e
+                      owner: ''
+                      description: >-
+                        Error while retrieving account mapped to the given
+                        project id.
+      x-codegen-request-body-name: body
+  /v1/projects/{projectId}/uploadCampaignFile:submit:
+    post:
+      tags:
+        - 10DLC Campaign Registration
+      summary: Upload attachments for 10DLC campaign registration
+      description: Uploads supporting documentation for 10DLC campaign registrations.
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      operationId: CampaignRegistrationExternalService_UploadCampaignFile
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/v1uploadCampaignFilesRequest'
+            example:
+              projectId: 0fc52975-636a-4700-8943-68759df5c9e1
+              campaignInternalId: 01k4cxccbt519xa3ejty1r5jb4
+              file:
+                fileName: TestText.txt
+                fileContent: VGhpcyBpcyBhIHRlc3QgdGV4dCBmaWxlLg==
+                fileCategory: 5
+              submitCampaign: false
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    description: Indicates whether the file upload was successful or not.
+                    example: success
+                  message:
+                    type: string
+                    description: >-
+                      A message providing details if the file upload was not
+                      successful. Will be an empty string if the upload was
+                      successful.
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid campaign_registration_id
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: campaign_registration_id
+                          description: invalid value
+        '404':
+          description: The campaign could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+                  details:
+                    - type: ResourceInfo
+                      resourceType: Campaign
+                      resourceName: 01frjdjhq2mnps0srvbt9wpvek
+                      owner: ''
+                      description: not found
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while retrieving campaign details.
+                  status: INTERNAL
+                  details:
+                    - type: ResourceInfo
+                      resourceType: Campaign
+                      resourceName: 01frjdjhq2mnps0srvbt9wpvek
+                      owner: ''
+                      description: Error while retrieving campaign details.
+  /v1/projects/{projectId}/campaignRegistrations/{campaignRegistrationId}:
+    get:
+      tags:
+        - 10DLC Campaign Registration
+      summary: Get Campaign Details
+      description: Returns the details of the specified campaign by its registration ID.
+      operationId: CampaignRegistrationExternalService_GetCampaign
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/campaignRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid campaign_registration_id
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: campaign_registration_id
+                          description: invalid value
+        '404':
+          description: The campaign could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+                  details:
+                    - type: ResourceInfo
+                      resourceType: Campaign
+                      resourceName: 01frjdjhq2mnps0srvbt9wpvek
+                      owner: ''
+                      description: not found
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while retrieving campaign details.
+                  status: INTERNAL
+                  details:
+                    - type: ResourceInfo
+                      resourceType: Campaign
+                      resourceName: 01frjdjhq2mnps0srvbt9wpvek
+                      owner: ''
+                      description: Error while retrieving campaign details.
+  /v1/projects/{projectId}/campaignRegistrations:fetchByTcrCampaignId:
+    get:
+      tags:
+        - 10DLC Campaign Registration
+      summary: Get Campaign Details using the TCR Campaign ID
+      description: Returns the specified campaign by its TCR Campaign ID.
+      operationId: CampaignRegistrationExternalService_GetCampaignByTcrCampaignId
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/campaignRegistrationIdQuery'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CampaignResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid tcr_campaign_id
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: tcr_campaign_id
+                          description: invalid value
+        '404':
+          description: The campaign could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+                  details:
+                    - type: ResourceInfo
+                      resourceType: Campaign
+                      resourceName: CTF4STM
+                      owner: ''
+                      description: not found
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while retrieving campaign details.
+                  status: INTERNAL
+                  details:
+                    - type: ResourceInfo
+                      resourceType: Campaign
+                      resourceName: CTF4STM
+                      owner: ''
+                      description: Error while retrieving campaign details.
+  /v1/projects/{projectId}/campaignRegistrations:qualify:
+    get:
+      tags:
+        - 10DLC Campaign Registration
+      summary: Qualify Brand by Use Case
+      description: >-
+        Before submitting a campaign, this API will provide some important
+        feedback about how the resulting campaign will be treated.  You can
+        verify that the campaign will be supported by all operators, the AT&T
+        message class and TPM, the T-Mobile brand daily bucket that will be
+        applied and more.
+
+
+        It is suggested to validate that the operator restrictions will meet
+        your needs prior to submitting the campaign request.  Brand revettings
+        do not automatically adjust operator restrictions, and in some cases a
+        new campaign may have to be resubmitted to receive the adjusted MNO
+        values.
+      operationId: CampaignRegistrationExternalService_QualifyBrandByUseCase
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/brandId'
+        - $ref: '#/components/parameters/useCase'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualifyBrandByUseCaseResponse'
+        '400':
+          description: Invalid Brand ID
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: >-
+                    Invalid brand_id. It must have upper-case alphanumeric
+                    characters with prefix letter 'B' and max length of 8
+                    characters
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: brand_id
+                          description: >-
+                            invalid value, it must have upper-case alphanumeric
+                            characters with prefix letter 'B' and max length of
+                            8 characters
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Brand not found
+                  status: INTERNAL
+                  details:
+                    - type: ResourceInfo
+                      resourceType: QualifyBrandByUseCaseResponse
+                      resourceName: ''
+                      owner: ''
+                      description: Brand not found
+  /v1/projects/{projectId}/campaignRegistration/{campaignRegistrationId}:
+    delete:
+      tags:
+        - 10DLC Campaign Registration
+      summary: Delete Campaign by campaignId
+      description: >-
+        Deactivate a campaign by removing the campaign from TCR and OSR. A
+        campaign cannot be restored once it is deactivated. New campaign status
+        is EXPIRED.
+      operationId: CampaignRegistrationExternalService_DeleteCampaign
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/campaignRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid campaign_id
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: tcr_campaign_id
+                          description: invalid value
+        '404':
+          description: The campaign could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+                  details:
+                    - type: ResourceInfo
+                      resourceType: Campaign
+                      resourceName: CTF4STM
+                      owner: ''
+                      description: not found
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while retrieving campaign details.
+                  status: INTERNAL
+                  details:
+                    - type: ResourceInfo
+                      resourceType: Campaign
+                      resourceName: CTF4STM
+                      owner: ''
+                      description: Error while retrieving campaign details.
+  /v1/projects/{projectId}/campaignRegistrations:
+    get:
+      tags:
+        - 10DLC Campaign Registration
+      summary: List Campaign Registrations
+      description: Lists all campaign registrations per project.
+      operationId: CampaignRegistrationService_ListCampaignRegistrationRequest
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/status'
+        - $ref: '#/components/parameters/mock'
+        - $ref: '#/components/parameters/useCase'
+        - $ref: '#/components/parameters/brand'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageToken'
+        - $ref: '#/components/parameters/orderBy'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListCampaignRegistrationResponse'
+        '400':
+          description: If the page_token, number_pattern or order_by is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: order_by
+                          description: Invalid order_by XXX
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while getting campaign registration.
+                  status: INTERNAL
+  /v1/projects/{projectId}/campaignRegistrations/{campaignRegistrationId}/feedback:
+    get:
+      tags:
+        - 10DLC Campaign Registration
+      summary: Campaign Registration Feedback
+      description: >-
+        Returns feedback information for campaign registrations that were
+        rejected.
+
+        Campaign registrations could be rejected due to TCR error or any other
+        internal error.
+      operationId: CampaignRegistrationService_GetCampaignRegistrationFeedback
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/campaignRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetCampaignRegistrationFeedbackResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: projectId
+                          description: invalid value
+        '404':
+          description: >-
+            The campaign could not be found or if the requested campaign does
+            not belong to the given project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while getting campaign feedback.
+                  status: INTERNAL
+  /v1/projects/{projectId}/campaignRegistrations/{campaignRegistrationId}/resubmit:
+    put:
+      tags:
+        - 10DLC Campaign Registration
+      summary: Campaign Registration Resubmit
+      description: >-
+        "Resubmit a campaign to:
+
+
+        1. Backfill missing MNO campaign operation records for one or more
+        networks.
+
+        2. Retroactively update the campaign to reflect newly assigned message
+        class.
+
+
+        Please note that running this endpoint could potentially downgrade
+        campaign business terms.<br><br>
+
+        After hitting this endpoint, call the Get Campaign Registration API to
+        to check lastActionStatus:
+
+
+        1. If lastActionStatus is `RESUBMIT_IN_PROGRESS, mno metadata not
+        updated`, poll again.
+
+        2. If lastActionStatus is `RESUBMIT_SUCCESSFUL`, get updated MNO
+        metadata.
+
+        3. If lastActionStatus is `RESUBMIT_FAILED`, call the Campaign Feedback
+        API to know the reason for failure.
+      operationId: CampaignRegistrationService_ResubmitCampaignRegistration
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/campaignRegistrationId'
+      requestBody:
+        description: >-
+          List of MNOs (ATT, TMO, USC, VZW) to resubmit a campaign in TCR.
+          Default value for empty list: ALL, i.e. all MNOs.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ResubmitCampaignRegistrationRequest'
+        required: false
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: projectId
+                          description: invalid value
+        '404':
+          description: >-
+            The campaign could not be found or if the requested campaign does
+            not belong to the given project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: Campaign not found
+                  status: NOT_FOUND
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 500
+                  message: Error while resubmitting campaign registration.
+                  status: INTERNAL
+      x-codegen-request-body-name: body
+  /v1/projects/{projectId}/brandRegistrations:submit:
+    post:
+      tags:
+        - 10DLC Brand Registration
+      summary: Create Brand Registrations
+      description: >-
+        Create a 10DLC brand registration at TCR (The Campaign Registry).
+
+        There are 2 types of registrations:
+
+
+        1. **Simplified Registration** - only verifies your brand.
+
+        2. **Full Registration** - performs a vetting and grants a vetted
+        verified brand.
+      operationId: BrandRegistrationService_CreateBrandRegistrationRequest
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      requestBody:
+        description: The request body to of the brand to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBrandRegistration'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBrandRegistrationResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: projectId
+                          description: invalid value
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+      x-codegen-request-body-name: body
+  /v1/projects/{projectId}/brandRegistrations:
+    get:
+      tags:
+        - 10DLC Brand Registration
+      summary: List Brand Registrations
+      description: Lists all brand registrations per project.
+      operationId: BrandRegistrationService_ListBrandRegistrationRequest
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBrandRegistrationResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: projectId
+                          description: invalid value
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+  /v1/projects/{projectId}/brandRegistrations/{brandRegistrationId}:
+    get:
+      tags:
+        - 10DLC Brand Registration
+      summary: Brand Registration Status
+      description: >-
+        Get brand registration details using brand registration ID when creating
+        a brand.
+      operationId: BrandRegistrationService_GetBrandRegistrationRequest
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/brandRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandRegistration'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: projectId
+                          description: invalid value
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+    patch:
+      tags:
+        - 10DLC Brand Registration
+      summary: Brand Registration Update
+      description: Update Brand Registration details
+      operationId: BrandRegistrationService_Update10DlcBrand
+      parameters:
+        - name: projectId
+          in: path
+          description: >-
+            Your project id can be found if you log into your account on
+            dashboard.sinch.com.
+          required: true
+          schema:
+            type: string
+        - name: brandRegistrationId
+          in: path
+          description: >-
+            The Brand Registration ID is returned in the response when creating
+            the brand
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenDlcBrandUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandRegistration'
+        '400':
+          description: 'INVALID_ARGUMENT: If the brandRegistrationId is not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: brandRegistrationId
+                          description: Invalid brandRegistrationId xyz
+        '404':
+          description: Brand could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: ''
+                  status: NOT_FOUND
+                  details:
+                    - type: ResourceInfo
+                      resourceType: BrandRegistration
+                      resourceName: xyz
+                      owner: ''
+                      description: ''
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      x-codegen-request-body-name: body
+  /v1/projects/{projectId}/brandRegistrations/{brandRegistrationId}/feedback:
+    get:
+      tags:
+        - 10DLC Brand Registration
+      summary: Brand Registration Feedback
+      description: >-
+        Returns feedback information for brand registrations that were rejected.
+
+        Following are the applicable category IDs:
+
+
+        * **TAX_ID** - Data mismatch related to tax id and its associated
+        properties.
+
+        * **STOCK_SYMBOL** - Non public entity registered as a public for profit
+        entity or the stock information mismatch.
+
+        * **GOVERNMENT_ENTITY** - Non government entity registered as a
+        government entity. Must be a U.S. government entity.
+
+        * **NONPROFIT** - No IRS 501c tax-exempt status found.
+
+        * **OTHERS** - Details of the data misrepresentation if any.
+      operationId: BrandRegistrationService_GetBrandRegistrationFeedback
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/brandRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandRegistrationFeedbackResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the brandRegistrationId is not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: brandRegistrationId
+                          description: Invalid brandRegistrationId xyz
+        '404':
+          description: Brand could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: ''
+                  status: NOT_FOUND
+                  details:
+                    - type: ResourceInfo
+                      resourceType: BrandRegistration
+                      resourceName: xyz
+                      owner: ''
+                      description: ''
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/projects/{projectId}/brandRegistrations:fetchByTcrBrandId:
+    get:
+      tags:
+        - 10DLC Brand Registration
+      summary: Get Brand Details
+      description: Get the US 10DLC brand details using the TCR brand ID.
+      operationId: BrandRegistrationService_fetchBrandRegistrationRequest
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/brandId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandRegistration'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: projectId
+                          description: invalid value
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+  /v1/projects/{projectId}/brandRegistrations/{brandRegistrationId}/upgrade:
+    post:
+      tags:
+        - 10DLC Brand Registration
+      summary: Brand Registration Upgrade
+      description: Upgrades brand from `SIMPLIFIED` to `FULL`.
+      operationId: BrandRegistrationService_Upgrade10DlcBrandToFullRegistration
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/brandRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandRegistration'
+        '400':
+          description: 'INVALID_ARGUMENT: If the brandRegistrationId is not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: brandRegistrationId
+                          description: Invalid brandRegistrationId xyz
+        '404':
+          description: Brand could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: ''
+                  status: NOT_FOUND
+                  details:
+                    - type: ResourceInfo
+                      resourceType: BrandRegistration
+                      resourceName: xyz
+                      owner: ''
+                      description: ''
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                type: object
+  /v1/projects/{projectId}/brandRegistrations/{brandRegistrationId}/vettingInfo:
+    get:
+      tags:
+        - 10DLC Brand Registration
+      summary: Brand Registration Vetting Information
+      description: >-
+        Returns the vetting information of a brand registration. Include
+        optional query parameters to filter results by vetting partner ID,
+        vetting class, or status.
+      operationId: BrandRegistrationService_VettingInfo
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/brandRegistrationId'
+        - $ref: '#/components/parameters/vettingStatus'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenDlcVettingInfoResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the brandRegistrationId is not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: brandRegistrationId
+                          description: Invalid brandRegistrationId xyz
+        '404':
+          description: Brand could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: ''
+                  status: NOT_FOUND
+                  details:
+                    - type: ResourceInfo
+                      resourceType: BrandRegistration
+                      resourceName: xyz
+                      owner: ''
+                      description: ''
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/projects/{projectId}/brandRegistrations/{bundleId}/resend2faEmail:
+    post:
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - name: bundleId
+          required: true
+          in: path
+          description: The ID of the bundle associated with the brand registration.
+          schema:
+            type: string
+      operationId: resend2faEmail
+      summary: Resend 2FA Email
+      description: Resends the two-factor authentication email.
+      responses:
+        '200':
+          description: No response
+          content: {}
+      tags:
+        - 10DLC Brand Registration
+  /v1/projects/{projectId}/tfnVerification:
+    post:
+      tags:
+        - TFN Verification
+      summary: Create TFN Verifications
+      description: Create a TFN verification.
+      operationId: TfnVerificationExternalService_CreateTfnVerificationRequest
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      requestBody:
+        description: The request body of the TFN Verification to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTfnVerificationRequest'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTfnVerificationResponse'
+        '400':
+          description: >-
+            If the mandatory fields are not present, exceed length limits or are
+            invalid (e.g. URLs, email addresses...)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: business_name
+                          description: Invalid business_name
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+      x-codegen-request-body-name: body
+    get:
+      tags:
+        - TFN Verification
+      summary: List TFN Verifications
+      description: Lists all TFN verifications per project.
+      operationId: TfnVerificationExternalService_ListTfnVerificationsRequest
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/tfnUseCase'
+        - $ref: '#/components/parameters/tfnVerificationStatus'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageToken'
+        - $ref: '#/components/parameters/orderBy'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTfnVerificationsResponse'
+        '400':
+          description: If the page_size, page_token or order_by are not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: order_by
+                          description: Invalid order_by XXX
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+  /v1/projects/{projectId}/tfnVerification/{tfnVerificationId}:
+    get:
+      tags:
+        - TFN Verification
+      summary: Get TFN Verifications
+      description: Get information about an existing TFN Verification.
+      operationId: TfnVerificationExternalService_GetTfnVerificationRequest
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/tfnVerificationIdPath'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TfnVerification'
+        '400':
+          description: If the projectId or tfnVerificationId are not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: tfn_verification_id
+                          description: Invalid tfn_verification_id
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+  /v1/projects/{projectId}/tfnVerification/useCases:
+    get:
+      tags:
+        - TFN Verification
+      summary: Get TFN Verification use cases
+      description: Get a list of valid use cases for creating TFN Verifications
+      operationId: TfnVerificationExternalService_GetTfnVerificationUseCasesRequest
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTfnVerificationUseCasesResponse'
+        '400':
+          description: If the project_id is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                    - type: BadRequest
+                      fieldViolations:
+                        - field: project_id
+                          description: Invalid project_id
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+components:
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: >-
+        Our basic security works with any project. Simply use the client_id and
+        client_secret that were displayed when you created your access key
+        through the dashboard in the [Access keys
+        section](https://dashboard.sinch.com/settings/access-keys).
+    OAuth2:
+      type: oauth2
+      description: This is the recommended way to access our APIs in production.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+  parameters:
+    projectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: >-
+        Sinch uses projects to group resources such as contacts and apps
+        together to manage and connect a unique set of keys and secret IDs for
+        all your Sinch API products. To identify a project, it is given a unique
+        alphanumeric identifier that ties it to your account. Your project ID
+        can be found in the [Customer
+        Dashboard](https://dashboard.sinch.com/settings/project-management).
+    campaignId:
+      name: campaignId
+      description: The ID of the campaign.
+      in: path
+      required: true
+      schema:
+        type: string
+    campaignRegistrationId:
+      name: campaignRegistrationId
+      description: Campaign Registration Id returned by the create campaign API.
+      in: path
+      required: true
+      schema:
+        type: string
+    campaignRegistrationIdQuery:
+      name: campaignRegistrationIdQuery
+      description: Campaign Registration Id returned by the create campaign API.
+      in: query
+      required: true
+      schema:
+        type: string
+    brandId:
+      name: brandId
+      description: Brand Id to be qualified
+      in: query
+      required: true
+      schema:
+        type: string
+    brandRegistrationId:
+      name: brandRegistrationId
+      description: >-
+        The Brand Registration ID is returned in the response when creating the
+        brand
+      in: path
+      required: true
+      schema:
+        type: string
+    status:
+      name: status
+      description: The campaign status on which to filter.
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          type: string
+          enum:
+            - SINCH_REVIEW
+            - SINCH_APPROVED
+            - SINCH_REJECTED
+            - SUBMITTED
+            - APPROVED
+            - ACTIVE
+            - EXPIRED
+            - REJECTED
+            - SUBMISSION_FAILED
+          x-enumDescriptions:
+            SINCH_REVIEW: Campaign submitted successfully and awaiting approval from Sinch.
+            SINCH_APPROVED: Campaign approved by Sinch.
+            SINCH_REJECTED: Campaign rejected by Sinch.
+            SUBMITTED: >-
+              Campaign submitted successfully to TCR and awaiting approval from
+              operators.
+            APPROVED: >-
+              Campaign has been approved by the operators and is ready to be
+              activated by adding a number to it.
+            ACTIVE: Campaign is active and running.
+            EXPIRED: >-
+              Campaign is expired. Traffic cannot be sent, cannot be
+              reactivated.
+            REJECTED: Campaign was rejected by one of the operators.
+            SUBMISSION_FAILED: Campaign submission failed.
+    mock:
+      name: mock
+      in: query
+      required: false
+      schema:
+        type: boolean
+    useCase:
+      name: useCase
+      description: The desired Use Case.
+      in: query
+      required: false
+      schema:
+        type: string
+    brand:
+      name: brand
+      in: query
+      required: false
+      schema:
+        type: string
+    pageSize:
+      name: pageSize
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    pageToken:
+      name: pageToken
+      in: query
+      required: false
+      schema:
+        type: string
+    orderBy:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+    vettingStatus:
+      name: vettingStatus
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+          - PENDING
+          - UNSCORE
+          - ACTIVE
+          - FAILED
+          - EXPIRED
+        x-enumDescriptions:
+          PENDING: Pending vetting.
+          UNSCORE: Undergoing vetting process.
+          ACTIVE: Active status.
+          FAILED: Vetting failed.
+          EXPIRED: Vetting expired.
+        default: ACTIVE
+    tfnVerificationIdPath:
+      name: tfnVerificationId
+      description: The ID of an existing TFN verification
+      in: path
+      required: true
+      schema:
+        type: string
+    tfnUseCase:
+      name: useCase
+      description: A use case associated to a verification to be searched
+      in: query
+      required: false
+      schema:
+        type: string
+    tfnVerificationId:
+      name: verificationId
+      description: An existing verification ID to be searched
+      in: query
+      required: false
+      schema:
+        type: string
+    tfnVerificationStatus:
+      name: statuses
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/TfnVerificationStatus'
+  schemas:
+    error:
+      required:
+        - error
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+            - code
+            - message
+          properties:
+            code:
+              type: integer
+              description: The error code.
+              example: 400
+            message:
+              type: string
+              description: The error message.
+              example: Invalid argument.
+            status:
+              type: string
+              description: The status of the error.
+              example: INVALID_ARGUMENT
+            details:
+              type: array
+              description: >-
+                An array of objects describing the error in more detail, if
+                applicable.
+              items:
+                $ref: '#/components/schemas/errorDetails'
+    errorDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: A more specific description of the error.
+          example: BadRequest
+        resourceType:
+          type: string
+          description: The type of resource relevant to the error, if applicable.
+        resourceName:
+          type: string
+          description: The name of the resource, if applicable.
+        owner:
+          type: string
+          description: The owner of the resource, if applicable.
+        description:
+          type: string
+          description: A description of the error, if applicable.
+        fieldViolations:
+          type: array
+          description: An array of all the field violations which contributed to the error.
+          items:
+            $ref: '#/components/schemas/fieldViolations'
+    fieldViolations:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field which produced the error.
+          example: order_by
+        description:
+          type: string
+          description: The description of the error.
+          example: Invalid `order_by` number.
+    CampaignResponse:
+      title: Campaign Response
+      type: object
+      properties:
+        campaignId:
+          maxLength: 7
+          type: string
+          description: Campaign ID returned by external partner. i.e. TCR Campaign Id
+        campaignName:
+          maxLength: 128
+          type: string
+          description: Optional name to help track and view campaign.
+        campaignRegistrationId:
+          maxLength: 26
+          type: string
+          description: Campaign Registration Id returned by the Create Campaign API
+        createDate:
+          type: string
+          description: Campaign Creation Date
+          format: date-time
+        modifiedDate:
+          type: string
+          description: Campaign Modified Date
+          format: date-time
+        createdBy:
+          maxLength: 20
+          type: string
+          description: Represents who Created this Campaign
+        modifiedBy:
+          maxLength: 20
+          type: string
+          description: Represents who was the Last to Modify this Campaign
+        autoRenewal:
+          type: boolean
+          description: Campaign subscription auto-renewal status.
+        billedDate:
+          type: string
+          description: Campaign recent billed date.
+          format: date-time
+        brandId:
+          maxLength: 8
+          type: string
+          description: Alphanumeric identifier of the brand associated with this campaign.
+        vertical:
+          maxLength: 20
+          type: string
+          description: >-
+            Business/industry segment of this campaign. Must be of defined valid
+            types.
+        useCase:
+          maxLength: 20
+          type: string
+          description: Campaign useCase.
+        subUseCases:
+          type: array
+          description: 'Campaign sub use-cases. '
+          items:
+            maxLength: 20
+            type: string
+        description:
+          maxLength: 4096
+          type: string
+          description: Summary description of this campaign.
+        embeddedLink:
+          type: boolean
+          description: Does message generated by the campaign include URL link in SMS?
+        embeddedPhone:
+          type: boolean
+          description: Does message generated by the campaign include phone number in SMS?
+        affiliateMarketing:
+          type: boolean
+          description: >-
+            Does message content controlled by affiliate marketing other than
+            the brand?
+        numberPool:
+          type: boolean
+          description: >-
+            Indicates whether this campaign has been approved and configured as
+            a numberpool campaign
+        ageGated:
+          type: boolean
+          description: Age gated content in campaign.
+        directLending:
+          type: boolean
+          description: is direct lending.
+        subscriberOptIn:
+          type: boolean
+          description: >-
+            Does campaign require subscriber to opt-in before SMS is sent to
+            subscriber?
+        subscriberOptOut:
+          type: boolean
+          description: Does campaign support subscriber opt-out keyword(s)?
+        subscriberHelp:
+          type: boolean
+          description: Does campaign responds to help keyword(s)?
+        sample1:
+          maxLength: 1024
+          type: string
+          description: >-
+            Message sample. Some campaign tiers require 1 or more message
+            samples.
+        sample2:
+          maxLength: 1024
+          type: string
+          description: >-
+            Message sample. Some campaign tiers require 2 or more message
+            samples.
+        sample3:
+          maxLength: 1024
+          type: string
+          description: >-
+            Message sample. Some campaign tiers require 3 or more message
+            samples.
+        sample4:
+          maxLength: 1024
+          type: string
+          description: >-
+            Message sample. Some campaign tiers require 4 or more message
+            samples.
+        stopMessage:
+          maxLength: 255
+          type: string
+          description: >-
+            Message that will be returned if a subscriber opts out of the
+            campaign.
+        optInMessage:
+          maxLength: 255
+          type: string
+          description: >-
+            Message that will be returned when a subscriber opts into a
+            campaign.
+        helpMessage:
+          maxLength: 255
+          type: string
+          description: Help message of the campaign.
+        monthlyFee:
+          type: number
+          description: Monthly Fee
+          format: float
+        setupFee:
+          type: number
+          description: Initial Setup Fee
+          format: float
+        status:
+          maxLength: 32
+          type: string
+          description: Campaign Status.
+          enum:
+            - SINCH_REVIEW
+            - SINCH_APPROVED
+            - SINCH_REJECTED
+            - SUBMITTED
+            - APPROVED
+            - ACTIVE
+            - EXPIRED
+            - REJECTED
+            - SUBMISSION_FAILED
+          x-enumDescriptions:
+            SINCH_REVIEW: Campaign submitted successfully and awaiting approval from Sinch.
+            SINCH_APPROVED: Campaign approved by Sinch.
+            SINCH_REJECTED: Campaign rejected by Sinch.
+            SUBMITTED: >-
+              Campaign submitted successfully to TCR and awaiting approval from
+              operators.
+            APPROVED: >-
+              Campaign has been approved by the operators and is ready to be
+              activated by adding a number to it.
+            ACTIVE: Campaign is active and running.
+            EXPIRED: >-
+              Campaign is expired. Traffic cannot be sent, cannot be
+              reactivated.
+            REJECTED: Campaign was rejected by one of the operators.
+            SUBMISSION_FAILED: Campaign submission failed.
+        mnoMetadata:
+          title: >-
+            Map of Metadata  Map of MNO metadata where key is the 'networkId' of
+            the MNO and value is Metadata of the MNO
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/CampaignMnoMetadata'
+        mock:
+          type: boolean
+          description: Defines if campaign mocked or real one
+        lastActionStatus:
+          type: string
+          description: Last Action Status.
+          enum:
+            - CREATE_IN_PROGRESS
+            - CREATE_SUCCESSFUL
+            - CREATE_FAILED
+            - DELETE_IN_PROGRESS
+            - DELETE_SUCCESSFUL
+            - DELETE_FAILED
+            - RESUBMIT_IN_PROGRESS
+            - RESUBMIT_SUCCESSFUL
+            - RESUBMIT_FAILED
+          x-enumDescriptions:
+            CREATE_IN_PROGRESS: Creating campaign in TCR.
+            CREATE_SUCCESSFUL: Campaign created in TCR.
+            CREATE_FAILED: Campaign creation failed in TCR.
+            DELETE_IN_PROGRESS: Deleting campaign in TCR.
+            DELETE_SUCCESSFUL: Campaign deleted in TCR.
+            DELETE_FAILED: Campaign deletion failed in TCR.
+            RESUBMIT_IN_PROGRESS: Campaign resubmission in progress.
+            RESUBMIT_SUCCESSFUL: Campaign resubmission completed.
+            RESUBMIT_FAILED: Campaign resubmission failed.
+        optinKeywords:
+          maxLength: 255
+          type: string
+          description: >-
+            Subscriber opt-in keywords. Must be upper-case alphanumeric comma(,)
+            separated keywords without space.
+        optoutKeywords:
+          maxLength: 255
+          type: string
+          description: >-
+            Subscriber opt-out keywords. Default value is 'STOP'. Must be
+            upper-case alphanumeric comma(,) separated keywords without space.
+        helpKeywords:
+          maxLength: 255
+          type: string
+          description: >-
+            Subscriber help keywords. Default value is 'HELP'. Must be
+            upper-case alphanumeric comma(,) separated keywords without space.
+        messageFlow:
+          maxLength: 2048
+          type: string
+          description: Message flow description.
+        nextRenewalOrExpirationDate:
+          type: string
+          description: When the campaign would be due for its next renew/bill date.
+          format: date-time
+    CreateTcrCampaignRequest:
+      title: Campaign Request
+      type: object
+      required:
+        - brandId
+        - useCase
+        - campaignName
+        - description
+        - sample1
+        - sample2
+        - sample3
+        - stopMessage
+        - optInMessage
+        - helpMessage
+        - autoRenewal
+        - embeddedLink
+        - embeddedPhone
+        - affiliateMarketing
+        - numberPool
+        - ageGated
+        - directLending
+        - subscriberOptIn
+        - subscriberOptOut
+        - subscriberHelp
+        - optinKeywords
+        - optoutKeywords
+        - helpKeywords
+        - messageFlow
+      properties:
+        brandId:
+          maxLength: 8
+          type: string
+          description: >-
+            The brand is the company or entity represented in the campaign. The
+            brand ID is an alphanumeric identifier that always begins with a
+            "B". When registering a brand in The Campaign Registry (TCR), TCR
+            returns a brand ID value, example: BESINCH. For more info, see
+            [Brand
+            Registrations](https://developers.sinch.com/docs/10dlc-registration/api-reference/10dlc-registration/tag/Brand-Registration/).
+        useCase:
+          $ref: '#/components/schemas/CampaignUseCaseType'
+        campaignName:
+          maxLength: 128
+          type: string
+          description: >-
+            This is an optional name to help track and view your campaign within
+            Sinch's platform. Use a name that is easily recognizable, this will
+            help you identify your campaign later within the Sinch customer
+            dashboard. This name is not part of the campaign registration in
+            TCR.
+        vertical:
+          $ref: '#/components/schemas/CampaignVerticalType'
+        description:
+          maxLength: 4096
+          type: string
+          description: >-
+            Describe in detail the service the message program is providing to
+            the end user and the purpose of the brand's messages (i.e.
+            appointment reminders, OTP alerts, etc.). The description should
+            match the selected use case and identify who is sending the
+            messages, who is receiving the messages, and why messages are being
+            sent.
+          minLength: 40
+        sample1:
+          minLength: 20
+          maxLength: 1024
+          type: string
+          description: >-
+            Provide sample production message content. Include the Brand name
+            and opt out instructions (e.g. Reply STOP to stop) in every message.
+            If you have selected Mixed use case, please provide examples of each
+            sub use case selected.
+          example: >-
+            {Brand name}: We are contacting you today to let you know your order
+            is ready for pickup. Reply STOP to stop.
+        sample2:
+          maxLength: 1024
+          type: string
+          description: >-
+            Message sample. Some campaign tiers require 2 or more message
+            samples, depending on sub-usecases.
+          example: >-
+            {Brand name}: Your confirmation code is SINCH1234. Please enter it
+            on the authentication website. Reply STOP to stop.
+        sample3:
+          maxLength: 1024
+          type: string
+          description: >-
+            Message sample. Some campaign tiers require 3 or more message
+            samples, depending on sub-usecases.
+          example: >-
+            {Brand name}: Shop at www.example.com for all your retail needs!
+            From clothing to home goods, we've got you covered. Visit us today
+            and save! Reply STOP to stop. 
+        sample4:
+          maxLength: 1024
+          type: string
+          description: >-
+            Message sample. Some campaign tiers require 4 or more message
+            samples, depending on sub-usecases.
+        stopMessage:
+          minLength: 20
+          maxLength: 255
+          type: string
+          description: >-
+            Message sent in response to a STOP keyword. It must confirm that the
+            end user has unsubscribed from the message program and will not
+            receive any further messages. Include the brand name. You can also
+            include customer care contact information (e.g. support email or
+            phone number).
+          example: >-
+            You have been unsubscribed and will not receive any more messages
+            from {Brand name}.  For more information call {phone number} or
+            email {email address}.
+        optInMessage:
+          minLength: 20
+          maxLength: 255
+          type: string
+          description: >-
+            Initial message that is sent confirming the end user's subscription.
+            Include the brand name, opt-out instructions (reply STOP to stop),
+            customer care instructions (reply HELP for help), message frequency
+            (#msgs/mo, msg frequency varies, recurring messages, etc.) and the
+            "message and data rates may apply" disclosure (Msg & Data rates may
+            apply).
+          example: >-
+            You have opted in to receive messages from {Brand name}! Msg freq
+            varies. Msg & data rates may apply. Reply HELP for help. Reply STOP
+            to stop.
+        helpMessage:
+          minLength: 20
+          maxLength: 255
+          type: string
+          description: >-
+            Message sent in response to HELP. Include the brand name and
+            additional customer care contact information (e.g. support email or
+            phone number).
+          example: >-
+            {Brand name}: For help call {phone number} or email {email address} 
+            Reply STOP to stop.
+        subUseCases:
+          type: array
+          description: >-
+            If you have selected a mixed use case, select all sub use cases that
+            apply to your message program. Choose between 2 and 5 sub use cases
+            for this campaign.  The input(s) should be one of the accepted enum
+            values.
+          items:
+            $ref: '#/components/schemas/CampaignSubUseCaseType'
+        autoRenewal:
+          type: boolean
+          description: >-
+            Will your campaign automatically renew? If "Yes", a monthly
+            recurring fee will be charged to the account. If "No", only the
+            initial setup fee will be charged, and the campaign will expire
+            after three months unless it is reviewed manually.
+          default: true
+        embeddedLink:
+          type: boolean
+          description: >-
+            Will your message content include a URL? Note that public URL
+            shorteners are not allowed.
+          default: false
+        embeddedPhone:
+          type: boolean
+          description: Will your message content include embedded phone numbers?
+          default: false
+        numberPool:
+          type: boolean
+          description: >-
+            Will your campaign support a number pool (more than 50 numbers)? If
+            yes, your use case should clearly support the need for a number
+            pool. For more info, see [When should I use a number pool for my
+            10DLC
+            campaign](https://community.sinch.com/t5/10DLC/When-should-I-use-a-number-pool-for-my-10DLC-campaign/ta-p/12432).
+          default: false
+        ageGated:
+          type: boolean
+          description: >-
+            Will your traffic include any content related to age-restricted
+            goods or services? If yes, you must implement an age gate
+            verification process.
+          default: false
+        directLending:
+          type: boolean
+          description: >-
+            Are you a financial institution engaged in direct, first-party
+            lending to your customers? If yes, note that your campaign
+            description should clearly indicate direct lending, even if your use
+            case is not related to your lending services (e.g. OTP).
+          default: false
+        subscriberOptIn:
+          type: boolean
+          description: >-
+            Will your campaign collect and process end user opt-ins? This is
+            mandatory for all use cases, except for Machine-to-Machine.
+          default: true
+        subscriberOptOut:
+          type: boolean
+          description: >-
+            Message sent in response to a STOP keyword. It must confirm that the
+            end user has unsubscribed from the message program and will not
+            receive any further messages. Include the brand name. You can also
+            include customer care contact information (e.g. support email or
+            phone number).
+          default: true
+        subscriberHelp:
+          type: boolean
+          description: >-
+            Message sent in response to HELP. Include the brand name and
+            additional customer care contact information (e.g. support email or
+            phone number).
+          default: true
+        optinKeywords:
+          maxLength: 255
+          type: string
+          description: >-
+            If subscribers can opt-in via a keyword, enter keyword(s) here
+            (alphanumeric comma separated values, no blank spaces).
+          example: Join,Subscribe,Agree
+        optoutKeywords:
+          maxLength: 255
+          type: string
+          description: >-
+            Subscriber opt-out keywords. Default values are STOP, QUIT, END,
+            CANCEL and UNSUBSCRIBE. If you accept additional opt-out keywords,
+            you can enter them here (alphanumeric comma separated values, no
+            blank spaces).
+          example: Stop,Quit,Cancel
+        helpKeywords:
+          maxLength: 255
+          type: string
+          description: >-
+            Subscriber help keywords. Default value is HELP.  If you accept
+            additional help keywords, you can enter them here. (alphanumeric
+            comma separated values, no blank spaces).
+          example: Help,Info
+        messageFlow:
+          minLength: 40
+          maxLength: 2048
+          type: string
+          description: >-
+            Provide instructions for how end users opt-in to receive messages. A
+            compliant opt-in is critical to the approval of your campaign.
+            Include all opt-in mechanisms (e.g. keyword/text-to-join, online
+            form, point-of-sale (POS) system, verbal consent, interactive voice
+            response (IVR) system, paper form) and a clear program description.
+            The Call-to-Action should include opt-out instructions (reply STOP
+            to stop), customer care instructions (reply HELP for help), message
+            frequency (#msgs/mo, msg frequency varies, recurring messages, etc.)
+            and message and data rates disclosure (Msg & Data rates may apply).
+          example: >-
+            Users will opt-in to receive messages from {Brand name} via {opt-in
+            mechanism}
+        terms_and_conditions_link:
+          type: string
+          maxLength: 255
+          description: A URL to a page containing the terms and conditions.
+          example: https://my.website.com/toc
+        privacy_policy_link:
+          type: string
+          maxLength: 255
+          description: A URL to a page containing the privacy policy.
+          example: https://my.website.com/privacy_policy
+        attachments:
+          type: boolean
+          description: >-
+            If this property is set to `true`, this will delay the submission of
+            the campaign until all necessary documentation is uploaded using the
+            [Upload Campaign
+            Files](https://developers.sinch.com/docs/10dlc-registration/api-reference/10dlc-registration/tag/10DLC-Campaign-Registration/#tag/10DLC-Campaign-Registration/operation/CampaignRegistrationExternalService_UploadCampaignFile)
+            operation.
+          default: false
+          example: false
+    v1uploadCampaignFilesRequest:
+      type: object
+      description: >-
+        Request payload to upload a file for a campaign registration. Only one
+        file can be uploaded at a time.
+      required:
+        - campaignInternalId
+        - submitCampaign
+      properties:
+        projectId:
+          type: string
+          description: The project ID to which the campaign belongs.
+          example: 0fc52975-636a-4700-8943-68759df5c9e1
+        campaignInternalId:
+          type: string
+          description: The campaign ID returned by the create campaign API endpoint.
+          example: 01k4cxccbt519xa3ejty1r5jb4
+        file:
+          type: object
+          description: >-
+            Files must be no larger than 10MB.
+
+
+            For PRIVACY_POLICY, TERMS_AND_CONDITIONS, CALL_TO_ACTION, and OPT_IN
+            file categories, the following file types are supported:
+
+
+            jpg, jpeg, png, bmp, tiff, raw, pdf, rtf, xml, odt, docx, tml, txt
+
+
+            For MMS file category, the following file types are supported:
+
+
+            bmp, dib, gif, jpeg, jpg, m2a, m4a, m4b, m4p, m4r, m4v, mp1, mp2,
+            mp3, mp4, mpa, oga, ogg, ogm, ogv, ogx, png, spx, txt, wav, webm
+
+
+            There can be a maximum of 5 files submitted for MMS and a maximum of
+            5 files for the other categories.
+          properties:
+            fileName:
+              type: string
+              description: The name of the file you want to upload.
+              example: MyFile.txt
+            fileContent:
+              type: string
+              description: The content of the file encoded in base64.
+              example: VGhpcyBpcyBhIHRlc3QgdGV4dCBmaWxlLg==
+            fileCategory:
+              type: integer
+              description: >-
+                Represents the category or intended purpose of a file and used
+                to classify uploaded files based on their content or function.
+              enum:
+                - 1
+                - 2
+                - 3
+                - 4
+                - 5
+              x-enumDescriptions:
+                PRIVACY_POLICY=1: File related to privacy policy content.
+                TERMS_AND_CONDITIONS=2: File related to terms and conditions.
+                CALL_TO_ACTION=3: File related to call-to-action prompts.
+                OPT_IN=4: File related to user opt-in/consent.
+                MMS=5: File related to MMS (Multimedia Messaging Service) contexts.
+        submitCampaign:
+          type: boolean
+          description: >-
+            Set this property to `false` for all uploaded files except the final
+            one, which will allow for uploading documents across multiple
+            requests without submitting the campaign.
+
+            For the last file, set it to `true` to indicate that the upload is
+            complete and the campaign should be submitted for review.
+    CreateTcrCampaignResponse:
+      title: Response Body for CreateTcrCampaign Request
+      type: object
+      properties:
+        campaignRegistrationId:
+          maxLength: 26
+          type: string
+          description: >-
+            Sinch generated campaign ID (ULID format).  Note that this is not
+            the TCR campaign ID.  The TCR Campaign ID will be available once the
+            campaign has been approved and submitted to TCR.
+    MnoMetadata:
+      title: MNO properties
+      type: object
+      properties:
+        mno:
+          type: string
+          description: Name of the MNO
+        mnoSupport:
+          type: boolean
+          description: If 'false', then desired use-case cannot be supported by the MNO
+        mnoReview:
+          type: boolean
+          description: >-
+            If 'true', then the submitted campaign is subject to MNO (manual)
+            review process. Campaign review status can be access via TCR APIs
+            for some of the MNOs
+        qualify:
+          type: boolean
+          description: >-
+            If 'false', then brand does not qualify for the desired use-case on
+            the MNO. CSP might consider getting brand vetted by one of the
+            approved external vetting provider
+        minMsgSamples:
+          type: string
+          description: >-
+            Minimum number of message samples required by MNO for submission of
+            desired use-case
+          format: integer
+        reqSubscriberOptIn:
+          type: boolean
+          description: >-
+            If 'true' then MNO requires subscriber to opt-into the campaign
+            before message may be sent to subscriber. Opt-in mechanism can be
+            mobile or web opt-in
+        reqSubscriberOptOut:
+          type: boolean
+          description: >-
+            If 'true' then MNO requires campaign to support an opt-out mechanism
+            through MO stop key words such as 'STOP', 'QUIT'. Upon receive STOP
+            message from subscriber, campaign must stop sending message to
+            subscriber immediately
+        reqSubscriberHelp:
+          title: >-
+            If 'true' then MNO requires campaign to support a 'help' mechanism
+            through MO help key words such as 'HELP', 'INFO'
+          type: boolean
+        noEmbeddedLink:
+          type: boolean
+          description: >-
+            If 'true' then MNO forbids call-to-action link/URL to be embedded in
+            all messages send to subscriber
+        noEmbeddedPhone:
+          type: boolean
+          description: >-
+            If 'true' then MNO forbids call-to-action phone number to be
+            embedded in all messages send to subscriber
+        surcharge:
+          type: number
+          description: >-
+            Per message fee imposed by MNO. This fee may vary depending on brand
+            qualification and use-case
+          format: double
+        msgClass:
+          type: string
+          description: >-
+            Message class assigned to the campaign by MNO. Please refer to AT&T
+            10DLC guide for complete list of available message class and
+            definition
+        tpm:
+          type: string
+          description: >-
+            Message TPM(throughput per minute) qualified by the brand for
+            desired use-case
+          format: integer
+        tpmScope:
+          type: string
+          description: >-
+            TPM restriction scope. Possible values: CAMPAIGN, PHONE_NUMBER. If
+            scope is at PHONE_NUMBER level, then the TPM rate-limiting imposed
+            separately for each phone number provisioned to the campaign.
+            CAMPAIGN level scope implies rate-limiting imposed at campaign
+            level.
+        brandTier:
+          type: string
+          description: >-
+            Daily message volume is restricted based on brand tier or brand
+            qualifcation. The daily volume restriction applies to brand across
+            campaigns and CSPs. Please contact your message service provider for
+            updated T-Mobile terms. Possible values: LOW, LOWER_MID, UPPER_MID,
+            TOP, UNCAPPED
+        brandDailyCap:
+          type: string
+          description: >-
+            Number of messages allowed per day on T-Mobile network. If the
+            brandTier attribute is 'UNCAPPED', then this attribute will be NULL.
+          format: string
+    CampaignMnoMetadata:
+      title: MNO properties
+      type: object
+      properties:
+        mno:
+          type: string
+          description: Name of the MNO
+        status:
+          type: string
+          description: MNO operation status
+        msgClass:
+          type: string
+          description: >-
+            Message class assigned to the campaign by MNO. Please refer to AT&T
+            10DLC guide for complete list of available message class and
+            definition
+        tpm:
+          type: string
+          description: >-
+            Message TPM(throughput per minute) qualified by the brand for
+            desired use-case
+          format: integer
+        tpmScope:
+          type: string
+          description: >-
+            TPM restriction scope. Possible values: CAMPAIGN, PHONE_NUMBER. If
+            scope is at PHONE_NUMBER level, then the TPM rate-limiting imposed
+            separately for each phone number provisioned to the campaign.
+            CAMPAIGN level scope implies rate-limiting imposed at campaign
+            level.
+        brandTier:
+          type: string
+          description: >-
+            Daily message volume is restricted based on brand tier or brand
+            qualifcation. The daily volume restriction applies to brand across
+            campaigns and CSPs. Please contact your message service provider for
+            updated T-Mobile terms. Possible values: LOW, LOWER_MID, UPPER_MID,
+            TOP, UNCAPPED
+        brandDailyCap:
+          type: string
+          description: >-
+            Number of messages allowed per day on T-Mobile network. If the
+            brandTier attribute is 'UNCAPPED', then this attribute will be NULL.
+          format: integer
+    QualifyBrandByUseCaseResponse:
+      title: Qualify Brand by Use Case response
+      type: object
+      properties:
+        useCase:
+          type: string
+          description: Desired useCase.
+        monthlyFee:
+          type: number
+          description: >-
+            Monthly registration fee for campaign. If auto-renew is selected on
+            a campaign, this recurring fee will be charged monthly starting
+            three months after the campaign is submitted.
+          format: float
+        setupFee:
+          type: number
+          description: >-
+            Initial setup fee, charged immediately once the campaign has been
+            approved by Sinch and submitted to partners.  This fee covers the
+            first three months of campaign use, and will be charged whether or
+            not the autoRenewal parameter is set on the campaign.
+          format: float
+        minSubUseCases:
+          type: number
+          description: >-
+            Minimum number of sub use-cases required when registering a campaign
+            with the desired use case.
+        maxSubUseCases:
+          type: number
+          description: >-
+            Maximum number of sub use-cases required when registering a campaign
+            with the desired use case.
+        mnoMetadata:
+          title: >-
+            Map of Metadata  Map of MNO metadata where key is the 'networkId' of
+            the MNO and value is Metadata of the MNO
+          type: object
+          additionalProperties:
+            $ref: '#/components/schemas/MnoMetadata'
+    CampaignUseCaseType:
+      title: Campaign Usecase Type
+      type: string
+      description: >-
+        Select a use case that is the primary use case that is most applicable
+        to the service that messages are providing to subscribers. Standard use
+        cases are immediately available for all qualified registered brands,
+        whereas special use cases require vetting or pre/post approval by mobile
+        network operators (MNOs).
+
+
+        Special use cases are sensitive or critical in nature and may require
+        vetting or pre/post registration approval by mobile network operators
+        (MNOs). Requirements may vary according to each MNO.
+
+
+        For more information on standard use case versus special use case
+        campaigns, see [10DLC Use Cases - Standard Use Cases vs Special Use
+        Cases](https://community.sinch.com/t5/10DLC/10DLC-Use-Cases-Standard-Use-Cases-vs-Special-Use-Cases/ta-p/7028/). 
+      enum:
+        - 2FA
+        - ACCOUNT_NOTIFICATION
+        - CUSTOMER_CARE
+        - DELIVERY_NOTIFICATION
+        - FRAUD_ALERT
+        - HIGHER_EDUCATION
+        - LOW_VOLUME
+        - MARKETING
+        - MIXED
+        - POLLING_VOTING
+        - PUBLIC_SERVICE_ANNOUNCEMENT
+        - SECURITY_ALERT
+        - AGENTS_FRANCHISES
+        - CARRIER_EXEMPT
+        - CHARITY
+        - EMERGENCY
+        - K12_EDUCATION
+        - POLITICAL
+        - PROXY
+        - SOCIAL
+        - SWEEPSTAKE
+        - SOLE_PROPRIETOR
+      x-enumDescriptions:
+        2FA: Any authentication, verification, or one-time passcode.
+        ACCOUNT_NOTIFICATION: >-
+          Standard notifications for account holders, relating to and being
+          about an account.
+        CUSTOMER_CARE: >-
+          All customer care interaction, including but not limited to account
+          management and customer support.
+        DELIVERY_NOTIFICATION: Notification about the status of the delivery of a product or service.
+        FRAUD_ALERT: >-
+          Notifications regarding potential fraudulent activity on a user's
+          account.
+        HIGHER_EDUCATION: >-
+          Messaging created on behalf of Colleges or Universities, including
+          School Districts and education institutions. This use case is NOT for
+          the "free to the consumer" messaging model.
+        LOW_VOLUME: >-
+          For Brands that have multiple use cases and only need very low
+          messaging throughput. Examples include: test or demo accounts, small
+          businesses (single Doctor's office, single Pizza shop etc.).
+        MARKETING: Any communication that includes marketing and/or promotional content.
+        MIXED: Any messaging campaign containing 2 to 5 standard uses cases.
+        POLLING_VOTING: >-
+          The sending of surveys and polling/voting campaigns for non political
+          arenas.
+        PUBLIC_SERVICE_ANNOUNCEMENT: >-
+          Informational messaging to raise an audience's awareness about
+          important issues.
+        SECURITY_ALERT: >-
+          A notification that the security of a system, either software or
+          hardware, has been compromised in some way and there is an action you
+          need to take.
+        AGENTS_FRANCHISES: Agents; franchises; local branches.
+        CARRIER_EXEMPT: Carrier exempt.
+        CHARITY: >-
+          Communications from a registered charity aimed at providing help and
+          raising money for those in need.
+        EMERGENCY: >-
+          Notification services designed to support public safety/health during
+          natural disasters, armed conflicts, pandemics, and other national or
+          regional emergencies.
+        K12_EDUCATION: >-
+          Campaigns created for messaging platforms that support schools from
+          grades K - 12, and distance learning centers.
+        POLITICAL: >-
+          Part of organized effort to influence decision making of specific
+          groups. Available only to Non-Profit entities with a Campaign Verify
+          token or Aegis Political Vet, or Non Profit entities with a verified
+          501(c)(3/4/5/6) tax exempt status.
+        PROXY: >-
+          Peer-to-peer, app-based group messaging with proxy/pooled numbers.
+          Supporting personalized services and non-exposure of personal numbers
+          for enterprise or A2P communications.
+        SOCIAL: >-
+          Communication between public figures/influencers and their
+          communities.
+        SWEEPSTAKE: All sweepstakes messaging.
+        SOLE_PROPRIETOR: >-
+          A business that is owned and operated by a single individual/business
+          entity. This use case is intended for sole proprietors who do not fit
+          the low volume use case but still have relatively low messaging needs.
+    CampaignSubUseCaseType:
+      type: string
+      enum:
+        - 2FA
+        - ACCOUNT_NOTIFICATION
+        - CUSTOMER_CARE
+        - DELIVERY_NOTIFICATION
+        - FRAUD_ALERT
+        - HIGHER_EDUCATION
+        - MARKETING
+        - POLLING_VOTING
+        - PUBLIC_SERVICE_ANNOUNCEMENT
+        - SECURITY_ALERT
+      x-enumDescriptions:
+        2FA: Any authentication, verification, or one-time passcode.
+        ACCOUNT_NOTIFICATION: >-
+          Standard notifications for account holders, relating to and being
+          about an account.
+        CUSTOMER_CARE: >-
+          All customer care interaction, including but not limited to account
+          management and customer support.
+        DELIVERY_NOTIFICATION: Notification about the status of the delivery of a product or service.
+        FRAUD_ALERT: >-
+          Notifications regarding potential fraudulent activity on a user's
+          account.
+        HIGHER_EDUCATION: >-
+          Messaging created on behalf of Colleges or Universities, including
+          School Districts and education institutions. This use case is NOT for
+          the "free to the consumer" messaging model.
+        MARKETING: Any communication that includes marketing and/or promotional content.
+        POLLING_VOTING: >-
+          The sending of surveys and polling/voting campaigns for non political
+          arenas.
+        PUBLIC_SERVICE_ANNOUNCEMENT: >-
+          Informational messaging to raise an audience's awareness about
+          important issues.
+        SECURITY_ALERT: >-
+          A notification that the security of a system, either software or
+          hardware, has been compromised in some way and there is an action you
+          need to take.
+    CampaignVerticalType:
+      deprecated: true
+      title: Campaign Vertical Type
+      type: string
+      description: This field has been deprecated and is no longer being captured.
+    RequestInfoResponse:
+      title: Campaign registration service response structure
+      type: object
+      properties:
+        requestId:
+          type: string
+          description: The same request Identification that was sent on the input.
+    CreateBrandRegistration:
+      title: Brand Registration Request
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Display name is defined by the user
+        brandRegistrationType:
+          $ref: '#/components/schemas/BrandRegistrationType'
+        companyDetails:
+          $ref: '#/components/schemas/CompanyDetails'
+        financialDetails:
+          $ref: '#/components/schemas/FinancialDetails'
+        contactDetails:
+          $ref: '#/components/schemas/ContactDetails'
+        mock:
+          type: boolean
+          description: Defines if created brand should be mocked or real one
+    CreateBrandRegistrationResponse:
+      title: Brand Registration Response
+      type: object
+      properties:
+        brandRegistrationId:
+          type: string
+          description: Output only. Brand registration Id
+          readOnly: true
+    BrandRegistration:
+      title: Brand Registration Details
+      type: object
+      properties:
+        brandRegistrationId:
+          type: string
+          description: Output only. Brand registration Id
+          readOnly: true
+        brandId:
+          type: string
+          description: Output only. TCR brand Id
+          readOnly: true
+        identityStatus:
+          type: string
+          description: Identity status for the brand.
+          readOnly: true
+        displayName:
+          type: string
+          description: Output only. Display name defined by user
+          readOnly: true
+        brandRegistrationStatus:
+          $ref: '#/components/schemas/BrandRegistrationStatus'
+        brandRegistrationType:
+          $ref: '#/components/schemas/BrandRegistrationType'
+        companyDetails:
+          $ref: '#/components/schemas/CompanyDetails'
+        financialDetails:
+          $ref: '#/components/schemas/FinancialDetails'
+        contactDetails:
+          $ref: '#/components/schemas/ContactDetails'
+        mock:
+          type: boolean
+          description: Defines if created brand should be mocked or real one
+    TenDlcBrandUpdateRequest:
+      type: object
+      properties:
+        companyDetails:
+          $ref: '#/components/schemas/CompanyDetails'
+        financialDetails:
+          $ref: '#/components/schemas/FinancialDetails'
+        contactDetails:
+          $ref: '#/components/schemas/ContactDetails'
+    FinancialDetails:
+      title: Financial Details
+      type: object
+      properties:
+        brandEntityType:
+          $ref: '#/components/schemas/BrandEntityType'
+        brandVerticalType:
+          $ref: '#/components/schemas/BrandVerticalType'
+        taxIdCountry:
+          type: string
+          description: In what country is your tax id registered
+        taxIdCorporate:
+          type: string
+          description: The tax id of the business
+        stockSymbol:
+          type: string
+          description: The company stock symbol
+        exchange:
+          type: string
+          description: In what stock exchange is the company registered
+    BrandEntityType:
+      title: Brand Entity Type
+      type: string
+      description: |-
+        - PUBLIC: A public company registered on a stock exchange
+        - PRIVATE: A private company
+        - CHARITY_NON_PROFIT: A charity or non-profit company
+      default: PUBLIC
+      enum:
+        - PUBLIC
+        - PRIVATE
+        - CHARITY_NON_PROFIT
+      x-enumDescriptions:
+        PUBLIC: A public company registered on a stock exchange
+        PRIVATE: A private company
+        CHARITY_NON_PROFIT: A charity or non-profit company
+    BrandStatus:
+      type: string
+      default: IMPORTED
+      enum:
+        - IMPORTED
+        - WAITING_FOR_VERIFICATION
+      x-enumDescriptions:
+        IMPORTED: Brand has been imported.
+        WAITING_FOR_VERIFICATION: Brand is waiting for verification.
+    BrandVerticalType:
+      title: Brand Vertical Type
+      type: string
+      description: |-
+        - PROFESSIONAL
+        - REAL_ESTATE
+        - HEALTHCARE
+        - HUMAN_RESOURCES
+        - ENERGY
+        - ENTERTAINMENT
+        - RETAIL
+        - AGRICULTURE
+        - INSURANCE
+        - POSTAL
+        - EDUCATION
+        - HOSPITALITY
+        - FINANCIAL
+        - POLITICAL
+        - GAMBLING
+        - LEGAL
+        - CONSTRUCTION
+        - NGO
+        - MANUFACTURING
+        - GOVERNMENT
+        - TECHNOLOGY
+        - COMMUNICATION
+      enum:
+        - PROFESSIONAL
+        - REAL_ESTATE
+        - HEALTHCARE
+        - HUMAN_RESOURCES
+        - ENERGY
+        - ENTERTAINMENT
+        - RETAIL
+        - TRANSPORTATION
+        - AGRICULTURE
+        - INSURANCE
+        - POSTAL
+        - EDUCATION
+        - HOSPITALITY
+        - FINANCIAL
+        - POLITICAL
+        - GAMBLING
+        - LEGAL
+        - CONSTRUCTION
+        - NGO
+        - MANUFACTURING
+        - GOVERNMENT
+        - TECHNOLOGY
+        - COMMUNICATION
+      x-enumDescriptions:
+        PROFESSIONAL: Professional services.
+        REAL_ESTATE: Real estate organizations.
+        HEALTHCARE: Healthcare organizations.
+        HUMAN_RESOURCES: Staffing agencies and HR.
+        ENERGY: Related to energy industry.
+        ENTERTAINMENT: Music, film, and sports product.
+        RETAIL: Retail organizations.
+        TRANSPORTATION: Transportation services.
+        AGRICULTURE: Agricultural services.
+        INSURANCE: Insurance industry.
+        POSTAL: Courier and delivery services.
+        EDUCATION: Schools, tutoring, and child-care services.
+        HOSPITALITY: Hotels, restaurants, and travel agencies.
+        FINANCIAL: Banking services, brokerages.
+        POLITICAL: Political campaigns, PACs.
+        GAMBLING: Gambling and lottery.
+        LEGAL: Attorneys, court reporting.
+        CONSTRUCTION: Construction industry.
+        NGO: Non-governmental organizations.
+        MANUFACTURING: Manufacturing industries.
+        GOVERNMENT: Government services.
+        TECHNOLOGY: Technology services.
+        COMMUNICATION: Communication services.
+    Category:
+      type: object
+      properties:
+        id:
+          description: The category ID.
+          type: string
+          readOnly: true
+          enum:
+            - TAX_ID
+            - STOCK_SYMBOL
+            - GOVERNMENT_ENTITY
+            - NONPROFIT
+            - OTHERS
+          x-enumDescriptions:
+            TAX_ID: Data mismatch related to tax id and its associated properties.
+            STOCK_SYMBOL: >-
+              Non public entity registered as a public for profit entity or the
+              stock information mismatch.
+            GOVERNMENT_ENTITY: >-
+              Non government entity registered as a government entity. Must be a
+              U.S. government entity.
+            NONPROFIT: No IRS 501c tax-exempt status found.
+            OTHERS: Details of the data misrepresentation if any.
+        displayName:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        fields:
+          type: array
+          readOnly: true
+          items:
+            type: string
+    CompanyDetails:
+      title: Company Details
+      type: object
+      properties:
+        companyName:
+          type: string
+          description: The legal name of the end user business
+        companyEmail:
+          type: string
+          description: The email address of support contact
+        businessContactEmail:
+          type: string
+          description: The email address of the primary business contact.
+        brandName:
+          type: string
+          description: The brand name the business wants to register
+        country:
+          type: string
+          description: 2 letter ISO-2 country code. E.g. US, CA
+        streetAddress:
+          type: string
+          description: Street name and house number. E.g. 1000 Sunset Hill Road
+        city:
+          type: string
+          description: City name
+        postalCode:
+          type: string
+          description: Zipcode or postal code. E.g. 21012
+        state:
+          type: string
+          description: >-
+            State or province. For the United States, please use 2 character
+            codes. E.g. 'CA' for California.
+        webAddress:
+          type: string
+          description: The website of the business
+    ContactDetails:
+      title: Contact Details
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: First name of business contact
+        lastName:
+          type: string
+          description: Last name of business contact
+        phoneNumber:
+          type: string
+          description: The support contact telephone in e.164 format. E.g. +12023339999
+        email:
+          type: string
+          description: The email address to the end user contact person
+    Brand:
+      type: object
+      properties:
+        brandId:
+          type: string
+        projectId:
+          type: string
+        displayName:
+          type: string
+        companyName:
+          type: string
+        ein:
+          type: string
+        phone:
+          type: string
+        street:
+          type: string
+        city:
+          type: string
+        state:
+          type: string
+        postalCode:
+          type: string
+        country:
+          type: string
+        email:
+          type: string
+        stockSymbol:
+          type: string
+        stockExchange:
+          type: string
+        website:
+          type: string
+        vertical:
+          $ref: '#/components/schemas/BrandVerticalType'
+        brandStatus:
+          $ref: '#/components/schemas/BrandStatus'
+    ListBrandRegistrationResponse:
+      type: object
+      properties:
+        brandRegistrations:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrandRegistration'
+        nextPageToken:
+          type: string
+        totalSize:
+          type: integer
+          format: int32
+    BrandRegistrationFeedbackResponse:
+      type: object
+      properties:
+        brandId:
+          type: string
+          readOnly: true
+        category:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Category'
+    ResubmitCampaignRegistrationRequest:
+      type: object
+      properties:
+        mnos:
+          type: array
+          items:
+            type: string
+    TenDlcVettingInfoResponse:
+      type: object
+      properties:
+        vettingInfo:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/VettingInfo'
+    BrandRegistrationStatus:
+      title: Brand Registration Status
+      type: string
+      description: >-
+        - DRAFT: Registration has not yet been submitted. Only feasible when
+        creating a brand registration in dashboard.sinch.com - IN_PROGRESS:
+        Registration had been submitted for review - REJECTED: Registration has
+        been rejected. Please contact your account manager for further
+        information - APPROVED: Brand registration has been completed - UPGRADE:
+        The Brand is being upgraded to FULL registration
+      default: DRAFT
+      enum:
+        - DRAFT
+        - IN_PROGRESS
+        - REJECTED
+        - APPROVED
+        - UPGRADE
+      x-enumDescriptions:
+        DRAFT: Registration has not yet been submitted.
+        IN_PROGRESS: Registration had been submitted for review.
+        REJECTED: Registration has been rejected.
+        APPROVED: Brand registration has been completed.
+        UPGRADE: Brand is being upgraded to FULL registration.
+    BrandRegistrationType:
+      title: Brand Registration Type
+      type: string
+      description: >-
+        - SIMPLIFIED: Simplified Registration costs 10USD and will only verify
+        your brand. - FULL: Full Registration will cost 50USD but perform an
+        vetting and grant a vetted verified brand.
+      default: SIMPLIFIED
+      enum:
+        - SIMPLIFIED
+        - FULL
+        - BRAND_REGISTRATION_TYPE_UNSPECIFIED
+      x-enumDescriptions:
+        SIMPLIFIED: Simplified Registration costs 10USD and will only verify your brand.
+        FULL: >-
+          Full Registration will cost 50USD but perform a vetting and grant a
+          vetted verified brand.
+        BRAND_REGISTRATION_TYPE_UNSPECIFIED: Type not specified.
+    ListCampaignRegistrationResponse:
+      type: object
+      properties:
+        campaignRegistrations:
+          type: array
+          items:
+            $ref: '#/components/schemas/CampaignResponse'
+        nextPageToken:
+          type: string
+        totalSize:
+          type: integer
+          format: int32
+    GetCampaignRegistrationFeedbackResponse:
+      type: object
+      properties:
+        campaignRegistrationId:
+          type: string
+        campaignId:
+          type: string
+        status:
+          type: string
+        tcrErrorResponse:
+          type: array
+          items:
+            $ref: '#/components/schemas/TcrErrorResponse'
+        internalErrorResponse:
+          type: array
+          items:
+            $ref: '#/components/schemas/InternalErrorResponse'
+    TcrErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        field:
+          type: string
+        description:
+          type: string
+    InternalErrorResponse:
+      type: object
+      properties:
+        code:
+          type: string
+        description:
+          type: string
+    VettingClass:
+      type: string
+      default: STANDARD
+      enum:
+        - STANDARD
+      x-enumDescriptions:
+        STANDARD: Standard vetting class.
+    VettingProvider:
+      type: string
+      default: AEGIS
+      enum:
+        - AEGIS
+      x-enumDescriptions:
+        AEGIS: Aegis is the vetting provider.
+    VettingInfo:
+      type: object
+      properties:
+        vettingId:
+          type: string
+          readOnly: true
+        provider:
+          $ref: '#/components/schemas/VettingProvider'
+        vettingStatus:
+          $ref: '#/components/schemas/VettingStatus'
+        vettingClass:
+          $ref: '#/components/schemas/VettingClass'
+        vettingToken:
+          type: string
+          readOnly: true
+        vettingScore:
+          type: integer
+          format: int32
+          readOnly: true
+        reasons:
+          type: array
+          readOnly: true
+          items:
+            type: string
+        vettingDetails:
+          type: object
+          additionalProperties:
+            type: string
+          readOnly: true
+        vettedDate:
+          type: string
+          format: date-time
+          readOnly: true
+        createDate:
+          type: string
+          format: date-time
+          readOnly: true
+    VettingStatus:
+      type: string
+      default: ACTIVE
+      enum:
+        - PENDING
+        - UNSCORE
+        - ACTIVE
+        - FAILED
+        - EXPIRED
+      x-enumDescriptions:
+        PENDING: Pending vetting.
+        UNSCORE: Undergoing vetting process.
+        ACTIVE: Active status.
+        FAILED: Vetting failed.
+        EXPIRED: Vetting expired.
+    TfnVerificationBase:
+      title: Tfn Verification Base
+      type: object
+      properties:
+        tfnVerificationId:
+          type: string
+          description: >-
+            The unique identifier for the TFN verification request, generated by
+            the server.
+          readOnly: true
+        status:
+          allOf:
+            - $ref: '#/components/schemas/TfnVerificationStatus'
+          description: The current status of the verification request.
+          readOnly: true
+        createTime:
+          type: string
+          format: date-time
+          description: >-
+            The timestamp when the verification was created, in UTC (RFC3339
+            format).
+          readOnly: true
+        projectId:
+          type: string
+          description: >-
+            Your project ID can be found in the [Customer
+            Dashboard](https://dashboard.sinch.com/settings/project-management).
+          readOnly: true
+        createdBy:
+          deprecated: true
+          maxLength: 50
+          type: string
+          format: email
+          description: The email of the user who initiated the request.
+        phoneNumber:
+          type: string
+          description: >-
+            Toll-Free Number that is procured, hosted or in the process of
+            hosting with Sinch. Must be in E.164 format.
+          pattern: ^\+[1-9]\d{1,14}$
+        businessName:
+          maxLength: 500
+          type: string
+        businessAddress1:
+          maxLength: 500
+          type: string
+        businessAddress2:
+          maxLength: 500
+          type: string
+        businessCity:
+          maxLength: 500
+          type: string
+        businessState:
+          maxLength: 500
+          type: string
+        businessZipCode:
+          maxLength: 500
+          type: string
+        businessCountry:
+          maxLength: 500
+          type: string
+        businessContactFirstName:
+          maxLength: 500
+          type: string
+        businessContactLastName:
+          maxLength: 500
+          type: string
+        businessContactEmail:
+          maxLength: 500
+          type: string
+          format: email
+        businessContactPhone:
+          type: string
+          pattern: ^\+[1-9]\d{1,14}$
+        corporateWebsite:
+          maxLength: 500
+          type: string
+        messageVolume:
+          maxLength: 500
+          type: string
+          description: >-
+            Estimate monthly volume of messages from the TFN (accepted values:
+            10, 100, 1000, 10000, 100000, 250000, 500000, 750000, 1000000,
+            5000000, 10000000+)
+        useCase:
+          maxLength: 500
+          type: string
+          description: Category of the use case, fetched from the dedicated API.
+        useCaseSummary:
+          maxLength: 500
+          type: string
+          description: General idea of the use case and customer.
+        productionMessageContent:
+          maxLength: 1000
+          type: string
+          description: Example of message content.
+        optInWorkflowDescription:
+          maxLength: 500
+          type: string
+          description: Description of the opt-in workflow.
+        optInWorkflowImageUrls:
+          type: array
+          description: Images showing the opt-in workflow.
+          items:
+            maxItems: 10
+            maxLength: 1000
+            type: string
+        additionalInformation:
+          maxLength: 500
+          type: string
+          description: Any additional information.
+        businessRegistrationNumber:
+          maxLength: 50
+          type: string
+          description: A legally recognized business registration number.
+        businessType:
+          maxLength: 50
+          type: string
+          description: The type of business, selected from a list of predefined categories.
+          enum:
+            - SOLE_PROPRIETOR
+            - PRIVATE_PROFIT
+            - PUBLIC_PROFIT
+            - NON_PROFIT
+            - GOVERNMENT
+          x-enumDescriptions:
+            SOLE_PROPRIETOR: A business owned and run by one individual.
+            PRIVATE_PROFIT: A privately-owned company that operates for profit.
+            PUBLIC_PROFIT: A publicly-traded company that operates for profit.
+            NON_PROFIT: >-
+              An organization that uses its surplus revenues to further achieve
+              its purpose or mission.
+            GOVERNMENT: A government entity or agency.
+        businessRegistrationCountry:
+          maxLength: 500
+          type: string
+          description: Country business is registered in.
+        campaignVerifyAuthorizationToken:
+          maxLength: 500
+          type: string
+          description: >-
+            Campaign tokens for customers. This is a sensitive, write-only
+            field.
+          format: password
+          writeOnly: true
+        businessRegistrationType:
+          maxLength: 50
+          type: string
+          description: >-
+            The type of business registration (e.g. EIN, CBN, CRN, NEQ,
+            Provincial Number, VAT, ACN, ABN, BRN)
+        businessDba:
+          maxLength: 500
+          type: string
+          description: The "doing business as" (DBA) name of the business.
+        termsAndConditionsUrl:
+          maxLength: 500
+          type: string
+          format: uri
+          pattern: ^https://
+          description: A URL to a page containing the terms and conditions.
+          example: https://www.example.com/terms
+        privacyPolicyUrl:
+          maxLength: 500
+          type: string
+          format: uri
+          pattern: ^https://
+          description: A URL to a page containing the privacy policy.
+          example: https://www.example.com/privacy-policy
+        notes:
+          type: array
+          description: Feedback notes added during the review process.
+          readOnly: true
+          items:
+            allOf:
+              - $ref: '#/components/schemas/TfnVerificationNote'
+      required:
+        - projectId
+        - phoneNumber
+        - businessName
+        - businessAddress1
+        - businessCity
+        - businessState
+        - businessZipCode
+        - businessContactFirstName
+        - businessContactLastName
+        - businessContactEmail
+        - businessContactPhone
+        - corporateWebsite
+        - messageVolume
+        - useCase
+        - useCaseSummary
+        - productionMessageContent
+        - optInWorkflowDescription
+        - optInWorkflowImageUrls
+        - businessRegistrationNumber
+        - businessType
+        - businessRegistrationCountry
+        - tfnVerificationId
+        - status
+        - createTime
+        - businessRegistrationType
+        - termsAndConditionsUrl
+        - privacyPolicyUrl
+    CreateTfnVerificationRequest:
+      title: Tfn Verification Request
+      allOf:
+        - $ref: '#/components/schemas/TfnVerificationBase'
+    CreateTfnVerificationResponse:
+      title: Tfn Verification's id
+      type: object
+      properties:
+        tfnVerificationId:
+          type: string
+    TfnVerification:
+      title: Tfn Verification object
+      allOf:
+        - $ref: '#/components/schemas/TfnVerificationBase'
+    TfnVerificationNote:
+      title: TFN Verification Note Object
+      description: >-
+        Feedback note added during the review process containing, e.g., the
+        rejection reason
+      properties:
+        note:
+          type: string
+        createTime:
+          type: string
+    ListTfnVerificationsResponse:
+      title: Tfn Verification listed information
+      type: object
+      properties:
+        tfnVerifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/TfnVerification'
+        totalSize:
+          type: integer
+        nextPageToken:
+          type: string
+    GetTfnVerificationRequest:
+      title: Get Tfn Verification request object
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: >-
+            Your project ID can be found in the [Customer
+            Dashboard](https://dashboard.sinch.com/settings/project-management).
+        tfnVerificationId:
+          type: string
+    GetTfnVerificationUseCasesResponse:
+      title: Tfn Verification use cases information
+      type: object
+      properties:
+        useCases:
+          type: array
+          items:
+            type: string
+    TfnVerificationStatus:
+      type: string
+      enum:
+        - STATUS_UNSPECIFIED
+        - WAITING
+        - IN_PROGRESS
+        - VERIFIED
+        - REJECTED
+      x-enumDescriptions:
+        STATUS_UNSPECIFIED: Status not specified.
+        WAITING: Verification is waiting.
+        IN_PROGRESS: Verification is in progress.
+        VERIFIED: TFN has been verified.
+        REJECTED: TFN has been rejected.
+x-explorer-enabled: false
+x-samples-languages:
+  - curl
+  - java
+  - csharp
+  - node
+  - php
+x-original-swagger-version: '2.0'

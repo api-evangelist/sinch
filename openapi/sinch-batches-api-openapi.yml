@@ -1,13 +1,24 @@
 openapi: 3.2.0
 info:
-  title: Sinch SMS Batches API
-  description: The Sinch SMS API enables developers to send and receive SMS messages globally at scale. It supports batch messaging with scheduled delivery, message templates, delivery reports, and inbound message handling via webhooks. The API provides group management for organizing recipients, automatic message encoding optimization, and supports both transactional and marketing use cases across carriers worldwide.
-  version: '1.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
+  title: Sinch Batches API
   termsOfService: https://www.sinch.com/terms-of-service/
+  x-refined-note:
+  - x-sinch-standards-version differs across the merged source definitions and was not carried
+  version: '1.0'
+  description: 'Operations tagged Batches across 3 of this provider''s published API definitions: sinch-voice-api-v2-openapi.yaml, original-sinch-sms-openapi.yml, sinch-voice-api-v2-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
+- url: https://voice.api.sinch.com
+  description: Endpoint which enables consuming the Voice API globally - Redirected by Sinch to the closest region.
+- url: https://us1.voice.api.sinch.com
+  description: North America 1 - East
+- url: https://br1.voice.api.sinch.com
+  description: South America 1 - East
+- url: https://eu1.voice.api.sinch.com
+  description: Europe 1 - Central
+- url: https://sg1.voice.api.sinch.com
+  description: Asia Pacific 1 - Southeast
+- url: https://au1.voice.api.sinch.com
+  description: Australia & Oceania 1 - Southeast
 - url: https://us.sms.api.sinch.com
   description: US Production Server
 - url: https://eu.sms.api.sinch.com
@@ -18,12 +29,167 @@ servers:
   description: Brazil Production Server
 - url: https://ca.sms.api.sinch.com
   description: Canada Production Server
-security:
-- bearerAuth: []
 tags:
 - name: Batches
-  description: Batches are sets of SMS messages. You can send a single message or many messages at once. Batches are queued and sent at the rate limit in first-in-first-out order.
+  description: A batch represents a group of call sessions initiated together as a single operation.
 paths:
+  /v2/projects/{projectId}/batches/{batchId}:
+    delete:
+      tags:
+      - Batches
+      summary: Stop processing a batch of call sessions
+      description: Stop processing a batch of call sessions. This will prevent any queued calls in the batch from being initiated. Calls that are already in progress will not be affected and will continue until completion.
+      operationId: stopBatchProcessing
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/batchId'
+      responses:
+        '202':
+          description: Batch call processing cancellation received.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/batchStopResponse'
+              example:
+                result: STOP_REQUESTED
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      x-codeSamples:
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\n\nfrom dotenv import load_dotenv\n\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n)\n\n# The ID of the batch call operation to stop\nbatch_id = \"BATCH_ID\"\n\nresponse = sinch_client.voice.v2.batches.stop(batch_id=batch_id)\n\nprint(f\"Batch processing cancellation result: {response.result}\")\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ID of the batch to stop processing\n  const batchId = 'BATCH_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.voice.v2.batches.stop({\n      batchId,\n    });\n    console.log(`✅ Successfully requested stop for the batch call with ID ${batchId}.`);\n    console.log(`Response:\\n${JSON.stringify(response, null, 2)}`);\n  } catch (err) {\n    console.error(`❌ Failed to stop the batch call with ID ${batchId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - SinchOAuth2: []
+    get:
+      tags:
+      - Batches
+      summary: Get a batch summary
+      description: Retrieve a summary of a batch call operation, including statistics on completed, failed, in-progress, and queued calls. This provides an overview of the batch execution state and individual call session states.
+      operationId: getBatchCallSummary
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/batchId'
+      responses:
+        '200':
+          description: A batch call summary
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/batchSummary'
+              example:
+                batchId: 01BX5ZZKBKACTAV9WEVGEMMVRC
+                sessionCount: 3
+                queued: 1
+                inProgress: 1
+                completed: 1
+                expired: 0
+                requestedCps: 10
+                ttlSeconds: 3600
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      x-codeSamples:
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\n\nfrom dotenv import load_dotenv\n\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n)\n\n# The ID of the batch\nbatch_id = \"BATCH_ID\"\n\nresponse = sinch_client.voice.v2.batches.get(batch_id=batch_id)\n\nprint(f\"Successfully retrieved batch call summary.\\n{response}\")\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ID of the batch to get a summary for\n  const batchId = 'BATCH_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.voice.v2.batches.get({\n      batchId,\n    });\n    console.log(`✅ Successfully retrieved the summary for the batch call with ID ${batchId}.`);\n    console.log(`Response:\\n${JSON.stringify(response, null, 2)}`);\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the summary for the batch call with ID ${batchId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - SinchOAuth2: []
+    servers:
+    - url: https://voice.api.sinch.com
+      description: Endpoint which enables consuming the Voice API globally - Redirected by Sinch to the closest region.
+    - url: https://us1.voice.api.sinch.com
+      description: North America 1 - East
+    - url: https://br1.voice.api.sinch.com
+      description: South America 1 - East
+    - url: https://eu1.voice.api.sinch.com
+      description: Europe 1 - Central
+    - url: https://sg1.voice.api.sinch.com
+      description: Asia Pacific 1 - Southeast
+    - url: https://au1.voice.api.sinch.com
+      description: Australia & Oceania 1 - Southeast
+  /v2/projects/{projectId}/batches/{batchId}/details:
+    get:
+      tags:
+      - Batches
+      summary: Get batch details
+      description: 'Retrieve per-session details for a batch call operation, including the current state of each call session in the batch.
+
+        Use this endpoint when individual session-level visibility is needed (for example, to inspect which sessions are `QUEUED`, `IN_PROGRESS` or `COMPLETED`). `EXPIRED` sessions are never returned because they were never initiated.'
+      operationId: getBatchDetails
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/batchId'
+      responses:
+        '200':
+          description: Batch details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/batchDetails'
+              example:
+                sessions:
+                - id: 01F8Z5J4X2G9Y3J4X2G9Y3J4X2G9
+                  state: COMPLETED
+                - id: 01F8Z5J4X2G9Y3J4X2G9Y3J4X5YJ
+                  state: IN_PROGRESS
+                - id: 01F8Z5J4X2G9Y3J4X2G9Y3J4X9QK
+                  state: QUEUED
+        '400':
+          $ref: '#/components/responses/400'
+        '401':
+          $ref: '#/components/responses/401'
+        '403':
+          $ref: '#/components/responses/403'
+        '404':
+          $ref: '#/components/responses/404'
+        '429':
+          $ref: '#/components/responses/429'
+        '500':
+          $ref: '#/components/responses/500'
+      x-codeSamples:
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\n\nfrom dotenv import load_dotenv\n\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n)\n\n# The ID of the batch\nbatch_id = \"BATCH_ID\"\n\nresponse = sinch_client.voice.v2.batches.get_details(batch_id=batch_id)\n\nprint(f\"Successfully retrieved batch details.\\n{response}\")\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ID of the batch to get details for\n  const batchId = 'BATCH_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.voice.v2.batches.getDetails({\n      batchId,\n    });\n    console.log(`✅ Successfully retrieved the details for the batch call with ID ${batchId}.`);\n    console.log(`Response:\\n${JSON.stringify(response, null, 2)}`);\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the details for the batch call with ID ${batchId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - BasicAuth: []
+      - SinchOAuth2: []
+    servers:
+    - url: https://voice.api.sinch.com
+      description: Endpoint which enables consuming the Voice API globally - Redirected by Sinch to the closest region.
+    - url: https://us1.voice.api.sinch.com
+      description: North America 1 - East
+    - url: https://br1.voice.api.sinch.com
+      description: South America 1 - East
+    - url: https://eu1.voice.api.sinch.com
+      description: Europe 1 - Central
+    - url: https://sg1.voice.api.sinch.com
+      description: Asia Pacific 1 - Southeast
+    - url: https://au1.voice.api.sinch.com
+      description: Australia & Oceania 1 - Southeast
   /xms/v1/{service_plan_id}/batches:
     post:
       operationId: sendBatch
@@ -50,6 +216,8 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
     get:
       operationId: listBatches
       summary: List Batches
@@ -92,6 +260,19 @@ paths:
                 $ref: '#/components/schemas/BatchList'
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://us.sms.api.sinch.com
+      description: US Production Server
+    - url: https://eu.sms.api.sinch.com
+      description: EU Production Server
+    - url: https://au.sms.api.sinch.com
+      description: Australia Production Server
+    - url: https://br.sms.api.sinch.com
+      description: Brazil Production Server
+    - url: https://ca.sms.api.sinch.com
+      description: Canada Production Server
   /xms/v1/{service_plan_id}/batches/{batch_id}:
     get:
       operationId: getBatch
@@ -113,6 +294,8 @@ paths:
           description: Unauthorized
         '404':
           description: Batch not found
+      security:
+      - bearerAuth: []
     post:
       operationId: updateBatch
       summary: Update a Batch
@@ -139,6 +322,19 @@ paths:
           description: Unauthorized
         '404':
           description: Batch not found
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://us.sms.api.sinch.com
+      description: US Production Server
+    - url: https://eu.sms.api.sinch.com
+      description: EU Production Server
+    - url: https://au.sms.api.sinch.com
+      description: Australia Production Server
+    - url: https://br.sms.api.sinch.com
+      description: Brazil Production Server
+    - url: https://ca.sms.api.sinch.com
+      description: Canada Production Server
   /xms/v1/{service_plan_id}/batches/{batch_id}/cancel:
     put:
       operationId: cancelBatch
@@ -160,6 +356,19 @@ paths:
           description: Unauthorized
         '404':
           description: Batch not found
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://us.sms.api.sinch.com
+      description: US Production Server
+    - url: https://eu.sms.api.sinch.com
+      description: EU Production Server
+    - url: https://au.sms.api.sinch.com
+      description: Australia Production Server
+    - url: https://br.sms.api.sinch.com
+      description: Brazil Production Server
+    - url: https://ca.sms.api.sinch.com
+      description: Canada Production Server
   /xms/v1/{service_plan_id}/batches/{batch_id}/dry_run:
     post:
       operationId: dryRunBatch
@@ -179,62 +388,262 @@ paths:
                 $ref: '#/components/schemas/DryRunResponse'
         '401':
           description: Unauthorized
+      security:
+      - bearerAuth: []
+    servers:
+    - url: https://us.sms.api.sinch.com
+      description: US Production Server
+    - url: https://eu.sms.api.sinch.com
+      description: EU Production Server
+    - url: https://au.sms.api.sinch.com
+      description: Australia Production Server
+    - url: https://br.sms.api.sinch.com
+      description: Brazil Production Server
+    - url: https://ca.sms.api.sinch.com
+      description: Canada Production Server
 components:
   schemas:
-    UpdateBatchRequest:
+    unauthorized:
+      title: Unauthorized
+      description: Returned when authentication fails — the token is missing, invalid, or expired.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/unauthorized
+          title:
+            const: Unauthorized
+          detail:
+            example: The token is missing, invalid, or has expired.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
+    problemDetails:
+      title: Problem Details
+      description: Base error response schema following [RFC 9457](https://www.rfc-editor.org/rfc/rfc9457) (Problem Details for HTTP APIs). All error responses use this structure.
+      x-category: response
+      x-usage: http-response
       type: object
+      additionalProperties: false
+      required:
+      - type
+      - title
+      - detail
+      - instance
       properties:
-        to_add:
-          type: array
-          description: Phone numbers to add to the batch
-          items:
-            type: string
-        to_remove:
-          type: array
-          description: Phone numbers to remove from the batch
-          items:
-            type: string
-        from:
+        type:
           type: string
-          description: Updated sender number
-        body:
+          description: URI that identifies the problem type and links to the corresponding error documentation.
+        title:
           type: string
-          description: Updated message body
-        delivery_report:
+          description: Human-readable short summary of the problem type.
+        detail:
           type: string
+          description: Human-readable explanation of the specific problem occurrence.
+        instance:
+          type: string
+          description: URI reference that identifies the specific occurrence of the problem (typically the request path).
+    sessionStates:
+      title: Session States
+      description: The state of the current session. Sessions can either be in a "transitional" or "final" state.  Sessions in a transitional state are ongoing. Sessions in a final state have will not send any  more events.
+      readOnly: true
+      type: string
+      enum:
+      - QUEUED
+      - IN_PROGRESS
+      - COMPLETED
+      - EXPIRED
+      x-enumDescriptions:
+        QUEUED: The session is queued, no calls have been initiated for this session. This is a transitional state.
+        IN_PROGRESS: At least one call has been initiated or received for this session. This is a transitional state.
+        COMPLETED: The session was completed. This is a final state.
+        EXPIRED: The call session was not initiated before the batch time-to-live (TTL) elapsed. This is a final state.
+      examples:
+      - COMPLETED
+    batchStopResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        result:
+          type: string
+          description: State of the batch processing cancellation request
           enum:
-          - none
-          - summary
-          - full
-          - per_recipient
-          description: Updated delivery report type
-    DryRunResponse:
+          - STOP_REQUESTED
+          x-enumDescriptions:
+            STOP_REQUESTED: Batch call processing cancellation requested. No new calls will be initiated.
+    projectId:
+      title: Project ID
+      type: string
+      format: uuid
+      description: The `Id` of the project associated with the call.
+      examples:
+      - 5c5bf2b1-35ae-4825-ab89-457e07bb60e6
+    notFound:
+      title: Not Found
+      description: Returned when the requested resource does not exist.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/not-found
+          title:
+            const: Not Found
+          detail:
+            example: The requested resource was not found.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
+    batchId:
+      title: Batch ID
+      type: string
+      format: ulid
+      description: The ID of the batch.
+      examples:
+      - 01BX5ZZKBKACTAV9WEVGEMMVRC
+    badRequest:
+      title: Bad Request
+      description: Returned when the request is malformed or contains invalid parameters.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/bad-request
+          title:
+            const: Bad Request
+          detail:
+            example: The request body is invalid or malformed.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
+    batchSummary:
+      title: Batch Summary
+      description: Summary of a batch call operation, including counts of call sessions by state and overall progress.
       type: object
+      additionalProperties: false
+      required:
+      - batchId
+      - sessionCount
+      - queued
+      - inProgress
+      - completed
+      - expired
+      - requestedCps
       properties:
-        number_of_recipients:
+        batchId:
+          type: string
+          format: ulid
+          description: 'Unique identifier of the batch call operation (ULID).
+
+            Use this value to retrieve the batch details ([GET] `/v2/projects/{projectId}/batches/{batchId}/details`) or stop processing ([DELETE] `/v2/projects/{projectId}/batches/{batchId}`).'
+        sessionCount:
           type: integer
-          description: The estimated number of recipients
-        number_of_messages:
+          example: 100
+          description: Total number of call sessions requested in this batch.
+        endTime:
+          type: string
+          format: date-time
+          description: 'Timestamp (RFC 3339) when the batch finished processing (all call sessions reached a final state). Returns
+
+
+            Omitted if the batch is still in progress or has not completed yet.'
+        queued:
           type: integer
-          description: The estimated number of messages
-        per_recipient:
+          example: 5
+          description: Number of call sessions that are queued and waiting to be initiated (not yet in progress).
+        inProgress:
+          type: integer
+          example: 2
+          description: Number of call sessions that are in progress.
+        completed:
+          type: integer
+          example: 93
+          description: Number of call sessions that have completed successfully.
+        expired:
+          type: integer
+          example: 0
+          description: Number of queued call sessions that were not initiated before the batch TTL (`ttlSeconds`) elapsed and therefore expired.
+        ttlSeconds:
+          type: integer
+          description: 'Batch time-to-live (TTL) in seconds. The maximum amount of time the platform will keep attempting to start queued call sessions in this batch.
+
+            When the TTL expires, any call sessions that have not yet been initiated will stop being processed (calls already in progress are not affected).'
+          example: 10800
+        requestedCps:
+          type: integer
+          example: 10
+          description: 'Requested maximum call initiation rate, in calls per second (CPS), for this batch.
+
+            Actual CPS may be lower depending on routing, carrier, and platform capacity, as well as account limitations.'
+    forbidden:
+      title: Forbidden
+      description: Returned when the authenticated identity does not have permission to perform the requested operation.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/forbidden
+          title:
+            const: Forbidden
+          detail:
+            example: The request was rejected.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
+    batchDetails:
+      title: Batch details
+      description: Detailed per-session view of a batch call operation. Contains one entry for each call session in the batch, including the session identifier and its current execution state.
+      type: object
+      additionalProperties: false
+      required:
+      - sessions
+      properties:
+        sessions:
           type: array
-          description: Per-recipient details
           items:
             type: object
+            additionalProperties: false
             properties:
-              recipient:
+              id:
                 type: string
-                description: The recipient phone number
-              number_of_parts:
-                type: integer
-                description: The number of message parts
-              body:
-                type: string
-                description: The rendered message body
-              encoding:
-                type: string
-                description: The message encoding
+                format: ulid
+                description: Unique identifier of the call session within the batch. This identifies the session, not an individual call. Use it with  `/v2/projects/{projectId}/sessions/{sessionId}` to retrieve full session details.
+              state:
+                $ref: '#/components/schemas/sessionStates'
+          examples:
+          - - id: 01F8Z5J4X2G9Y3J4X2G9Y3J4X2G9
+              state: COMPLETED
+            - id: 01F8Z5J4X2G9Y3J4X2G9Y3J4X5YJ
+              state: IN_PROGRESS
+    tooManyRequests:
+      title: Too Many Requests
+      description: Returned when the request rate limit has been exceeded. Retry after the duration indicated in the `Retry-After` response header.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/too-many-requests
+          title:
+            const: Too Many Requests
+          detail:
+            example: Rate limit exceeded. Please slow down your request rate and retry after the indicated period.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls
+    internalServerError:
+      title: Internal Server Error
+      description: Returned when an unexpected error occurs on the server.
+      allOf:
+      - $ref: '#/components/schemas/problemDetails'
+      - type: object
+        properties:
+          type:
+            const: https://api.sinch.com/docs/errors/internal-server-error
+          title:
+            const: Internal Server Error
+          detail:
+            example: An unexpected error occurred on the server.
+          instance:
+            example: /v2/projects/5c5bf2b1-35ae-4825-ab89-457e07bb60e6/calls/01ARZ3NDEKTSV4RRFFQ69G5FAA
     SendBatchRequest:
       type: object
       required:
@@ -290,6 +699,33 @@ components:
             type: object
             additionalProperties:
               type: string
+    DryRunResponse:
+      type: object
+      properties:
+        number_of_recipients:
+          type: integer
+          description: The estimated number of recipients
+        number_of_messages:
+          type: integer
+          description: The estimated number of messages
+        per_recipient:
+          type: array
+          description: Per-recipient details
+          items:
+            type: object
+            properties:
+              recipient:
+                type: string
+                description: The recipient phone number
+              number_of_parts:
+                type: integer
+                description: The number of message parts
+              body:
+                type: string
+                description: The rendered message body
+              encoding:
+                type: string
+                description: The message encoding
     Batch:
       type: object
       properties:
@@ -349,14 +785,98 @@ components:
           description: List of batch objects
           items:
             $ref: '#/components/schemas/Batch'
+    UpdateBatchRequest:
+      type: object
+      properties:
+        to_add:
+          type: array
+          description: Phone numbers to add to the batch
+          items:
+            type: string
+        to_remove:
+          type: array
+          description: Phone numbers to remove from the batch
+          items:
+            type: string
+        from:
+          type: string
+          description: Updated sender number
+        body:
+          type: string
+          description: Updated message body
+        delivery_report:
+          type: string
+          enum:
+          - none
+          - summary
+          - full
+          - per_recipient
+          description: Updated delivery report type
+  responses:
+    '400':
+      description: Invalid request parameters.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/badRequest'
+    '404':
+      description: Resource not found.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/notFound'
+    '500':
+      description: Internal server error occurred.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/internalServerError'
+    '403':
+      description: Forbidden.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/forbidden'
+    '401':
+      description: Authentication failed — token missing, invalid, or expired.
+      headers:
+        WWW-Authenticate:
+          description: RFC 7235 challenge. Indicates the required authentication scheme and, for expired tokens, provides an error hint.
+          schema:
+            type: string
+            example: Bearer realm="sinch", error="invalid_token", error_description="Token has expired"
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/unauthorized'
+    '429':
+      description: Too many requests — rate limit exceeded.
+      headers:
+        Retry-After:
+          description: Number of seconds to wait before retrying the request.
+          required: false
+          schema:
+            type: integer
+            example: 60
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/tooManyRequests'
   parameters:
-    ServicePlanId:
-      name: service_plan_id
+    batchId:
+      name: batchId
+      description: The ID of the batch.
       in: path
       required: true
-      description: The unique identifier for the service plan
       schema:
-        type: string
+        $ref: '#/components/schemas/batchId'
+    projectId:
+      name: projectId
+      description: The ID of the project.
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/projectId'
     BatchId:
       name: batch_id
       in: path
@@ -364,7 +884,57 @@ components:
       description: The unique identifier for the batch
       schema:
         type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
+      schema:
+        type: string
   securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: 'Use HTTP Basic authentication.
+
+
+        - **Username**: the **Access Key ID**
+
+        - **Password**: the **Access Key Secret**
+
+
+        Send credentials in the `Authorization` header:
+
+
+        `Authorization: Basic <base64(AccessKeyId:AccessKeySecret)>`
+
+
+        Create and manage access keys in the Dashboard:
+
+        https://dashboard.sinch.com/settings/access-keys'
+    SinchOAuth2:
+      type: oauth2
+      description: 'OAuth 2.0 **Client Credentials** grant (recommended for production).
+
+
+        Exchange the **Access Key ID** (`client_id`) and **Access Key Secret**
+
+        (`client_secret`) for a short-lived Bearer token.
+
+
+        Tokens typically expire after **3600 seconds**. When the token expires,
+
+        request a new one using the same `tokenUrl`. There is no separate
+
+        refresh token in the client credentials flow — simply re-authenticate.
+
+
+        Access keys are managed in the Dashboard: https://dashboard.sinch.com/settings/access-keys'
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          refreshUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
     bearerAuth:
       type: http
       scheme: bearer
@@ -372,3 +942,15 @@ components:
 externalDocs:
   description: Sinch SMS API Documentation
   url: https://developers.sinch.com/docs/sms
+x-refined-from:
+- sinch-voice-api-v2-openapi.yaml
+- original-sinch-sms-openapi.yml
+- sinch-voice-api-v2-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

@@ -1,0 +1,155 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-service-schema.json",
+  "title": "Service",
+  "description": "You can use the default created service, or create multiple services within the same project to have different default behavior for all your different faxing use cases.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-fax-api-openapi.yml#/components/schemas/Service",
+  "type": "object",
+  "properties": {
+    "id": {
+      "$ref": "#/$defs/ServiceId"
+    },
+    "name": {
+      "type": "string",
+      "description": "A friendly name for the service. Maximum is 60 characters.",
+      "default": "Default service"
+    },
+    "incomingWebhookUrl": {
+      "type": "string",
+      "x-version": 1,
+      "description": "The URL to which Sinch will post when someone sends a fax to your Sinch number. To accept incoming faxes this must be set and your Sinch phone number must be configured to receive faxes.\n\nNote: If a webhook uses basicauth credentials, when the webhook URL is retrieved those credentials are masked. It is not possible to retrieve previously-set credentials through the API. ",
+      "readOnly": false
+    },
+    "webhookContentType": {
+      "description": "The content type of the webhook.",
+      "type": "string",
+      "default": "multipart/form-data",
+      "enum": [
+        "multipart/form-data",
+        "application/json"
+      ],
+      "x-enumDescriptions": {
+        "multipart/form-data": "The webhook will be sent as a multipart/form-data request. Files are sent as attachments to the body.",
+        "application/json": "The webhook will be sent as a JSON request. Files are sent as base64 encoded strings in the JSON object."
+      }
+    },
+    "defaultForProject": {
+      "x-version": 1,
+      "type": "boolean",
+      "format": "string",
+      "description": "If set to true this is the service used to create faxes when no serviceId is specified in the API endpoints.",
+      "default": false,
+      "x-internal": "When an account and project is created, a default service for Voice should be created, and the test number should be assigned to this service"
+    },
+    "defaultFrom": {
+      "x-version": 1,
+      "type": "string",
+      "description": "One of your Sinch numbers connected to this service or any of your verified numbers."
+    },
+    "numberOfRetries": {
+      "type": "integer",
+      "description": "The number of times to retry sending a fax if it fails. Default is 3. Maximum is 5.",
+      "default": 3
+    },
+    "retryDelaySeconds": {
+      "description": "The number of seconds to wait between retries if the fax is not yet completed.",
+      "type": "integer",
+      "minimum": 30,
+      "maximum": 300,
+      "default": 60
+    },
+    "imageConversionMethod": {
+      "$ref": "#/$defs/ImageConversionMethod"
+    },
+    "coverPageId": {
+      "type": "string",
+      "format": "ulid",
+      "description": "If a value it will always add that cover page id to outbound faxes",
+      "x-internal": "in ui this will be a select list of the pages on the service"
+    },
+    "saveOutboundFaxDocuments": {
+      "description": "Save fax documents with Sinch when you send faxes. Fax records are retained for 13 months. Records older than 13 months are deleted.",
+      "type": "boolean",
+      "default": true
+    },
+    "saveInboundFaxDocuments": {
+      "description": "Save fax documents with Sinch when you receive faxes. Fax records are retained for 13 months. Records older than 13 months are deleted.",
+      "type": "boolean",
+      "default": true
+    },
+    "scanIncomingBarcodes": {
+      "type": "boolean",
+      "description": "If set to true, barcodes will be detected on incoming faxes.",
+      "default": false
+    },
+    "inProgressNotifications": {
+      "type": "boolean",
+      "description": "If set to `true`, you will receive a webhook notification for each page sent on an outbound fax.",
+      "default": false
+    },
+    "projectId": {
+      "$ref": "#/$defs/ProjectId",
+      "readOnly": true
+    },
+    "resolution": {
+      "$ref": "#/$defs/Resolution"
+    },
+    "createdAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "The date and time the service was created."
+    },
+    "updatedAt": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "The date and time the service was last updated."
+    }
+  },
+  "$defs": {
+    "ImageConversionMethod": {
+      "type": "string",
+      "description": "Determines how documents are converted to black and white on OUTBOUND faxes only.  Image conversion is not done on INBOUND faxes. Defaults to value selected on Fax Service object.",
+      "enum": [
+        "HALFTONE",
+        "MONOCHROME"
+      ],
+      "x-enumDescriptions": {
+        "HALFTONE": "Converts the image to halftone.",
+        "MONOCHROME": "Converts the image to monochrome."
+      },
+      "default": "HALFTONE"
+    },
+    "ProjectId": {
+      "type": "string",
+      "x-PII": false,
+      "x-v1": false,
+      "description": "The `Id` of the project associated with the call.",
+      "x-Internal": "to support future account keys",
+      "readOnly": true
+    },
+    "Resolution": {
+      "type": "string",
+      "description": "The resolution for the fax. If this is set at the service, this applies to all faxes sent using that service. If this is set on the fax, this will override the service setting.",
+      "enum": [
+        "FINE",
+        "SUPERFINE"
+      ],
+      "x-enumDescriptions": {
+        "FINE": "Most commonly accepted fax resolution at 200 dpi.",
+        "SUPERFINE": "Higher but less commonly accepted fax resolution at 400 dpi. May be required when sending small text or detailed images."
+      }
+    },
+    "ServiceId": {
+      "x-PII": false,
+      "x-v1": true,
+      "readOnly": true,
+      "type": "string",
+      "description": "ID of the fax service used."
+    }
+  }
+}

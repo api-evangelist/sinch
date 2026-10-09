@@ -1,0 +1,141 @@
+generated: '2026-10-08'
+method: probed
+source: https://developers.sinch.com/.well-known/agent-card.json (names the MCP URL); POST https://developers.sinch.com/mcp
+  initialize + tools/list on 2026-10-08 (200, text/event-stream, serverInfo "Sinch Docs" 2026-10-08, protocolVersion 2025-06-18);
+  https://registry.npmjs.org/@sinch/mcp README (documented tool table for the local server)
+name: Sinch MCP servers
+status: published
+description: 'Sinch ships two MCP surfaces. (1) A REMOTE documentation server at https://developers.sinch.com/mcp, announced
+  by the developer portal agent card and reachable anonymously: it exposes two meta-tools (describe-tools, execute) that run
+  JavaScript against documentation tools (API discovery, endpoint details, security schemes, full-text search) — it reads
+  the docs, it does not call the Sinch APIs. (2) A LOCAL stdio server, @sinch/mcp on npm (developer preview, 0.0.1-alpha.6,
+  2026-04-14; source github.com/sinch/sinch-mcp-server), whose 25 documented tools send messages, emails, verifications and
+  calls and manage numbers against the live Sinch and Mailgun APIs with the user''s own credentials.'
+deployment:
+  mode: both
+  endpoint: https://developers.sinch.com/mcp
+  install: npx -y @sinch/mcp
+  package: https://www.npmjs.com/package/@sinch/mcp
+  auth: none
+  verified: probed
+  note: endpoint auth is none (anonymous initialize/tools/list returned 200); the local server needs PROJECT_ID + access key,
+    APPLICATION_KEY/secret and MAILGUN_API_KEY env vars per its README. GET on the endpoint returns 405 with the instruction
+    to register the URL in an MCP client. The install line is the README's Claude Desktop config (command npx, args -y @sinch/mcp)
+    rendered as a shell command.
+remote_server:
+  endpoint: https://developers.sinch.com/mcp
+  transport: streamable-http (text/event-stream responses)
+  protocol_version: '2025-06-18'
+  server_info:
+    name: Sinch Docs
+    version: '2026-10-08'
+  tools:
+  - name: execute
+    title: Execute code
+    description: 'Run JavaScript in a sandbox against the documentation tools on the global `tools` object.
+
+      The only extra global is `tools` - there is no `fetch`, `console`, `setTimeout`, `require`, or Node.js API; all I/O
+      goes through `tools`.
+
+
+      Workflow - minimize round-trips; one `describe-tools` call plus one `ex'
+  - name: describe-tools
+    title: Describe tools
+    description: 'Get the exact TypeScript signatures of the sandbox tools available to `execute`.
+
+      Analyze the user request first, then pass `tools` with only the tool names the request needs (every name is listed in
+      this input schema / description); omit `tools` only when you cannot tell which tools apply.
+
+      Always ca'
+  tools_list_verbatim: mcp/sinch-docs-mcp-tools-list.json
+  agent_card: https://developers.sinch.com/.well-known/agent-card.json
+local_server:
+  package: '@sinch/mcp'
+  version: 0.0.1-alpha.6
+  published: '2026-04-14'
+  repository: https://github.com/sinch/sinch-mcp-server
+  license: Apache-2.0
+  transport: stdio
+  documented_tools_source: https://www.npmjs.com/package/@sinch/mcp (README tool tables; names as PUBLISHED, not observed
+    from a live server)
+  tools:
+  - name: send-text-message
+    category: Conversation Tools
+    description: Send a plain text message to a recipient on a supported channel.
+  - name: send-media-message
+    category: Conversation Tools
+    description: Send an image, video, or document via a media message.
+  - name: send-template-message
+    category: Conversation Tools
+    description: Send a message using a predefined template (omni-template only).
+  - name: send-whatsapp-template-message
+    category: Conversation Tools
+    description: Send a message using a predefined WhatsApp template.
+  - name: send-choice-message
+    category: Conversation Tools
+    description: Send a message that includes interactive choices (buttons or quick replies).
+  - name: send-location-message
+    category: Conversation Tools
+    description: Send a location pin or coordinates to a user.
+  - name: list-conversation-apps
+    category: Conversation Tools
+    description: List all configured Conversation apps in the Sinch account.
+  - name: list-messaging-templates
+    category: Conversation Tools
+    description: List all omni-channel and channel-specific message templates.
+  - name: send-email
+    category: Email tools (Mailgun)
+    description: Send an email using a predefined HTML template or raw HTML/text content.
+  - name: list-email-templates
+    category: Email tools (Mailgun)
+    description: List all email templates available for a specific domain.
+  - name: retrieve-email-info
+    category: Email tools (Mailgun)
+    description: Retrieve metadata, content and delivery status for a specific email message.
+  - name: list-email-events
+    category: Email tools (Mailgun)
+    description: Retrieve and group recent email delivery events, such as bounces, opens, or clicks.
+  - name: analytics-metrics
+    category: Email tools (Mailgun)
+    description: Retrieve email analytics metrics, such as open rates or click-through rates.
+  - name: number-lookup
+    category: Verification Tools
+    description: Lookup a phone number for its status and capabilities.
+  - name: start-sms-verification
+    category: Verification Tools
+    description: Initiate an SMS verification by sending an OTP to a user's phone number.
+  - name: report-sms-verification
+    category: Verification Tools
+    description: Submit a one-time password (OTP) to complete SMS verification.
+  - name: tts-callout
+    category: Voice Tools
+    description: Place a voice call and read aloud a message using Text-to-Speech.
+  - name: conference-callout
+    category: Voice Tools
+    description: Start a voice call to one or more participants and connect them to a shared conference.
+  - name: manage-conference-participant
+    category: Voice Tools
+    description: Mute, unmute, hold, or resume an individual participant in a conference call.
+  - name: close-conference
+    category: Voice Tools
+    description: End a conference call by disconnecting all the participants using the ID of the conference.
+  - name: list-available-regions
+    category: Numbers Tools
+    description: List all regions where phone numbers are available for the project. Can filter by number type (MOBILE, LOCAL,
+      TOLL_FREE)
+  - name: list-rented-numbers
+    category: Numbers Tools
+    description: List all active (rented) phone numbers for the project. Can filter by region, type, pattern, and capability.
+  - name: search-for-available-numbers
+    category: Numbers Tools
+    description: Search for phone numbers available to rent, with filters for region, type, pattern, and capabilities.
+  - name: rent-sinch-virtual-numbers
+    category: Numbers Tools
+    description: Rent (activate) one or more phone numbers by providing them in E.164 format.
+  - name: sinch-mcp-configuration
+    category: Configuration Tools
+    description: List all available tools in the Sinch MCP server and their status. If a tool is disabled, it will display
+      the reason why
+tool_count:
+  remote: 2
+  local_documented: 25

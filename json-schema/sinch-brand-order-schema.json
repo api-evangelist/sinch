@@ -1,0 +1,213 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-brand-order-schema.json",
+  "title": "BrandOrder",
+  "description": "A brand order created for a brand and a specific process metadata.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-compliance-brands-api-openapi.yml#/components/schemas/BrandOrder",
+  "type": "object",
+  "properties": {
+    "brandOrderId": {
+      "description": "The unique identifier for the brand order.",
+      "type": "string",
+      "readOnly": true
+    },
+    "brandId": {
+      "description": "Brand ID this Order belongs to.",
+      "type": "string",
+      "readOnly": true
+    },
+    "status": {
+      "description": "Brand order status represents the current state of the brand order in the system. When a brand order is created, it is in NEW status. After that, it can be moved to PENDING status when the validation process starts, then it can be moved to REJECTED or INCOMPLETE if the validation process fails, or to COMPLETED if the validation process is successful. When a brand order is in INCOMPLETE status, customer can update the brand/brand order. Updating the brand order moves the brand order to PENDING_REVIEW state, what means that is waiting for another review after the customer changes. Finally, a brand order can be moved to ARCHIVED status after a cancellation.",
+      "$ref": "#/$defs/BrandOrderStatus",
+      "readOnly": true
+    },
+    "metadataName": {
+      "description": "Metadata name of the brand order, which identifies the type of the order and the process it follows. This field is useful to quickly check the type of the order without having to call the Get Brand Order endpoint.",
+      "$ref": "#/$defs/BrandOrderMetadata",
+      "readOnly": true
+    },
+    "logs": {
+      "description": "Detailed history of the status changes this brand went through",
+      "items": {
+        "$ref": "#/$defs/BrandOrderLog"
+      },
+      "type": "array",
+      "readOnly": true
+    },
+    "channels": {
+      "description": "Channels available for this Brand Order",
+      "items": {
+        "$ref": "#/$defs/Channel"
+      },
+      "type": "array",
+      "readOnly": true
+    },
+    "thirdPartyMetadata": {
+      "description": "Third party metadata available for this Brand Order",
+      "items": {
+        "$ref": "#/$defs/ThirdPartyElement"
+      },
+      "type": "array",
+      "readOnly": true
+    },
+    "pricing": {
+      "description": "Includes details of the fee associated with the process to be carried out. For more information about pricing, you may consult your Account Manager or the Sinch Customer Dashboard.",
+      "$ref": "#/$defs/Money",
+      "readOnly": true
+    },
+    "callbackUrl": {
+      "description": "The URL to receive the order status update callback. The URL must be a valid URL and must be reachable from Sinch.",
+      "type": "string",
+      "format": "uri"
+    },
+    "createTime": {
+      "description": "Create time of the request. ISO date time format in UTC.",
+      "type": "string",
+      "readOnly": true,
+      "format": "date-time"
+    },
+    "updateTime": {
+      "description": "Update time of the request. ISO date time format in UTC.",
+      "type": "string",
+      "readOnly": true,
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "BrandOrderLog": {
+      "description": "A log entry for a brand order, which contains details of the brand order status update or new channel added. It can contain information provided by the agent handling the request.",
+      "properties": {
+        "createTime": {
+          "description": "Create time of this log entry. ISO date time format in UTC.",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "message": {
+          "description": "Optional message with details of the brand status update or new channel added. It can contain information provided by the agent handling the request.",
+          "type": "string"
+        },
+        "brandCurrentState": {
+          "description": "State of the order after this entry was created",
+          "$ref": "#/$defs/BrandOrderStatus",
+          "readOnly": true
+        },
+        "brandPreviousState": {
+          "description": "State of the order before this entry was created",
+          "$ref": "#/$defs/BrandOrderStatus",
+          "readOnly": true
+        }
+      },
+      "type": "object"
+    },
+    "BrandOrderMetadata": {
+      "description": "These are the different processes the customers can request to add different channels to the Brand.\n\n**Note:** US_SC_REGISTRY is only used to retrieve existing brand orders. It cannot be used for new ones.",
+      "enum": [
+        "US_SC_REGISTRY",
+        "US_SC_GCH",
+        "US_SC_GCH_CONTENT_PROVIDER",
+        "US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION",
+        "US_10DLC_TCR_PUBLIC_BRAND_REGISTRATION",
+        "US_10DLC_TCR_PRIVATE_BRAND_UPDATE",
+        "US_10DLC_TCR_PUBLIC_BRAND_UPDATE",
+        "US_10DLC_TCR_PRIVATE_MOCK",
+        "US_10DLC_TCR_PUBLIC_MOCK",
+        "US_10DLC_TCR_SOLE_PROPRIETOR",
+        "US_10DLC_TCR_PRIVATE_STANDARD_BRAND_REGISTRATION",
+        "US_10DLC_TCR_PRIVATE_ENHANCED_BRAND_REGISTRATION",
+        "US_10DLC_TCR_PUBLIC_STANDARD_BRAND_REGISTRATION",
+        "US_10DLC_TCR_PUBLIC_ENHANCED_BRAND_REGISTRATION",
+        "US_RCS_TCR_PRIVATE_BRAND_REGISTRATION",
+        "US_RCS_TCR_PUBLIC_BRAND_REGISTRATION",
+        "US_RCS_TCR_UPDATE_ASSETS"
+      ],
+      "x-enumDescriptions": {
+        "US_SC_REGISTRY": "For US Short Code brand verification. This is a legacy manual process that is now disabled and read-only. New registrations are not possible through this process. For new Short Code registrations, please use US_SC_GCH.",
+        "US_SC_GCH": "Unified US Short Code verification process via the US Short Code Registry. The specific process to be applied is automatically determined by the brand's programType field: Standard → standard process, Government → government process, Charitable Organization → charity process, Political → political process. This process is free of charge and, upon successful completion, the SHORT_CODE channel will be granted to the brand.",
+        "US_SC_GCH_CONTENT_PROVIDER": "US Short Code verification process for Content Provider entities. This process internally uses the US Short Code Registry and is free of charge. Upon successful completion, the SHORT_CODE channel will be granted to the content provider.",
+        "US_10DLC_TCR_SOLE_PROPRIETOR": "To register as a Sole Proprietor for 10-Digit Long Code (10DLC) messaging via 10DLC, you can complete the registration process without needing an Employer Identification Number (EIN). Upon initiating the registration, a One-Time Password (OTP) will be automatically sent to the provided mobile number for identity verification, which you must subsequently submit using the endpoint /v1/projects/{projectId}/us/brands/{brandId}/orders/{orderId}/verifyOtp to successfully authorize and finalize the process.",
+        "US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION": "Simple brand registration with 10DLC for private companies to obtain the 10DLC channel in the US. This process does not include vetting. You will receive a TCR ID upon completion (approx. 1 minute). Provides lower throughput and a maximum of 3 numbers. Once completed, this process can be re-requested if any data needs to be modified (there are some fields not allowed for edition: legalCompanyName, entityType, federalTaxId and taxCountry). This process can be initiated again for revetting the brand, in case that critical information needs to be updated: entityType, legalCompanyName, federalTaxId or taxCountry. In this case, the brand will go through the same process as a new registration, with the same time of completion, but keeping the same TCR ID and the history of previous registrations.",
+        "US_10DLC_TCR_PUBLIC_BRAND_REGISTRATION": "Simple brand registration with 10DLC for public companies to obtain the 10DLC channel in the US. This process does not include vetting. You will receive a TCR ID upon completion (approx. 1 minutes). Provides lower throughput and a maximum of 3 numbers. Once completed, this process can be re-requested if any data needs to be modified (there are some fields not allowed for edition: legalCompanyName, entityType, federalTaxId and taxCountry). This process can be initiated again for revetting the brand, in case that critical information needs to be updated: entityType, legalCompanyName, federalTaxId or taxCountry. In this case, the brand will go through the same process as a new registration, with the same time of completion, but keeping the same TCR ID and the history of previous registrations.",
+        "US_10DLC_TCR_PRIVATE_BRAND_UPDATE": "Brand data update process with 10DLC for private companies that already have the 10DLC channel. This process is used to update any brand data that needs to be modified after a successful registration, except for critical information such as entityType, legalCompanyName, federalTaxId or taxCountry. Cost: free. You will receive a confirmation of the update upon completion (approx. 1 minute). This process does not affect the TCR ID, the throughput or the number of phone numbers allowed. Update process cannot be used after standard or enhanced vetting, as the brand needs to be revetted in case of any critical information update.",
+        "US_10DLC_TCR_PUBLIC_BRAND_UPDATE": "Brand data update process with 10DLC for public companies that already have the 10DLC channel. This process is used to update any brand data that needs to be modified after a successful registration, except for critical information such as entityType, legalCompanyName, federalTaxId or taxCountry. Cost: free. You will receive a confirmation of the update upon completion (approx. 1 minute). This process does not affect the TCR ID, the throughput or the number of phone numbers allowed. Update process cannot be used after standard or enhanced vetting, as the brand needs to be revetted in case of any critical information update.",
+        "US_10DLC_TCR_PRIVATE_MOCK": "A free-of-charge mock process for private companies to test the 10DLC integration. Successfully completing this process does not grant the 10DLC channel but serves as a preliminary check to ensure that subsequent paid TCR registrations will be successful.",
+        "US_10DLC_TCR_PUBLIC_MOCK": "A free-of-charge mock process for public companies to test the 10DLC integration. Successfully completing this process does not grant the 10DLC channel but serves as a preliminary check to ensure that subsequent paid TCR registrations will be successful.",
+        "US_10DLC_TCR_PRIVATE_STANDARD_BRAND_REGISTRATION": "Initiates a standard brand registration with 10DLC for a private company, which involves an automated review of compliance history, employee count, and other business metrics. The process, which typically takes 5-10 days, is used to verify the brand and assign a vetting score from 0-100 that determines the brand's throughput level with network carriers. A successful registration provides higher throughput and allows for unlimited campaigns and numbers. Once completed, this process can be re-requested if any data not included in US_TCR_PATCH_BRAND needs to be modified. Once completed, this process can be re-requested if any data needs to be modified (there are some fields not allowed for edition: legalCompanyName, entityType, federalTaxId and taxCountry)",
+        "US_10DLC_TCR_PUBLIC_STANDARD_BRAND_REGISTRATION": "Initiates a standard brand registration with 10DLC for a public company, which involves an automated review of compliance history, employee count, and other business metrics. The process, which typically takes 5-10 days, is used to verify the brand and assign a vetting score from 0-100 that determines the brand's throughput level with network carriers. A successful registration provides higher throughput and allows for unlimited campaigns and numbers. Once completed, this process can be re-requested if any data needs to be modified (there are some fields not allowed for edition: legalCompanyName, entityType, federalTaxId and taxCountry)",
+        "US_10DLC_TCR_PRIVATE_ENHANCED_BRAND_REGISTRATION": "Initiates an enhanced brand registration for a private company, which is recommended if you are dissatisfied with your Standard vet score and believe a more thorough review could yield a higher rating. This process is designed to improve the brand's vetting score and potentially achieve better throughput. Please note that this enhanced vet can only be ordered after a STANDARD registration is complete.",
+        "US_10DLC_TCR_PUBLIC_ENHANCED_BRAND_REGISTRATION": "Initiates an enhanced brand registration for a public company, which is recommended if you are dissatisfied with your Standard vet score and believe a more thorough review could yield a higher rating. This process is designed to improve the brand's vetting score and potentially achieve better throughput. Please note that this enhanced vet can only be ordered after a STANDARD registration is complete.",
+        "US_RCS_TCR_PRIVATE_BRAND_REGISTRATION": "US RCS brand registration process with RCS for private companies. This process is used to verify a private brand for RCS in the US. Upon successful completion, the RCS channel will be granted to the brand.",
+        "US_RCS_TCR_PUBLIC_BRAND_REGISTRATION": "US RCS brand registration process with RCS for public companies. This process is used to verify a public brand for RCS in the US. Upon successful completion, the RCS channel will be granted to the brand.",
+        "US_RCS_TCR_UPDATE_ASSETS": "US RCS asset update process with RCS. This process is used to update the brand assets required for RCS, such as logos or banners, after the brand has already been registered."
+      },
+      "type": "string"
+    },
+    "BrandOrderStatus": {
+      "description": "Brand order status represents the current state of the brand order in the system. When a brand order is created, it is in NEW status. After that, it can be moved to PENDING status when the validation process starts, then it can be moved to REJECTED or INCOMPLETE if the validation process fails, or to COMPLETED if the validation process is successful. When a brand order is in INCOMPLETE status, customer can update the brand/brand order. Updating the brand order moves the brand order to PENDING_REVIEW state, what means that is waiting for another review after the customer changes. Finally, a brand order can be moved to ARCHIVED status after a cancellation.",
+      "enum": [
+        "NEW",
+        "PENDING",
+        "PENDING_REVIEW",
+        "REJECTED",
+        "INCOMPLETE",
+        "COMPLETED",
+        "ARCHIVED"
+      ],
+      "x-enumDescriptions": {
+        "NEW": "A new brand order created, not processed yet.",
+        "PENDING": "The brand order info is under review.",
+        "PENDING_REVIEW": "When a brand order is in incomplete status, customer can update the brand/brand order. Updating the brand order moves the brand order to PENDING_REVIEW state, what means that is waiting for another review after the customer changes.",
+        "REJECTED": "The brand order has been rejected.",
+        "INCOMPLETE": "The brand order is incomplete. The customer can update the brand/brand order to complete it.",
+        "COMPLETED": "The brand order validation has been completed and the brand order is approved for integration against the channel specification.",
+        "ARCHIVED": "The brand order is archived after a cancellation. It can not be updated or submitted for validation."
+      },
+      "type": "string"
+    },
+    "Channel": {
+      "description": "Channel represents the different channels that can be assigned to a brand after completing a brand order. Each channel has different requirements and it is assigned after completing a specific brand order process.",
+      "enum": [
+        "RCS",
+        "SHORT_CODE",
+        "TENDLC"
+      ],
+      "x-enumDescriptions": {
+        "RCS": "RCS Channel enables RCS traffic and it is provided by RCS.",
+        "SHORT_CODE": "The SHORT_CODE Channel enables Short Code traffic and it is provided by the US Short Code Registry.",
+        "TENDLC": "Ten Digit Long Code (10DLC) channel enables Long Number traffic and it is provided by 10DLC."
+      },
+      "type": "string"
+    },
+    "Money": {
+      "description": "Money amount with currency.",
+      "properties": {
+        "amount": {
+          "description": "The amount of money.",
+          "type": "string"
+        },
+        "currencyCode": {
+          "description": "The currency of the money amount, in ISO 4217 format.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "ThirdPartyElement": {
+      "description": "Third party metadata element. This is used to include any additional information that is required for the brand order process that is not included in the standard fields. For instance, it can be used to include the 10DLC brand ID when the import type is IMPORT_TCR_BRAND, or the US Short Code Registry brand ID when the import type is IMPORT_GCH_BRAND.",
+      "properties": {
+        "name": {
+          "description": "Third Party metadata property name.",
+          "type": "string"
+        },
+        "value": {
+          "description": "Third party metadata property value.",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    }
+  }
+}

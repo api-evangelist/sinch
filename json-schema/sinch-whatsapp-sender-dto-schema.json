@@ -1,0 +1,855 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-whatsapp-sender-dto-schema.json",
+  "title": "WhatsappSenderDto",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-provisioning-api-openapi.yml#/components/schemas/WhatsappSenderDto",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The unique ID of the sender.",
+      "uniqueItems": false
+    },
+    "state": {
+      "x-enumDescriptions": {
+        "ACTIVE": "The sender identity is active and ready to dispatch messages.",
+        "IN_PROGRESS": "The configuration or provisioning sequence for the sender identity is currently in progress.",
+        "INACTIVE": "The sender identity exists within the system but is currently not active.",
+        "PENDING_VERIFICATION": "The sender identity awaits completion of the formal verification and compliance loop.",
+        "SUSPENDED": "The sender identity has been temporarily suspended due to administrative or policy restrictions.",
+        "ERROR": "The sender identity has encountered an operational failure and requires technical troubleshooting."
+      },
+      "description": "The current state of the sender.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappSenderStatesEnum"
+        }
+      ]
+    },
+    "changes": {
+      "description": "Any pending changes to the sender.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappSenderChangesDto"
+        }
+      ]
+    },
+    "details": {
+      "description": "Sender details and information.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappSenderDetailsDto"
+        }
+      ]
+    },
+    "metadata": {
+      "description": "Data about the current state of individual sender fields.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappSenderMetadataDto"
+        }
+      ]
+    },
+    "region": {
+      "x-enumDescriptions": {
+        "BR": "Specifies that the bot infrastructure should be hosted within the Brazil region.",
+        "EU": "Specifies that the bot infrastructure should be hosted within the Europe region.",
+        "US": "Specifies that the bot infrastructure should be hosted within the United States region.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Region sender is provisioned in.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappSenderBotRegionEnum"
+        }
+      ]
+    },
+    "metaLocalStorage": {
+      "x-enumDescriptions": {
+        "AE": "Specifies that Meta-managed user and compliance data should be stored within the United Arab Emirates.",
+        "AU": "Specifies that Meta-managed user and compliance data should be stored within Australia.",
+        "BH": "Specifies that Meta-managed user and compliance data should be stored within Bahrain.",
+        "BR": "Specifies that Meta-managed user and compliance data should be stored within Brazil.",
+        "CA": "Specifies that Meta-managed user and compliance data should be stored within Canada.",
+        "CH": "Specifies that Meta-managed user and compliance data should be stored within Switzerland.",
+        "DE": "Specifies that Meta-managed user and compliance data should be stored within Germany.",
+        "GB": "Specifies that Meta-managed user and compliance data should be stored within the United Kingdom.",
+        "ID": "Specifies that Meta-managed user and compliance data should be stored within Indonesia.",
+        "IN": "Specifies that Meta-managed user and compliance data should be stored within India.",
+        "JP": "Specifies that Meta-managed user and compliance data should be stored within Japan.",
+        "KR": "Specifies that Meta-managed user and compliance data should be stored within South Korea.",
+        "SG": "Specifies that Meta-managed user and compliance data should be stored within Singapore.",
+        "US": "Specifies that Meta-managed user and compliance data should be stored within the United States.",
+        "ZA": "Specifies that Meta-managed user and compliance data should be stored within South Africa.",
+        "UNSPECIFIED": "The Meta data storage residency location is unspecified.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Region sender store the data in Meta.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappSenderMetaLocalStoragesEnum"
+        }
+      ]
+    },
+    "conversationApiApp": {
+      "type": "string",
+      "description": "If set, the Conversation API App ID the sender is connected to.",
+      "deprecated": true,
+      "uniqueItems": false
+    },
+    "conversationApiAppDetails": {
+      "description": "If set, the details of the Conversation API App the sender is connected to.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappConversationApiAppDto"
+        }
+      ]
+    },
+    "maxTps": {
+      "type": "number",
+      "description": "Maximum sender TPS.",
+      "uniqueItems": false
+    },
+    "qualityRating": {
+      "x-enumDescriptions": {
+        "GREEN": "Indicates an optimal quality tier with low user block rates and high delivery reliability compliance.",
+        "RED": "Indicates a degraded quality tier with severe block rates, forcing active delivery throttling or profile suspension.",
+        "YELLOW": "Indicates a warning quality tier reflecting increased end-user complaints or delivery metric fluctuations.",
+        "UNKNOWN": "The underlying message quality evaluation history metrics are currently unavailable.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Current quality rating of the sender.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappQualityRatingEnum"
+        }
+      ]
+    },
+    "dailyLimit": {
+      "x-enumDescriptions": {
+        "NOT_SET": "The daily messaging threshold tier has not been assigned.",
+        "TIER_100K": "Restricts outbound traffic up to 100,000 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_10K": "Restricts outbound traffic up to 10,000 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_1K": "Restricts outbound traffic up to 1,000 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_250": "Restricts outbound traffic up to 250 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_2K": "Restricts outbound traffic up to 2,000 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_50": "Restricts outbound traffic up to 50 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_UNLIMITED": "No daily throttling thresholds or messaging limit restrictions apply to this profile.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "This property is deprecated. Use `AccountDto.businessDailyLimit` instead. Current daily message limit of the sender. ",
+      "deprecated": true,
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappDailyLimitEnum"
+        }
+      ]
+    },
+    "bearerToken": {
+      "type": "string",
+      "description": "Bearer token of the sender. The bearer token is needed to connect the sender to a Conversation API App.",
+      "uniqueItems": false
+    },
+    "cloudApi": {
+      "type": "boolean",
+      "description": "True if the sender is hosted in WhatsApp Cloud API.",
+      "deprecated": true,
+      "uniqueItems": false
+    },
+    "created": {
+      "type": "string",
+      "description": "The UTC Date Time in ISO 8601 for when the sender was created.",
+      "uniqueItems": false
+    },
+    "modified": {
+      "type": "string",
+      "description": "The UTC Date Time in ISO 8601 for when the sender was last modified.",
+      "uniqueItems": false
+    },
+    "countryCode": {
+      "type": "string",
+      "description": "Country code of sender phone number.",
+      "uniqueItems": false
+    },
+    "phoneNumber": {
+      "type": "string",
+      "description": "Sender phone number without country code.",
+      "uniqueItems": false
+    },
+    "numberProvider": {
+      "x-enumDescriptions": {
+        "CUSTOMER": "The communication channel routes traffic using a customer-owned and customer-hosted network node.",
+        "SINCH": "The communication channel routes traffic using a system-provided and system-provisioned network node.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Provider for phone number.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappSenderNumberProviderTypeEnum"
+        }
+      ]
+    },
+    "businessManager": {
+      "x-enumDescriptions": {
+        "SINCH_AMERICA": "Associates the profile configuration with the Sinch America Meta Business Manager account.",
+        "SINCH_BR": "Associates the profile configuration with the Sinch Brazil Meta Business Manager account.",
+        "SINCH_MX": "Associates the profile configuration with the Sinch Mexico Meta Business Manager account.",
+        "SINCH_SEP": "Associates the profile configuration with the Sinch SEP Meta Business Manager account.",
+        "SINCH_UK": "Associates the profile configuration with the Sinch UK Meta Business Manager account.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Business manager.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappBusinessManagersEnum"
+        }
+      ]
+    },
+    "wabaBanState": {
+      "x-enumDescriptions": {
+        "DISABLE": "The WhatsApp Business Account has been disabled due to administrative or policy enforcement.",
+        "REINSTATE": "The WhatsApp Business Account has been successfully reinstated and cleared of restrictions.",
+        "SCHEDULE_FOR_DISABLE": "The WhatsApp Business Account is scheduled for automatic disablement following a grace or appeal period.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Please use get account endpoint for this information.",
+      "deprecated": true,
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappWabaBanStatesEnum"
+        }
+      ]
+    },
+    "wabaBanDate": {
+      "type": "string",
+      "description": "Please use get account endpoint for this information.",
+      "deprecated": true,
+      "uniqueItems": false
+    },
+    "compatibleRegions": {
+      "type": "array",
+      "x-enumDescriptions": {
+        "br": "The messaging applications and session contexts are hosted within the Brazil region.",
+        "eu": "The messaging applications and session contexts are hosted within the Europe region.",
+        "us": "The messaging applications and session contexts are hosted within the United States region."
+      },
+      "uniqueItems": true,
+      "description": "Conversation API app regions the sender can be used for.",
+      "items": {
+        "$ref": "#/$defs/WhatsappConversationAppRegionsEnum"
+      }
+    }
+  },
+  "required": [
+    "id",
+    "region",
+    "metaLocalStorage",
+    "cloudApi",
+    "businessManager",
+    "compatibleRegions"
+  ],
+  "$defs": {
+    "WhatsappBusinessManagersEnum": {
+      "type": "string",
+      "enum": [
+        "SINCH_AMERICA",
+        "SINCH_BR",
+        "SINCH_MX",
+        "SINCH_SEP",
+        "SINCH_UK",
+        "UNRECOGNIZED"
+      ],
+      "description": "Business manager."
+    },
+    "WhatsappConversationApiAppDto": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "ID of the app",
+          "uniqueItems": false
+        },
+        "projectId": {
+          "type": "string",
+          "description": "ID of the app project",
+          "uniqueItems": false
+        },
+        "region": {
+          "x-enumDescriptions": {
+            "BR": "The application operates within the Brazil region.",
+            "EU": "The application operates within the Europe region.",
+            "US": "The application operates within the United States region.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "App region.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappConversationApiAppRegionsEnum"
+            }
+          ]
+        },
+        "channelStatus": {
+          "x-enumDescriptions": {
+            "ACTIVE": "The channel integration is active and operating as expected.",
+            "FAILING": "The channel integration is failing and requires manual attention or troubleshooting.",
+            "PENDING": "The channel integration setup or synchronization is pending completion.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Status of the channel credentials integration.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappConversationAppChannelIntegrationStatusEnum"
+            }
+          ]
+        }
+      },
+      "required": [
+        "id",
+        "projectId",
+        "region"
+      ]
+    },
+    "WhatsappConversationApiAppRegionsEnum": {
+      "type": "string",
+      "enum": [
+        "BR",
+        "EU",
+        "US",
+        "UNRECOGNIZED"
+      ],
+      "description": "App region."
+    },
+    "WhatsappConversationAppChannelIntegrationStatusEnum": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "FAILING",
+        "PENDING",
+        "UNRECOGNIZED"
+      ],
+      "description": "Status of the channel credentials integration."
+    },
+    "WhatsappConversationAppRegionsEnum": {
+      "type": "string",
+      "enum": [
+        "br",
+        "eu",
+        "us"
+      ],
+      "description": "Conversation API app regions the sender can be used for."
+    },
+    "WhatsappDailyLimitEnum": {
+      "type": "string",
+      "enum": [
+        "NOT_SET",
+        "TIER_100K",
+        "TIER_10K",
+        "TIER_1K",
+        "TIER_250",
+        "TIER_2K",
+        "TIER_50",
+        "TIER_UNLIMITED",
+        "UNRECOGNIZED"
+      ],
+      "description": "This property is deprecated. Use `AccountDto.businessDailyLimit` instead. Current daily message limit of the sender. "
+    },
+    "WhatsappQualityRatingEnum": {
+      "type": "string",
+      "enum": [
+        "GREEN",
+        "RED",
+        "YELLOW",
+        "UNKNOWN",
+        "UNRECOGNIZED"
+      ],
+      "description": "Current quality rating of the sender."
+    },
+    "WhatsappSenderBotRegionEnum": {
+      "type": "string",
+      "enum": [
+        "BR",
+        "EU",
+        "US",
+        "UNRECOGNIZED"
+      ],
+      "description": "Region sender is provisioned in."
+    },
+    "WhatsappSenderChangesDetailsDto": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Sender display name within WhatsApp.",
+          "uniqueItems": false
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the sender displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false
+        },
+        "vertical": {
+          "x-enumDescriptions": {
+            "ALCOHOL": "The brand operates within the alcohol sector.",
+            "AUTOMOTIVE": "The brand operates within the automotive sector.",
+            "BEAUTY_SPA_SALON": "The brand operates within beauty, spa, or salon services.",
+            "CLOTHING_AND_APPAREL": "The brand operates within clothing and apparel commerce.",
+            "EDUCATION": "The brand operates within the education field.",
+            "ENTERTAINMENT": "The brand operates within the entertainment and media industry.",
+            "EVENT_PLANNING_AND_SERVICE": "The brand operates within event planning and corporate services.",
+            "FINANCE_AND_BANKING": "The brand operates within financial and banking services.",
+            "FOOD_AND_GROCERY": "The brand operates within the food supply or grocery sector.",
+            "HOTEL_AND_LODGING": "The brand operates within hospitality, hotels, or lodging.",
+            "MEDICAL_AND_HEALTH": "The brand operates within healthcare, medical services, or pharmaceuticals.",
+            "NON_PROFIT": "The brand is a registered non-profit organization.",
+            "NOT_SET": "The operational business vertical has not been selected.",
+            "ONLINE_GAMBLING": "The brand operates within the online gambling or betting industry.",
+            "OTC_DRUGS": "The brand operates within over-the-counter drug sales and distribution.",
+            "OTHER": "The brand operates in an industry outside the standard defined taxonomy.",
+            "PHYSICAL_GAMBLING": "The brand operates within physical gambling establishments or casinos.",
+            "PROFESSIONAL_SERVICES": "The brand provides corporate, professional, or technical services.",
+            "PUBLIC_SERVICE": "The brand provides public utilities or governmental services.",
+            "RESTAURANT": "The brand operates a restaurant or food service establishment.",
+            "SHOPPING_AND_RETAIL": "The brand operates within retail or wholesale commerce.",
+            "TRAVEL_AND_TRANSPORTATION": "The brand operates within transportation, travel, or logistics services.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Category of the sender displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderWhatsAppVerticalEnum"
+            }
+          ]
+        },
+        "email": {
+          "type": "string",
+          "description": "Contact email displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false
+        },
+        "address": {
+          "type": "string",
+          "description": "Business address displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false
+        },
+        "websiteOne": {
+          "type": "string",
+          "description": "Business website displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false
+        },
+        "websiteTwo": {
+          "type": "string",
+          "description": "Second business website displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false
+        },
+        "about": {
+          "type": "string",
+          "description": "About text displayed in the Business Info within WhatsApp.\n  - Hyperlinks can be included but will not render as clickable links.\n  - Markdown is not supported.\n  ",
+          "uniqueItems": false
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "URL to the sender image displayed in WhatsApp.\n- Supported mime types: `image/jpeg`, `image/png` or `image/webp`.\n- Maximum file size: 5MB.\n- Minimum image dimensions: 192 x 192 px.\n- Maximum image dimensions: 640 x 640 px.\n- Image will be cropped to maximum image dimensions.\n- If you submit a PNG image with a transparent background, the background will be rendered as black.",
+          "uniqueItems": false
+        },
+        "username": {
+          "type": "string",
+          "description": "WhatsApp Business username of the sender.",
+          "uniqueItems": false
+        }
+      }
+    },
+    "WhatsappSenderChangesDto": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "x-enumDescriptions": {
+            "APPROVED": "The profile field modification has been approved and applied.",
+            "DEFERRED": "The profile field modification has been deferred and will be evaluated later.",
+            "DELETED": "The profile field modification has been removed and is no longer active.",
+            "EXPIRED": "The profile field modification expired prior to completion.",
+            "PENDING": "The profile field modification is currently awaiting review or system processing.",
+            "REJECTED": "The profile field modification has been reviewed and rejected.",
+            "RESERVED": "The requested field parameter value is reserved but has not yet received final approval.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version.",
+            "UNSPECIFIED": "The operational status of the field modification is unspecified."
+          },
+          "description": "Current status of the pending changes.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderStatusesEnum"
+            }
+          ]
+        },
+        "details": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderDetailsDto",
+              "description": "For newly created sender"
+            },
+            {
+              "$ref": "#/$defs/WhatsappSenderChangesDetailsDto",
+              "description": "For update sender"
+            }
+          ],
+          "description": "The pending changes to sender details and information",
+          "uniqueItems": false
+        },
+        "errorReason": {
+          "type": "string",
+          "description": "Error reason if sender is in state `ERROR`.",
+          "uniqueItems": false
+        },
+        "errorCode": {
+          "x-enumDescriptions": {
+            "CANNOT_ASSIGN_CREDIT_LINE": "Indicates the provisioning system failed to allocate an active financial credit line configuration.",
+            "CANNOT_ASSIGN_SYSTEM_USER": "Indicates the system failed to map an active system user credential reference to the resource context.",
+            "CANNOT_CREATE_NEW_WHATSAPP_SENDER": "Indicates a structural failure occurred during the initialization of the WhatsApp channel.",
+            "CANNOT_CREATE_WABA_FOR_BUSINESS": "Indicates the automated registration workflow failed to instantiate a new WhatsApp Business Account (WABA).",
+            "CANNOT_GET_DETAILS_FOR_CLOUD_API": "Indicates an upstream communication breakdown prevented fetching active Cloud API configuration parameters.",
+            "CANNOT_GET_WABA_DETAILS": "Indicates system query layers failed to retrieve account metadata from the core WhatsApp business registry.",
+            "CANNOT_REGISTER_NEW_WHATSAPP_SENDER": "Indicates the downstream carrier gateway rejected the initial registration request block.",
+            "CANNOT_REGISTER_TO_CLOUD_API": "Indicates the system could not link the communication profile context with Meta Cloud API nodes.",
+            "CANNOT_SUBSCRIBE_TO_CLOUD_API": "Indicates the background event handler failed to bind operational event listeners on the Cloud API cluster.",
+            "CANNOT_SUBSCRIBE_TO_WEBHOOK": "Indicates the streaming broker layer rejected the integration callback subscription sequence.",
+            "DUPLICATES_ON_SENDER_PHONE_NUMBER": "Indicates the provided phone number identifier is already mapped to another active routing terminal.",
+            "FAILED_TO_FETCH_APPROVED_MESSAGE_TEMPLATES": "Indicates an operational query failure prevented compiling the list of certified payload templates.",
+            "MULTIPLE_WABA_FOR_PROJECT_ID": "Indicates a project boundary isolation violation where multiple WABA assets exist for a single project context.",
+            "NO_CERTIFICATE_AVAILABLE": "Indicates the system lacks a valid cryptographic handshake or validation certificate to proceed.",
+            "NO_NOVA_ACCOUNT_ID": "The internal financial node identifier property is missing or null.",
+            "NO_PRICING_PLAN": "The billing rate plan or pricing schema pointer is missing from the request context.",
+            "NO_PROJECT_ID": "The project boundary isolation reference identifier is missing or null.",
+            "NO_VERIFIED_PHONE_NUMBER": "The request payload contains no verified phone number pointers capable of routing.",
+            "REQUESTED_PHONE_NUMBER_OR_COUNTRY_CODE_CONFLICT": "Requested phone number or country code are not the same as assigned in WABA.",
+            "NOT_VERIFIED_REQUESTED_PHONE_NUMBER": "The targeted phone number resource context has not completed verified lifecycle milestones.",
+            "NOT_VERIFY_BUSINESS_VIA_WHATSAPP": "The Meta ecosystem rejected compliance verification for the associated business organization.",
+            "NOVA_ACCOUNT_ID_CONFLICT": "The input financial node identifier conflicts with an existing persistent registration.",
+            "PROJECT_ID_CONFLICT": "The input project boundary reference identifier conflicts with an existing persistent registration.",
+            "SENDER_HAS_BEEN_DELETED": "The designated channel entity footprint has already undergone a permanent cascading deletion sequence.",
+            "WABA_CONNECTED_TO_ANOTHER_PROJECT": "The specified WhatsApp Business Account is actively locked to a separate project isolation layer.",
+            "UNKNOWN_ERROR": "An unclassified internal processing error occurred within the orchestration tier.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Error code if sender is in state `ERROR`.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderErrorCodeEnum"
+            }
+          ]
+        }
+      },
+      "required": [
+        "status"
+      ]
+    },
+    "WhatsappSenderDetailsDto": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Sender display name within WhatsApp.",
+          "uniqueItems": false
+        },
+        "description": {
+          "type": "string",
+          "description": "Description of the sender displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false
+        },
+        "vertical": {
+          "x-enumDescriptions": {
+            "ALCOHOL": "The brand operates within the alcohol sector.",
+            "AUTOMOTIVE": "The brand operates within the automotive sector.",
+            "BEAUTY_SPA_SALON": "The brand operates within beauty, spa, or salon services.",
+            "CLOTHING_AND_APPAREL": "The brand operates within clothing and apparel commerce.",
+            "EDUCATION": "The brand operates within the education field.",
+            "ENTERTAINMENT": "The brand operates within the entertainment and media industry.",
+            "EVENT_PLANNING_AND_SERVICE": "The brand operates within event planning and corporate services.",
+            "FINANCE_AND_BANKING": "The brand operates within financial and banking services.",
+            "FOOD_AND_GROCERY": "The brand operates within the food supply or grocery sector.",
+            "HOTEL_AND_LODGING": "The brand operates within hospitality, hotels, or lodging.",
+            "MEDICAL_AND_HEALTH": "The brand operates within healthcare, medical services, or pharmaceuticals.",
+            "NON_PROFIT": "The brand is a registered non-profit organization.",
+            "NOT_SET": "The operational business vertical has not been selected.",
+            "ONLINE_GAMBLING": "The brand operates within the online gambling or betting industry.",
+            "OTC_DRUGS": "The brand operates within over-the-counter drug sales and distribution.",
+            "OTHER": "The brand operates in an industry outside the standard defined taxonomy.",
+            "PHYSICAL_GAMBLING": "The brand operates within physical gambling establishments or casinos.",
+            "PROFESSIONAL_SERVICES": "The brand provides corporate, professional, or technical services.",
+            "PUBLIC_SERVICE": "The brand provides public utilities or governmental services.",
+            "RESTAURANT": "The brand operates a restaurant or food service establishment.",
+            "SHOPPING_AND_RETAIL": "The brand operates within retail or wholesale commerce.",
+            "TRAVEL_AND_TRANSPORTATION": "The brand operates within transportation, travel, or logistics services.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Category of the sender displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderWhatsAppVerticalEnum"
+            }
+          ]
+        },
+        "email": {
+          "type": "string",
+          "description": "Contact email displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false
+        },
+        "address": {
+          "type": "string",
+          "description": "Business address displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false
+        },
+        "websiteOne": {
+          "type": "string",
+          "description": "Business website displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false
+        },
+        "websiteTwo": {
+          "type": "string",
+          "description": "Second business website displayed in the Business Info within WhatsApp.",
+          "uniqueItems": false
+        },
+        "about": {
+          "type": "string",
+          "description": "About text displayed in the Business Info within WhatsApp.\n  - Hyperlinks can be included but will not render as clickable links.\n  - Markdown is not supported.\n  ",
+          "uniqueItems": false
+        },
+        "photoUrl": {
+          "type": "string",
+          "description": "URL to the sender image displayed in WhatsApp.\n- Supported mime types: `image/jpeg`, `image/png` or `image/webp`.\n- Maximum file size: 5MB.\n- Minimum image dimensions: 192 x 192 px.\n- Maximum image dimensions: 640 x 640 px.\n- Image will be cropped to maximum image dimensions.\n- If you submit a PNG image with a transparent background, the background will be rendered as black.",
+          "uniqueItems": false
+        },
+        "username": {
+          "type": "string",
+          "description": "WhatsApp Business username of the sender.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "displayName",
+        "vertical"
+      ]
+    },
+    "WhatsappSenderErrorCodeEnum": {
+      "type": "string",
+      "enum": [
+        "CANNOT_ASSIGN_CREDIT_LINE",
+        "CANNOT_ASSIGN_SYSTEM_USER",
+        "CANNOT_CREATE_NEW_WHATSAPP_SENDER",
+        "CANNOT_CREATE_WABA_FOR_BUSINESS",
+        "CANNOT_GET_DETAILS_FOR_CLOUD_API",
+        "CANNOT_GET_WABA_DETAILS",
+        "CANNOT_REGISTER_NEW_WHATSAPP_SENDER",
+        "CANNOT_REGISTER_TO_CLOUD_API",
+        "CANNOT_SUBSCRIBE_TO_CLOUD_API",
+        "CANNOT_SUBSCRIBE_TO_WEBHOOK",
+        "DUPLICATES_ON_SENDER_PHONE_NUMBER",
+        "FAILED_TO_FETCH_APPROVED_MESSAGE_TEMPLATES",
+        "MULTIPLE_WABA_FOR_PROJECT_ID",
+        "NO_CERTIFICATE_AVAILABLE",
+        "NO_NOVA_ACCOUNT_ID",
+        "NO_PRICING_PLAN",
+        "NO_PROJECT_ID",
+        "NO_VERIFIED_PHONE_NUMBER",
+        "NOT_VERIFIED_REQUESTED_PHONE_NUMBER",
+        "NOT_VERIFY_BUSINESS_VIA_WHATSAPP",
+        "NOVA_ACCOUNT_ID_CONFLICT",
+        "PROJECT_ID_CONFLICT",
+        "REQUESTED_PHONE_NUMBER_OR_COUNTRY_CODE_CONFLICT",
+        "SENDER_HAS_BEEN_DELETED",
+        "WABA_CONNECTED_TO_ANOTHER_PROJECT",
+        "UNKNOWN_ERROR",
+        "UNRECOGNIZED"
+      ],
+      "description": "Error code if sender is in state `ERROR`."
+    },
+    "WhatsappSenderMetaLocalStoragesEnum": {
+      "type": "string",
+      "enum": [
+        "AE",
+        "AU",
+        "BH",
+        "BR",
+        "CA",
+        "CH",
+        "DE",
+        "GB",
+        "ID",
+        "IN",
+        "JP",
+        "KR",
+        "SG",
+        "US",
+        "ZA",
+        "UNRECOGNIZED",
+        "UNSPECIFIED"
+      ],
+      "description": "Region sender store the data in Meta."
+    },
+    "WhatsappSenderMetadataDto": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "description": "Approval status of the sender display name.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderMetadataFieldDto"
+            }
+          ]
+        },
+        "username": {
+          "description": "Approval status of the sender username.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderMetadataFieldDto"
+            }
+          ]
+        }
+      }
+    },
+    "WhatsappSenderMetadataFieldDto": {
+      "type": "object",
+      "properties": {
+        "value": {
+          "type": "string",
+          "description": "Requested value of the field.",
+          "uniqueItems": false
+        },
+        "status": {
+          "x-enumDescriptions": {
+            "APPROVED": "The profile field modification has been approved and applied.",
+            "DEFERRED": "The profile field modification has been deferred and will be evaluated later.",
+            "DELETED": "The profile field modification has been removed and is no longer active.",
+            "EXPIRED": "The profile field modification expired prior to completion.",
+            "PENDING": "The profile field modification is currently awaiting review or system processing.",
+            "REJECTED": "The profile field modification has been reviewed and rejected.",
+            "RESERVED": "The requested field parameter value is reserved but has not yet received final approval.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version.",
+            "UNSPECIFIED": "The operational status of the field modification is unspecified."
+          },
+          "description": "Current approval status of the field.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappWhatsAppSenderFieldUpdateStatusEnum"
+            }
+          ]
+        },
+        "rejectionReason": {
+          "type": "string",
+          "description": "Reason for rejection if the field update was rejected.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "status"
+      ]
+    },
+    "WhatsappSenderNumberProviderTypeEnum": {
+      "type": "string",
+      "enum": [
+        "CUSTOMER",
+        "SINCH",
+        "UNRECOGNIZED"
+      ],
+      "description": "Provider for phone number."
+    },
+    "WhatsappSenderStatesEnum": {
+      "type": "string",
+      "enum": [
+        "ACTIVE",
+        "IN_PROGRESS",
+        "INACTIVE",
+        "PENDING_VERIFICATION",
+        "SUSPENDED",
+        "ERROR"
+      ],
+      "description": "The current state of the sender."
+    },
+    "WhatsappSenderStatusesEnum": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "ERROR",
+        "IN_PROGRESS",
+        "MULTIPLE_WABA_ERROR",
+        "REJECTED"
+      ],
+      "description": "Current status of the pending changes."
+    },
+    "WhatsappSenderWhatsAppVerticalEnum": {
+      "type": "string",
+      "enum": [
+        "ALCOHOL",
+        "AUTOMOTIVE",
+        "BEAUTY_SPA_SALON",
+        "CLOTHING_AND_APPAREL",
+        "EDUCATION",
+        "ENTERTAINMENT",
+        "EVENT_PLANNING_AND_SERVICE",
+        "FINANCE_AND_BANKING",
+        "FOOD_AND_GROCERY",
+        "HOTEL_AND_LODGING",
+        "MEDICAL_AND_HEALTH",
+        "NON_PROFIT",
+        "NOT_SET",
+        "ONLINE_GAMBLING",
+        "OTC_DRUGS",
+        "OTHER",
+        "PHYSICAL_GAMBLING",
+        "PROFESSIONAL_SERVICES",
+        "PUBLIC_SERVICE",
+        "RESTAURANT",
+        "SHOPPING_AND_RETAIL",
+        "TRAVEL_AND_TRANSPORTATION",
+        "UNRECOGNIZED"
+      ],
+      "description": "Category of the sender displayed in the Business Info within WhatsApp."
+    },
+    "WhatsappWabaBanStatesEnum": {
+      "type": "string",
+      "enum": [
+        "DISABLE",
+        "REINSTATE",
+        "SCHEDULE_FOR_DISABLE",
+        "UNRECOGNIZED"
+      ],
+      "description": "Please use get account endpoint for this information."
+    },
+    "WhatsappWhatsAppSenderFieldUpdateStatusEnum": {
+      "type": "string",
+      "enum": [
+        "APPROVED",
+        "DEFERRED",
+        "DELETED",
+        "EXPIRED",
+        "PENDING",
+        "REJECTED",
+        "RESERVED",
+        "UNRECOGNIZED",
+        "UNSPECIFIED"
+      ],
+      "description": "Current approval status of the field."
+    }
+  }
+}

@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-get-query-number-schema.json",
+  "title": "getQueryNumber",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-voice-api-openapi.yml#/components/schemas/getQueryNumber",
+  "type": "object",
+  "properties": {
+    "number": {
+      "type": "object",
+      "description": "The number item object.",
+      "properties": {
+        "countryId": {
+          "type": "string",
+          "description": "The ISO 3166-1 formatted country code."
+        },
+        "numberType": {
+          "type": "string",
+          "x-enumDescriptions": {
+            "Unknown": "Unknown number type.",
+            "Fixed": "A fixed number.",
+            "Mobile": "A mobile number.",
+            "Other": "A type other than fixed or mobile."
+          },
+          "enum": [
+            "Unknown",
+            "Fixed",
+            "Mobile",
+            "Other"
+          ],
+          "description": "The type of the number."
+        },
+        "normalizedNumber": {
+          "type": "string",
+          "description": "The number in E.164 format."
+        },
+        "restricted": {
+          "type": "boolean",
+          "description": "Concerns whether the call is restricted or not."
+        },
+        "rate": {
+          "$ref": "#/$defs/price"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "price": {
+      "type": "object",
+      "properties": {
+        "currencyId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "amount": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    }
+  }
+}

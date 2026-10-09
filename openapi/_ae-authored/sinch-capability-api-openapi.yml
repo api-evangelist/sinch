@@ -1,0 +1,134 @@
+openapi: 3.2.0
+info:
+  title: Sinch Conversation Capability API
+  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://us.conversation.api.sinch.com
+  description: US Production Server
+- url: https://eu.conversation.api.sinch.com
+  description: EU Production Server
+- url: https://br.conversation.api.sinch.com
+  description: Brazil Production Server
+security:
+- oAuth2: []
+- basicAuth: []
+tags:
+- name: Capability
+  description: Query channel capabilities for specific contacts to determine which channels can be used to reach them.
+paths:
+  /v1/projects/{project_id}/capability:query:
+    post:
+      operationId: queryCapability
+      summary: Query Channel Capability
+      description: Queries the capability of a specific channel for a contact to determine if the channel can be used to reach them.
+      tags:
+      - Capability
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CapabilityQueryRequest'
+      responses:
+        '200':
+          description: Capability result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CapabilityQueryResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+components:
+  schemas:
+    CapabilityQueryResponse:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        recipient:
+          type: object
+          description: The queried recipient
+        request_id:
+          type: string
+          description: The capability query request ID
+    ChannelIdentity:
+      type: object
+      properties:
+        channel:
+          type: string
+          enum:
+          - SMS
+          - RCS
+          - WHATSAPP
+          - MESSENGER
+          - INSTAGRAM
+          - VIBER
+          - VIBERBM
+          - TELEGRAM
+          - KAKAOTALK
+          - LINE
+          - MMS
+          description: The channel type
+        identity:
+          type: string
+          description: The channel-specific identity
+        app_id:
+          type: string
+          description: The app ID for the channel
+    CapabilityQueryRequest:
+      type: object
+      required:
+      - app_id
+      - recipient
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        recipient:
+          type: object
+          description: The recipient to query capability for
+          properties:
+            contact_id:
+              type: string
+              description: The contact ID
+            identified_by:
+              type: object
+              description: Channel identity to query
+              properties:
+                channel_identities:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/ChannelIdentity'
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow using project key ID and secret.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Key ID as username and key secret as password.
+externalDocs:
+  description: Sinch Conversation API Documentation
+  url: https://developers.sinch.com/docs/conversation

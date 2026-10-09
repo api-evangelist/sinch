@@ -1,0 +1,468 @@
+openapi: 3.2.0
+info:
+  title: Provisioning RCS Accounts API
+  description: The RCS endpoint offers you a way to manage your RCS accounts.
+  version: 1.2.117
+servers:
+- url: https://provisioning.api.sinch.com
+  description: Production server
+security:
+- BasicAuth: []
+  BearerAuth: []
+  OAuth2Production: []
+tags:
+- name: RCS Accounts
+  description: The RCS endpoint offers you a way to manage your RCS accounts.
+paths:
+  /v1/projects/{projectId}/rcs/activities:
+    get:
+      description: Paginated list of activities for account. Ordered from the most recent one to the oldest one.
+      operationId: RcsAccountsController_listActivities_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: pageToken
+        required: false
+        in: query
+        schema:
+          type: string
+        description: The page token if retrieving the next page from a previous query.
+      - name: pageSize
+        required: false
+        in: query
+        schema:
+          type: number
+          minimum: 1
+          maximum: 100
+        description: The page size requested.
+      responses:
+        '200':
+          description: Recent activities on account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsAccountNotificationListDto'
+              examples:
+                response:
+                  summary: List account activities response
+                  description: "\n    Response for all account activities.\n    "
+                  value:
+                    totalSize: 2
+                    pageSize: 50
+                    notifications:
+                    - type: CREATED
+                      created: '2023-02-10T11:41:14.202Z'
+                      author: Provisioning API user
+                    - type: COMMENT_ADDED
+                      created: '2023-02-10T11:41:14.202Z'
+                      comment: Example comment
+                      author: Provisioning API user
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                invalid_page_token-0:
+                  summary: InvalidPageTokenError
+                  value:
+                    errorCode: invalid_page_token
+                    message: Invalid page token.
+                    resolution: The page token to use is provided in the previous query response, for new queries simply leave this field undefined.
+                invalid_page_size-1:
+                  summary: InvalidPageSizeError
+                  value:
+                    errorCode: invalid_page_size
+                    message: Page size must be numeric.
+                    resolution: Use a integer value for pageSize parameter.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                account_not_found-0:
+                  summary: AccountNotFoundError
+                  value:
+                    errorCode: account_not_found
+                    message: Account not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Lists activities on account
+      tags:
+      - RCS Accounts
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/rcs/comments:
+    post:
+      callbacks:
+        Comment:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Comment on account
+              description: "\n        Received when a comment has been added to the account.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event, in this case `RCS_ACCOUNT_COMMENT_ADDED`.
+                          type: string
+                        comment:
+                          description: Comment for account.
+                          type: string
+                      required:
+                      - type
+                      - comment
+                    example:
+                      type: RCS_ACCOUNT_COMMENT_ADDED
+                      comment: Example comment
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+      description: Creates a comment for an account.
+      operationId: RcsAccountsController_createComment_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Comment data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RcsCommentInputDto'
+            examples:
+              input:
+                summary: Body request
+                description: "\n      Example body request to create a comment.\n      "
+                value:
+                  comment: Example comment.
+      responses:
+        '201':
+          description: Created comment for an account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsCommentDto'
+              examples:
+                created:
+                  summary: Create response
+                  description: "\n    Response when successfully creating a comment.\n    "
+                  value:
+                    type: CREATED
+                    comment: Example comment
+                    created: '2023-01-19T13:11:08.204Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                invalid_input-0:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - comment must be longer than or equal to 1 characters
+                invalid_payload-1:
+                  summary: InvalidPayloadError
+                  value:
+                    errorCode: invalid_payload
+                    message: Invalid payload.
+                    resolution: Correct payload and submit again.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                account_not_found-0:
+                  summary: AccountNotFoundError
+                  value:
+                    errorCode: account_not_found
+                    message: Account not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Creates a comment for an account
+      tags:
+      - RCS Accounts
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+components:
+  schemas:
+    RcsPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+    RcsCommentTypeEnum:
+      type: string
+      const: CREATED
+    RcsCommentInputDto:
+      type: object
+      properties:
+        comment:
+          type: string
+          minLength: 1
+          maxLength: 65535
+          uniqueItems: false
+      required:
+      - comment
+    RcsAccountNotificationListDto:
+      type: object
+      properties:
+        totalSize:
+          type: number
+          description: Total size of the entries matching the search query.
+          uniqueItems: false
+        pageSize:
+          type: number
+          description: Requested size of the page.
+          uniqueItems: false
+        previousPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch previous batch of entries.
+          uniqueItems: false
+        nextPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch next batch of entries.
+          uniqueItems: false
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/RcsAccountNotificationDto'
+          uniqueItems: false
+      required:
+      - totalSize
+      - pageSize
+      - notifications
+    RcsCommentDto:
+      type: object
+      properties:
+        type:
+          x-enumDescriptions:
+            CREATED: Indicates the comment has been successfully created and published.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsCommentTypeEnum'
+        comment:
+          type: string
+          uniqueItems: false
+        created:
+          type: string
+          uniqueItems: false
+      required:
+      - type
+      - comment
+    RcsAccountNotificationDto:
+      type: object
+      properties:
+        type:
+          x-enumDescriptions:
+            COMMENT_ADDED: A new comment has been added to the notification trail.
+            CREATED: The notification configuration has been successfully created.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsAccountNotificationTypeEnum'
+        created:
+          type: string
+          uniqueItems: false
+        author:
+          type: string
+          uniqueItems: false
+        comment:
+          type: string
+          uniqueItems: false
+      required:
+      - type
+    RcsAccountNotificationTypeEnum:
+      type: string
+      enum:
+      - COMMENT_ADDED
+      - CREATED
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
+x-tagGroup-upscale:
+  name: Upscale
+  tags:
+  - Upscale Admin Feature Flag
+  - Upscale Admin Log Operation
+  - Upscale Admin Migrations
+  - Upscale Admin Sms
+  - Upscale Admin Upscales
+  - Internal
+  - Upscale Sms
+  - Upscale Upscales
+x-tagGroup-notification:
+  name: Notification
+  tags:
+  - Notification Admin Feature Flag
+  - Notification Admin Log Operation
+  - Internal
+x-tagGroups:
+- name: Webhook
+  tags:
+  - Webhooks
+- name: WhatsApp
+  tags:
+  - WhatsApp Accounts
+  - WhatsApp
+  - WhatsApp Flows
+  - WhatsApp Senders
+  - WhatsApp Solutions
+  - WhatsApp Templates
+- name: Bundles
+  tags:
+  - Bundles
+- name: KakaoTalk
+  tags:
+  - KakaoTalk Categories
+  - KakaoTalk Senders
+  - KakaoTalk Templates
+- name: Conversation
+  tags:
+  - Conversation
+- name: RCS
+  tags:
+  - RCS Accounts
+  - RCS Questionnaire
+  - RCS Senders
+- name: SMS
+  tags:
+  - SMS Apps

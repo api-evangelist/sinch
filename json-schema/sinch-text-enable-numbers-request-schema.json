@@ -1,0 +1,187 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-text-enable-numbers-request-schema.json",
+  "title": "TextEnableNumbersRequest",
+  "description": "A request to text enable the numbers in a hosting order.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-imported-numbers-hosting-orders-api-openapi.yml#/components/schemas/TextEnableNumbersRequest",
+  "required": [
+    "regionCode",
+    "numbers",
+    "servicePlanId"
+  ],
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string",
+      "description": "The ID of the project to which the hosting order is associated."
+    },
+    "displayName": {
+      "type": "string",
+      "description": "The optional display name of the hosting order."
+    },
+    "regionCode": {
+      "type": "string",
+      "description": "The region code for the hosting order."
+    },
+    "numbers": {
+      "type": "array",
+      "description": "An array of all the phone numbers associated with the hosting order.",
+      "items": {
+        "type": "string"
+      }
+    },
+    "nnid": {
+      "type": "string",
+      "description": "Defaults to either Sinch NNID or what was originally configured on the customer account. Sinch encourages customers to use the Sinch NNID, but if you want to use another NNID, please contact your account manager."
+    },
+    "servicePlanId": {
+      "type": "string",
+      "description": "The ID of the service plan to which the hosting order is associated."
+    },
+    "campaignId": {
+      "type": "string",
+      "description": "The ID of the campaign to which the hosting order is associated."
+    },
+    "directLoaInfo": {
+      "$ref": "#/$defs/DirectLoaInfo"
+    },
+    "resellerLoaInfo": {
+      "$ref": "#/$defs/ResellerLoaInfo"
+    },
+    "blanketLoaInfo": {
+      "$ref": "#/$defs/BlanketLoaInfo"
+    },
+    "scheduledOsrUpdateTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The scheduled time for OSR to be updated."
+    },
+    "migrateToSinchTmo": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "Displays if a number is assigned to another aggregator in T-Mobile's platform, and requires migration from previous aggregator to Sinch."
+    },
+    "callbackUrl": {
+      "type": "string",
+      "description": "The client's callback URL to be called for text enablement updates."
+    }
+  },
+  "$defs": {
+    "Address": {
+      "description": "The address of the business.",
+      "required": [
+        "buildingNumber",
+        "street",
+        "city",
+        "state",
+        "postalCode",
+        "country"
+      ],
+      "type": "object",
+      "properties": {
+        "buildingNumber": {
+          "type": "string",
+          "description": "The building number of the address."
+        },
+        "street": {
+          "type": "string",
+          "description": "The street name of the address."
+        },
+        "city": {
+          "type": "string",
+          "description": "The city name of the address."
+        },
+        "state": {
+          "type": "string",
+          "description": "The state name of the address."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "The postal code of the address."
+        },
+        "country": {
+          "type": "string",
+          "description": "The country of the address."
+        }
+      }
+    },
+    "AuthorizedPerson": {
+      "description": "The person authorized and responsible for the hosting order.",
+      "required": [
+        "firstName",
+        "lastName",
+        "email"
+      ],
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the authorized person."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the authorized person."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the authorized person."
+        }
+      }
+    },
+    "BlanketLoaInfo": {
+      "description": "You can set up a blanket Letter of Authorization (LoA) that will allow you to import numbers to your account without having to sign an LoA each time you submit a request. To set up a blanket LoA, email your account manager. Once the LoA has been approved, you can use this `blanketLoaInfo` object in your requests. The `blanketLoaInfo` object should be sent as an empty object.",
+      "type": "object",
+      "properties": {}
+    },
+    "DirectLoaInfo": {
+      "description": "Letter of Authorization for direct Sinch customers.",
+      "required": [
+        "authorisedPerson",
+        "address",
+        "currentVoiceCarrier"
+      ],
+      "type": "object",
+      "properties": {
+        "authorisedPerson": {
+          "$ref": "#/$defs/AuthorizedPerson"
+        },
+        "address": {
+          "$ref": "#/$defs/Address"
+        },
+        "currentVoiceCarrier": {
+          "type": "string",
+          "description": "The current carrier you are using for voice services for the number you want to host on Sinch."
+        }
+      }
+    },
+    "ResellerLoaInfo": {
+      "description": "Letter of Authorization for resellers.",
+      "required": [
+        "businessName",
+        "authorisedPerson",
+        "address",
+        "currentVoiceCarrier"
+      ],
+      "type": "object",
+      "properties": {
+        "businessName": {
+          "type": "string",
+          "description": "The name of the business."
+        },
+        "authorisedPerson": {
+          "$ref": "#/$defs/AuthorizedPerson"
+        },
+        "address": {
+          "$ref": "#/$defs/Address"
+        },
+        "currentVoiceCarrier": {
+          "type": "string",
+          "description": "The current carrier you are using for voice services for the number you want to host on Sinch."
+        }
+      }
+    }
+  }
+}

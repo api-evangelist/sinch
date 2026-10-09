@@ -1,0 +1,1067 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-whatsapp-account-dto-schema.json",
+  "title": "WhatsappAccountDto",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-provisioning-api-openapi.yml#/components/schemas/WhatsappAccountDto",
+  "type": "object",
+  "properties": {
+    "state": {
+      "x-enumDescriptions": {
+        "ONBOARDED": "The onboarding sequence is complete, and the channels linked to the account are active.",
+        "PENDING_FACEBOOK_VERIFICATION": "The account setup awaits completed Facebook business verification workflows.",
+        "REJECTED": "The account profile registration or verification sequence was reviewed and rejected."
+      },
+      "description": "The current state of your account.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappAccountStateEnum"
+        }
+      ]
+    },
+    "isEmbeddedSignup": {
+      "type": "boolean",
+      "description": "`true` if the Account was created through Embedded Signup. `false` otherwise.",
+      "uniqueItems": false
+    },
+    "businessManager": {
+      "x-enumDescriptions": {
+        "SINCH_AMERICA": "Associates the profile configuration with the Sinch America Meta Business Manager account.",
+        "SINCH_BR": "Associates the profile configuration with the Sinch Brazil Meta Business Manager account.",
+        "SINCH_MX": "Associates the profile configuration with the Sinch Mexico Meta Business Manager account.",
+        "SINCH_SEP": "Associates the profile configuration with the Sinch SEP Meta Business Manager account.",
+        "SINCH_UK": "Associates the profile configuration with the Sinch UK Meta Business Manager account.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Business manager.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappBusinessManagersEnum"
+        }
+      ]
+    },
+    "wabaId": {
+      "type": "string",
+      "description": "WhatsApp Business Manager ID.",
+      "uniqueItems": false
+    },
+    "changes": {
+      "description": "Any pending changes to the account.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappAccountChangesDto"
+        }
+      ]
+    },
+    "details": {
+      "description": "Account details and information.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappAccountDetailsDto"
+        }
+      ]
+    },
+    "wabaBanState": {
+      "x-enumDescriptions": {
+        "DISABLE": "The WhatsApp Business Account has been disabled due to administrative or policy enforcement.",
+        "REINSTATE": "The WhatsApp Business Account has been successfully reinstated and cleared of restrictions.",
+        "SCHEDULE_FOR_DISABLE": "The WhatsApp Business Account is scheduled for automatic disablement following a grace or appeal period.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Ban state when account has been banned.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappWabaBanStatesEnum"
+        }
+      ]
+    },
+    "wabaBanDate": {
+      "type": "string",
+      "description": "The UTC Date Time in ISO 8601 for when account has been banned.",
+      "uniqueItems": false
+    },
+    "wabaEnabledForInsights": {
+      "type": "boolean",
+      "description": "Template analytics status for account.",
+      "uniqueItems": false
+    },
+    "wabaEnabledForDirectSend": {
+      "type": "boolean",
+      "description": "Direct Send API status for account.",
+      "uniqueItems": false
+    },
+    "wabaMaxPriceOnboarded": {
+      "type": "boolean",
+      "description": "Indicates whether the account has the maximum price feature enabled.",
+      "uniqueItems": false
+    },
+    "compatibleRegions": {
+      "type": "array",
+      "x-enumDescriptions": {
+        "br": "The messaging applications and session contexts are hosted within the Brazil region.",
+        "eu": "The messaging applications and session contexts are hosted within the Europe region.",
+        "us": "The messaging applications and session contexts are hosted within the United States region."
+      },
+      "uniqueItems": true,
+      "description": "Conversation API app regions the sender can be used for.",
+      "items": {
+        "$ref": "#/$defs/WhatsappConversationAppRegionsEnum"
+      }
+    },
+    "primaryBusinessLocation": {
+      "x-enumDescriptions": {
+        "AD": "The country code for Andorra.",
+        "AE": "The country code for the United Arab Emirates.",
+        "AF": "The country code for Afghanistan.",
+        "AG": "The country code for Antigua and Barbuda.",
+        "AI": "The country code for Anguilla.",
+        "AL": "The country code for Albania.",
+        "AM": "The country code for Armenia.",
+        "AO": "The country code for Angola.",
+        "AQ": "The country code for Antarctica.",
+        "AR": "The country code for Argentina.",
+        "AS": "The country code for American Samoa.",
+        "AT": "The country code for Austria.",
+        "AU": "The country code for Australia.",
+        "AW": "The country code for Aruba.",
+        "AZ": "The country code for Azerbaijan.",
+        "BA": "The country code for Bosnia and Herzegovina.",
+        "BB": "The country code for Barbados.",
+        "BD": "The country code for Bangladesh.",
+        "BE": "The country code for Belgium.",
+        "BF": "The country code for Burkina Faso.",
+        "BG": "The country code for Bulgaria.",
+        "BH": "The country code for Bahrain.",
+        "BI": "The country code for Burundi.",
+        "BJ": "The country code for Benin.",
+        "BM": "The country code for Bermuda.",
+        "BN": "The country code for Brunei.",
+        "BO": "The country code for Bolivia.",
+        "BQ": "The country code for Bonaire.",
+        "BR": "The country code for Brazil.",
+        "BS": "The country code for the Bahamas.",
+        "BT": "The country code for Bhutan.",
+        "BW": "The country code for Botswana.",
+        "BY": "The country code for Belarus.",
+        "BZ": "The country code for Belize.",
+        "CA": "The country code for Canada.",
+        "CD": "The country code for the Democratic Republic of the Congo.",
+        "CF": "The country code for the Central African Republic.",
+        "CG": "The country code for the Republic of the Congo.",
+        "CH": "The country code for Switzerland.",
+        "CI": "The country code for the Ivory Coast.",
+        "CK": "The country code for the Cook Islands.",
+        "CL": "The country code for Chile.",
+        "CM": "The country code for Cameroon.",
+        "CN": "The country code for China.",
+        "CO": "The country code for Colombia.",
+        "CR": "The country code for Costa Rica.",
+        "CU": "The country code for Cuba.",
+        "CV": "The country code for Cape Verde.",
+        "CW": "The country code for Curaçao.",
+        "CY": "The country code for Cyprus.",
+        "CZ": "The country code for the Czech Republic.",
+        "DE": "The country code for Germany.",
+        "DJ": "The country code for Djibouti.",
+        "DK": "The country code for Denmark.",
+        "DM": "The country code for Dominica.",
+        "DO": "The country code for the Dominican Republic.",
+        "DZ": "The country code for Algeria.",
+        "EC": "The country code for Ecuador.",
+        "EE": "The country code for Estonia.",
+        "EG": "The country code for Egypt.",
+        "ER": "The country code for Eritrea.",
+        "ES": "The country code for Spain.",
+        "ET": "The country code for Ethiopia.",
+        "FI": "The country code for Finland.",
+        "FJ": "The country code for Fiji.",
+        "FK": "The country code for the Falkland Islands.",
+        "FM": "The country code for Micronesia.",
+        "FO": "The country code for the Faroe Islands.",
+        "FR": "The country code for France.",
+        "GA": "The country code for Gabon.",
+        "GB": "The country code for the United Kingdom of Great Britain.",
+        "GD": "The country code for Grenada.",
+        "GE": "The country code for Georgia.",
+        "GF": "The country code for French Guiana.",
+        "GG": "The country code for Guernsey.",
+        "GH": "The country code for Ghana.",
+        "GI": "The country code for Gibraltar.",
+        "GL": "The country code for Greenland.",
+        "GM": "The country code for the Gambia.",
+        "GN": "The country code for Guinea.",
+        "GP": "The country code for Guadeloupe.",
+        "GQ": "The country code for Equatorial Guinea.",
+        "GR": "The country code for Greece.",
+        "GT": "The country code for Guatemala.",
+        "GU": "The country code for Guam.",
+        "GW": "The country code for Guinea-Bissau.",
+        "GY": "The country code for Guyana.",
+        "HK": "The country code for Hong Kong.",
+        "HN": "The country code for Honduras.",
+        "HR": "The country code for Croatia.",
+        "HT": "The country code for Haiti.",
+        "HU": "The country code for Hungary.",
+        "ID": "The country code for Indonesia.",
+        "IE": "The country code for Ireland.",
+        "IL": "The country code for Israel.",
+        "IM": "The country code for the Isle of Man.",
+        "IN": "The country code for India.",
+        "IO": "The country code for the British Indian Ocean Territory.",
+        "IQ": "The country code for Iraq.",
+        "IR": "The country code for Iran.",
+        "IS": "The country code for Iceland.",
+        "IT": "The country code for Italy.",
+        "JE": "The country code for Jersey.",
+        "JM": "The country code for Jamaica.",
+        "JO": "The country code for Jordan.",
+        "JP": "The country code for Japan.",
+        "KE": "The country code for Kenya.",
+        "KG": "The country code for Kyrgyzstan.",
+        "KH": "The country code for Cambodia.",
+        "KI": "The country code for Kiribati.",
+        "KM": "The country code for Comoros.",
+        "KN": "The country code for Saint Kitts and Nevis.",
+        "KP": "The country code for North Korea.",
+        "KR": "The country code for South Korea.",
+        "KW": "The country code for Kuwait.",
+        "KY": "The country code for the Cayman Islands.",
+        "KZ": "The country code for Kazakhstan.",
+        "LA": "The country code for Laos.",
+        "LB": "The country code for Lebanon.",
+        "LC": "The country code for Saint Lucia.",
+        "LI": "The country code for Liechtenstein.",
+        "LK": "The country code for Sri Lanka.",
+        "LR": "The country code for Liberia.",
+        "LS": "The country code for Lesotho.",
+        "LT": "The country code for Lithuania.",
+        "LU": "The country code for Luxembourg.",
+        "LV": "The country code for Latvia.",
+        "LY": "The country code for Libya.",
+        "MA": "The country code for Morocco.",
+        "MC": "The country code for Monaco.",
+        "MD": "The country code for Moldova.",
+        "ME": "The country code for Montenegro.",
+        "MG": "The country code for Madagascar.",
+        "MH": "The country code for the Marshall Islands.",
+        "MK": "The country code for North Macedonia.",
+        "ML": "The country code for Mali.",
+        "MM": "The country code for Myanmar.",
+        "MN": "The country code for Mongolia.",
+        "MO": "The country code for Macao.",
+        "MP": "The country code for the Northern Mariana Islands.",
+        "MQ": "The country code for Martinique.",
+        "MR": "The country code for Mauritania.",
+        "MS": "The country code for Montserrat.",
+        "MT": "The country code for Malta.",
+        "MU": "The country code for Mauritius.",
+        "MV": "The country code for the Maldives.",
+        "MW": "The country code for Malawi.",
+        "MX": "The country code for Mexico.",
+        "MY": "The country code for Malaysia.",
+        "MZ": "The country code for Mozambique.",
+        "NA": "The country code for Namibia.",
+        "NC": "The country code for New Caledonia.",
+        "NE": "The country code for Niger.",
+        "NF": "The country code for Norfolk Island.",
+        "NG": "The country code for Nigeria.",
+        "NI": "The country code for Nicaragua.",
+        "NL": "The country code for the Netherlands.",
+        "NO": "The country code for Norway.",
+        "NP": "The country code for Nepal.",
+        "NR": "The country code for Nauru.",
+        "NU": "The country code for Niue.",
+        "NZ": "The country code for New Zealand.",
+        "OM": "The country code for Oman.",
+        "PA": "The country code for Panama.",
+        "PE": "The country code for Peru.",
+        "PF": "The country code for French Polynesia.",
+        "PG": "The country code for Papua New Guinea.",
+        "PH": "The country code for the Philippines.",
+        "PK": "The country code for Pakistan.",
+        "PL": "The country code for Poland.",
+        "PM": "The country code for Saint Pierre and Miquelon.",
+        "PR": "The country code for Puerto Rico.",
+        "PS": "The country code for Palestine.",
+        "PT": "The country code for Portugal.",
+        "PW": "The country code for Palau.",
+        "PY": "The country code for Paraguay.",
+        "QA": "The country code for Qatar.",
+        "RE": "The country code for Réunion.",
+        "RO": "The country code for Romania.",
+        "RS": "The country code for Serbia.",
+        "RU": "The country code for Russia.",
+        "RW": "The country code for Rwanda.",
+        "SA": "The country code for Saudi Arabia.",
+        "SB": "The country code for the Solomon Islands.",
+        "SC": "The country code for Seychelles.",
+        "SD": "The country code for Sudan.",
+        "SE": "The country code for Sweden.",
+        "SG": "The country code for Singapore.",
+        "SH": "The country code for Saint Helena.",
+        "SI": "The country code for Slovenia.",
+        "SK": "The country code for Slovakia.",
+        "SL": "The country code for Sierra Leone.",
+        "SM": "The country code for San Marino.",
+        "SN": "The country code for Senegal.",
+        "SO": "The country code for Somalia.",
+        "SR": "The country code for Suriname.",
+        "SS": "The country code for South Sudan.",
+        "ST": "The country code for São Tomé and Príncipe.",
+        "SV": "The country code for El Salvador.",
+        "SX": "The country code for Sint Maarten.",
+        "SY": "The country code for Syria.",
+        "SZ": "The country code for Eswatini.",
+        "TC": "The country code for the Turks and Caicos Islands.",
+        "TD": "The country code for Chad.",
+        "TG": "The country code for Togo.",
+        "TH": "The country code for Thailand.",
+        "TJ": "The country code for Tajikistan.",
+        "TK": "The country code for Tokelau.",
+        "TL": "The country code for East Timor.",
+        "TM": "The country code for Turkmenistan.",
+        "TN": "The country code for Tunisia.",
+        "TO": "The country code for Tonga.",
+        "TR": "The country code for Turkey.",
+        "TT": "The country code for Trinidad and Tobago.",
+        "TV": "The country code for Tuvalu.",
+        "TW": "The country code for Taiwan.",
+        "TZ": "The country code for Tanzania.",
+        "UA": "The country code for Ukraine.",
+        "UG": "The country code for Uganda.",
+        "UM": "The country code for the United States Minor Outlying Islands.",
+        "US": "The country code for the United States of America.",
+        "UY": "The country code for Uruguay.",
+        "UZ": "The country code for Uzbekistan.",
+        "VC": "The country code for Saint Vincent and the Grenadines.",
+        "VE": "The country code for Venezuela.",
+        "VG": "The country code for the British Virgin Islands.",
+        "VI": "The country code for the United States Virgin Islands.",
+        "VN": "The country code for Vietnam.",
+        "VU": "The country code for Vanuatu.",
+        "WF": "The country code for Wallis and Futuna.",
+        "WS": "The country code for Samoa.",
+        "XK": "The country code for Kosovo.",
+        "YE": "The country code for Yemen.",
+        "YT": "The country code for Mayotte.",
+        "ZA": "The country code for South Africa.",
+        "ZM": "The country code for Zambia.",
+        "ZW": "The country code for Zimbabwe.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Two-letter country code in ISO 3166 standard, specifying the country where business is based",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappCountryCodesEnum"
+        }
+      ]
+    },
+    "partnerInitiatedRequestId": {
+      "type": "string",
+      "deprecated": true,
+      "description": "Deprecated. This field is retained for backward compatibility and is always returned as undefined.",
+      "uniqueItems": false
+    },
+    "businessDailyLimit": {
+      "x-enumDescriptions": {
+        "NOT_SET": "The daily messaging threshold tier has not been assigned.",
+        "TIER_100K": "Restricts outbound traffic up to 100,000 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_10K": "Restricts outbound traffic up to 10,000 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_1K": "Restricts outbound traffic up to 1,000 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_250": "Restricts outbound traffic up to 250 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_2K": "Restricts outbound traffic up to 2,000 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_50": "Restricts outbound traffic up to 50 business-initiated conversations per rolling 24-hour cycle.",
+        "TIER_UNLIMITED": "No daily throttling thresholds or messaging limit restrictions apply to this profile.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Current daily message limit of the account.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappDailyLimitEnum"
+        }
+      ]
+    },
+    "currency": {
+      "type": "string",
+      "description": "The currency code for the account.",
+      "uniqueItems": false
+    }
+  },
+  "required": [
+    "isEmbeddedSignup",
+    "businessManager",
+    "wabaMaxPriceOnboarded",
+    "compatibleRegions"
+  ],
+  "$defs": {
+    "WhatsappAccountChangeStateEnum": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "IN_PROGRESS",
+        "PENDING_FACEBOOK_VERIFICATION",
+        "REJECTED"
+      ],
+      "description": "Current status of the pending changes."
+    },
+    "WhatsappAccountChangesDetailsDto": {
+      "type": "object",
+      "properties": {
+        "clientBusinessManagerId": {
+          "type": "string",
+          "description": "The Business Manager ID for the client.",
+          "uniqueItems": false
+        },
+        "companyLegalName": {
+          "type": "string",
+          "deprecated": true,
+          "description": "The registered name of the brand who will be engaging with their users.",
+          "uniqueItems": false
+        },
+        "wabaName": {
+          "type": "string",
+          "description": "The registered name of the brand who will be engaging with their users.",
+          "uniqueItems": false
+        },
+        "senderDetails": {
+          "description": "Details of the sender firstly created.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappAccountSenderRelatedChangesDetailsDto"
+            }
+          ]
+        }
+      }
+    },
+    "WhatsappAccountChangesDto": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "x-enumDescriptions": {
+            "DRAFT": "The modifications to the account profile are saved as a draft only.",
+            "IN_PROGRESS": "The modifications to the account profile have been submitted and are still processing.",
+            "PENDING_FACEBOOK_VERIFICATION": "The modifications to the account profile await completed Facebook business verification workflows.",
+            "REJECTED": "The modifications to the account profile have been reviewed and rejected."
+          },
+          "description": "Current status of the pending changes.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappAccountChangeStateEnum"
+            }
+          ]
+        },
+        "details": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WhatsappAccountDetailsDto",
+              "description": "For newly created account"
+            },
+            {
+              "$ref": "#/$defs/WhatsappAccountChangesDetailsDto",
+              "description": "For update account"
+            }
+          ],
+          "description": "The pending changes to account details and information",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "status"
+      ]
+    },
+    "WhatsappAccountDetailsDto": {
+      "type": "object",
+      "properties": {
+        "clientBusinessManagerId": {
+          "type": "string",
+          "description": "The Business Manager ID for the client.",
+          "uniqueItems": false
+        },
+        "companyLegalName": {
+          "type": "string",
+          "deprecated": true,
+          "description": "The registered name of the brand who will be engaging with their users.",
+          "uniqueItems": false
+        },
+        "wabaName": {
+          "type": "string",
+          "description": "The registered name of the brand who will be engaging with their users.",
+          "uniqueItems": false
+        },
+        "senderDetails": {
+          "description": "Details of the sender firstly created.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappAccountSenderRelatedDetailsDto"
+            }
+          ]
+        }
+      },
+      "required": [
+        "clientBusinessManagerId",
+        "wabaName"
+      ]
+    },
+    "WhatsappAccountSenderRelatedChangesDetailsDto": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "minLength": 1,
+          "maxLength": 255,
+          "description": "Waba display name / used as default display name of new phone at Meta",
+          "uniqueItems": false
+        },
+        "businessCategory": {
+          "x-enumDescriptions": {
+            "ALCOHOL": "The brand operates within the alcohol sector.",
+            "AUTOMOTIVE": "The brand operates within the automotive sector.",
+            "BEAUTY_SPA_SALON": "The brand operates within beauty, spa, or salon services.",
+            "CLOTHING_AND_APPAREL": "The brand operates within clothing and apparel commerce.",
+            "EDUCATION": "The brand operates within the education field.",
+            "ENTERTAINMENT": "The brand operates within the entertainment and media industry.",
+            "EVENT_PLANNING_AND_SERVICE": "The brand operates within event planning and corporate services.",
+            "FINANCE_AND_BANKING": "The brand operates within financial and banking services.",
+            "FOOD_AND_GROCERY": "The brand operates within the food supply or grocery sector.",
+            "HOTEL_AND_LODGING": "The brand operates within hospitality, hotels, or lodging.",
+            "MEDICAL_AND_HEALTH": "The brand operates within healthcare, medical services, or pharmaceuticals.",
+            "NON_PROFIT": "The brand is a registered non-profit organization.",
+            "NOT_SET": "The operational business vertical has not been selected.",
+            "ONLINE_GAMBLING": "The brand operates within the online gambling or betting industry.",
+            "OTC_DRUGS": "The brand operates within over-the-counter drug sales and distribution.",
+            "OTHER": "The brand operates in an industry outside the standard defined taxonomy.",
+            "PHYSICAL_GAMBLING": "The brand operates within physical gambling establishments or casinos.",
+            "PROFESSIONAL_SERVICES": "The brand provides corporate, professional, or technical services.",
+            "PUBLIC_SERVICE": "The brand provides public utilities or governmental services.",
+            "RESTAURANT": "The brand operates a restaurant or food service establishment.",
+            "SHOPPING_AND_RETAIL": "The brand operates within retail or wholesale commerce.",
+            "TRAVEL_AND_TRANSPORTATION": "The brand operates within transportation, travel, or logistics services.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Vertical / business category for the business account.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderWhatsAppVerticalEnum"
+            }
+          ]
+        },
+        "region": {
+          "x-enumDescriptions": {
+            "BR": "Specifies that the bot infrastructure should be hosted within the Brazil region.",
+            "EU": "Specifies that the bot infrastructure should be hosted within the Europe region.",
+            "US": "Specifies that the bot infrastructure should be hosted within the United States region.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Region for the partner-initiated sender.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderBotRegionEnum"
+            }
+          ]
+        },
+        "metaLocalStorage": {
+          "x-enumDescriptions": {
+            "AE": "Specifies that Meta-managed user and compliance data should be stored within the United Arab Emirates.",
+            "AU": "Specifies that Meta-managed user and compliance data should be stored within Australia.",
+            "BH": "Specifies that Meta-managed user and compliance data should be stored within Bahrain.",
+            "BR": "Specifies that Meta-managed user and compliance data should be stored within Brazil.",
+            "CA": "Specifies that Meta-managed user and compliance data should be stored within Canada.",
+            "CH": "Specifies that Meta-managed user and compliance data should be stored within Switzerland.",
+            "DE": "Specifies that Meta-managed user and compliance data should be stored within Germany.",
+            "GB": "Specifies that Meta-managed user and compliance data should be stored within the United Kingdom.",
+            "ID": "Specifies that Meta-managed user and compliance data should be stored within Indonesia.",
+            "IN": "Specifies that Meta-managed user and compliance data should be stored within India.",
+            "JP": "Specifies that Meta-managed user and compliance data should be stored within Japan.",
+            "KR": "Specifies that Meta-managed user and compliance data should be stored within South Korea.",
+            "SG": "Specifies that Meta-managed user and compliance data should be stored within Singapore.",
+            "US": "Specifies that Meta-managed user and compliance data should be stored within the United States.",
+            "ZA": "Specifies that Meta-managed user and compliance data should be stored within South Africa.",
+            "UNSPECIFIED": "The Meta data storage residency location is unspecified.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Local storage region for the partner-initiated sender.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderMetaLocalStoragesEnum"
+            }
+          ]
+        }
+      },
+      "required": [
+        "displayName",
+        "businessCategory",
+        "region",
+        "metaLocalStorage"
+      ]
+    },
+    "WhatsappAccountSenderRelatedDetailsDto": {
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "type": "string",
+          "description": "Waba display name / used as default display name of new phone at Meta",
+          "uniqueItems": false
+        },
+        "businessCategory": {
+          "x-enumDescriptions": {
+            "ALCOHOL": "The brand operates within the alcohol sector.",
+            "AUTOMOTIVE": "The brand operates within the automotive sector.",
+            "BEAUTY_SPA_SALON": "The brand operates within beauty, spa, or salon services.",
+            "CLOTHING_AND_APPAREL": "The brand operates within clothing and apparel commerce.",
+            "EDUCATION": "The brand operates within the education field.",
+            "ENTERTAINMENT": "The brand operates within the entertainment and media industry.",
+            "EVENT_PLANNING_AND_SERVICE": "The brand operates within event planning and corporate services.",
+            "FINANCE_AND_BANKING": "The brand operates within financial and banking services.",
+            "FOOD_AND_GROCERY": "The brand operates within the food supply or grocery sector.",
+            "HOTEL_AND_LODGING": "The brand operates within hospitality, hotels, or lodging.",
+            "MEDICAL_AND_HEALTH": "The brand operates within healthcare, medical services, or pharmaceuticals.",
+            "NON_PROFIT": "The brand is a registered non-profit organization.",
+            "NOT_SET": "The operational business vertical has not been selected.",
+            "ONLINE_GAMBLING": "The brand operates within the online gambling or betting industry.",
+            "OTC_DRUGS": "The brand operates within over-the-counter drug sales and distribution.",
+            "OTHER": "The brand operates in an industry outside the standard defined taxonomy.",
+            "PHYSICAL_GAMBLING": "The brand operates within physical gambling establishments or casinos.",
+            "PROFESSIONAL_SERVICES": "The brand provides corporate, professional, or technical services.",
+            "PUBLIC_SERVICE": "The brand provides public utilities or governmental services.",
+            "RESTAURANT": "The brand operates a restaurant or food service establishment.",
+            "SHOPPING_AND_RETAIL": "The brand operates within retail or wholesale commerce.",
+            "TRAVEL_AND_TRANSPORTATION": "The brand operates within transportation, travel, or logistics services.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Vertical / business category for the business account.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderWhatsAppVerticalEnum"
+            }
+          ]
+        },
+        "region": {
+          "x-enumDescriptions": {
+            "BR": "Specifies that the bot infrastructure should be hosted within the Brazil region.",
+            "EU": "Specifies that the bot infrastructure should be hosted within the Europe region.",
+            "US": "Specifies that the bot infrastructure should be hosted within the United States region.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Region for the partner-initiated sender.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderBotRegionEnum"
+            }
+          ]
+        },
+        "metaLocalStorage": {
+          "x-enumDescriptions": {
+            "AE": "Specifies that Meta-managed user and compliance data should be stored within the United Arab Emirates.",
+            "AU": "Specifies that Meta-managed user and compliance data should be stored within Australia.",
+            "BH": "Specifies that Meta-managed user and compliance data should be stored within Bahrain.",
+            "BR": "Specifies that Meta-managed user and compliance data should be stored within Brazil.",
+            "CA": "Specifies that Meta-managed user and compliance data should be stored within Canada.",
+            "CH": "Specifies that Meta-managed user and compliance data should be stored within Switzerland.",
+            "DE": "Specifies that Meta-managed user and compliance data should be stored within Germany.",
+            "GB": "Specifies that Meta-managed user and compliance data should be stored within the United Kingdom.",
+            "ID": "Specifies that Meta-managed user and compliance data should be stored within Indonesia.",
+            "IN": "Specifies that Meta-managed user and compliance data should be stored within India.",
+            "JP": "Specifies that Meta-managed user and compliance data should be stored within Japan.",
+            "KR": "Specifies that Meta-managed user and compliance data should be stored within South Korea.",
+            "SG": "Specifies that Meta-managed user and compliance data should be stored within Singapore.",
+            "US": "Specifies that Meta-managed user and compliance data should be stored within the United States.",
+            "ZA": "Specifies that Meta-managed user and compliance data should be stored within South Africa.",
+            "UNSPECIFIED": "The Meta data storage residency location is unspecified.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Local storage region for the partner-initiated sender.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappSenderMetaLocalStoragesEnum"
+            }
+          ]
+        }
+      },
+      "required": [
+        "displayName",
+        "businessCategory",
+        "region",
+        "metaLocalStorage"
+      ]
+    },
+    "WhatsappAccountStateEnum": {
+      "type": "string",
+      "enum": [
+        "ONBOARDED",
+        "PENDING_FACEBOOK_VERIFICATION",
+        "REJECTED"
+      ],
+      "description": "The current state of your account."
+    },
+    "WhatsappBusinessManagersEnum": {
+      "type": "string",
+      "enum": [
+        "SINCH_AMERICA",
+        "SINCH_BR",
+        "SINCH_MX",
+        "SINCH_SEP",
+        "SINCH_UK",
+        "UNRECOGNIZED"
+      ],
+      "description": "Business manager."
+    },
+    "WhatsappConversationAppRegionsEnum": {
+      "type": "string",
+      "enum": [
+        "br",
+        "eu",
+        "us"
+      ],
+      "description": "Conversation API app regions the sender can be used for."
+    },
+    "WhatsappCountryCodesEnum": {
+      "type": "string",
+      "enum": [
+        "AD",
+        "AE",
+        "AF",
+        "AG",
+        "AI",
+        "AL",
+        "AM",
+        "AO",
+        "AQ",
+        "AR",
+        "AS",
+        "AT",
+        "AU",
+        "AW",
+        "AZ",
+        "BA",
+        "BB",
+        "BD",
+        "BE",
+        "BF",
+        "BG",
+        "BH",
+        "BI",
+        "BJ",
+        "BM",
+        "BN",
+        "BO",
+        "BQ",
+        "BR",
+        "BS",
+        "BT",
+        "BW",
+        "BY",
+        "BZ",
+        "CA",
+        "CD",
+        "CF",
+        "CG",
+        "CH",
+        "CI",
+        "CK",
+        "CL",
+        "CM",
+        "CN",
+        "CO",
+        "CR",
+        "CU",
+        "CV",
+        "CW",
+        "CY",
+        "CZ",
+        "DE",
+        "DJ",
+        "DK",
+        "DM",
+        "DO",
+        "DZ",
+        "EC",
+        "EE",
+        "EG",
+        "ER",
+        "ES",
+        "ET",
+        "FI",
+        "FJ",
+        "FK",
+        "FM",
+        "FO",
+        "FR",
+        "GA",
+        "GB",
+        "GD",
+        "GE",
+        "GF",
+        "GG",
+        "GH",
+        "GI",
+        "GL",
+        "GM",
+        "GN",
+        "GP",
+        "GQ",
+        "GR",
+        "GT",
+        "GU",
+        "GW",
+        "GY",
+        "HK",
+        "HN",
+        "HR",
+        "HT",
+        "HU",
+        "ID",
+        "IE",
+        "IL",
+        "IM",
+        "IN",
+        "IO",
+        "IQ",
+        "IR",
+        "IS",
+        "IT",
+        "JE",
+        "JM",
+        "JO",
+        "JP",
+        "KE",
+        "KG",
+        "KH",
+        "KI",
+        "KM",
+        "KN",
+        "KP",
+        "KR",
+        "KW",
+        "KY",
+        "KZ",
+        "LA",
+        "LB",
+        "LC",
+        "LI",
+        "LK",
+        "LR",
+        "LS",
+        "LT",
+        "LU",
+        "LV",
+        "LY",
+        "MA",
+        "MC",
+        "MD",
+        "ME",
+        "MG",
+        "MH",
+        "MK",
+        "ML",
+        "MM",
+        "MN",
+        "MO",
+        "MP",
+        "MQ",
+        "MR",
+        "MS",
+        "MT",
+        "MU",
+        "MV",
+        "MW",
+        "MX",
+        "MY",
+        "MZ",
+        "NA",
+        "NC",
+        "NE",
+        "NF",
+        "NG",
+        "NI",
+        "NL",
+        "NO",
+        "NP",
+        "NR",
+        "NU",
+        "NZ",
+        "OM",
+        "PA",
+        "PE",
+        "PF",
+        "PG",
+        "PH",
+        "PK",
+        "PL",
+        "PM",
+        "PR",
+        "PS",
+        "PT",
+        "PW",
+        "PY",
+        "QA",
+        "RE",
+        "RO",
+        "RS",
+        "RU",
+        "RW",
+        "SA",
+        "SB",
+        "SC",
+        "SD",
+        "SE",
+        "SG",
+        "SH",
+        "SI",
+        "SK",
+        "SL",
+        "SM",
+        "SN",
+        "SO",
+        "SR",
+        "SS",
+        "ST",
+        "SV",
+        "SX",
+        "SY",
+        "SZ",
+        "TC",
+        "TD",
+        "TG",
+        "TH",
+        "TJ",
+        "TK",
+        "TL",
+        "TM",
+        "TN",
+        "TO",
+        "TR",
+        "TT",
+        "TV",
+        "TW",
+        "TZ",
+        "UA",
+        "UG",
+        "UM",
+        "US",
+        "UY",
+        "UZ",
+        "VC",
+        "VE",
+        "VG",
+        "VI",
+        "VN",
+        "VU",
+        "WF",
+        "WS",
+        "XK",
+        "YE",
+        "YT",
+        "ZA",
+        "ZM",
+        "ZW",
+        "UNRECOGNIZED"
+      ],
+      "description": "Upscalable country codes (ISO 3166-1 alpha-2)."
+    },
+    "WhatsappDailyLimitEnum": {
+      "type": "string",
+      "enum": [
+        "NOT_SET",
+        "TIER_100K",
+        "TIER_10K",
+        "TIER_1K",
+        "TIER_250",
+        "TIER_2K",
+        "TIER_50",
+        "TIER_UNLIMITED",
+        "UNRECOGNIZED"
+      ],
+      "description": "This property is deprecated. Use `AccountDto.businessDailyLimit` instead. Current daily message limit of the sender. "
+    },
+    "WhatsappSenderBotRegionEnum": {
+      "type": "string",
+      "enum": [
+        "BR",
+        "EU",
+        "US",
+        "UNRECOGNIZED"
+      ],
+      "description": "Region sender is provisioned in."
+    },
+    "WhatsappSenderMetaLocalStoragesEnum": {
+      "type": "string",
+      "enum": [
+        "AE",
+        "AU",
+        "BH",
+        "BR",
+        "CA",
+        "CH",
+        "DE",
+        "GB",
+        "ID",
+        "IN",
+        "JP",
+        "KR",
+        "SG",
+        "US",
+        "ZA",
+        "UNRECOGNIZED",
+        "UNSPECIFIED"
+      ],
+      "description": "Region sender store the data in Meta."
+    },
+    "WhatsappSenderWhatsAppVerticalEnum": {
+      "type": "string",
+      "enum": [
+        "ALCOHOL",
+        "AUTOMOTIVE",
+        "BEAUTY_SPA_SALON",
+        "CLOTHING_AND_APPAREL",
+        "EDUCATION",
+        "ENTERTAINMENT",
+        "EVENT_PLANNING_AND_SERVICE",
+        "FINANCE_AND_BANKING",
+        "FOOD_AND_GROCERY",
+        "HOTEL_AND_LODGING",
+        "MEDICAL_AND_HEALTH",
+        "NON_PROFIT",
+        "NOT_SET",
+        "ONLINE_GAMBLING",
+        "OTC_DRUGS",
+        "OTHER",
+        "PHYSICAL_GAMBLING",
+        "PROFESSIONAL_SERVICES",
+        "PUBLIC_SERVICE",
+        "RESTAURANT",
+        "SHOPPING_AND_RETAIL",
+        "TRAVEL_AND_TRANSPORTATION",
+        "UNRECOGNIZED"
+      ],
+      "description": "Category of the sender displayed in the Business Info within WhatsApp."
+    },
+    "WhatsappWabaBanStatesEnum": {
+      "type": "string",
+      "enum": [
+        "DISABLE",
+        "REINSTATE",
+        "SCHEDULE_FOR_DISABLE",
+        "UNRECOGNIZED"
+      ],
+      "description": "Please use get account endpoint for this information."
+    }
+  }
+}

@@ -1,0 +1,237 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-get-call-response-obj-schema.json",
+  "title": "getCallResponseObj",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-voice-api-openapi.yml#/components/schemas/getCallResponseObj",
+  "type": "object",
+  "properties": {
+    "from": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/destinationMxp"
+        },
+        {
+          "$ref": "#/$defs/destinationPstn"
+        },
+        {
+          "$ref": "#/$defs/destinationSip"
+        }
+      ]
+    },
+    "to": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/destinationMxp"
+        },
+        {
+          "$ref": "#/$defs/destinationPstn"
+        },
+        {
+          "$ref": "#/$defs/destinationSip"
+        }
+      ]
+    },
+    "domain": {
+      "type": "string",
+      "x-enumDescriptions": {
+        "pstn": "The Public Switched Telephone Network, or a normal phone call."
+      },
+      "enum": [
+        "pstn"
+      ],
+      "description": "Must be `pstn` for PSTN."
+    },
+    "callId": {
+      "type": "string",
+      "description": "The unique identifier of the call."
+    },
+    "duration": {
+      "type": "integer",
+      "description": "The duration of the call in seconds."
+    },
+    "status": {
+      "type": "string",
+      "x-enumDescriptions": {
+        "ONGOING": "Call status is `ONGOING`",
+        "FINAL": "Call status is `FINAL`"
+      },
+      "enum": [
+        "ONGOING",
+        "FINAL"
+      ],
+      "description": "The status of the call. Either `ONGOING` or `FINAL`"
+    },
+    "result": {
+      "$ref": "#/$defs/callResult"
+    },
+    "reason": {
+      "type": "string",
+      "x-enumDescriptions": {
+        "N/A": "Not available.",
+        "TIMEOUT": "Timed out.",
+        "CALLERHANGUP": "Caller hung up.",
+        "CALLEEHANGUP": "Callee hung up.",
+        "BLOCKED": "The call was blocked.",
+        "NOCREDITPARTNER": "No credit available.",
+        "MANAGERHANGUP": "The Sinch server ended the call.",
+        "CANCEL": "Call was canceled.",
+        "GENERALERROR": "A general error.",
+        "INVALIDSVAMLACTION": "Call could not be completed due to invalid SVAML response."
+      },
+      "enum": [
+        "N/A",
+        "TIMEOUT",
+        "CALLERHANGUP",
+        "CALLEEHANGUP",
+        "BLOCKED",
+        "NOCREDITPARTNER",
+        "MANAGERHANGUP",
+        "CANCEL",
+        "GENERALERROR",
+        "INVALIDSVAMLACTION"
+      ],
+      "description": "Contains the reason why a call ended."
+    },
+    "timestamp": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date and time of the call."
+    },
+    "custom": {
+      "type": "string",
+      "description": "A string that can be used to pass custom information related to the call."
+    },
+    "userRate": {
+      "$ref": "#/$defs/price"
+    },
+    "debit": {
+      "$ref": "#/$defs/price"
+    }
+  },
+  "$defs": {
+    "callResult": {
+      "type": "string",
+      "x-enumDescriptions": {
+        "N/A": "Not applicable",
+        "ANSWERED": "The call was answered.",
+        "BUSY": "The line called was busy.",
+        "NOANSWER": "The line called failed to answer.",
+        "FAILED": "The call failed."
+      },
+      "enum": [
+        "N/A",
+        "ANSWERED",
+        "BUSY",
+        "NOANSWER",
+        "FAILED"
+      ],
+      "description": "Contains the result of a call."
+    },
+    "destinationMxp": {
+      "type": "object",
+      "description": "The type of device and number or endpoint to call.",
+      "required": [
+        "type",
+        "endpoint"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/mxpDestination"
+        },
+        "endpoint": {
+          "type": "string",
+          "description": "For type `userName` the value is the username for a data endpoint.",
+          "format": "user name"
+        }
+      }
+    },
+    "destinationPstn": {
+      "type": "object",
+      "description": "The type of device and number or endpoint to call.",
+      "required": [
+        "type",
+        "endpoint"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/pstnDestination"
+        },
+        "endpoint": {
+          "type": "string",
+          "description": "If the type is `number` the value of the endpoint is a phone number.",
+          "format": "e164 for numbers"
+        }
+      }
+    },
+    "destinationSip": {
+      "type": "object",
+      "description": "The type of device and number or endpoint to call.",
+      "required": [
+        "type",
+        "endpoint"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/sipDestination"
+        },
+        "endpoint": {
+          "type": "string",
+          "description": "For type `sip` the value is the SIP address for a SIP endpoint.",
+          "format": "sip address"
+        }
+      }
+    },
+    "mxpDestination": {
+      "type": "string",
+      "description": "Type `userName` used for data endpoints.",
+      "x-enumDescriptions": {
+        "username": "A username for data endpoints.",
+        "Username": "A username for data endpoints."
+      },
+      "enum": [
+        "username",
+        "Username"
+      ]
+    },
+    "price": {
+      "type": "object",
+      "properties": {
+        "currencyId": {
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "amount": {
+          "type": "number",
+          "format": "float"
+        }
+      }
+    },
+    "pstnDestination": {
+      "type": "string",
+      "description": "Type `number` used for PSTN endpoints.",
+      "x-enumDescriptions": {
+        "number": "A e.164 formatted number for PSTN endpoints.",
+        "Number": "A e.164 formatted number for PSTN endpoints."
+      },
+      "enum": [
+        "number",
+        "Number"
+      ]
+    },
+    "sipDestination": {
+      "type": "string",
+      "description": "Type `sip` for SIP infrastructures.",
+      "x-enumDescriptions": {
+        "sip": "A SIP address for SIP infrastructures."
+      },
+      "enum": [
+        "sip"
+      ]
+    }
+  }
+}

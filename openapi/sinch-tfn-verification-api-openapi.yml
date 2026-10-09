@@ -1,0 +1,580 @@
+openapi: 3.2.0
+info:
+  title: Registration TFN Verification API
+  description: Service for creating and listing US 10DLC brand and campaign registrations and TFN Verifications.
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- url: https://us10dlc.numbers.api.sinch.com
+  description: HTTP 10DLC API Server (Default(US))
+security:
+- BasicAuth: []
+- OAuth2: []
+tags:
+- name: TFN Verification
+  description: Create or look up Verifications for Toll-Free Numbers
+paths:
+  /v1/projects/{projectId}/tfnVerification:
+    post:
+      tags:
+      - TFN Verification
+      summary: Create TFN Verifications
+      description: Create a TFN verification.
+      operationId: TfnVerificationExternalService_CreateTfnVerificationRequest
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      requestBody:
+        description: The request body of the TFN Verification to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTfnVerificationRequest'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateTfnVerificationResponse'
+        '400':
+          description: If the mandatory fields are not present, exceed length limits or are invalid (e.g. URLs, email addresses...)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: business_name
+                      description: Invalid business_name
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+      x-codegen-request-body-name: body
+    get:
+      tags:
+      - TFN Verification
+      summary: List TFN Verifications
+      description: Lists all TFN verifications per project.
+      operationId: TfnVerificationExternalService_ListTfnVerificationsRequest
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/tfnUseCase'
+      - $ref: '#/components/parameters/tfnVerificationStatus'
+      - $ref: '#/components/parameters/pageSize'
+      - $ref: '#/components/parameters/pageToken'
+      - $ref: '#/components/parameters/orderBy'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListTfnVerificationsResponse'
+        '400':
+          description: If the page_size, page_token or order_by are not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: order_by
+                      description: Invalid order_by XXX
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+  /v1/projects/{projectId}/tfnVerification/{tfnVerificationId}:
+    get:
+      tags:
+      - TFN Verification
+      summary: Get TFN Verifications
+      description: Get information about an existing TFN Verification.
+      operationId: TfnVerificationExternalService_GetTfnVerificationRequest
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/tfnVerificationIdPath'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TfnVerification'
+        '400':
+          description: If the projectId or tfnVerificationId are not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: tfn_verification_id
+                      description: Invalid tfn_verification_id
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+  /v1/projects/{projectId}/tfnVerification/useCases:
+    get:
+      tags:
+      - TFN Verification
+      summary: Get TFN Verification use cases
+      description: Get a list of valid use cases for creating TFN Verifications
+      operationId: TfnVerificationExternalService_GetTfnVerificationUseCasesRequest
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTfnVerificationUseCasesResponse'
+        '400':
+          description: If the project_id is not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: project_id
+                      description: Invalid project_id
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+components:
+  parameters:
+    pageToken:
+      name: pageToken
+      in: query
+      required: false
+      schema:
+        type: string
+    tfnVerificationIdPath:
+      name: tfnVerificationId
+      description: The ID of an existing TFN verification
+      in: path
+      required: true
+      schema:
+        type: string
+    tfnUseCase:
+      name: useCase
+      description: A use case associated to a verification to be searched
+      in: query
+      required: false
+      schema:
+        type: string
+    pageSize:
+      name: pageSize
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    tfnVerificationStatus:
+      name: statuses
+      in: query
+      required: false
+      schema:
+        type: array
+        items:
+          $ref: '#/components/schemas/TfnVerificationStatus'
+    orderBy:
+      name: orderBy
+      in: query
+      required: false
+      schema:
+        type: string
+    projectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Sinch uses projects to group resources such as contacts and apps together to manage and connect a unique set of keys and secret IDs for all your Sinch API products. To identify a project, it is given a unique alphanumeric identifier that ties it to your account. Your project ID can be found in the [Customer Dashboard](https://dashboard.sinch.com/settings/project-management).
+  schemas:
+    fieldViolations:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field which produced the error.
+          example: order_by
+        description:
+          type: string
+          description: The description of the error.
+          example: Invalid `order_by` number.
+    ListTfnVerificationsResponse:
+      title: Tfn Verification listed information
+      type: object
+      properties:
+        tfnVerifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/TfnVerification'
+        totalSize:
+          type: integer
+        nextPageToken:
+          type: string
+    errorDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: A more specific description of the error.
+          example: BadRequest
+        resourceType:
+          type: string
+          description: The type of resource relevant to the error, if applicable.
+        resourceName:
+          type: string
+          description: The name of the resource, if applicable.
+        owner:
+          type: string
+          description: The owner of the resource, if applicable.
+        description:
+          type: string
+          description: A description of the error, if applicable.
+        fieldViolations:
+          type: array
+          description: An array of all the field violations which contributed to the error.
+          items:
+            $ref: '#/components/schemas/fieldViolations'
+    GetTfnVerificationUseCasesResponse:
+      title: Tfn Verification use cases information
+      type: object
+      properties:
+        useCases:
+          type: array
+          items:
+            type: string
+    TfnVerification:
+      title: Tfn Verification object
+      allOf:
+      - $ref: '#/components/schemas/TfnVerificationBase'
+    TfnVerificationBase:
+      title: Tfn Verification Base
+      type: object
+      properties:
+        tfnVerificationId:
+          type: string
+          description: The unique identifier for the TFN verification request, generated by the server.
+          readOnly: true
+        status:
+          allOf:
+          - $ref: '#/components/schemas/TfnVerificationStatus'
+          description: The current status of the verification request.
+          readOnly: true
+        createTime:
+          type: string
+          format: date-time
+          description: The timestamp when the verification was created, in UTC (RFC3339 format).
+          readOnly: true
+        projectId:
+          type: string
+          description: Your project ID can be found in the [Customer Dashboard](https://dashboard.sinch.com/settings/project-management).
+          readOnly: true
+        createdBy:
+          deprecated: true
+          maxLength: 50
+          type: string
+          format: email
+          description: The email of the user who initiated the request.
+        phoneNumber:
+          type: string
+          description: Toll-Free Number that is procured, hosted or in the process of hosting with Sinch. Must be in E.164 format.
+          pattern: ^\+[1-9]\d{1,14}$
+        businessName:
+          maxLength: 500
+          type: string
+        businessAddress1:
+          maxLength: 500
+          type: string
+        businessAddress2:
+          maxLength: 500
+          type: string
+        businessCity:
+          maxLength: 500
+          type: string
+        businessState:
+          maxLength: 500
+          type: string
+        businessZipCode:
+          maxLength: 500
+          type: string
+        businessCountry:
+          maxLength: 500
+          type: string
+        businessContactFirstName:
+          maxLength: 500
+          type: string
+        businessContactLastName:
+          maxLength: 500
+          type: string
+        businessContactEmail:
+          maxLength: 500
+          type: string
+          format: email
+        businessContactPhone:
+          type: string
+          pattern: ^\+[1-9]\d{1,14}$
+        corporateWebsite:
+          maxLength: 500
+          type: string
+        messageVolume:
+          maxLength: 500
+          type: string
+          description: 'Estimate monthly volume of messages from the TFN (accepted values: 10, 100, 1000, 10000, 100000, 250000, 500000, 750000, 1000000, 5000000, 10000000+)'
+        useCase:
+          maxLength: 500
+          type: string
+          description: Category of the use case, fetched from the dedicated API.
+        useCaseSummary:
+          maxLength: 500
+          type: string
+          description: General idea of the use case and customer.
+        productionMessageContent:
+          maxLength: 1000
+          type: string
+          description: Example of message content.
+        optInWorkflowDescription:
+          maxLength: 500
+          type: string
+          description: Description of the opt-in workflow.
+        optInWorkflowImageUrls:
+          type: array
+          description: Images showing the opt-in workflow.
+          items:
+            maxItems: 10
+            maxLength: 1000
+            type: string
+        additionalInformation:
+          maxLength: 500
+          type: string
+          description: Any additional information.
+        businessRegistrationNumber:
+          maxLength: 50
+          type: string
+          description: A legally recognized business registration number.
+        businessType:
+          maxLength: 50
+          type: string
+          description: The type of business, selected from a list of predefined categories.
+          enum:
+          - SOLE_PROPRIETOR
+          - PRIVATE_PROFIT
+          - PUBLIC_PROFIT
+          - NON_PROFIT
+          - GOVERNMENT
+          x-enumDescriptions:
+            SOLE_PROPRIETOR: A business owned and run by one individual.
+            PRIVATE_PROFIT: A privately-owned company that operates for profit.
+            PUBLIC_PROFIT: A publicly-traded company that operates for profit.
+            NON_PROFIT: An organization that uses its surplus revenues to further achieve its purpose or mission.
+            GOVERNMENT: A government entity or agency.
+        businessRegistrationCountry:
+          maxLength: 500
+          type: string
+          description: Country business is registered in.
+        campaignVerifyAuthorizationToken:
+          maxLength: 500
+          type: string
+          description: Campaign tokens for customers. This is a sensitive, write-only field.
+          format: password
+          writeOnly: true
+        businessRegistrationType:
+          maxLength: 50
+          type: string
+          description: The type of business registration (e.g. EIN, CBN, CRN, NEQ, Provincial Number, VAT, ACN, ABN, BRN)
+        businessDba:
+          maxLength: 500
+          type: string
+          description: The "doing business as" (DBA) name of the business.
+        termsAndConditionsUrl:
+          maxLength: 500
+          type: string
+          format: uri
+          pattern: ^https://
+          description: A URL to a page containing the terms and conditions.
+          example: https://www.example.com/terms
+        privacyPolicyUrl:
+          maxLength: 500
+          type: string
+          format: uri
+          pattern: ^https://
+          description: A URL to a page containing the privacy policy.
+          example: https://www.example.com/privacy-policy
+        notes:
+          type: array
+          description: Feedback notes added during the review process.
+          readOnly: true
+          items:
+            allOf:
+            - $ref: '#/components/schemas/TfnVerificationNote'
+      required:
+      - projectId
+      - phoneNumber
+      - businessName
+      - businessAddress1
+      - businessCity
+      - businessState
+      - businessZipCode
+      - businessContactFirstName
+      - businessContactLastName
+      - businessContactEmail
+      - businessContactPhone
+      - corporateWebsite
+      - messageVolume
+      - useCase
+      - useCaseSummary
+      - productionMessageContent
+      - optInWorkflowDescription
+      - optInWorkflowImageUrls
+      - businessRegistrationNumber
+      - businessType
+      - businessRegistrationCountry
+      - tfnVerificationId
+      - status
+      - createTime
+      - businessRegistrationType
+      - termsAndConditionsUrl
+      - privacyPolicyUrl
+    CreateTfnVerificationRequest:
+      title: Tfn Verification Request
+      allOf:
+      - $ref: '#/components/schemas/TfnVerificationBase'
+    TfnVerificationStatus:
+      type: string
+      enum:
+      - STATUS_UNSPECIFIED
+      - WAITING
+      - IN_PROGRESS
+      - VERIFIED
+      - REJECTED
+      x-enumDescriptions:
+        STATUS_UNSPECIFIED: Status not specified.
+        WAITING: Verification is waiting.
+        IN_PROGRESS: Verification is in progress.
+        VERIFIED: TFN has been verified.
+        REJECTED: TFN has been rejected.
+    error:
+      required:
+      - error
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: integer
+              description: The error code.
+              example: 400
+            message:
+              type: string
+              description: The error message.
+              example: Invalid argument.
+            status:
+              type: string
+              description: The status of the error.
+              example: INVALID_ARGUMENT
+            details:
+              type: array
+              description: An array of objects describing the error in more detail, if applicable.
+              items:
+                $ref: '#/components/schemas/errorDetails'
+    CreateTfnVerificationResponse:
+      title: Tfn Verification's id
+      type: object
+      properties:
+        tfnVerificationId:
+          type: string
+    TfnVerificationNote:
+      title: TFN Verification Note Object
+      description: Feedback note added during the review process containing, e.g., the rejection reason
+      properties:
+        note:
+          type: string
+        createTime:
+          type: string
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: Our basic security works with any project. Simply use the client_id and client_secret that were displayed when you created your access key through the dashboard in the [Access keys section](https://dashboard.sinch.com/settings/access-keys).
+    OAuth2:
+      type: oauth2
+      description: This is the recommended way to access our APIs in production.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

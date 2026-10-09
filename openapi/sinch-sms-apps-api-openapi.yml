@@ -1,0 +1,893 @@
+openapi: 3.2.0
+info:
+  title: Provisioning SMS Apps API
+  description: The SMS apps endpoint allows you to create and manage your SMS apps.
+  version: 1.2.117
+servers:
+- url: https://provisioning.api.sinch.com
+  description: Production server
+security:
+- BasicAuth: []
+  BearerAuth: []
+  OAuth2Production: []
+tags:
+- name: SMS Apps
+  description: The SMS apps endpoint allows you to create and manage your SMS apps.
+paths:
+  /v1/projects/{projectId}/sms/smsApps:
+    get:
+      description: Returns a paginated list of all sms apps. If no page token is supplied then the first `50` will be returned.
+      operationId: SmsSmsAppsController_listSmsApps_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: pageSize
+        required: false
+        in: query
+        schema:
+          type: number
+          minimum: 1
+          maximum: 100
+        description: The page size requested.
+      - name: pageToken
+        required: false
+        in: query
+        schema:
+          type: string
+        description: The page token if retrieving the next page from a previous query.
+      responses:
+        '200':
+          description: List of sms apps
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsSmsAppListDto'
+              examples:
+                response:
+                  summary: List response
+                  description: "\n    Response with sms apps.\n    "
+                  value:
+                    totalSize: 1
+                    pageSize: 50
+                    smsApps:
+                    - id: 439fffeedc41494ca58b99a534139bb0
+                      smsServiceId: 4b4ef32ba72d415cb259d179afa33d75
+                      name: Sms app name
+                      status: ACTIVE
+                      regions:
+                      - EU
+                      conversationApiAppDetails:
+                        id: 4CF9CE97504C4A468F4610919D17ECC1
+                        projectId: ea026751-3edf-40a9-ad93-1b382bd60a78
+                        region: EU
+                        channelStatus: ACTIVE
+                      test: false
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                invalid_page_token-0:
+                  summary: InvalidPageTokenError
+                  value:
+                    errorCode: invalid_page_token
+                    message: Invalid page token.
+                    resolution: The page token to use is provided in the previous query response, for new queries simply leave this field undefined.
+                invalid_page_size-1:
+                  summary: InvalidPageSizeError
+                  value:
+                    errorCode: invalid_page_size
+                    message: Page size must be numeric.
+                    resolution: Use a integer value for pageSize parameter.
+                invalid_id_format-2:
+                  summary: InvalidIdFormatError
+                  value:
+                    errorCode: invalid_id_format
+                    message: Id is not in the expected format.
+                    resolution: projectId param is in the wrong format. Confirm that you're sending the correct value.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                sms_service_not_found-0:
+                  summary: SmsServiceNotFoundError
+                  value:
+                    errorCode: sms_service_not_found
+                    message: SmsService not found.
+                    resolution: Verify that the projectId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: List all sms apps
+      tags:
+      - SMS Apps
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+    post:
+      description: Creates a new sms app for the given project.
+      operationId: SmsSmsAppsController_createSmsApp_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Sms app to create
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsInputSmsAppDto'
+            examples:
+              europe:
+                summary: Create sms app
+                description: Example body for creating an sms app.
+                value:
+                  name: Sms app name
+                  region: EU
+              europeWithConversationApiApp:
+                summary: Create sms app with conversation API app
+                description: Example body for creating an sms app and a conversation API app.
+                value:
+                  name: Sms app name
+                  region: EU
+                  convApiApp: true
+              europeWithConvApiAppId:
+                summary: Create sms app and connect to existing conversation API app
+                description: Example body for creating an sms app and connecting to an existing conversation API app.
+                value:
+                  name: Sms app name
+                  region: EU
+                  convApiAppId: 01KXD2MJSAN61CNE0CJ6VT6PXP
+      responses:
+        '201':
+          description: Newly created sms app
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsSmsAppDto'
+              examples:
+                europe:
+                  summary: Create response
+                  description: Response for successfully created sms app.
+                  value:
+                    id: 439fffeedc41494ca58b99a534139bb0
+                    smsServiceId: 4b4ef32ba72d415cb259d179afa33d75
+                    name: Sms app name
+                    status: ACTIVE
+                    regions:
+                    - EU
+                    conversationApiAppDetails:
+                      id: 4CF9CE97504C4A468F4610919D17ECC1
+                      projectId: ea026751-3edf-40a9-ad93-1b382bd60a78
+                      region: EU
+                      channelStatus: ACTIVE
+                    test: false
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                invalid_input-0:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - Description of fields failing validation
+                invalid_payload-1:
+                  summary: InvalidPayloadError
+                  value:
+                    errorCode: invalid_payload
+                    message: Invalid payload.
+                    resolution: Correct payload and submit again.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Create an sms app
+      tags:
+      - SMS Apps
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/sms/smsApps/{smsAppId}:
+    get:
+      description: Retrieves a single SMS app by its ID within a project.
+      operationId: SmsSmsAppsController_getSmsApp_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: smsAppId
+        required: true
+        in: path
+        description: Sms App id.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: SMS app details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsSmsAppDto'
+              examples:
+                response:
+                  summary: SMS App response
+                  description: "\n    Response with single SMS app details.\n    "
+                  value:
+                    id: 439fffeedc41494ca58b99a534139bb0
+                    smsServiceId: 4b4ef32ba72d415cb259d179afa33d75
+                    name: Sms app name
+                    status: ACTIVE
+                    regions:
+                    - EU
+                    conversationApiAppDetails:
+                      id: 4CF9CE97504C4A468F4610919D17ECC1
+                      projectId: ea026751-3edf-40a9-ad93-1b382bd60a78
+                      region: EU
+                      channelStatus: ACTIVE
+                    test: false
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+                unauthorized_error-1:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                sms_app_not_found-0:
+                  summary: SmsAppNotFoundError
+                  value:
+                    errorCode: sms_app_not_found
+                    message: SmsApp not found.
+                    resolution: Verify that the appId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get SMS app by ID
+      tags:
+      - SMS Apps
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+    delete:
+      operationId: SmsSmsAppsController_deleteSmsApp_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: smsAppId
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Sms app deleted.
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                invalid_id_format-0:
+                  summary: InvalidIdFormatError
+                  value:
+                    errorCode: invalid_id_format
+                    message: Id is not in the expected format.
+                    resolution: smsAppId param is in the wrong format. Confirm that you're sending the correct value.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                sms_app_not_found-0:
+                  summary: SmsAppNotFoundError
+                  value:
+                    errorCode: sms_app_not_found
+                    message: SmsApp not found.
+                    resolution: Verify that the appId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Delete sms app
+      tags:
+      - SMS Apps
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+    patch:
+      description: Updates the name of an existing sms app.
+      operationId: SmsSmsAppsController_updateSmsApp_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: smsAppId
+        required: true
+        in: path
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Sms app fields to update
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SmsUpdateSmsAppDto'
+      responses:
+        '200':
+          description: Updated sms app
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsSmsAppDto'
+              examples:
+                response:
+                  summary: Update response
+                  description: Response for successfully updated sms app.
+                  value:
+                    id: 439fffeedc41494ca58b99a534139bb0
+                    smsServiceId: 4b4ef32ba72d415cb259d179afa33d75
+                    name: Sms app name
+                    status: ACTIVE
+                    regions:
+                    - EU
+                    conversationApiAppDetails:
+                      id: 4CF9CE97504C4A468F4610919D17ECC1
+                      projectId: ea026751-3edf-40a9-ad93-1b382bd60a78
+                      region: EU
+                      channelStatus: ACTIVE
+                    test: false
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                invalid_input-0:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - Description of fields failing validation
+                no_fields_to_update-1:
+                  summary: NoFieldsToUpdateError
+                  value:
+                    errorCode: no_fields_to_update
+                    message: No fields to be updated.
+                    resolution: Supply at least one field to be updated.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                sms_app_not_found-0:
+                  summary: SmsAppNotFoundError
+                  value:
+                    errorCode: sms_app_not_found
+                    message: SmsApp not found.
+                    resolution: Verify that the appId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SmsPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Update an sms app
+      tags:
+      - SMS Apps
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+components:
+  schemas:
+    SmsUpdateSmsAppDto:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: New name for the SMS App.
+          uniqueItems: false
+    SmsProvisioningStatesEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - BLOCKED
+      - DELETED
+      - DEPROVISIONING
+      - DEPROVISIONING_FAILED
+      - FAILED_ADD
+      - FAILED_BLOCK
+      - FAILED_DELETE
+      - FAILED_UNBLOCK
+      - FAILED_UPDATE
+      - IN_PROGRESS_ADD
+      - IN_PROGRESS_BLOCK
+      - IN_PROGRESS_DELETE
+      - IN_PROGRESS_UNBLOCK
+      - IN_PROGRESS_UPDATE
+      - PENDING_ADD
+      - PENDING_BLOCK
+      - PENDING_DELETE
+      - PENDING_UNBLOCK
+      - PENDING_UPDATE
+      - PROVISIONING
+      - PROVISIONING_ADD
+      - PROVISIONING_ADD_FAILED
+      - PROVISIONING_BLOCK
+      - PROVISIONING_BLOCK_FAILED
+      - PROVISIONING_FAILED
+      - PROVISIONING_UNBLOCK
+      - PROVISIONING_UNBLOCK_FAILED
+      - PROVISIONING_UPDATE
+      - PROVISIONING_UPDATE_FAILED
+      - STATUS_UNSPECIFIED
+      - UNRECOGNIZED
+      description: Status of SMS App.
+    SmsSmsAppListDto:
+      type: object
+      properties:
+        totalSize:
+          type: number
+          description: Total size of the entries matching the search query.
+          uniqueItems: false
+        pageSize:
+          type: number
+          description: Requested size of the page.
+          uniqueItems: false
+        previousPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch previous batch of entries.
+          uniqueItems: false
+        nextPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch next batch of entries.
+          uniqueItems: false
+        smsApps:
+          description: List of sms apps.
+          uniqueItems: false
+          type: array
+          items:
+            $ref: '#/components/schemas/SmsSmsAppDto'
+      required:
+      - totalSize
+      - pageSize
+      - smsApps
+    SmsInputSmsAppRegionsEnum:
+      type: string
+      enum:
+      - BR
+      - EU
+      - US
+      description: "Region to create SMS app.\n (Allowed values for staging environment: `EU` or `US`)."
+    SmsConversationApiAppDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID of the app
+          uniqueItems: false
+        projectId:
+          type: string
+          description: ID of the app project
+          uniqueItems: false
+        region:
+          x-enumDescriptions:
+            BR: The application operates within the Brazil region.
+            EU: The application operates within the Europe region.
+            US: The application operates within the United States region.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: App region.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/SmsConversationApiAppRegionsEnum'
+        channelStatus:
+          x-enumDescriptions:
+            ACTIVE: The channel integration is active and operating as expected.
+            FAILING: The channel integration is failing and requires manual attention or troubleshooting.
+            PENDING: The channel integration setup or synchronization is pending completion.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Status of the channel credentials integration.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/SmsConversationAppChannelIntegrationStatusEnum'
+      required:
+      - id
+      - projectId
+      - region
+    SmsPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+    SmsSmsAppDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: SMS App id.
+          uniqueItems: false
+        smsServiceId:
+          type: string
+          description: Id of the SMS Service which the SMS App belongs to.
+          uniqueItems: false
+        name:
+          type: string
+          description: Name of SMS App.
+          uniqueItems: false
+        status:
+          x-enumDescriptions:
+            ACTIVE: The resource is active and ready to use.
+            BLOCKED: The resource is blocked and cannot be used.
+            DELETED: The resource has been deleted.
+            DEPROVISIONING: The resource deprovisioning is currently in progress.
+            DEPROVISIONING_FAILED: The resource deprovisioning failed and requires attention.
+            FAILED_ADD: Adding the resource failed during the provisioning sequence.
+            FAILED_BLOCK: Blocking the resource failed during the provisioning sequence.
+            FAILED_DELETE: Deleting the resource failed during the provisioning sequence.
+            FAILED_UNBLOCK: Unblocking the resource failed during the provisioning sequence.
+            FAILED_UPDATE: Updating the resource failed during the provisioning sequence.
+            IN_PROGRESS_ADD: The resource creation sequence is currently in progress.
+            IN_PROGRESS_BLOCK: The resource blocking sequence is currently in progress.
+            IN_PROGRESS_DELETE: The resource deletion sequence is currently in progress.
+            IN_PROGRESS_UNBLOCK: The resource unblocking sequence is currently in progress.
+            IN_PROGRESS_UPDATE: The resource update sequence is currently in progress.
+            PENDING_ADD: The resource creation sequence is queued and waiting to start.
+            PENDING_BLOCK: The resource blocking sequence is queued and waiting to start.
+            PENDING_DELETE: The resource deletion sequence is queued and waiting to start.
+            PENDING_UNBLOCK: The resource unblocking sequence is queued and waiting to start.
+            PENDING_UPDATE: The resource update sequence is queued and waiting to start.
+            PROVISIONING: The provisioning sequence is currently in progress.
+            PROVISIONING_ADD: The provisioning system is actively processing resource creation.
+            PROVISIONING_ADD_FAILED: The provisioning flow failed while attempting to create the resource.
+            PROVISIONING_BLOCK: The provisioning system is actively processing resource blocking.
+            PROVISIONING_BLOCK_FAILED: The provisioning flow failed while attempting to block the resource.
+            PROVISIONING_FAILED: The provisioning sequence failed and requires technical attention.
+            PROVISIONING_UNBLOCK: The provisioning system is actively processing resource unblocking.
+            PROVISIONING_UNBLOCK_FAILED: The provisioning flow failed while attempting to unblock the resource.
+            PROVISIONING_UPDATE: The provisioning system is actively processing a resource update.
+            PROVISIONING_UPDATE_FAILED: The provisioning flow failed while attempting to update the resource.
+            STATUS_UNSPECIFIED: The provisioning status was not specified by the upstream system.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Status of SMS App.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/SmsProvisioningStatesEnum'
+        regions:
+          type: array
+          x-enumDescriptions:
+            AU: The application operates within the Australia region.
+            BR: The application operates within the Brazil region.
+            CA: The application operates within the Canada region.
+            EU: The application operates within the Europe region.
+            US: The application operates within the United States region.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: List of regions of the app.
+          uniqueItems: false
+          items:
+            $ref: '#/components/schemas/SmsSmsAppRegionsEnum'
+        conversationApiAppDetails:
+          description: If set, the details of the Conversation API App the sender is connected to.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/SmsConversationApiAppDto'
+        test:
+          type: boolean
+          description: True if the app is a test app.
+          uniqueItems: false
+      required:
+      - id
+      - smsServiceId
+      - name
+      - status
+      - regions
+      - test
+    SmsConversationAppChannelIntegrationStatusEnum:
+      type: string
+      enum:
+      - ACTIVE
+      - FAILING
+      - PENDING
+      - UNRECOGNIZED
+      description: Status of the channel credentials integration.
+    SmsSmsAppRegionsEnum:
+      type: string
+      enum:
+      - AU
+      - BR
+      - CA
+      - EU
+      - US
+      - UNRECOGNIZED
+      description: List of regions of the app.
+    SmsInputSmsAppDto:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Name of SMS App to create.
+          uniqueItems: false
+        region:
+          x-enumDescriptions:
+            BR: The application operates within the Brazil region.
+            EU: The application operates within the Europe region.
+            US: The application operates within the United States region.
+          description: "Region to create SMS app.\n (Allowed values for staging environment: `EU` or `US`)."
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/SmsInputSmsAppRegionsEnum'
+        test:
+          type: boolean
+          default: false
+          deprecated: true
+          description: Deprecated. This field is no longer used and will be removed in a future release.
+          uniqueItems: false
+        convApiApp:
+          type: boolean
+          description: Flag to create a new Conversation App alongside this SMS App
+          uniqueItems: false
+        convApiAppId:
+          type: string
+          description: Id of an existing Conversation API App to link with the new SMS App. Mutually exclusive with `convApiApp`.
+          minLength: 1
+          uniqueItems: false
+      required:
+      - name
+      - region
+    SmsConversationApiAppRegionsEnum:
+      type: string
+      enum:
+      - BR
+      - EU
+      - US
+      - UNRECOGNIZED
+      description: App region.
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
+x-tagGroup-upscale:
+  name: Upscale
+  tags:
+  - Upscale Admin Feature Flag
+  - Upscale Admin Log Operation
+  - Upscale Admin Migrations
+  - Upscale Admin Sms
+  - Upscale Admin Upscales
+  - Internal
+  - Upscale Sms
+  - Upscale Upscales
+x-tagGroup-notification:
+  name: Notification
+  tags:
+  - Notification Admin Feature Flag
+  - Notification Admin Log Operation
+  - Internal
+x-tagGroups:
+- name: Webhook
+  tags:
+  - Webhooks
+- name: WhatsApp
+  tags:
+  - WhatsApp Accounts
+  - WhatsApp
+  - WhatsApp Flows
+  - WhatsApp Senders
+  - WhatsApp Solutions
+  - WhatsApp Templates
+- name: Bundles
+  tags:
+  - Bundles
+- name: KakaoTalk
+  tags:
+  - KakaoTalk Categories
+  - KakaoTalk Senders
+  - KakaoTalk Templates
+- name: Conversation
+  tags:
+  - Conversation
+- name: RCS
+  tags:
+  - RCS Accounts
+  - RCS Questionnaire
+  - RCS Senders
+- name: SMS
+  tags:
+  - SMS Apps

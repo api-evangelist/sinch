@@ -1,0 +1,2829 @@
+openapi: 3.0.3
+info:
+  title: Imported Numbers and Hosting Orders
+  description: >-
+    API for importing, hosting, and qualifying numbers to enable them for use
+    with Sinch SMS text messaging services.
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: support@sinch.com
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  version: '1.0'
+servers:
+  - url: https://imported.numbers.api.sinch.com
+    description: Global API
+x-webhooks:
+  EventsCallback:
+    post:
+      tags:
+        - Imported Numbers and Hosting Orders Callbacks
+      summary: Event notification
+      description: A notification of an event sent to your configured callback URL.
+      operationId: ImportedNumberService_EventsCallback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackPayload'
+      responses:
+        default:
+          description: 200 OK
+paths:
+  /v1/projects/{projectId}/importedNumbers:
+    get:
+      tags:
+        - Imported Numbers
+      summary: List imported numbers
+      description: Lists all imported numbers for the project.
+      operationId: ImportNumberService_ListImportedNumbers
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/regionCode'
+        - $ref: '#/components/parameters/numberPattern.pattern'
+        - $ref: '#/components/parameters/numberPattern.searchPattern'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageToken'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/servicePlanId'
+        - $ref: '#/components/parameters/campaignId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListImportedNumbersResponse'
+        '400':
+          description: If the page_token, number_pattern or order_by is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+        - Imported Numbers
+      summary: Import number
+      description: >-
+        You can use the Import Numbers API to import a non-Sinch number that you
+        want to enable for SMS with Sinch as the Direct Connectivity Aggregator
+        (DCA) without porting (or even partially porting) the number.
+
+
+        Note: Customers who are importing numbers (i.e. want to use their own
+        NNID) will need to complete the NNID provisioning process to support
+        proper message routing with the carriers. To learn more, refer to the
+        article [How can you provision a Network Number ID
+        (NNID)?](https://community.sinch.com/t5/10DLC/How-can-you-provision-a-Network-Number-ID-NNID/ta-p/7040)
+      operationId: ImportNumberService_ImportNumber
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateImportedNumberRequest'
+            examples:
+              ProvisioningExample:
+                summary: Importing a qualified number
+                value:
+                  regionCode: US
+                  smsConfiguration:
+                    servicePlanId: YOUR_service_plan_id
+                    campaignId: YOUR_campaign_id
+                    migrateToSinchTmo: true
+                  phoneNumber: '+11234567890'
+                  displayName: MyPhoneNumber
+                  callbackUrl: https://www.your-callback-server.com/callback
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportedNumber'
+        '400':
+          description: >-
+            INVALID_ARGUMENT: If the importedNumber.phoneNumber,
+            importedNumber.smsConfiguration.servicePlanId is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The imported number already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/importedNumbers/{phoneNumber}:
+    get:
+      tags:
+        - Imported Numbers
+      summary: Get imported number
+      description: Returns the imported number you specify in the path.
+      operationId: ImportNumberService_GetImportedNumber
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/phoneNumber'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportedNumberResponse'
+        '404':
+          description: The imported number could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Imported Numbers
+      summary: Delete imported number
+      description: Delete an imported number from the project.
+      operationId: ImportNumberService_DeleteImportedNumber
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/phoneNumber'
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '404':
+          description: The imported number could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+        - Imported Numbers
+      summary: Update imported number
+      description: >-
+        Update an imported phone number. You can perform the following updates:
+
+
+        * Update the name that displays for a customer by modifying the
+        `displayName` parameter.
+
+        * Unlink the number from an SMS service or campaign by updating the
+        `smsConfiguration` configuration object. To unlink a number, submit the
+        request with an empty string (`””`) in the service plan ID or campaign
+        ID fields.
+
+        * Before linking a number to a new service or campaign, it must be
+        unlinked from any existing service or campaign. Then, link the number to
+        a new SMS service or campaign by updating the service plan ID or
+        campaign ID with the new desired value.
+      operationId: ImportNumberService_UpdateImportedNumber
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/phoneNumber'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportedNumber'
+            examples:
+              UnlinkNumber:
+                summary: Unlink a number with a campaign and service plan
+                value:
+                  displayName: My Display Name
+                  smsConfiguration:
+                    servicePlanId: ''
+                    campaignId: ''
+                  callbackUrl: https://www.your-callback-server.com/callback
+              LinkNumber:
+                summary: Link a number from a campaign and service plan
+                value:
+                  displayName: My Display Name
+                  smsConfiguration:
+                    servicePlanId: YOUR_service_plan_id
+                    campaignId: YOUR_campaign_id
+                  callbackUrl: https://www.your-callback-server.com/callback
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportedNumber'
+        '400':
+          description: >-
+            INVALID_ARGUMENT: If the fieldMask is not provided or
+            importedNumber.smsConfiguration.servicePlanId is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: The imported number could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/hostingOrders:
+    get:
+      tags:
+        - Hosting Orders
+      summary: List hosting orders
+      description: Lists the hosting orders for the project.
+      operationId: HostingOrderService_ListHostingOrders
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/regionCode'
+        - $ref: '#/components/parameters/states'
+        - $ref: '#/components/parameters/type'
+        - $ref: '#/components/parameters/servicePlanId'
+        - $ref: '#/components/parameters/campaignId'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/pageToken'
+        - $ref: '#/components/parameters/pageSize'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListHostingOrdersResponse'
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/hostingOrders/{hostingOrderId}:
+    get:
+      tags:
+        - Hosting Orders
+      summary: Get hosting order
+      description: Returns the hosting order specified by the hosting order ID.
+      operationId: HostingOrderService_GetHostingOrder
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/hostingOrderId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostingOrder'
+              example:
+                projectId: d1923022-5199-4bb3-a513-c47n7a656bc5
+                hostingOrderId: 01arz3nhyrtsv4rrffq69g5fav
+                displayName: Hosting order with campaignId, nnid and smsAppId
+                regionCode: US
+                state: SUBMITTED
+                type: IMPORT
+                createdTime: '2023-01-12T14:34:40.968Z'
+                updatedTime: '2023-01-12T14:34:40.968Z'
+                scheduledOsrUpdateTime: '2023-01-13T14:34:40.968Z'
+                servicePlanId: 16e5c8d2odc842bda9a1b90e1673c174
+                campaignId: C3O84GA
+                migrateToSinchTmo: true
+                callbackUrl: https://www.your-callback-server.com/callback
+                hostingOrderInfo:
+                  businessName: Sinch AB
+                  authorisedPerson:
+                    firstName: John
+                    lastName: Smith
+                    email: email@domain.com
+                  address:
+                    buildingNumber: '2433'
+                    street: Vesta Drive
+                    city: Chicago
+                    state: IL
+                    postalCode: '60647'
+                    country: US
+                  serviceProvider: Sinch America Inc.
+                  currentVoiceCarrier: Verizon
+                  nnid: '104029'
+                  loaType: DIRECT
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/hostingOrders/{hostingOrderId}/report:
+    get:
+      summary: Retrieve a hosting order report
+      description: Returns the report object for a specific hosting order
+      operationId: GetHostingOrderReport
+      responses:
+        '200':
+          $ref: '#/components/responses/HostingOrderReportResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '500':
+          $ref: '#/components/responses/InternalErrorResponse'
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/hostingOrderId'
+      tags:
+        - Hosting Orders
+  /v1/projects/{projectId}/hostingOrders/{hostingOrderId}/numbers:
+    get:
+      tags:
+        - Hosting Orders
+      summary: List hosting order numbers
+      description: Lists the numbers belonging to the specified hosting order.
+      operationId: HostingOrderService_ListHostingOrderNumbers
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/hostingOrderId'
+        - $ref: '#/components/parameters/orderBy'
+        - $ref: '#/components/parameters/pageToken'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/osrUpdateState'
+        - name: campaignProvisioningState
+          description: Filter the results by the state of the campaign provisioning.
+          in: query
+          schema:
+            $ref: '#/components/schemas/State'
+        - name: platformProvisioningState
+          description: Filter the results by the state of the platform provisioning.
+          in: query
+          schema:
+            $ref: '#/components/schemas/State'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListHostingOrderNumbersResponse'
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/hostingOrders/{hostingOrderId}/numbers/{phoneNumber}:
+    get:
+      tags:
+        - Hosting Orders
+      summary: Get hosting order number
+      description: >-
+        Returns the specified phone number belonging to the specified hosting
+        order.
+      operationId: HostingOrderService_GetHostingOrderNumber
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/hostingOrderId'
+        - $ref: '#/components/parameters/phoneNumber'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/HostingOrderNumber'
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/hostingOrders:importNumbers:
+    post:
+      tags:
+        - Hosting Orders
+      summary: Import numbers using hosting orders
+      description: >-
+        Import numbers associated with hosting orders of a specific project and
+        schedule the async provisioning to Sinch SMS platform and linking to
+        campaign if applicable.
+
+
+        <b>Note:</b> This operation is limited to five numbers. If you want to
+        increase the quantity of numbers you can import using this operation,
+        please contact your account manager for authorization.
+      operationId: HostingOrderService_ImportNumbers
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      requestBody:
+        $ref: '#/components/requestBodies/ImportNumbersRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/ImportNumbersHostingOrderResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/hostingOrders:textEnableNumbers:
+    post:
+      summary: Text enable numbers in hosting orders
+      description: >-
+        Text enable numbers associated with hosting orders of a specific
+        project.
+      operationId: TextEnableNumbers
+      requestBody:
+        $ref: '#/components/requestBodies/TextEnableNumbersRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/HostingOrderResponse'
+        '400':
+          $ref: '#/components/responses/TextEnableNumbers_InvalidArgumentResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/AlreadyExistsResponse'
+        '500':
+          $ref: '#/components/responses/InternalErrorResponse'
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      tags:
+        - Hosting Orders
+  /v1/projects/{projectId}/hostingOrders:textEnableTollFreeNumbers:
+    post:
+      summary: Text enable Toll Free numbers in hosting orders
+      description: >-
+        Text enable Toll Free numbers associated with hosting orders of a
+        specific project.
+      operationId: TextEnableTollFreeNumbers
+      requestBody:
+        $ref: '#/components/requestBodies/TextEnableTollFreeNumbersRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/HostingOrderResponse'
+        '400':
+          $ref: '#/components/responses/TextEnableNumbers_InvalidArgumentResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/AlreadyExistsResponse'
+        '500':
+          $ref: '#/components/responses/InternalErrorResponse'
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      tags:
+        - Hosting Orders
+  /v1/projects/{projectId}/callbackConfiguration:
+    get:
+      summary: Get callbacks configuration
+      description: Returns the callbacks configuration for the specified project
+      operationId: GetCallbackConfiguration
+      responses:
+        '200':
+          description: Callbacks configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfiguration'
+        '400':
+          description: 400 Invalid Argument error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidArgument'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      tags:
+        - Imported Numbers and Hosting Orders Callbacks
+    patch:
+      summary: Update callback configuration
+      description: Updates the callbacks configuration for the specified project
+      operationId: UpdateCallbackConfiguration
+      requestBody:
+        description: The callback configuration details to be updated.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackConfigurationUpdate'
+      responses:
+        '200':
+          description: Callback configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfiguration'
+        '400':
+          description: 400 Invalid Argument error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidArgument'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      tags:
+        - Imported Numbers and Hosting Orders Callbacks
+  /v1/projects/{projectId}/qualifiedNumbers:
+    get:
+      tags:
+        - Qualified Numbers
+      summary: List qualified numbers
+      description: Returns a list of qualified numbers for the project.
+      operationId: QualifiedNumberService_ListQualifiedNumbers
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/regionCode'
+        - $ref: '#/components/parameters/globalProcessStates'
+        - $ref: '#/components/parameters/pageSize'
+        - $ref: '#/components/parameters/pageToken'
+        - $ref: '#/components/parameters/orderBy'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListQualifiedNumber'
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/qualifiedNumbers/{phoneNumber}:
+    get:
+      tags:
+        - Qualified Numbers
+      summary: Get qualified number
+      description: Return a qualified number as specified by the phone number in the path.
+      operationId: QualifiedNumberService_GetQualifiedNumber
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/phoneNumber'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualifiedNumber'
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Qualified Numbers
+      summary: Delete qualified number
+      description: Deletes a qualified number as specified by the phone number in the path.
+      operationId: QualifiedNumberService_DeleteQualifiedNumber
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/phoneNumber'
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/qualifiedNumbers:addNumbers:
+    post:
+      tags:
+        - Qualified Numbers
+      summary: Create qualified number batch
+      description: >-
+        Create a request to qualify a batch of numbers. After you have submitted
+        the request, you must send an email to orders@sinch.com attaching all of
+        the invoices related to the phone numbers in the request. In most cases,
+        it will take the Sinch team 1-3 days to review your documentation and
+        qualify your numbers.
+      operationId: QualifiedNumberService_BatchCreateQualifiedNumbers
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BatchCreateQualifiedNumbersRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BatchCreateQualifiedNumbersResponse'
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/qualifiedNumbers:textEnableNumbers:
+    post:
+      tags:
+        - Qualified Numbers
+      summary: Text enable numbers
+      description: >-
+        Enables text capability for the specified qualified numbers. You can
+        enable up to 500 numbers at once. To enable a number for SMS, you must
+        include a Campaign ID and billing information for a Letter of
+        Authorization to be generated. The information required can differ
+        depending on if you are a direct customer of Sinch or a reseller. The
+        Letter of Authorization will be sent to the email you provide in the
+        request to be e-signed.
+      operationId: QualifiedNumberService_TextEnableNumbers
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TextEnableNumbersRequest'
+            examples:
+              directLOAExample:
+                summary: Direct customer LOA
+                value:
+                  regionCode: US
+                  numbers:
+                    - '+12025550134'
+                  servicePlanId: YOUR_service_plan_id
+                  campaignId: YOUR_campaign_id
+                  directLoaInfo:
+                    authorisedPerson:
+                      firstName: John
+                      lastName: Doe
+                      email: john.doe@email.com
+                    address:
+                      buildingNumber: '1234'
+                      street: Main St
+                      city: NYC
+                      state: NY
+                      postalCode: '01002'
+                      country: US
+                    currentVoiceCarrier: Verizon
+                  scheduledOsrUpdateTime: '2023-01-13T14:34:40.968Z'
+                  migrateToSinchTmo: true
+              resellerLOAExample:
+                summary: Reseller LOA
+                value:
+                  regionCode: US
+                  numbers:
+                    - '+12025550134'
+                  servicePlanId: YOUR_service_plan_id
+                  campaignId: YOUR_campaign_id
+                  resellerLoaInfo:
+                    businessName: Acme, Inc.
+                    authorisedPerson:
+                      firstName: John
+                      lastName: Doe
+                      email: john.doe@email.com
+                    address:
+                      buildingNumber: '1234'
+                      street: Main St
+                      city: NYC
+                      state: NY
+                      postalCode: '01002'
+                      country: US
+                    currentVoiceCarrier: Verizon
+                  scheduledOsrUpdateTime: '2023-01-13T14:34:40.968Z'
+                  migrateToSinchTmo: true
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TextEnableResponse'
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/qualifiedNumbers:textEnableTollFreeNumbers:
+    post:
+      summary: Text enable Toll Free qualified numbers
+      description: >-
+        Text enable Toll Free qualified numbers of a specific project by
+        creating a hosting order.
+      operationId: QualifiedNumbersTextEnableTollFreeNumbers
+      requestBody:
+        $ref: '#/components/requestBodies/TextEnableTollFreeNumbersRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/HostingOrderResponse'
+        '400':
+          $ref: '#/components/responses/TextEnableNumbers_InvalidArgumentResponse'
+        '404':
+          $ref: '#/components/responses/NotFoundResponse'
+        '409':
+          $ref: '#/components/responses/AlreadyExistsResponse'
+        '500':
+          $ref: '#/components/responses/InternalErrorResponse'
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+      tags:
+        - Qualified Numbers
+  /v1/projects/{projectId}/qualifiedNumbers/{phoneNumber}:verifyVoiceChallenge:
+    post:
+      tags:
+        - Qualified Numbers
+      summary: Verify voice challenge
+      description: >-
+        Uses the code you received from the Send voice challenge operation to
+        verify that you own the phone number.
+      operationId: QualifiedNumberService_VerifyVoiceChallenge
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/phoneNumber'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyVoiceChallengeRequest'
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualifiedNumber'
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/qualifiedNumbers/{phoneNumber}:sendVoiceChallenge:
+    post:
+      tags:
+        - Qualified Numbers
+      summary: Send voice challenge
+      description: >-
+        Sends a voice challenge to the phone number specified in the path to
+        verify that you own the number. The voice call contains a code that you
+        must use to verify the number.
+      operationId: QualifiedNumberService_SendVoiceChallenge
+      parameters:
+        - $ref: '#/components/parameters/projectId'
+        - $ref: '#/components/parameters/phoneNumber'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/QualifiedNumber'
+        '404':
+          description: 'NOT FOUND: The resource could not be found.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  parameters:
+    projectId:
+      name: projectId
+      description: >-
+        Found on your [Sinch Customer
+        Dashboard](https://dashboard.sinch.com/settings/project-management).
+        Settings > Projects.
+      in: path
+      required: true
+      schema:
+        type: string
+        example: d1923022-5199-4bb3-a513-c47b3a656bc5
+    hostingOrderId:
+      name: hostingOrderId
+      description: >-
+        Found on your [Sinch Customer
+        Dashboard](https://dashboard.sinch.com/settings/project-management).
+        Settings > Projects.
+      in: path
+      required: true
+      schema:
+        type: string
+        example: 01arz3ndektsv4rrffq69g5fav
+    phoneNumber:
+      name: phoneNumber
+      description: >-
+        The phone number in
+        [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format
+        with leading `+`.
+      in: path
+      required: true
+      schema:
+        type: string
+        example: '+12025550134'
+    numberPattern.pattern:
+      name: numberPattern.pattern
+      description: >-
+        Sequence of digits to search for. If you prefer or need certain digits
+        in sequential order, you can enter the sequence of numbers here.
+
+        When using `START`, a plus sign (+) must be included and URL encoded.
+        For example, to search for area code 206 in the US, the url encoded
+        string would be `%2B1206`
+      in: query
+      required: false
+      schema:
+        type: string
+        example: '+1732'
+    numberPattern.searchPattern:
+      name: numberPattern.searchPattern
+      description: >-
+        Search pattern to apply. The options are, `START`, `CONTAIN`, and `END`.
+
+        Numbers that begin with the `numberPattern.pattern` entered. Often used
+        to search for a specific area code.
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - START
+          - CONTAIN
+          - END
+        x-enumDescriptions:
+          START: Number starts with specified pattern.
+          CONTAIN: Number contains specified pattern.
+          END: Number ends with specified pattern.
+        example: START
+    regionCode:
+      name: regionCode
+      description: >-
+        Region code to filter by. ISO 3166-1 alpha-2 country code of the phone
+        number. Currently supported are US, CA
+      in: query
+      required: false
+      schema:
+        type: string
+        example: US
+    servicePlanIdOpt:
+      name: servicePlanId
+      description: The hosting order servicePlanId
+      in: query
+      required: false
+      schema:
+        type: string
+        example: 324e4567-e89b-12d3-a456-426614174000
+    campaignIdOpt:
+      name: campaignId
+      description: The hosting order campaignId
+      in: query
+      required: false
+      schema:
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+    states:
+      name: states
+      description: The hosting order states
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+          - HOSTING_ORDER_STATE_UNSPECIFIED
+          - DRAFT
+          - SUBMITTED
+          - WAITING_FOR_LOA_SIGNATURE
+          - IN_PROGRESS
+          - COMPLETED
+          - REJECTED
+        x-enumDescriptions:
+          HOSTING_ORDER_STATE_UNSPECIFIED: State is unspecified.
+          DRAFT: Hosting order is a draft.
+          SUBMITTED: Hosting order has been submitted.
+          WAITING_FOR_LOA_SIGNATURE: Hosting order is waiting for the LoA signature.
+          IN_PROGRESS: Hosting order is in progress.
+          COMPLETED: Hosting order is completed.
+          REJECTED: Hosting order is rejected.
+    type:
+      name: type
+      description: The hosting order type
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+          - HOSTING_ORDER_TYPE_UNSPECIFIED
+          - IMPORT
+          - TYPE_TEXT_ENABLE
+        x-enumDescriptions:
+          HOSTING_ORDER_TYPE_UNSPECIFIED: Type is unspecified.
+          IMPORT: Type is importing numbers.
+          TYPE_TEXT_ENABLE: Type is text enabling numbers.
+    servicePlanId:
+      name: servicePlanId
+      description: The hosting order servicePlanId
+      in: query
+      required: true
+      schema:
+        type: string
+        example: 324e4567-e89b-12d3-a456-426614174000
+    campaignId:
+      name: campaignId
+      description: The hosting order campaignId
+      in: query
+      required: true
+      schema:
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+    orderBy:
+      name: orderBy
+      description: Parameter used to order the returned hosting orders
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+          - createdTime
+          - updatedTime
+        x-enumDescriptions:
+          createdTime: Order by the time the hosting order was created.
+          updatedTime: Order by the time the hosting order was last updated.
+    pageSize:
+      name: pageSize
+      description: >-
+        The maximum number of items to return, server can enforce an upper limit
+        and overwrite the value.
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 20
+    pageToken:
+      name: pageToken
+      description: The next page token value returned from a previous listing.
+      in: query
+      required: false
+      schema:
+        type: string
+        example: C2VNYXJrEg4KDCsxMjAxMjI2MzUyOQ==
+    globalProcessStates:
+      name: states
+      description: The qualified number states
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+          - GLOBAL_PROCESS_STATE_ELIGIBLE_CHECK_PENDING
+          - GLOBAL_PROCESS_STATE_ELIGIBLE
+          - GLOBAL_PROCESS_STATE_NOT_ELIGIBLE
+          - GLOBAL_PROCESS_STATE_VERIFICATION_PENDING
+          - GLOBAL_PROCESS_STATE_VERIFICATION_FAILED
+          - GLOBAL_PROCESS_STATE_VERIFICATION_BLOCKED
+          - GLOBAL_PROCESS_STATE_VERIFIED
+          - GLOBAL_PROCESS_STATE_HOSTING_IN_PROGRESS
+          - GLOBAL_PROCESS_STATE_HOSTING_DONE
+          - GLOBAL_PROCESS_STATE_HOSTING_FAILED
+          - GLOBAL_PROCESS_STATE_UNSPECIFIED
+        x-enumDescriptions:
+          GLOBAL_PROCESS_STATE_UNSPECIFIED: The state is unspecified.
+          GLOBAL_PROCESS_STATE_ELIGIBLE_CHECK_PENDING: The check for eligibility is pending.
+          GLOBAL_PROCESS_STATE_ELIGIBLE: The state is eligible.
+          GLOBAL_PROCESS_STATE_NOT_ELIGIBLE: The state is not eligible.
+          GLOBAL_PROCESS_STATE_VERIFICATION_PENDING: The state verification is pending.
+          GLOBAL_PROCESS_STATE_VERIFICATION_FAILED: The state verification failed.
+          GLOBAL_PROCESS_STATE_VERIFICATION_BLOCKED: The state verification is blocked.
+          GLOBAL_PROCESS_STATE_VERIFIED: The state is verified.
+          GLOBAL_PROCESS_STATE_HOSTING_IN_PROGRESS: Hosting process is in progress.
+          GLOBAL_PROCESS_STATE_HOSTING_DONE: Hosting process is done.
+          GLOBAL_PROCESS_STATE_HOSTING_FAILED: Hosting process failed.
+        example: GLOBAL_PROCESS_STATE_HOSTING_IN_PROGRESS
+    osrUpdateState:
+      name: osrUpdateState
+      description: Filter the results by the state of the OSR update.
+      in: query
+      required: false
+      schema:
+        $ref: '#/components/schemas/State'
+  examples:
+    hostingOrderReportResponse:
+      summary: A hosting order report response example
+      value:
+        total: 1
+        osrUpdated: 1
+        smsProvisioned: 1
+        addedToCampaign: 1
+    textEnableTollFreeNumbers:
+      summary: Create a new order to text enable Toll Free numbers in the given project
+      value:
+        regionCode: US
+        numbers:
+          - '+18335870229'
+          - '+18339460473'
+        servicePlanId: 07d6c2621f364b68856fe4938b7bb78f
+        callbackUrl: https://www.your-callback-server.com/callback
+        directLoaInfo:
+          authorisedPerson:
+            firstName: John
+            lastName: Smith
+            email: email@domain.com
+          address:
+            buildingNumber: '2433'
+            street: Vesta Drive
+            city: Chicago
+            state: IL
+            postalCode: '60647'
+            country: US
+          currentVoiceCarrier: Verizon
+          scheduledZipwhipProvisioningTime: '2023-01-13T14:34:40.968Z'
+          migrateToSinchTmo: true
+    invalidServicePlanId:
+      summary: Invalid servicePlanId
+      value:
+        code: '400'
+        message: Invalid service_plan_id {servicePlanId}
+        status: INVALID_ARGUMENT
+        details:
+          - type: BadRequest
+            fieldViolations:
+              - field: smsConfiguration.servicePlanId
+                description: Invalid servicePlanId
+    hostingOrderResponse:
+      summary: A hosting order response example
+      value:
+        projectId: d1923022-5199-4bb3-a513-c47n7a656bc5
+        hostingOrderId: 01arz3nhyrtsv4rrffq69g5fav
+        displayName: Hosting order with campaignId, nnid and smsAppId
+        regionCode: US
+        state: SUBMITTED
+        type: TYPE_TEXT_ENABLE
+        createdTime: '2023-01-12T14:34:40.968Z'
+        updatedTime: '2023-01-12T14:34:40.968Z'
+        scheduledOsrUpdateTime: '2023-01-13T14:34:40.968Z'
+        servicePlanId: 16e5c8d2odc842bda9a1b90e1673c174
+        campaignId: C3O84GA
+        migrateToSinchTmo: true
+        callbackUrl: https://www.your-callback-server.com/callback
+        hostingOrderInfo:
+          businessName: Sinch AB
+          authorisedPerson:
+            firstName: John
+            lastName: Smith
+            email: email@domain.com
+          address:
+            buildingNumber: '2433'
+            street: Vesta Drive
+            city: Chicago
+            state: IL
+            postalCode: '60647'
+            country: US
+          serviceProvider: Sinch America Inc.
+          currentVoiceCarrier: Verizon
+          nnid: '104029'
+          loaType: DIRECT
+    blanketLoaTextEnable:
+      summary: Create a new order to text enable numbers with a blanket LOA
+      value:
+        regionCode: US
+        numbers:
+          - '+17724295286'
+          - '+17724295287'
+        servicePlanId: 07d6c2621f364b68856fe4938b7bb78f
+        campaignId: C3O8OGA
+        callbackUrl: https://www.your-callback-server.com/callback
+        blanketLoaInfo: {}
+        scheduledOsrUpdateTime: '2023-01-13T14:34:40.968Z'
+        migrateToSinchTmo: true
+    textEnableNumbers:
+      summary: Create a new order to text enable numbers in the given project
+      value:
+        regionCode: US
+        numbers:
+          - '+17724295286'
+          - '+17724295287'
+        servicePlanId: 07d6c2621f364b68856fe4938b7bb78f
+        campaignId: C3O8OGA
+        callbackUrl: https://www.your-callback-server.com/callback
+        directLoaInfo:
+          authorisedPerson:
+            firstName: John
+            lastName: Smith
+            email: email@domain.com
+          address:
+            buildingNumber: '2433'
+            street: Vesta Drive
+            city: Chicago
+            state: IL
+            postalCode: '60647'
+            country: US
+          currentVoiceCarrier: Verizon
+        scheduledOsrUpdateTime: '2023-01-13T14:34:40.968Z'
+        migrateToSinchTmo: true
+    importNumbersHostingOrderRequest:
+      summary: Create a new order to import numbers in the given project
+      value:
+        displayName: Import numbers order
+        regionCode: US
+        numbers:
+          - '+17724295286'
+          - '+17724295287'
+        servicePlanId: 07d6c2621f364b68856fe4938b7bb78f
+        campaignId: C3O8OGA
+        callbackUrl: https://www.your-callback-server.com/callback
+        migrateToSinchTmo: true
+    importNumbersHostingOrderResponse:
+      summary: A import numbers hosting order response example
+      value:
+        projectId: d1923022-5199-4bb3-a513-c47n7a656bc5
+        hostingOrderId: 01arz3nhyrtsv4rrffq69g5fav
+        displayName: Hosting order with campaignId and smsAppId
+        regionCode: US
+        state: SUBMITTED
+        type: IMPORT
+        createdTime: '2023-01-12T14:34:40.968Z'
+        updatedTime: '2023-01-12T14:34:40.968Z'
+        servicePlanId: 16e5c8d2odc842bda9a1b90e1673c174
+        campaignId: C3O84GA
+        migrateToSinchTmo: true
+        callbackUrl: https://www.your-callback-server.com/callback
+        numberImport: '{}'
+  requestBodies:
+    TextEnableTollFreeNumbersRequest:
+      description: >-
+        The request to text-enable hosting orders Toll Free numbers in the
+        current project
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TextEnableTollFreeNumbersRequest'
+          examples:
+            textEnableNumbers:
+              $ref: '#/components/examples/textEnableTollFreeNumbers'
+    TextEnableNumbersRequest:
+      description: The request to text-enable hosting orders numbers in the current project
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TextEnableNumbersRequest'
+          examples:
+            textEnableNumbers:
+              $ref: '#/components/examples/textEnableNumbers'
+            blanketLoa:
+              $ref: '#/components/examples/blanketLoaTextEnable'
+    ImportNumbersRequest:
+      description: The request to import hosting orders numbers in the current project
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ImportNumbersRequest'
+          examples:
+            importNumbersRequest:
+              $ref: '#/components/examples/importNumbersHostingOrderRequest'
+  responses:
+    TextEnableNumbers_InvalidArgumentResponse:
+      description: >-
+        Status returned if any of the projectId, displayName, regionCode,
+        numbers, nnid, servicePlanId or campaignId parameters are not valid
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+          examples:
+            invalidServicePlanId:
+              $ref: '#/components/examples/invalidServicePlanId'
+    AlreadyExistsResponse:
+      description: The imported number already exists and cannot be created
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    NotFoundResponse:
+      description: >-
+        The imported number, project, hosting order, qualified number or phone
+        number could not be found
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    InternalErrorResponse:
+      description: Internal server error. Typically, a server bug.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ErrorResponse'
+    HostingOrderResponse:
+      description: A successful response with a hosting order, or an error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HostingOrder'
+          examples:
+            hostingOrderTextEnableResponse:
+              $ref: '#/components/examples/hostingOrderResponse'
+            hostingOrderImportNumbersResponse:
+              $ref: '#/components/examples/importNumbersHostingOrderResponse'
+    HostingOrderReportResponse:
+      description: A successful response with a hosting order report, or an error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/HostingOrderReport'
+          examples:
+            hostingOrderReportResponse:
+              $ref: '#/components/examples/hostingOrderReportResponse'
+    ImportNumbersHostingOrderResponse:
+      description: A successful response with a hosting order, or an error
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ImportHostingOrder'
+          examples:
+            hostingOrderResponse:
+              $ref: '#/components/examples/importNumbersHostingOrderResponse'
+  schemas:
+    CreateImportedNumberRequest:
+      title: Create Imported Number
+      required:
+        - regionCode
+        - smsConfiguration
+      allOf:
+        - $ref: '#/components/schemas/ImportedNumber'
+    CreateTextEnabledNumberRequest:
+      title: Text Enable Number
+      required:
+        - projectId
+        - phoneNumber
+        - regionCode
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: >-
+            The ID of the project resource. You can find your project ID on
+            dashboard.sinch.com.
+          example: YOUR_project_id
+        phoneNumber:
+          type: string
+          description: The phone number in e.164 format with leading +.
+          example: '+12025550134'
+        regionCode:
+          type: string
+          description: >-
+            ISO 3166-1 alpha-2 country code of the phone number. Example US, UK
+            or SE.
+          example: US
+        displayName:
+          type: string
+          description: User supplied name for the phone number.
+          example: MyPhoneNumber
+        servicePlanId:
+          type: string
+          description: The service plan ID for the phone number.
+          example: YOUR_service_plan_id
+        campaignId:
+          type: string
+          description: The campaign ID for the phone number.
+          example: YOUR_campaign_id
+        nnid:
+          type: string
+          description: The Net Number ID identifying the phone number.
+      description: Request message for creating text enabled phone number.
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          example: '404'
+          type: string
+          description: The HTTP response code for the error.
+        message:
+          example: The imported number could not be found.
+          type: string
+          description: The friendly message describing the reason for the error response.
+        status:
+          example: NOT_FOUND
+          type: string
+          description: The HTTP response status for the error.
+      description: The schema for an error response.
+    ImportedNumber:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in e.164 format with leading +.
+          example: '+12025550134'
+        projectId:
+          type: string
+          description: >-
+            The ID of the project resource. You can find your project ID on
+            dashboard.sinch.com.
+          example: YOUR_project_id
+        regionCode:
+          type: string
+          description: >-
+            ISO 3166-1 alpha-2 country code of the phone number. Example US, UK
+            or SE.
+          example: US
+        displayName:
+          type: string
+          description: User supplied name for the phone number.
+          example: MyPhoneNumber
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        callbackUrl:
+          type: string
+          description: >-
+            The client's callback URL to be called upon finishing the number
+            import.
+          example: https://www.your-callback-server.com/callback
+    ImportedNumberResponse:
+      allOf:
+        - $ref: '#/components/schemas/ImportedNumber'
+        - $ref: '#/components/schemas/MnoConfiguration'
+        - $ref: '#/components/schemas/SmsProvisioning'
+        - $ref: '#/components/schemas/CampaignProvisioning'
+    ListImportedNumbersResponse:
+      title: List Imported Numbers Response
+      type: object
+      properties:
+        importedNumbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportedNumberResponse'
+          description: >-
+            List of numbers associated to the client project specified in
+            `ListImportedNumbers`.
+        nextPageToken:
+          type: string
+          description: The token to be used for listing the next page.
+        totalSize:
+          type: integer
+          description: https://cloud.google.com/apis/design/design_patterns#list_pagination
+          format: int32
+      description: Response message to list your imported phone numbers
+    SmsProvisioning:
+      description: An object giving details about the SMS provisioning of the number.
+      type: object
+      properties:
+        smsProvisioning:
+          description: An object giving details about the SMS provisioning of the number.
+          type: object
+          properties:
+            serviceType:
+              $ref: '#/components/schemas/ServiceType'
+            serviceId:
+              description: A unique identifier for the service being provisioned.
+              type: string
+              example: 0130a21c9ed6461ba3a1fefda83f7ec7
+            type:
+              $ref: '#/components/schemas/Type'
+            state:
+              $ref: '#/components/schemas/State'
+            updateTime:
+              type: string
+              description: >-
+                A timestamp in ISO 8601 format (UTC) indicating the last time
+                the provisioning status was updated.
+              example: '2023-02-02T21:00:07.467353Z'
+            errorMessage:
+              type: string
+              description: >-
+                If an error occurred during provisioning, this field will
+                contain a descriptive message. It will be an empty string if no
+                error is present.
+              example: ''
+            errorCode:
+              type: string
+              description: >-
+                If an error occurred during provisioning, this field will
+                contain the error code. This field is also an empty string when
+                no error has occurred.
+              example: ''
+    CampaignProvisioning:
+      description: An object giving details about the campaign provisioning of the number.
+      type: object
+      properties:
+        campaignProvisioning:
+          description: >-
+            An object giving details about the campaign provisioning of the
+            number.
+          type: object
+          properties:
+            serviceType:
+              $ref: '#/components/schemas/ServiceType'
+            serviceId:
+              description: A unique identifier for the service being provisioned.
+              type: string
+              example: CDCQLGJ
+            type:
+              $ref: '#/components/schemas/Type'
+            state:
+              $ref: '#/components/schemas/State'
+            updateTime:
+              type: string
+              description: >-
+                A timestamp in ISO 8601 format (UTC) indicating the last time
+                the provisioning status was updated.
+              example: '2023-02-02T21:00:07.467353Z'
+            errorMessage:
+              type: string
+              description: >-
+                If an error occurred during provisioning, this field will
+                contain a descriptive message. It will be an empty string if no
+                error is present.
+              example: ''
+            errorCode:
+              type: string
+              description: >-
+                If an error occurred during provisioning, this field will
+                contain the error code. This field is also an empty string when
+                no error has occurred.
+              example: ''
+    ServiceType:
+      description: The type of service.
+      type: string
+      enum:
+        - SMS
+        - CAMPAIGN
+      x-enumDescriptions:
+        SMS: SMS provisioning.
+        CAMPAIGN: Campaign provisioning.
+    Type:
+      description: >-
+        Specifies the type of operation. This value of this field is either
+        "PROVISIONING" or "DEPROVISIONING".
+      type: string
+      enum:
+        - PROVISIONING
+        - DEPROVISIONING
+      x-enumDescriptions:
+        PROVISIONING: The operation is provisioning the number.
+        DEPROVISIONING: The operation is deprovisioning the number.
+    ScheduledProvisioning:
+      readOnly: true
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: Service plan of the scheduled provisioning task.
+          example: YOUR_service_plan_id
+        status:
+          type: integer
+          description: Status of the pending change.
+          format: enum
+        lastUpdatedTime:
+          type: string
+          description: Timestamp when the status was last updated.
+          format: date-time
+        campaignId:
+          type: string
+          description: The campaign of the scheduled provisioning task.
+          example: YOUR_campaign_id
+        errorCodes:
+          type: array
+          items:
+            type: integer
+            format: enum
+          description: >-
+            A list of error codes, if applicable, for the scheduled provisioning
+            task.
+      description: Ongoing Provisioning for SMS service
+    MnoConfiguration:
+      type: object
+      properties:
+        mnoConfiguration:
+          type: object
+          description: >-
+            The mnoConfiguration object represents the status and progress of
+            configuration operations for SMS and MMS services across different
+            carriers (AT&T and T-Mobile). Each key within this object (smsAtt,
+            smsTmo, mmsAtt and mmsTmo) corresponds to a specific service type
+            (SMS or MMS) associated with a particular mobile network operator.
+          properties:
+            smsAtt:
+              description: Contains information about SMS-enabled ATT&T numbers.
+              allOf:
+                - $ref: '#/components/schemas/CarrierState'
+                - type: object
+                  properties:
+                    operation:
+                      $ref: '#/components/schemas/Operation'
+            smsTmo:
+              description: Contains information about SMS-enabled T-Mobile numbers.
+              allOf:
+                - $ref: '#/components/schemas/CarrierState'
+                - type: object
+                  properties:
+                    operation:
+                      $ref: '#/components/schemas/Operation'
+            mmsAtt:
+              description: Contains information about MMS-enabled AT&T numbers.
+              allOf:
+                - $ref: '#/components/schemas/CarrierState'
+                - type: object
+                  properties:
+                    operation:
+                      $ref: '#/components/schemas/Operation'
+            mmsTmo:
+              description: Contains information about MMS-enabled T-Mobile numbers.
+              allOf:
+                - $ref: '#/components/schemas/CarrierState'
+                - type: object
+                  properties:
+                    operation:
+                      $ref: '#/components/schemas/Operation'
+    CarrierState:
+      type: object
+      description: Contains information about the state of the carrier.
+      properties:
+        state:
+          $ref: '#/components/schemas/State'
+        errorCode:
+          $ref: '#/components/schemas/ErrorCode'
+        errorMessage:
+          $ref: '#/components/schemas/ErrorMessage'
+        updateTime:
+          $ref: '#/components/schemas/UpdateTime'
+    State:
+      type: string
+      description: Indicates the current state of the operation.
+      enum:
+        - DONE
+        - FAILED
+        - IN_PROGRESS
+        - WAITING
+        - STATE_UNSPECIFIED
+      x-enumDescriptions:
+        DONE: The operation was completed successfully.
+        FAILED: The operation has failed.
+        IN_PROGRESS: The operation is currently in progress.
+        WAITING: The operation is pending and has not yet started.
+        STATE_UNSPECIFIED: The state is unspecified.
+      example: DONE
+    Operation:
+      type: string
+      description: Specifies the type of action being performed.
+      enum:
+        - PROVISIONING
+        - DEPROVISIONING
+        - OPERATION_UNSPECIFIED
+      x-enumDescriptions:
+        PROVISIONING: The service is being configured or activated.
+        DEPROVISIONING: The service is being deactivated or removed.
+        OPERATION_UNSPECIFIED: The operation is unspecified.
+    ErrorCode:
+      type: string
+      description: >-
+        An optional string field that contains an error code if the operation
+        failed. This field is empty ("") when there is no error.
+      example: ''
+    ErrorMessage:
+      type: string
+      description: >-
+        An optional string field that provides a human-readable message
+        describing the error. This field is empty ("") when no error has
+        occurred.
+    UpdateTime:
+      type: string
+      description: >-
+        A timestamp in ISO 8601 format indicating the last time the status was
+        updated.
+      example: '2025-04-02T19:45:28.650924Z'
+    SmsConfiguration:
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: "The current SMS configuration for this number.\r The `servicePlanId`` can be found when logging into dashboard.sinch.com\r in the SMS>APIs section."
+          example: YOUR_service_plan_id
+        scheduledProvisioning:
+          $ref: '#/components/schemas/ScheduledProvisioning'
+        campaignId:
+          type: string
+          description: The current campaign ID assigned to this number.
+          example: YOUR_campaign_id
+        migrateToSinchTmo:
+          type: boolean
+          readOnly: true
+          description: >-
+            Displays if a number is assigned to another aggregator in T-Mobile's
+            platform, and requires migration from previous aggregator to Sinch.
+      description: Configuration for SMS
+    Address:
+      description: The address of the business.
+      required:
+        - buildingNumber
+        - street
+        - city
+        - state
+        - postalCode
+        - country
+      type: object
+      properties:
+        buildingNumber:
+          type: string
+          description: The building number of the address.
+          example: '123'
+        street:
+          type: string
+          description: The street name of the address.
+          example: 1st
+        city:
+          type: string
+          description: The city name of the address.
+          example: New York
+        state:
+          type: string
+          description: The state name of the address.
+          example: NY
+        postalCode:
+          type: string
+          description: The postal code of the address.
+          example: '00001'
+        country:
+          type: string
+          description: The country of the address.
+          example: USA
+    AuthorizedPerson:
+      description: The person authorized and responsible for the hosting order.
+      required:
+        - firstName
+        - lastName
+        - email
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: The first name of the authorized person.
+          example: John
+        lastName:
+          type: string
+          description: The last name of the authorized person.
+          example: Doe
+        email:
+          type: string
+          description: The email address of the authorized person.
+          example: john.doe@company.com
+    BlanketLoaInfo:
+      description: >-
+        You can set up a blanket Letter of Authorization (LoA) that will allow
+        you to import numbers to your account without having to sign an LoA each
+        time you submit a request. To set up a blanket LoA, email your account
+        manager. Once the LoA has been approved, you can use this
+        `blanketLoaInfo` object in your requests. The `blanketLoaInfo` object
+        should be sent as an empty object.
+      type: object
+      properties: {}
+    DirectLoaInfo:
+      description: Letter of Authorization for direct Sinch customers.
+      required:
+        - authorisedPerson
+        - address
+        - currentVoiceCarrier
+      type: object
+      properties:
+        authorisedPerson:
+          $ref: '#/components/schemas/AuthorizedPerson'
+        address:
+          $ref: '#/components/schemas/Address'
+        currentVoiceCarrier:
+          type: string
+          description: >-
+            The current carrier you are using for voice services for the number
+            you want to host on Sinch.
+          example: TMO
+    ImportHostingOrder:
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: The project ID to which the hosting order is associated.
+          example: YOUR_project_id
+        hostingOrderId:
+          type: string
+          description: The unique ID of the hosting order.
+          example: YOUR_hosting_order_id
+        displayName:
+          type: string
+          description: The friendly name of the hosting order.
+          example: MyHostingOrder
+        regionCode:
+          type: string
+          description: >-
+            The region code of the hosting order. Number hosting is only
+            available for the US and Canada, so you must enter either "US" or
+            "CA".
+          example: US
+        state:
+          type: string
+          enum:
+            - HOSTING_ORDER_STATE_UNSPECIFIED
+            - DRAFT
+            - SUBMITTED
+            - WAITING_FOR_LOA_SIGNATURE
+            - IN_PROGRESS
+            - COMPLETED
+            - REJECTED
+          x-enumDescriptions:
+            HOSTING_ORDER_STATE_UNSPECIFIED: State is unspecified.
+            DRAFT: Hosting order is a draft.
+            SUBMITTED: Hosting order has been submitted.
+            WAITING_FOR_LOA_SIGNATURE: Hosting order is waiting for the LoA signature.
+            IN_PROGRESS: Hosting order is in progress.
+            COMPLETED: Hosting order is completed.
+            REJECTED: Hosting order is rejected.
+          description: The state of the hosting order.
+        type:
+          type: string
+          enum:
+            - HOSTING_ORDER_TYPE_UNSPECIFIED
+            - IMPORT
+            - TYPE_TEXT_ENABLE
+          x-enumDescriptions:
+            HOSTING_ORDER_TYPE_UNSPECIFIED: The type of hosting order is unspecified.
+            IMPORT: Hosting order to import numbers.
+            TYPE_TEXT_ENABLE: Hosting order to text-enable numbers.
+          description: The hosting order type.
+        createdTime:
+          type: string
+          format: date-time
+          description: Timestamp when the hosting order was created
+          readOnly: true
+        updatedTime:
+          type: string
+          format: date-time
+          description: Timestamp when the hosting order was last updated
+          readOnly: true
+        servicePlanId:
+          type: string
+          description: The service plan to which the hosting order is associated.
+          example: YOUR_service_plan_id
+        campaignId:
+          type: string
+          description: The campaign to which the hosting order is associated.
+          example: YOUR_campaign_id
+        migrateToSinchTmo:
+          type: boolean
+          readOnly: true
+          description: >-
+            Displays if a number is assigned to another aggregator in T-Mobile's
+            platform, and requires migration from previous aggregator to Sinch.
+        callbackUrl:
+          type: string
+          description: >-
+            The client's callback URL to be called upon finishing the number
+            import.
+          example: https://www.your-callback-server.com/callback
+    HostingOrder:
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: The project ID to which the hosting order is associated.
+          example: YOUR_project_id
+        hostingOrderId:
+          type: string
+          description: The unique ID of the hosting order.
+          example: YOUR_hosting_order_id
+        displayName:
+          type: string
+          description: The friendly name of the hosting order.
+          example: MyHostingOrder
+        regionCode:
+          type: string
+          description: >-
+            The region code of the hosting order. Number hosting is only
+            available for the US and Canada, so you must enter either "US" or
+            "CA".
+          example: US
+        state:
+          type: string
+          enum:
+            - HOSTING_ORDER_STATE_UNSPECIFIED
+            - DRAFT
+            - SUBMITTED
+            - WAITING_FOR_LOA_SIGNATURE
+            - IN_PROGRESS
+            - COMPLETED
+            - REJECTED
+          x-enumDescriptions:
+            HOSTING_ORDER_STATE_UNSPECIFIED: State is unspecified.
+            DRAFT: Hosting order is a draft.
+            SUBMITTED: Hosting order has been submitted.
+            WAITING_FOR_LOA_SIGNATURE: Hosting order is waiting for the LoA signature.
+            IN_PROGRESS: Hosting order is in progress.
+            COMPLETED: Hosting order is completed.
+            REJECTED: Hosting order is rejected.
+          description: The state of the hosting order.
+        type:
+          type: string
+          enum:
+            - HOSTING_ORDER_TYPE_UNSPECIFIED
+            - IMPORT
+            - TYPE_TEXT_ENABLE
+          x-enumDescriptions:
+            HOSTING_ORDER_TYPE_UNSPECIFIED: The type of hosting order is unspecified.
+            IMPORT: Hosting order to import numbers.
+            TYPE_TEXT_ENABLE: Hosting order to text-enable numbers.
+          description: The hosting order type.
+        createdTime:
+          type: string
+          format: date-time
+          description: Timestamp when the hosting order was created
+          readOnly: true
+        updatedTime:
+          type: string
+          format: date-time
+          description: Timestamp when the hosting order was last updated
+          readOnly: true
+        scheduledOsrUpdateTime:
+          type: string
+          format: date-time
+          description: Timestamp when the OSR update will be done
+          readOnly: true
+        servicePlanId:
+          type: string
+          description: The service plan to which the hosting order is associated.
+          example: YOUR_service_plan_id
+        campaignId:
+          type: string
+          description: The campaign to which the hosting order is associated.
+          example: YOUR_campaign_id
+        migrateToSinchTmo:
+          type: boolean
+          readOnly: true
+          description: >-
+            Displays if a number is assigned to another aggregator in T-Mobile's
+            platform, and requires migration from previous aggregator to Sinch.
+        textEnableInfo:
+          $ref: '#/components/schemas/TextEnableInfo'
+        callbackUrl:
+          type: string
+          description: >-
+            The client's callback URL to be called upon finishing the number
+            import.
+          example: https://www.your-callback-server.com/callback
+    HostingOrderNumber:
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: The project ID to which the number belongs.
+          example: YOUR_project_id
+        hostingOrderId:
+          type: string
+          description: The ID of the hosting order to which the number belongs.
+          example: YOUR_hosting_order_id
+        phoneNumber:
+          type: string
+          description: The phone number in e.164 format with leading +.
+          example: '+12025550134'
+        osrUpdate:
+          $ref: '#/components/schemas/HostingOrderNumber_OsrUpdate'
+        campaignProvisioning:
+          $ref: '#/components/schemas/HostingOrderNumber_CampaignProvisioning'
+        platformProvisioning:
+          $ref: '#/components/schemas/HostingOrderNumber_PlatformProvisioning'
+        smsAtt:
+          description: Contains information about hosted SMS AT&T numbers.
+          allOf:
+            - $ref: '#/components/schemas/CarrierState'
+        smsTmo:
+          description: Contains information about hosted SMS T-Mobile numbers.
+          allOf:
+            - $ref: '#/components/schemas/CarrierState'
+        mmsAtt:
+          description: Contains information about hosted MMS AT&T numbers.
+          allOf:
+            - $ref: '#/components/schemas/CarrierState'
+        mmsTmo:
+          description: Contains information about hosted MMS T-Mobile numbers.
+          allOf:
+            - $ref: '#/components/schemas/CarrierState'
+    HostingOrderNumber_CampaignProvisioning:
+      description: An object containing information about campaign provisioning.
+      type: object
+      properties:
+        campaignId:
+          type: string
+          description: The campaign ID to which the hosting order is associated.
+          example: YOUR_campaign_id
+        state:
+          $ref: '#/components/schemas/State'
+    HostingOrderNumber_OsrUpdate:
+      description: An object containing information about the OSR update.
+      type: object
+      properties:
+        nnid:
+          type: string
+          description: The Net Number ID identifying the phone number.
+        state:
+          $ref: '#/components/schemas/State'
+    TextEnableTollFreeNumbersRequest:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/TextEnableTollFreeNumbersDirectLoaInfoRequest'
+        - $ref: '#/components/schemas/TextEnableTollFreeNumbersResellerLoaInfoRequest'
+      description: Request for text enabling project Toll Free numbers.
+      title: Text enable Toll Free numbers request
+    TextEnableTollFreeNumbersLoaInfoCommon:
+      required:
+        - projectId
+        - regionCode
+        - numbers
+        - servicePlanId
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: The project id we want the numbers to be enabled for.
+        displayName:
+          type: string
+          description: The display name of the numbers.
+        regionCode:
+          type: string
+          description: 'ISO 3166-1 alpha-2 country code of the phone number. Example: US, CA'
+        numbers:
+          type: array
+          items:
+            type: string
+        scheduledZipwhipProvisioningTime:
+          type: string
+          description: >-
+            Optional field which allow to determine when Zipwhip provisioning
+            will be done. Timestamp needs to be from UTC zone. Important! If LOA
+            is signed after `scheduledZipwhipProvisioningTime`, date will be
+            rescheduled to the next day at the same time.
+        servicePlanId:
+          type: string
+          description: >-
+            The SMS service that the number will be linked to. The
+            `servicePlanId` can be found in the [Sinch Customer
+            Dashboard](https://dashboard.sinch.com/sms/api/rest).
+        callbackUrl:
+          type: string
+          description: The callback URL to be called for text enablement updates
+    TextEnableTollFreeNumbersDirectLoaInfoRequest:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/TextEnableTollFreeNumbersLoaInfoCommon'
+        directLoaInfo:
+          $ref: '#/components/schemas/DirectLoaInfo'
+      required:
+        - directLoaInfo
+    TextEnableTollFreeNumbersResellerLoaInfoRequest:
+      type: object
+      properties:
+        allOf:
+          $ref: '#/components/schemas/TextEnableTollFreeNumbersLoaInfoCommon'
+        resellerLoaInfo:
+          $ref: '#/components/schemas/ResellerLoaInfo'
+      required:
+        - resellerLoaInfo
+    HostingOrderNumber_PlatformProvisioning:
+      description: >-
+        An object containing information related to the provisioning on the
+        platform.
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: The service plan ID to which the hosting order number is associated.
+          example: YOUR_service_plan_id
+        state:
+          $ref: '#/components/schemas/State'
+    HostingOrderReport:
+      type: object
+      properties:
+        total:
+          type: integer
+          format: int32
+        osrUpdated:
+          type: integer
+          format: int32
+        smsProvisioned:
+          type: integer
+          format: int32
+        addedToCampaign:
+          type: integer
+          format: int32
+        ongoingManualAction:
+          type: integer
+          format: int32
+    ImportNumbersRequest:
+      required:
+        - regionCode
+        - numbers
+        - servicePlanId
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: The ID of the project to which the import request is associated.
+          example: YOUR_project_id
+        displayName:
+          type: string
+          description: The optional display name of the import request.
+          example: MyImportRequest
+        regionCode:
+          type: string
+          description: The region code for the import request.
+          example: US
+        numbers:
+          type: array
+          description: >-
+            An array of all the phone numbers associated with the import
+            request.
+          items:
+            type: string
+            example: '+12025550134'
+        servicePlanId:
+          type: string
+          description: >-
+            The ID of the service plan to which the import request is
+            associated.
+          example: YOUR_service_plan_id
+        campaignId:
+          type: string
+          description: The ID of the campaign to which the request is associated.
+          example: YOUR_campaign_id
+        callbackUrl:
+          type: string
+          description: The callback URL to be called for import numbers updates
+        migrateToSinchTmo:
+          type: boolean
+          description: >-
+            If a number is assigned to another aggregator in T-Mobile's
+            platform, then T-Mobile will give an error code 60135 indicating
+            that number needs to be “migrated” from previous aggregator to
+            Sinch. This “migration” requires provisioning of number by setting
+            this flag named to true for successful number linking process.
+    ListHostingOrderNumbersResponse:
+      type: object
+      properties:
+        numbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/HostingOrderNumber'
+        nextPageToken:
+          type: string
+        totalSize:
+          type: integer
+          format: int32
+    ListHostingOrdersResponse:
+      type: object
+      properties:
+        hostingOrders:
+          type: array
+          items:
+            $ref: '#/components/schemas/HostingOrder'
+        nextPageToken:
+          type: string
+        totalSize:
+          type: integer
+          format: int32
+    ResellerLoaInfo:
+      description: Letter of Authorization for resellers.
+      required:
+        - businessName
+        - authorisedPerson
+        - address
+        - currentVoiceCarrier
+      type: object
+      properties:
+        businessName:
+          type: string
+          description: The name of the business.
+          example: Acme, Inc.
+        authorisedPerson:
+          $ref: '#/components/schemas/AuthorizedPerson'
+        address:
+          $ref: '#/components/schemas/Address'
+        currentVoiceCarrier:
+          type: string
+          description: >-
+            The current carrier you are using for voice services for the number
+            you want to host on Sinch.
+          example: TMO
+    TextEnableInfo:
+      type: object
+      properties:
+        businessName:
+          type: string
+          description: The name of the business.
+          example: Acme, Inc.
+        authorisedPerson:
+          $ref: '#/components/schemas/AuthorizedPerson'
+        address:
+          $ref: '#/components/schemas/Address'
+        serviceProvider:
+          type: string
+        currentVoiceCarrier:
+          type: string
+          description: >-
+            The current carrier you are using for voice services for the number
+            you want to host on Sinch.
+          example: TMO
+        nnid:
+          type: string
+          description: The Net Number ID for the number you want to host on Sinch.
+        loaType:
+          description: The type of the letter of authorization.
+          type: string
+          format: enum
+          enum:
+            - Direct
+            - Reseller
+          x-enumDescriptions:
+            Direct: If you are a direct Sinch customer.
+            Reseller: If you are a Sinch partner or reseller.
+    TextEnableNumbersRequest:
+      description: A request to text enable the numbers in a hosting order.
+      required:
+        - regionCode
+        - numbers
+        - servicePlanId
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: The ID of the project to which the hosting order is associated.
+          example: YOUR_project_id
+        displayName:
+          type: string
+          description: The optional display name of the hosting order.
+          example: MyHostingOrder
+        regionCode:
+          type: string
+          description: The region code for the hosting order.
+          example: US
+        numbers:
+          type: array
+          description: An array of all the phone numbers associated with the hosting order.
+          items:
+            type: string
+            example: '+12025550134'
+        nnid:
+          type: string
+          description: >-
+            Defaults to either Sinch NNID or what was originally configured on
+            the customer account. Sinch encourages customers to use the Sinch
+            NNID, but if you want to use another NNID, please contact your
+            account manager.
+        servicePlanId:
+          type: string
+          description: The ID of the service plan to which the hosting order is associated.
+          example: YOUR_service_plan_id
+        campaignId:
+          type: string
+          description: The ID of the campaign to which the hosting order is associated.
+          example: YOUR_campaign_id
+        directLoaInfo:
+          $ref: '#/components/schemas/DirectLoaInfo'
+        resellerLoaInfo:
+          $ref: '#/components/schemas/ResellerLoaInfo'
+        blanketLoaInfo:
+          $ref: '#/components/schemas/BlanketLoaInfo'
+        scheduledOsrUpdateTime:
+          type: string
+          format: date-time
+          description: The scheduled time for OSR to be updated.
+        migrateToSinchTmo:
+          type: boolean
+          readOnly: true
+          description: >-
+            Displays if a number is assigned to another aggregator in T-Mobile's
+            platform, and requires migration from previous aggregator to Sinch.
+        callbackUrl:
+          type: string
+          description: The client's callback URL to be called for text enablement updates.
+          example: https://www.your-callback-server.com/callback
+    BatchCreateQualifiedNumbersRequest:
+      required:
+        - phoneNumbers
+      type: object
+      properties:
+        phoneNumbers:
+          type: array
+          items:
+            type: string
+            example: '+12345612345'
+      description: The phone numbers you want to qualify.
+    BatchCreateQualifiedNumbersResponse:
+      type: object
+      properties:
+        qualifiedNumbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/QualifiedNumber'
+    ListQualifiedNumber:
+      type: object
+      properties:
+        qualifiedNumbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/QualifiedNumber'
+        nextPageToken:
+          type: string
+        totalSize:
+          type: integer
+          format: int32
+    QualifiedNumber:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in e.164 format with leading +.
+          example: '+12025550134'
+        projectId:
+          type: string
+          description: The ID of the project to which the number belongs.
+          example: abcd12ef-ab12-ab12-bc34-abcdef123456
+        regionCode:
+          type: string
+          description: >-
+            ISO 3166-1 alpha-2 country code of the phone number. Example US or
+            CA.
+          example: US
+        globalProcessState:
+          type: string
+          format: enum
+          enum:
+            - GLOBAL_PROCESS_STATE_UNSPECIFIED
+            - GLOBAL_PROCESS_STATE_ELIGIBLE_CHECK_PENDING
+            - GLOBAL_PROCESS_STATE_ELIGIBLE
+            - GLOBAL_PROCESS_STATE_NOT_ELIGIBLE
+            - GLOBAL_PROCESS_STATE_VERIFICATION_PENDING
+            - GLOBAL_PROCESS_STATE_VERIFICATION_FAILED
+            - GLOBAL_PROCESS_STATE_VERIFICATION_BLOCKED
+            - GLOBAL_PROCESS_STATE_VERIFIED
+            - GLOBAL_PROCESS_STATE_HOSTING_IN_PROGRESS
+            - GLOBAL_PROCESS_STATE_HOSTING_DONE
+            - GLOBAL_PROCESS_STATE_HOSTING_FAILED
+          x-enumDescriptions:
+            GLOBAL_PROCESS_STATE_UNSPECIFIED: The state is unspecified.
+            GLOBAL_PROCESS_STATE_ELIGIBLE_CHECK_PENDING: The check for eligibility is pending.
+            GLOBAL_PROCESS_STATE_ELIGIBLE: The state is eligible.
+            GLOBAL_PROCESS_STATE_NOT_ELIGIBLE: The state is not eligible.
+            GLOBAL_PROCESS_STATE_VERIFICATION_PENDING: The state verification is pending.
+            GLOBAL_PROCESS_STATE_VERIFICATION_FAILED: The state verification failed.
+            GLOBAL_PROCESS_STATE_VERIFICATION_BLOCKED: The state verification is blocked.
+            GLOBAL_PROCESS_STATE_VERIFIED: The state is verified.
+            GLOBAL_PROCESS_STATE_HOSTING_IN_PROGRESS: Hosting process is in progress.
+            GLOBAL_PROCESS_STATE_HOSTING_DONE: Hosting process is done.
+            GLOBAL_PROCESS_STATE_HOSTING_FAILED: Hosting process failed.
+          description: The global processing state of the qualified number.
+        osrEligibility:
+          $ref: '#/components/schemas/QualifiedNumber_OsrEligibilityDetails'
+        ownershipVerification:
+          $ref: '#/components/schemas/QualifiedNumber_OwnershipVerificationDetails'
+        hostedNumber:
+          $ref: '#/components/schemas/QualifiedNumber_HostedNumberDetails'
+        createdTime:
+          description: The date and time the hosting order was created.
+          type: string
+          format: date-time
+        updatedTime:
+          description: The date and time the hosting order was last updated.
+          type: string
+          format: date-time
+    QualifiedNumber_HostedNumberDetails:
+      description: >-
+        Details about the hosting status of a number, including any errors if
+        available.
+      type: object
+      properties:
+        status:
+          type: integer
+          description: The status of the hosting details.
+          format: enum
+          enum:
+            - 0
+            - 1
+            - 2
+          x-enumDescriptions:
+            '0': HOSTING_STATUS_UNSPECIFIED
+            '1': HOSTING_STATUS_HOSTED
+            '2': HOSTING_STATUS_FAILED
+        error:
+          type: string
+          description: The description of the hosting status error.
+    QualifiedNumber_OsrEligibilityDetails:
+      description: >-
+        Details about the OSR eligibility, including the status of the OSR
+        update, and the error if available.
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/State'
+        error:
+          type: string
+    QualifiedNumber_OwnershipVerificationDetails:
+      description: >-
+        Details about the ownership verification, including the status of the
+        verification process and any error if available.
+      type: object
+      properties:
+        status:
+          $ref: '#/components/schemas/State'
+        error:
+          type: string
+    TextEnableResponse:
+      type: object
+      properties:
+        hostingOrderId:
+          type: string
+          description: The ID of the hosting order.
+    VerifyVoiceChallengeRequest:
+      required:
+        - code
+      type: object
+      properties:
+        code:
+          type: string
+          example: '1234'
+    CallbackConfiguration:
+      description: >-
+        Response message containing the callbacks configuration for a specific
+        project.
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: ID of the project the configuration belongs to.
+          example: a99aa9aa-b888-777c-dd6d-ee55e5555555
+        hmacSecret:
+          type: string
+          description: >-
+            The HMAC secret used for hashing the callback body using the
+            HMAC-SHA1 algorithm - and for creating the `X-Sinch-Signature`
+            header.
+          example: YOUR_hmac_secret
+    CallbackConfigurationUpdate:
+      title: CallbackConfigurationUpdate
+      type: object
+      properties:
+        hmacSecret:
+          type: string
+          description: The HMAC secret to be updated for the specified project
+      description: >-
+        The request to update the callbacks configuration for the current
+        project.
+    CallbackPayload:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          description: The type of the resource.
+          enum:
+            - IMPORTED_NUMBER
+            - HOSTING_ORDER_NUMBER
+          x-enumDescriptions:
+            IMPORTED_NUMBER: >-
+              Numbers imported individually or previously imported successfully
+              via hosting orders but later updated.
+            HOSTING_ORDER_NUMBER: Numbers that are imported as part of a hosting order.
+          example: IMPORTED_NUMBER
+        eventType:
+          type: string
+          description: The type of the event.
+          enum:
+            - PROVISIONING_TO_SMS_PLATFORM
+            - DEPROVISIONING_TO_SMS_PLATFORM
+            - LINK_TO_10DLC_CAMPAIGN
+            - UNLINK_TO_10DLC_CAMPAIGN
+            - HOSTING_PROCESS
+            - OSR_UPDATE
+            - DELETE
+          x-enumDescriptions:
+            PROVISIONING_TO_SMS_PLATFORM: An event that occurs when a number is linked to a Service Plan ID.
+            DEPROVISIONING_TO_SMS_PLATFORM: >-
+              An event that occurs when a number is unlinked from a Service Plan
+              ID.
+            LINK_TO_10DLC_CAMPAIGN: An event that occurs when a number is linked to a Campaign.
+            UNLINK_TO_10DLC_CAMPAIGN: An event that occurs when a number is unlinked from a Campaign.
+            HOSTING_PROCESS: >-
+              An event that indicates the success or failure of a number's
+              hosting process.
+            OSR_UPDATE: An event that occurs when an OSR update is performed for a number.
+            DELETE: An event that occurs when a number is deleted.
+          example: LINK_TO_10DLC_CAMPAIGN
+        eventId:
+          type: string
+          description: The ID of the event.
+          example: abcd1234efghijklmnop567890
+        timestamp:
+          type: string
+          description: >-
+            The date and time when the callback was created and added to the
+            callbacks queue in ISO 8601 format (UTC).
+          format: date-time
+          example: '2023-06-06T07:45:27.785357Z'
+        projectId:
+          type: string
+          description: The ID of the project to which the event belongs.
+          example: abcd12ef-ab12-ab12-bc34-abcdef123456
+        resourceId:
+          type: string
+          description: >-
+            The unique identifier of the resource, depending on the resource
+            type. For example, a phone number, a hosting order ID, or a brand
+            ID.
+          example: '+12345612345'
+        status:
+          type: string
+          description: The status of the event. For example, `SUCCEEDED` or `FAILED`.
+          x-enumDescriptions:
+            SUCCEEDED: The event has succeeded.
+            FAILED: The event has failed.
+          enum:
+            - SUCCEEDED
+            - FAILED
+          example: FAILED
+        failureCode:
+          type: string
+          description: >-
+            If the status is FAILED, a failure code will be provided. For
+            numbers provisioning to SMS platform, there won't be any extra
+            `failureCode`, as the result is binary. For campaign
+            provisioning-related failures, refer to the list for the possible
+            values.
+          example: CAMPAIGN_NOT_AVAILABLE
+          enum:
+            - CAMPAIGN_NOT_AVAILABLE
+            - EXCEEDED_10DLC_LIMIT
+            - NUMBER_PROVISIONING_FAILED
+            - PARTNER_SERVICE_UNAVAILABLE
+            - CAMPAIGN_PENDING_ACCEPTANCE
+            - MNO_SHARING_ERROR
+            - CAMPAIGN_PROVISIONING_FAILED
+            - CAMPAIGN_EXPIRED
+            - CAMPAIGN_MNO_REJECTED
+            - CAMPAIGN_MNO_SUSPENDED
+            - CAMPAIGN_MNO_REVIEW
+            - INSUFFICIENT_BALANCE
+            - MOCK_CAMPAIGN_NOT_ALLOWED
+            - TFN_NOT_ALLOWED
+            - INVALID_NNID
+          x-enumDescriptions:
+            CAMPAIGN_NOT_AVAILABLE: The specified campaign is not available.
+            EXCEEDED_10DLC_LIMIT: Exceeded the limit for 10DLC.
+            NUMBER_PROVISIONING_FAILED: Provisioning the number failed.
+            PARTNER_SERVICE_UNAVAILABLE: The third party service is unavailable.
+            CAMPAIGN_PENDING_ACCEPTANCE: The campaign is not yet accepted.
+            MNO_SHARING_ERROR: Error with MNO.
+            CAMPAIGN_PROVISIONING_FAILED: The campaign failed to provision.
+            CAMPAIGN_EXPIRED: The campaign expired.
+            CAMPAIGN_MNO_REJECTED: The campaign MNO was rejected.
+            CAMPAIGN_MNO_SUSPENDED: The campaign MNO was suspended.
+            CAMPAIGN_MNO_REVIEW: The campaign MNO is under review.
+            INSUFFICIENT_BALANCE: Not enough credit in the account.
+            MOCK_CAMPAIGN_NOT_ALLOWED: Provisioning not allowed for mock campaigns.
+            TFN_NOT_ALLOWED: Toll free numbers not allowed.
+            INVALID_NNID: Invalid NNID.
+    InvalidArgument:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+                - 400
+              x-enumDescriptions:
+                '400': An invalid argument error code.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+                - INVALID_ARGUMENT
+              x-enumDescriptions:
+                INVALID_ARGUMENT: An invalid argument error.
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/BadRequest'
+    BadRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+            - BadRequest
+          x-enumDescriptions:
+            BadRequest: A bad request error.
+        fieldViolations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldViolation'
+    FieldViolation:
+      type: object
+      properties:
+        field:
+          type: string
+        description:
+          type: string
+    NotFound:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+                - 404
+              x-enumDescriptions:
+                '404': A not found error code.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+                - NOT_FOUND
+              x-enumDescriptions:
+                NOT_FOUND: Could not find the resource.
+            details:
+              type: array
+              items:
+                type: object
+    InternalError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+                - 500
+              x-enumDescriptions:
+                '500': An internal server error code.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+                - INTERNAL
+                - UNKNOWN
+              x-enumDescriptions:
+                INTERNAL: Internal server error.
+                UNKNOWN: Unknown error.
+            details:
+              type: array
+              items:
+                type: object
+  securitySchemes:
+    Basic:
+      type: http
+      description: >-
+        Your key ID and Key secret serve as the username and password,
+        respectively. Both can be found in the [Sinch Customer
+        Dashboard](https://dashboard.sinch.com/settings/access-keys).For more
+        information about basic authentication in the Numbers API, click
+        [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/basic).
+      scheme: basic
+    OAuth2.0:
+      type: oauth2
+      description: >-
+        The username and password are your Key ID and Key Secret from the
+        [Access keys section](https://dashboard.sinch.com/settings/access-keys)
+        in the Sinch Customer Dashboard. Exchange these for a bearer token
+        (access token). Learn how
+        [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+security:
+  - Basic: []
+  - OAuth2.0: []
+tags:
+  - name: Hosting Orders
+    description: >-
+      Hosted numbers provide you with an easy method to port your SMS enabled
+      numbers to Sinch or to use SMS messaging and other products to send and
+      receive messages, on voice-enabled numbers (including landline numbers)
+      that you already own.
+
+
+      Note: The SMS enablement process is only supported in United States and
+      Canada.
+
+
+      The Hosting Orders API allows you to manage all the numbers that you are
+      hosting on the Sinch platform. This includes numbers that you have ported
+      to Sinch and/or any non- Sinch numbers that you already own and are
+      hosting on Sinch to enable Sinch SMS messaging and other products.
+  - name: Imported Numbers
+    description: >-
+      Use the Imported Numbers API endpoints to list imported numbers or import
+      a number that's already been provisioned with an NNID for use with Sinch.
+      Imported numbers can be used with Sinch SMS services.
+
+
+      Note: The SMS enablement process is only supported in United States and
+      Canada.
+  - name: Qualified Numbers
+    description: >-
+      You can use the Qualified Numbers API to qualify numbers you want Sinch to
+      host and have available for use with Sinch SMS services. Qualifying a
+      number involves verifying ownership of a number either by providing a one
+      time passcode sent to the number by voice call or by providing invoices
+      for multiple numbers. Once numbers are qualified, you can then enable
+      those numbers for SMS text messaging services.
+
+
+      Note: The SMS enablement process is only supported in United States and
+      Canada.
+  - name: Imported Numbers and Hosting Orders Callbacks
+    description: >-
+      You can set up callback URLs to receive event notifications when your
+      numbers are updated. 
+
+
+      When delivering events the order is not guaranteed (for example, a failed
+      event scheduled for retry will not block other events that were queued).
+
+
+      The client's callback handler must implement the state machine that can
+      decide what to do with _unexpected_ events, for example, "old" events or
+      invalid state transitions. In these cases the handler could use the API to
+      GET the latest state for the resource.
+
+
+      The callback handler is expected to "ingest" the event and respond with
+      200 OK. The domain-specific business logic and processes should be
+      executed outside of the callback request, as internal asynchronous jobs.
+
+
+      To use callbacks, add the following IP addresses to your allowlist:
+
+
+      - 54.76.19.159
+
+      - 54.78.194.39
+
+      - 54.155.83.128
+
+
+      ### Secure Webhook Endpoints with HMAC
+
+
+      Implementing HMAC (Hash-based Message Authentication Code) on your webhook
+      endpoints will ensure the integrity of data, preventing tampering during
+      transmission.
+
+      An HMAC used in webhooks is a common approach in the industry and
+      essentially it is just special code that can be used to check if a message
+      hasn't been tampered with during the transmission.
+
+
+      We recommend to configure an HMAC secret for your project using the
+      [callback
+      configuration](https://developers.sinch.com/docs/numbers/api-reference/imported-hosting/imported-numbers-and-hosting-orders-callbacks/updatecallbackconfiguration).
+      Then, when sending the number events, the HTTP POST requests will include
+      the header `X-Sinch-Signature` with the computed HMAC.
+
+
+      **NOTE:** The HMAC secret is configured per project; if you are using the
+      Numbers API with multiple projects, make sure you configure the HMAC
+      secret in each project, and fetch it for either imported or purchased
+      numbers from the dedicated endpoints.
+
+
+      ### HMAC verification
+
+
+      We recommend to verify the HMAC code received with every event in your
+      event handler. When receiving a new event on your endpoint URL, compute
+      the HMAC of the payload using the secret (configured
+      [here](https://developers.sinch.com/docs/numbers/api-reference/imported-hosting/imported-numbers-and-hosting-orders-callbacks/updatecallbackconfiguration))
+      and compare it with one received in the `X-Sinch-Signature` header.
+
+
+      **NOTE:** Compute the HMAC on the plain text value before parsing the JSON
+      payload.

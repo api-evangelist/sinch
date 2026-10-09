@@ -1,0 +1,77 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-service-phone-number-schema.json",
+  "title": "ServicePhoneNumber",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-fax-api-openapi.yml#/components/schemas/ServicePhoneNumber",
+  "type": "object",
+  "properties": {
+    "phoneNumber": {
+      "$ref": "#/$defs/PhoneNumber"
+    },
+    "permissions": {
+      "type": "string",
+      "description": "Allows you to set permissions for sending and receiving faxes to this email/phone number combination. Default value is `both`.",
+      "x-enumDescriptions": {
+        "both": "Allows the email to send and receive faxes to this email/phone number combination.",
+        "send": "Allows the email to only send faxes to this email/phone number combination.",
+        "receive": "Allows the email to only receive faxes from this email/phone number combination."
+      },
+      "enum": [
+        "both",
+        "send",
+        "receive"
+      ],
+      "default": "both"
+    },
+    "country": {
+      "readOnly": true,
+      "type": "string",
+      "description": "The country code of the phone number in ISO 3166-1 alpha-2 format."
+    },
+    "suspended": {
+      "type": "boolean",
+      "description": "Specifies if a number is suspended or not.",
+      "readOnly": true
+    },
+    "note": {
+      "type": "string",
+      "description": "An optional field providing context about the suspension.",
+      "readOnly": true
+    },
+    "projectId": {
+      "$ref": "#/$defs/ProjectId",
+      "readOnly": true
+    },
+    "serviceId": {
+      "$ref": "#/$defs/ServiceId",
+      "readOnly": true
+    }
+  },
+  "$defs": {
+    "PhoneNumber": {
+      "x-PII": true,
+      "x-v1": true,
+      "type": "string",
+      "format": "phoneNumber",
+      "description": "A phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format, including the leading '+'."
+    },
+    "ProjectId": {
+      "type": "string",
+      "x-PII": false,
+      "x-v1": false,
+      "description": "The `Id` of the project associated with the call.",
+      "x-Internal": "to support future account keys",
+      "readOnly": true
+    },
+    "ServiceId": {
+      "x-PII": false,
+      "x-v1": true,
+      "readOnly": true,
+      "type": "string",
+      "description": "ID of the fax service used."
+    }
+  }
+}

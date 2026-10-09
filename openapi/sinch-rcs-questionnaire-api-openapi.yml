@@ -1,0 +1,2711 @@
+openapi: 3.2.0
+info:
+  title: Provisioning RCS Questionnaire API
+  description: Manage your RCS questionnaires.
+  version: 1.2.117
+servers:
+- url: https://provisioning.api.sinch.com
+  description: Production server
+security:
+- BasicAuth: []
+  BearerAuth: []
+  OAuth2Production: []
+tags:
+- name: RCS Questionnaire
+  description: Manage your RCS questionnaires.
+paths:
+  /v1/projects/{projectId}/rcs/questionnaire/{useCase}:
+    get:
+      description: 'Returns questionnaire questions for a use case.
+
+
+        The launch questionnaire is based on information required by different Suppliers and Operators. As such, especially the country specific, may be subject to change.'
+      operationId: RcsQuestionnaireController_getQuestions_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: useCase
+        required: true
+        in: path
+        description: Use case.
+        x-enumDescriptions:
+          MULTIUSE: Configures the sender for multiple distinct types of message flows.
+          OTP: Configures the sender exclusively for one-time passwords and secure tokens.
+          PROMOTIONAL: Configures the sender for marketing, offers, and promotional broadcasts.
+          TRANSACTIONAL: Configures the sender for critical, non-marketing customer alerts and account updates.
+        schema:
+          $ref: '#/components/schemas/RcsInputSenderUseCasesEnum'
+      - name: countries
+        required: false
+        in: query
+        description: Optional query for sender countries.
+        x-enumDescriptions:
+          AT: The country code for Austria.
+          BE: The country code for Belgium.
+          BR: The country code for Brazil.
+          CA: The country code for Canada.
+          CZ: The country code for the Czech Republic.
+          DK: The country code for Denmark.
+          FI: The country code for Finland.
+          FR: The country code for France.
+          DE: The country code for Germany.
+          GR: The country code for Greece.
+          HU: The country code for Hungary.
+          IT: The country code for Italy.
+          LT: The country code for Lithuania.
+          MX: The country code for Mexico.
+          NL: The country code for the Netherlands.
+          'NO': The country code for Norway.
+          PE: The country code for Peru.
+          PL: The country code for Poland.
+          PT: The country code for Portugal.
+          SG: The country code for Singapore.
+          SK: The country code for Slovakia.
+          ES: The country code for Spain.
+          SE: The country code for Sweden.
+          US: The country code for the United States of America.
+          GB: The country code for the United Kingdom of Great Britain.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/RcsInputRcsCountryCodesEnum'
+      - name: usQuestionnaireBrandCampaignVersion
+        required: false
+        in: query
+        description: Optional query parameter to specify the US questionnaire brand campaign version.
+        x-enumDescriptions:
+          NON_US_PRIVATE: Applies compliance rules designated for a privately held brand located outside the United States.
+          NON_US_PUBLIC: Applies compliance rules designated for a publicly traded brand located outside the United States.
+          US_PRIVATE: Applies compliance rules designated for a privately held brand located within the United States.
+          US_PUBLIC: Applies compliance rules designated for a publicly traded brand located within the United States.
+        schema:
+          $ref: '#/components/schemas/RcsUsQuestionnaireBrandCampaignVersionsEnum'
+      - name: usQuestionnaireVersion
+        required: false
+        in: query
+        description: Optional query parameter to specify the US questionnaire version.
+        x-enumDescriptions:
+          v1: Specifies the initial legacy version of the US compliance questionnaire framework.
+          v2: Specifies the current updated version of the US compliance questionnaire framework.
+        schema:
+          $ref: '#/components/schemas/RcsUsQuestionnaireVersionsEnum'
+      responses:
+        '200':
+          description: Questionnaire questions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireBaseDto'
+              examples:
+                usPublicQuestionnaireResponse:
+                  summary: Get US Public questionnaire response
+                  description: "\n    Response with US Public questionnaire questions.\n    "
+                  value:
+                    general:
+                      questions:
+                        optInDescription:
+                          question: How do users agree to receive messages from your business through the agent?
+                          suggestedAnswers:
+                          - By subscribing to our loyalty program
+                          - By making a purchase in-store or online
+                          - By subscribing to a newsletter
+                          - By creating an account on our website or app
+                        triggerDescription:
+                          question: When does your business send messages to users through the agent?
+                          suggestedAnswers:
+                          - User actions (e.g. after making a purchase)
+                        interactionsDescription:
+                          question: How will users interact with your business through the agent?
+                          suggestedAnswers:
+                          - Online Payment
+                          - Password reset
+                          - OTP/2FA for account login
+                        optOutDescription:
+                          question: What message does your business send when a user opts out?
+                          suggestedAnswers:
+                          - Thank you for opting out
+                          - Thank you for unsubscribing
+                          - We have registered your opt out request
+                        videoUris:
+                          question: ''
+                          suggestedAnswers: []
+                        screenshotUris:
+                          question: ''
+                          suggestedAnswers: []
+                    verification:
+                      questions:
+                        name:
+                          question: What is the name of your verification contact?
+                          suggestedAnswers: []
+                        email:
+                          question: What is the email of your verification contact?
+                          suggestedAnswers: []
+                        title:
+                          question: What is the title of your verification contact?
+                          suggestedAnswers: []
+                        website:
+                          question: What is the website of your verification contact?
+                          suggestedAnswers: []
+                        phone:
+                          question: What is the phone number of your verification contact?
+                          suggestedAnswers: []
+                        partner:
+                          companyName:
+                            question: 'For ASP resellers: what is the name of the brand partner company?'
+                            suggestedAnswers: []
+                          contactName:
+                            question: 'For ASP resellers: what is the name of the brand partner contact person?'
+                            suggestedAnswers: []
+                          contactEmailAddress:
+                            question: 'For ASP resellers: what is the email of the brand partner contact person?'
+                            suggestedAnswers: []
+                    us:
+                      questions:
+                        ownershipType:
+                          question: What is the ownership type of your company?
+                          suggestedAnswers:
+                          - PRIVATE
+                          - PUBLIC
+                        companyLegalName:
+                          question: What is the registered legal name of your company?
+                          suggestedAnswers: []
+                        companyPhoneNumber:
+                          question: What is the primary phone number of your company?
+                          suggestedAnswers: []
+                        companyEmailAddress:
+                          question: What is the primary email address of your company?
+                          suggestedAnswers: []
+                        brandName:
+                          question: What is your brand name or Doing Business As (DBA)?
+                          suggestedAnswers: []
+                        brandIndustry:
+                          question: What sector or industry does your business operate in?
+                          suggestedAnswers:
+                          - AGRICULTURE
+                          - COMMUNICATION
+                          - CONSTRUCTION
+                          - EDUCATION
+                          - ENERGY
+                          - ENTERTAINMENT
+                          - FINANCIAL
+                          - GAMBLING
+                          - GOVERNMENT
+                          - HEALTHCARE
+                          - HOSPITALITY
+                          - HUMAN_RESOURCES
+                          - INSURANCE
+                          - LEGAL
+                          - MANUFACTURING
+                          - NON_GOVERNMENTAL_ORGANIZATION
+                          - POLITICAL
+                          - POSTAL
+                          - PROFESSIONAL
+                          - REAL_ESTATE
+                          - RETAIL
+                          - TECHNOLOGY
+                          - TRANSPORTATION
+                        legalForm:
+                          question: What is the legal form of your company?
+                          suggestedAnswers:
+                          - CORPORATION
+                          - LIMITED_LIABILITY_COMPANY
+                          - PARTNERSHIP
+                          - S_CORPORATION
+                        taxIdCountry:
+                          question: In which country is your company's tax ID registered?
+                          suggestedAnswers: []
+                        taxId:
+                          question: 'For non-US companies: what is the tax ID of your company?'
+                          suggestedAnswers: []
+                        addressLine:
+                          question: What is the primary street address of your company?
+                          suggestedAnswers: []
+                        addressCity:
+                          question: In which city is your company located?
+                          suggestedAnswers: []
+                        addressCountry:
+                          question: In which country is your company located?
+                          suggestedAnswers: []
+                        addressPostalCode:
+                          question: What is the postal code for your company address?
+                          suggestedAnswers: []
+                        websiteUrl:
+                          question: What is the primary website URL for your company?
+                          suggestedAnswers: []
+                        contactFirstName:
+                          question: What is the first name of the responsible contact person for your company?
+                          suggestedAnswers: []
+                        contactSurname:
+                          question: What is the surname of the responsible contact person for your company?
+                          suggestedAnswers: []
+                        sampleMessages:
+                          question: Please provide sample messages for each use case or message type sent by your brand.
+                          suggestedAnswers: []
+                        messagesVolume:
+                          question: What is the expected message volume?
+                          suggestedAnswers: []
+                        embeddedLink:
+                          question: Does your brand send messages that contain embedded links to external websites?
+                          suggestedAnswers: []
+                        embeddedPhone:
+                          question: Does your brand send messages that contain embedded phone numbers for direct calling?
+                          suggestedAnswers: []
+                        ageGatedContent:
+                          question: Does your brand send messages that contain age-gated content or require age verification?
+                          suggestedAnswers: []
+                        directLending:
+                          question: Does your brand send messages that involve direct lending or financial services?
+                          suggestedAnswers: []
+                        optInConfirmationMessage:
+                          question: Does your brand send opt-in confirmation messages to users who have subscribed to receive messages?
+                          suggestedAnswers: []
+                        helpMessage:
+                          question: Does your brand send help messages that provide assistance or support information to users?
+                          suggestedAnswers: []
+                        callToActionMessage:
+                          question: Does your brand send call-to-action messages that encourage users to take specific actions?
+                          suggestedAnswers: []
+                        addressState:
+                          question: In which state is your company located?
+                          suggestedAnswers: []
+                        stockExchange:
+                          question: What is the primary home country stock exchange abbreviation?
+                          suggestedAnswers: []
+                        stockSymbol:
+                          question: What is the primary home country stock symbol associated with the stock exchange?
+                          suggestedAnswers: []
+                usPrivateQuestionnaireResponse:
+                  summary: Get US Private questionnaire response
+                  description: "\n    Response with US Private questionnaire questions.\n    "
+                  value:
+                    general:
+                      questions:
+                        optInDescription:
+                          question: How do users agree to receive messages from your business through the agent?
+                          suggestedAnswers:
+                          - By subscribing to our loyalty program
+                          - By making a purchase in-store or online
+                          - By subscribing to a newsletter
+                          - By creating an account on our website or app
+                        triggerDescription:
+                          question: When does your business send messages to users through the agent?
+                          suggestedAnswers:
+                          - User actions (e.g. after making a purchase)
+                        interactionsDescription:
+                          question: How will users interact with your business through the agent?
+                          suggestedAnswers:
+                          - Online Payment
+                          - Password reset
+                          - OTP/2FA for account login
+                        optOutDescription:
+                          question: What message does your business send when a user opts out?
+                          suggestedAnswers:
+                          - Thank you for opting out
+                          - Thank you for unsubscribing
+                          - We have registered your opt out request
+                        videoUris:
+                          question: ''
+                          suggestedAnswers: []
+                        screenshotUris:
+                          question: ''
+                          suggestedAnswers: []
+                    verification:
+                      questions:
+                        name:
+                          question: What is the name of your verification contact?
+                          suggestedAnswers: []
+                        email:
+                          question: What is the email of your verification contact?
+                          suggestedAnswers: []
+                        title:
+                          question: What is the title of your verification contact?
+                          suggestedAnswers: []
+                        website:
+                          question: What is the website of your verification contact?
+                          suggestedAnswers: []
+                        phone:
+                          question: What is the phone number of your verification contact?
+                          suggestedAnswers: []
+                        partner:
+                          companyName:
+                            question: 'For ASP resellers: what is the name of the brand partner company?'
+                            suggestedAnswers: []
+                          contactName:
+                            question: 'For ASP resellers: what is the name of the brand partner contact person?'
+                            suggestedAnswers: []
+                          contactEmailAddress:
+                            question: 'For ASP resellers: what is the email of the brand partner contact person?'
+                            suggestedAnswers: []
+                    us:
+                      questions:
+                        ownershipType:
+                          question: What is the ownership type of your company?
+                          suggestedAnswers:
+                          - PRIVATE
+                          - PUBLIC
+                        companyLegalName:
+                          question: What is the registered legal name of your company?
+                          suggestedAnswers: []
+                        companyPhoneNumber:
+                          question: What is the primary phone number of your company?
+                          suggestedAnswers: []
+                        companyEmailAddress:
+                          question: What is the primary email address of your company?
+                          suggestedAnswers: []
+                        brandName:
+                          question: What is your brand name or Doing Business As (DBA)?
+                          suggestedAnswers: []
+                        brandIndustry:
+                          question: What sector or industry does your business operate in?
+                          suggestedAnswers:
+                          - AGRICULTURE
+                          - COMMUNICATION
+                          - CONSTRUCTION
+                          - EDUCATION
+                          - ENERGY
+                          - ENTERTAINMENT
+                          - FINANCIAL
+                          - GAMBLING
+                          - GOVERNMENT
+                          - HEALTHCARE
+                          - HOSPITALITY
+                          - HUMAN_RESOURCES
+                          - INSURANCE
+                          - LEGAL
+                          - MANUFACTURING
+                          - NON_GOVERNMENTAL_ORGANIZATION
+                          - POLITICAL
+                          - POSTAL
+                          - PROFESSIONAL
+                          - REAL_ESTATE
+                          - RETAIL
+                          - TECHNOLOGY
+                          - TRANSPORTATION
+                        legalForm:
+                          question: What is the legal form of your company?
+                          suggestedAnswers:
+                          - CORPORATION
+                          - LIMITED_LIABILITY_COMPANY
+                          - PARTNERSHIP
+                          - S_CORPORATION
+                        taxIdCountry:
+                          question: In which country is your company's tax ID registered?
+                          suggestedAnswers: []
+                        taxId:
+                          question: 'For non-US companies: what is the tax ID of your company?'
+                          suggestedAnswers: []
+                        addressLine:
+                          question: What is the primary street address of your company?
+                          suggestedAnswers: []
+                        addressCity:
+                          question: In which city is your company located?
+                          suggestedAnswers: []
+                        addressCountry:
+                          question: In which country is your company located?
+                          suggestedAnswers: []
+                        addressPostalCode:
+                          question: What is the postal code for your company address?
+                          suggestedAnswers: []
+                        websiteUrl:
+                          question: What is the primary website URL for your company?
+                          suggestedAnswers: []
+                        contactFirstName:
+                          question: What is the first name of the responsible contact person for your company?
+                          suggestedAnswers: []
+                        contactSurname:
+                          question: What is the surname of the responsible contact person for your company?
+                          suggestedAnswers: []
+                        sampleMessages:
+                          question: Please provide sample messages for each use case or message type sent by your brand.
+                          suggestedAnswers: []
+                        messagesVolume:
+                          question: What is the expected message volume?
+                          suggestedAnswers: []
+                        embeddedLink:
+                          question: Does your brand send messages that contain embedded links to external websites?
+                          suggestedAnswers: []
+                        embeddedPhone:
+                          question: Does your brand send messages that contain embedded phone numbers for direct calling?
+                          suggestedAnswers: []
+                        ageGatedContent:
+                          question: Does your brand send messages that contain age-gated content or require age verification?
+                          suggestedAnswers: []
+                        directLending:
+                          question: Does your brand send messages that involve direct lending or financial services?
+                          suggestedAnswers: []
+                        optInConfirmationMessage:
+                          question: Does your brand send opt-in confirmation messages to users who have subscribed to receive messages?
+                          suggestedAnswers: []
+                        helpMessage:
+                          question: Does your brand send help messages that provide assistance or support information to users?
+                          suggestedAnswers: []
+                        callToActionMessage:
+                          question: Does your brand send call-to-action messages that encourage users to take specific actions?
+                          suggestedAnswers: []
+                        addressState:
+                          question: In which state is your company located?
+                          suggestedAnswers: []
+                nonUsPublicQuestionnaireResponse:
+                  summary: Get non-US Public questionnaire response
+                  description: "\n    Response with non-US Public questionnaire questions.\n    "
+                  value:
+                    general:
+                      questions:
+                        optInDescription:
+                          question: How do users agree to receive messages from your business through the agent?
+                          suggestedAnswers:
+                          - By subscribing to our loyalty program
+                          - By making a purchase in-store or online
+                          - By subscribing to a newsletter
+                          - By creating an account on our website or app
+                        triggerDescription:
+                          question: When does your business send messages to users through the agent?
+                          suggestedAnswers:
+                          - User actions (e.g. after making a purchase)
+                        interactionsDescription:
+                          question: How will users interact with your business through the agent?
+                          suggestedAnswers:
+                          - Online Payment
+                          - Password reset
+                          - OTP/2FA for account login
+                        optOutDescription:
+                          question: What message does your business send when a user opts out?
+                          suggestedAnswers:
+                          - Thank you for opting out
+                          - Thank you for unsubscribing
+                          - We have registered your opt out request
+                        videoUris:
+                          question: ''
+                          suggestedAnswers: []
+                        screenshotUris:
+                          question: ''
+                          suggestedAnswers: []
+                    verification:
+                      questions:
+                        name:
+                          question: What is the name of your verification contact?
+                          suggestedAnswers: []
+                        email:
+                          question: What is the email of your verification contact?
+                          suggestedAnswers: []
+                        title:
+                          question: What is the title of your verification contact?
+                          suggestedAnswers: []
+                        website:
+                          question: What is the website of your verification contact?
+                          suggestedAnswers: []
+                        phone:
+                          question: What is the phone number of your verification contact?
+                          suggestedAnswers: []
+                        partner:
+                          companyName:
+                            question: 'For ASP resellers: what is the name of the brand partner company?'
+                            suggestedAnswers: []
+                          contactName:
+                            question: 'For ASP resellers: what is the name of the brand partner contact person?'
+                            suggestedAnswers: []
+                          contactEmailAddress:
+                            question: 'For ASP resellers: what is the email of the brand partner contact person?'
+                            suggestedAnswers: []
+                    us:
+                      questions:
+                        ownershipType:
+                          question: What is the ownership type of your company?
+                          suggestedAnswers:
+                          - PRIVATE
+                          - PUBLIC
+                        companyLegalName:
+                          question: What is the registered legal name of your company?
+                          suggestedAnswers: []
+                        companyPhoneNumber:
+                          question: What is the primary phone number of your company?
+                          suggestedAnswers: []
+                        companyEmailAddress:
+                          question: What is the primary email address of your company?
+                          suggestedAnswers: []
+                        brandName:
+                          question: What is your brand name or Doing Business As (DBA)?
+                          suggestedAnswers: []
+                        brandIndustry:
+                          question: What sector or industry does your business operate in?
+                          suggestedAnswers:
+                          - AGRICULTURE
+                          - COMMUNICATION
+                          - CONSTRUCTION
+                          - EDUCATION
+                          - ENERGY
+                          - ENTERTAINMENT
+                          - FINANCIAL
+                          - GAMBLING
+                          - GOVERNMENT
+                          - HEALTHCARE
+                          - HOSPITALITY
+                          - HUMAN_RESOURCES
+                          - INSURANCE
+                          - LEGAL
+                          - MANUFACTURING
+                          - NON_GOVERNMENTAL_ORGANIZATION
+                          - POLITICAL
+                          - POSTAL
+                          - PROFESSIONAL
+                          - REAL_ESTATE
+                          - RETAIL
+                          - TECHNOLOGY
+                          - TRANSPORTATION
+                        legalForm:
+                          question: What is the legal form of your company?
+                          suggestedAnswers:
+                          - CORPORATION
+                          - LIMITED_LIABILITY_COMPANY
+                          - PARTNERSHIP
+                          - S_CORPORATION
+                        taxIdCountry:
+                          question: In which country is your company's tax ID registered?
+                          suggestedAnswers: []
+                        taxId:
+                          question: 'For non-US companies: what is the tax ID of your company?'
+                          suggestedAnswers: []
+                        addressLine:
+                          question: What is the primary street address of your company?
+                          suggestedAnswers: []
+                        addressCity:
+                          question: In which city is your company located?
+                          suggestedAnswers: []
+                        addressCountry:
+                          question: In which country is your company located?
+                          suggestedAnswers: []
+                        addressPostalCode:
+                          question: What is the postal code for your company address?
+                          suggestedAnswers: []
+                        websiteUrl:
+                          question: What is the primary website URL for your company?
+                          suggestedAnswers: []
+                        contactFirstName:
+                          question: What is the first name of the responsible contact person for your company?
+                          suggestedAnswers: []
+                        contactSurname:
+                          question: What is the surname of the responsible contact person for your company?
+                          suggestedAnswers: []
+                        sampleMessages:
+                          question: Please provide sample messages for each use case or message type sent by your brand.
+                          suggestedAnswers: []
+                        messagesVolume:
+                          question: What is the expected message volume?
+                          suggestedAnswers: []
+                        embeddedLink:
+                          question: Does your brand send messages that contain embedded links to external websites?
+                          suggestedAnswers: []
+                        embeddedPhone:
+                          question: Does your brand send messages that contain embedded phone numbers for direct calling?
+                          suggestedAnswers: []
+                        ageGatedContent:
+                          question: Does your brand send messages that contain age-gated content or require age verification?
+                          suggestedAnswers: []
+                        directLending:
+                          question: Does your brand send messages that involve direct lending or financial services?
+                          suggestedAnswers: []
+                        optInConfirmationMessage:
+                          question: Does your brand send opt-in confirmation messages to users who have subscribed to receive messages?
+                          suggestedAnswers: []
+                        helpMessage:
+                          question: Does your brand send help messages that provide assistance or support information to users?
+                          suggestedAnswers: []
+                        callToActionMessage:
+                          question: Does your brand send call-to-action messages that encourage users to take specific actions?
+                          suggestedAnswers: []
+                        stockExchange:
+                          question: What is the primary home country stock exchange abbreviation?
+                          suggestedAnswers: []
+                        stockSymbol:
+                          question: What is the primary home country stock symbol associated with the stock exchange?
+                          suggestedAnswers: []
+                nonUsPrivateQuestionnaireResponse:
+                  summary: Get non-US Private questionnaire response
+                  description: "\n    Response with non-US Private questionnaire questions.\n    "
+                  value:
+                    general:
+                      questions:
+                        optInDescription:
+                          question: How do users agree to receive messages from your business through the agent?
+                          suggestedAnswers:
+                          - By subscribing to our loyalty program
+                          - By making a purchase in-store or online
+                          - By subscribing to a newsletter
+                          - By creating an account on our website or app
+                        triggerDescription:
+                          question: When does your business send messages to users through the agent?
+                          suggestedAnswers:
+                          - User actions (e.g. after making a purchase)
+                        interactionsDescription:
+                          question: How will users interact with your business through the agent?
+                          suggestedAnswers:
+                          - Online Payment
+                          - Password reset
+                          - OTP/2FA for account login
+                        optOutDescription:
+                          question: What message does your business send when a user opts out?
+                          suggestedAnswers:
+                          - Thank you for opting out
+                          - Thank you for unsubscribing
+                          - We have registered your opt out request
+                        videoUris:
+                          question: ''
+                          suggestedAnswers: []
+                        screenshotUris:
+                          question: ''
+                          suggestedAnswers: []
+                    verification:
+                      questions:
+                        name:
+                          question: What is the name of your verification contact?
+                          suggestedAnswers: []
+                        email:
+                          question: What is the email of your verification contact?
+                          suggestedAnswers: []
+                        title:
+                          question: What is the title of your verification contact?
+                          suggestedAnswers: []
+                        website:
+                          question: What is the website of your verification contact?
+                          suggestedAnswers: []
+                        phone:
+                          question: What is the phone number of your verification contact?
+                          suggestedAnswers: []
+                        partner:
+                          companyName:
+                            question: 'For ASP resellers: what is the name of the brand partner company?'
+                            suggestedAnswers: []
+                          contactName:
+                            question: 'For ASP resellers: what is the name of the brand partner contact person?'
+                            suggestedAnswers: []
+                          contactEmailAddress:
+                            question: 'For ASP resellers: what is the email of the brand partner contact person?'
+                            suggestedAnswers: []
+                    us:
+                      questions:
+                        ownershipType:
+                          question: What is the ownership type of your company?
+                          suggestedAnswers:
+                          - PRIVATE
+                          - PUBLIC
+                        companyLegalName:
+                          question: What is the registered legal name of your company?
+                          suggestedAnswers: []
+                        companyPhoneNumber:
+                          question: What is the primary phone number of your company?
+                          suggestedAnswers: []
+                        companyEmailAddress:
+                          question: What is the primary email address of your company?
+                          suggestedAnswers: []
+                        brandName:
+                          question: What is your brand name or Doing Business As (DBA)?
+                          suggestedAnswers: []
+                        brandIndustry:
+                          question: What sector or industry does your business operate in?
+                          suggestedAnswers:
+                          - AGRICULTURE
+                          - COMMUNICATION
+                          - CONSTRUCTION
+                          - EDUCATION
+                          - ENERGY
+                          - ENTERTAINMENT
+                          - FINANCIAL
+                          - GAMBLING
+                          - GOVERNMENT
+                          - HEALTHCARE
+                          - HOSPITALITY
+                          - HUMAN_RESOURCES
+                          - INSURANCE
+                          - LEGAL
+                          - MANUFACTURING
+                          - NON_GOVERNMENTAL_ORGANIZATION
+                          - POLITICAL
+                          - POSTAL
+                          - PROFESSIONAL
+                          - REAL_ESTATE
+                          - RETAIL
+                          - TECHNOLOGY
+                          - TRANSPORTATION
+                        legalForm:
+                          question: What is the legal form of your company?
+                          suggestedAnswers:
+                          - CORPORATION
+                          - LIMITED_LIABILITY_COMPANY
+                          - PARTNERSHIP
+                          - S_CORPORATION
+                        taxIdCountry:
+                          question: In which country is your company's tax ID registered?
+                          suggestedAnswers: []
+                        taxId:
+                          question: 'For non-US companies: what is the tax ID of your company?'
+                          suggestedAnswers: []
+                        addressLine:
+                          question: What is the primary street address of your company?
+                          suggestedAnswers: []
+                        addressCity:
+                          question: In which city is your company located?
+                          suggestedAnswers: []
+                        addressCountry:
+                          question: In which country is your company located?
+                          suggestedAnswers: []
+                        addressPostalCode:
+                          question: What is the postal code for your company address?
+                          suggestedAnswers: []
+                        websiteUrl:
+                          question: What is the primary website URL for your company?
+                          suggestedAnswers: []
+                        contactFirstName:
+                          question: What is the first name of the responsible contact person for your company?
+                          suggestedAnswers: []
+                        contactSurname:
+                          question: What is the surname of the responsible contact person for your company?
+                          suggestedAnswers: []
+                        sampleMessages:
+                          question: Please provide sample messages for each use case or message type sent by your brand.
+                          suggestedAnswers: []
+                        messagesVolume:
+                          question: What is the expected message volume?
+                          suggestedAnswers: []
+                        embeddedLink:
+                          question: Does your brand send messages that contain embedded links to external websites?
+                          suggestedAnswers: []
+                        embeddedPhone:
+                          question: Does your brand send messages that contain embedded phone numbers for direct calling?
+                          suggestedAnswers: []
+                        ageGatedContent:
+                          question: Does your brand send messages that contain age-gated content or require age verification?
+                          suggestedAnswers: []
+                        directLending:
+                          question: Does your brand send messages that involve direct lending or financial services?
+                          suggestedAnswers: []
+                        optInConfirmationMessage:
+                          question: Does your brand send opt-in confirmation messages to users who have subscribed to receive messages?
+                          suggestedAnswers: []
+                        helpMessage:
+                          question: Does your brand send help messages that provide assistance or support information to users?
+                          suggestedAnswers: []
+                        callToActionMessage:
+                          question: Does your brand send call-to-action messages that encourage users to take specific actions?
+                          suggestedAnswers: []
+                usQuestionnaire:
+                  summary: Get US questionnaire response
+                  description: "\n    Response with questionnaire questions.\n    "
+                  value:
+                    general:
+                      questions:
+                        optInDescription:
+                          question: How do users agree to receive messages from your business through the agent?
+                          suggestedAnswers:
+                          - By subscribing to our loyalty program
+                          - By making a purchase in-store or online
+                          - By subscribing to a newsletter
+                          - By creating an account on our website or app
+                        triggerDescription:
+                          question: When does your business send messages to users through the agent?
+                          suggestedAnswers:
+                          - User actions (e.g. after making a purchase)
+                        interactionsDescription:
+                          question: How will users interact with your business through the agent?
+                          suggestedAnswers:
+                          - Online Payment
+                          - Password reset
+                          - OTP/2FA for account login
+                        optOutDescription:
+                          question: What message does your business send when a user opts out?
+                          suggestedAnswers:
+                          - Thank you for opting out
+                          - Thank you for unsubscribing
+                          - We have registered your opt out request
+                        videoUris:
+                          question: ''
+                          suggestedAnswers: []
+                        screenshotUris:
+                          question: ''
+                          suggestedAnswers: []
+                    verification:
+                      questions:
+                        name:
+                          question: What is the name of your verification contact?
+                          suggestedAnswers: []
+                        email:
+                          question: What is the email of your verification contact?
+                          suggestedAnswers: []
+                        title:
+                          question: What is the title of your verification contact?
+                          suggestedAnswers: []
+                        website:
+                          question: What is the website of your verification contact?
+                          suggestedAnswers: []
+                        phone:
+                          question: What is the phone number of your verification contact?
+                          suggestedAnswers: []
+                        partner:
+                          companyName:
+                            question: 'For ASP resellers: what is the name of the brand partner company?'
+                            suggestedAnswers: []
+                          contactName:
+                            question: 'For ASP resellers: what is the name of the brand partner contact person?'
+                            suggestedAnswers: []
+                          contactEmailAddress:
+                            question: 'For ASP resellers: what is the email of the brand partner contact person?'
+                            suggestedAnswers: []
+                    us:
+                      questions:
+                        ownershipType:
+                          question: What is the ownership type of your company?
+                          suggestedAnswers:
+                          - PRIVATE
+                          - PUBLIC
+                        companyLegalName:
+                          question: What is the registered legal name of your company?
+                          suggestedAnswers: []
+                        companyPhoneNumber:
+                          question: What is the primary phone number of your company?
+                          suggestedAnswers: []
+                        companyEmailAddress:
+                          question: What is the primary email address of your company?
+                          suggestedAnswers: []
+                        brandName:
+                          question: What is your brand name or Doing Business As (DBA)?
+                          suggestedAnswers: []
+                        brandIndustry:
+                          question: What sector or industry does your business operate in?
+                          suggestedAnswers:
+                          - AGRICULTURE
+                          - COMMUNICATION
+                          - CONSTRUCTION
+                          - EDUCATION
+                          - ENERGY
+                          - ENTERTAINMENT
+                          - FINANCIAL
+                          - GAMBLING
+                          - GOVERNMENT
+                          - HEALTHCARE
+                          - HOSPITALITY
+                          - HUMAN_RESOURCES
+                          - INSURANCE
+                          - LEGAL
+                          - MANUFACTURING
+                          - NON_GOVERNMENTAL_ORGANIZATION
+                          - POLITICAL
+                          - POSTAL
+                          - PROFESSIONAL
+                          - REAL_ESTATE
+                          - RETAIL
+                          - TECHNOLOGY
+                          - TRANSPORTATION
+                        legalForm:
+                          question: What is the legal form of your company?
+                          suggestedAnswers:
+                          - CORPORATION
+                          - LIMITED_LIABILITY_COMPANY
+                          - PARTNERSHIP
+                          - S_CORPORATION
+                        taxIdCountry:
+                          question: In which country is your company's tax ID registered?
+                          suggestedAnswers: []
+                        taxId:
+                          question: 'For non-US companies: what is the tax ID of your company?'
+                          suggestedAnswers: []
+                        addressLine:
+                          question: What is the primary street address of your company?
+                          suggestedAnswers: []
+                        addressCity:
+                          question: In which city is your company located?
+                          suggestedAnswers: []
+                        addressCountry:
+                          question: In which country is your company located?
+                          suggestedAnswers: []
+                        addressState:
+                          question: In which state is your company located?
+                          suggestedAnswers: []
+                        addressPostalCode:
+                          question: What is the postal code for your company address?
+                          suggestedAnswers: []
+                        websiteUrl:
+                          question: What is the primary website URL for your company?
+                          suggestedAnswers: []
+                        contactFirstName:
+                          question: What is the first name of the responsible contact person for your company?
+                          suggestedAnswers: []
+                        contactSurname:
+                          question: What is the surname of the responsible contact person for your company?
+                          suggestedAnswers: []
+                        stockExchange:
+                          question: What is the primary home country stock exchange abbreviation?
+                          suggestedAnswers: []
+                        stockSymbol:
+                          question: What is the primary home country stock symbol associated with the stock exchange?
+                          suggestedAnswers: []
+                        sampleMessages:
+                          question: Please provide sample messages for each use case or message type sent by your brand.
+                          suggestedAnswers: []
+                        messagesVolume:
+                          question: What is the expected message volume?
+                          suggestedAnswers: []
+                        embeddedLink:
+                          question: Does your brand send messages that contain embedded links to external websites?
+                          suggestedAnswers: []
+                        embeddedPhone:
+                          question: Does your brand send messages that contain embedded phone numbers for direct calling?
+                          suggestedAnswers: []
+                        ageGatedContent:
+                          question: Does your brand send messages that contain age-gated content or require age verification?
+                          suggestedAnswers: []
+                        directLending:
+                          question: Does your brand send messages that involve direct lending or financial services?
+                          suggestedAnswers: []
+                        optInConfirmationMessage:
+                          question: Does your brand send opt-in confirmation messages to users who have subscribed to receive messages?
+                          suggestedAnswers: []
+                        helpMessage:
+                          question: Does your brand send help messages that provide assistance or support information to users?
+                          suggestedAnswers: []
+                        callToActionMessage:
+                          question: Does your brand send call-to-action messages that encourage users to take specific actions?
+                          suggestedAnswers: []
+                deprecatedUsQuestionnaire:
+                  summary: '[Deprecated] Get US questionnaire response'
+                  description: "\n    Response with deprecated US questionnaire questions.\n    "
+                  value:
+                    general:
+                      questions:
+                        optInDescription:
+                          question: How do users agree to receive messages from your business through the agent?
+                          suggestedAnswers:
+                          - By subscribing to our loyalty program
+                          - By making a purchase in-store or online
+                          - By subscribing to a newsletter
+                          - By creating an account on our website or app
+                        triggerDescription:
+                          question: When does your business send messages to users through the agent?
+                          suggestedAnswers:
+                          - User actions (e.g. after making a purchase)
+                        interactionsDescription:
+                          question: How will users interact with your business through the agent?
+                          suggestedAnswers:
+                          - Online Payment
+                          - Password reset
+                          - OTP/2FA for account login
+                        optOutDescription:
+                          question: What message does your business send when a user opts out?
+                          suggestedAnswers:
+                          - Thank you for opting out
+                          - Thank you for unsubscribing
+                          - We have registered your opt out request
+                        videoUris:
+                          question: ''
+                          suggestedAnswers: []
+                        screenshotUris:
+                          question: ''
+                          suggestedAnswers: []
+                    verification:
+                      questions:
+                        name:
+                          question: What is the name of your verification contact?
+                          suggestedAnswers: []
+                        email:
+                          question: What is the email of your verification contact?
+                          suggestedAnswers: []
+                        title:
+                          question: What is the title of your verification contact?
+                          suggestedAnswers: []
+                        website:
+                          question: What is the website of your verification contact?
+                          suggestedAnswers: []
+                        phone:
+                          question: What is the phone number of your verification contact?
+                          suggestedAnswers: []
+                        partner:
+                          companyName:
+                            question: 'For ASP resellers: what is the name of the brand partner company?'
+                            suggestedAnswers: []
+                          contactName:
+                            question: 'For ASP resellers: what is the name of the brand partner contact person?'
+                            suggestedAnswers: []
+                          contactEmailAddress:
+                            question: 'For ASP resellers: what is the email of the brand partner contact person?'
+                            suggestedAnswers: []
+                    us:
+                      questions:
+                        companyLegalName:
+                          question: What is the registered legal name of your company?
+                          suggestedAnswers: []
+                        ein:
+                          question: What is the Employer Identification Number (EIN) of your company?
+                          suggestedAnswers: []
+                        brandIndustry:
+                          question: What sector or industry does your business operate in?
+                          suggestedAnswers:
+                          - Automotive
+                          - Beauty, spa and salon
+                          - Clothing
+                          - Education
+                          - Entertainment
+                          - Event planning and service
+                          - Finance and banking
+                          - Food and groceries
+                          - Public service
+                          - Hotel and lodging
+                          - Medical and health
+                          - Charity
+                          - Professional services
+                          - Shopping and retail
+                          - Travel and transportation
+                          - Restaurant
+                        fullCompanyAddress:
+                          question: Full Company Address
+                          suggestedAnswers: []
+                        smsCampaign:
+                          question: US SMS campaign used as fallback.
+                          suggestedAnswers: []
+                        messagesVolume:
+                          question: What is the total volume of messages expected to be sent by your agent?
+                          suggestedAnswers:
+                          - 0 - 10K messages
+                          - 10K - 100K messages
+                          - 100K - 1M messages
+                          - 1M+ messages
+                gbFrQuestionnaire:
+                  summary: Get GB and FR questionnaire response
+                  description: "\n    Response with GB and FR questionnaire questions.\n    "
+                  value:
+                    general:
+                      questions:
+                        optInDescription:
+                          question: How do users agree to receive messages from your business through the agent?
+                          suggestedAnswers:
+                          - By subscribing to our loyalty program
+                          - By making a purchase in-store or online
+                          - By subscribing to a newsletter
+                          - By creating an account on our website or app
+                        triggerDescription:
+                          question: When does your business send messages to users through the agent?
+                          suggestedAnswers:
+                          - User actions (e.g. after making a purchase)
+                        interactionsDescription:
+                          question: How will users interact with your business through the agent?
+                          suggestedAnswers:
+                          - Online Payment
+                          - Password reset
+                          - OTP/2FA for account login
+                        optOutDescription:
+                          question: What message does your business send when a user opts out?
+                          suggestedAnswers:
+                          - Thank you for opting out
+                          - Thank you for unsubscribing
+                          - We have registered your opt out request
+                        videoUris:
+                          question: ''
+                          suggestedAnswers: []
+                        screenshotUris:
+                          question: ''
+                          suggestedAnswers: []
+                    verification:
+                      questions:
+                        name:
+                          question: What is the name of your verification contact?
+                          suggestedAnswers: []
+                        email:
+                          question: What is the email of your verification contact?
+                          suggestedAnswers: []
+                        title:
+                          question: What is the title of your verification contact?
+                          suggestedAnswers: []
+                        website:
+                          question: What is the website of your verification contact?
+                          suggestedAnswers: []
+                        phone:
+                          question: What is the phone number of your verification contact?
+                          suggestedAnswers: []
+                        partner:
+                          companyName:
+                            question: 'For ASP resellers: what is the name of the brand partner company?'
+                            suggestedAnswers: []
+                          contactName:
+                            question: 'For ASP resellers: what is the name of the brand partner contact person?'
+                            suggestedAnswers: []
+                          contactEmailAddress:
+                            question: 'For ASP resellers: what is the email of the brand partner contact person?'
+                            suggestedAnswers: []
+                    gb:
+                      questions:
+                        brandIndustry:
+                          question: What sector or industry does your business operate in?
+                          suggestedAnswers:
+                          - Automotive
+                          - Beauty, spa and salon
+                          - Clothing
+                          - Education
+                          - Entertainment
+                          - Event planning and service
+                          - Finance and banking
+                          - Food and groceries
+                          - Public service
+                          - Hotel and lodging
+                          - Medical and health
+                          - Charity
+                          - Professional services
+                          - Shopping and retail
+                          - Travel and transportation
+                          - Restaurant
+                        companyLegalName:
+                          question: What is the registered legal name of your company?
+                          suggestedAnswers: []
+                        companyRegistrationNumber:
+                          question: What is the registration number of your company?
+                          suggestedAnswers: []
+                        fullCompanyAddress:
+                          question: Full Company Address
+                          suggestedAnswers: []
+                        messagesVolume:
+                          question: What is the total volume of messages expected to be sent by your agent?
+                          suggestedAnswers:
+                          - 0 - 10K messages
+                          - 10K - 100K messages
+                          - 100K - 1M messages
+                          - 1M+ messages
+                        messagesFrequency:
+                          question: How often do you expect to send messages?
+                          suggestedAnswers:
+                          - Once per day
+                          - Once per week
+                          - Once per month
+                          - Once per 3 months
+                          - Once per 6 months
+                        campaignLength:
+                          question: What will be the length of the RCS campaign?
+                          suggestedAnswers:
+                          - 1 day or less
+                          - 2 to 7 days
+                          - 8 to 21 days
+                          - 1 month
+                          - 3 months
+                          - 6 months
+                          - Continuous / ongoing
+                    fr:
+                      questions:
+                        fullCompanyAddress:
+                          question: Full Company Address
+                          suggestedAnswers: []
+                        siren:
+                          question: What is your Company directory identification system number (SIREN)?
+                          suggestedAnswers: []
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                questionnaire_invalid_use_case-0:
+                  summary: QuestionnaireInvalidUseCaseError
+                  value:
+                    errorCode: questionnaire_invalid_use_case
+                    message: Invalid use case value.
+                    resolution: Verify that the use case value is supported by the Provisioning API.
+                    additionalInformation:
+                      validUseCases: MULTIUSE, OTP, PROMOTIONAL, TRANSACTIONAL
+                questionnaire_invalid_country-1:
+                  summary: QuestionnaireInvalidCountryError
+                  value:
+                    errorCode: questionnaire_invalid_country
+                    message: Invalid country.
+                    resolution: Use the supported values for the countries parameter.
+                    additionalInformation:
+                      supportedValues: AT, BE, BR, CA, CZ, DK, FI, FR, DE, GR, HU, IT, LT, MX, NL, NO, PE, PL, PT, SG, SK, ES, SE, US, GB
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RcsPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get questionnaire questions for project and use case
+      tags:
+      - RCS Questionnaire
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+components:
+  schemas:
+    RcsSenderDetailsQuestionnaireBaseDto:
+      type: object
+      properties:
+        general:
+          description: General launch questions
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireGeneralBaseDto'
+        verification:
+          description: Verification questions.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireVerificationBaseDto'
+        gb:
+          description: Launch questions specific for UK.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireGBBaseDto'
+        fr:
+          description: Launch questions specific for France.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireFRBaseDto'
+        us:
+          oneOf:
+          - $ref: '#/components/schemas/RcsBrandCampaignSenderDetailsQuestionnaireUSBaseDto'
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireUSBaseDto'
+          description: Launch questions specific for US.
+          uniqueItems: false
+      required:
+      - general
+      - verification
+    RcsUsPublicBrandCampaignSenderDetailsQuestionnaireUSQuestionsDto:
+      type: object
+      properties:
+        ownershipType:
+          readOnly: true
+          description: Ownership type of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyLegalName:
+          readOnly: true
+          description: The registered legal name of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyPhoneNumber:
+          readOnly: true
+          description: The registered phone number of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyEmailAddress:
+          readOnly: true
+          description: The email address of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandName:
+          readOnly: true
+          description: Brand name or Doing Business As (DBA). Must be legally associated with the provided legal company name. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandIndustry:
+          readOnly: true
+          description: Sector or industry of business. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        legalForm:
+          readOnly: true
+          description: Legal form of the company.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        taxIdCountry:
+          readOnly: true
+          description: Country of the company's tax registration.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        taxId:
+          readOnly: true
+          description: Tax registration identifier associated with the provided legal company name.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressLine:
+          readOnly: true
+          description: Street address line. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressCity:
+          readOnly: true
+          description: City. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressCountry:
+          readOnly: true
+          description: Country. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressState:
+          readOnly: true
+          description: State (US only). Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressPostalCode:
+          readOnly: true
+          description: Postal code. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        websiteUrl:
+          readOnly: true
+          description: Primary website URL. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactFirstName:
+          readOnly: true
+          description: First name of the responsible contact person. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactSurname:
+          readOnly: true
+          description: Surname of the responsible contact person. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        stockExchange:
+          readOnly: true
+          description: Primary home country stock exchange abbreviation. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        stockSymbol:
+          readOnly: true
+          description: Primary home country stock symbol associated with stock exchange. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        sampleMessages:
+          readOnly: true
+          description: Sample messages for each use case or message type sent by the brand. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        messagesVolume:
+          readOnly: true
+          description: Messages volume. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        embeddedLink:
+          readOnly: true
+          description: Flag indicating if URL links will be embedded within message payloads. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        embeddedPhone:
+          readOnly: true
+          description: Flag indicating if phone numbers will be embedded within message payloads. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        ageGatedContent:
+          readOnly: true
+          description: Indicates if the campaign content is restricted by age (e.g., alcohol, tobacco). Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        directLending:
+          readOnly: true
+          description: Indicates if the campaign involves direct financial lending, requiring stricter compliance. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        optInConfirmationMessage:
+          readOnly: true
+          description: Opt-in confirmation message sent to users. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        helpMessage:
+          readOnly: true
+          description: Help message of the campaign. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        callToActionMessage:
+          readOnly: true
+          description: Call to action message of the campaign. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+      required:
+      - ownershipType
+      - companyLegalName
+      - companyPhoneNumber
+      - companyEmailAddress
+      - brandName
+      - brandIndustry
+      - legalForm
+      - taxIdCountry
+      - taxId
+      - addressLine
+      - addressCity
+      - addressCountry
+      - addressState
+      - addressPostalCode
+      - websiteUrl
+      - contactFirstName
+      - contactSurname
+      - stockExchange
+      - stockSymbol
+      - sampleMessages
+      - messagesVolume
+      - embeddedLink
+      - embeddedPhone
+      - ageGatedContent
+      - directLending
+      - optInConfirmationMessage
+      - helpMessage
+      - callToActionMessage
+    RcsSenderDetailsQuestionnaireGeneralBaseDto:
+      type: object
+      properties:
+        questions:
+          readOnly: true
+          description: Launch questions
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireGeneralQuestionsDto'
+      required:
+      - questions
+    RcsSenderDetailsQuestionnaireFRBaseDto:
+      type: object
+      properties:
+        questions:
+          readOnly: true
+          description: Launch questions specific for France.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireFRQuestionsDto'
+      required:
+      - questions
+    RcsInputSenderUseCasesEnum:
+      type: string
+      enum:
+      - MULTIUSE
+      - OTP
+      - PROMOTIONAL
+      - TRANSACTIONAL
+      description: Use case.
+    RcsSenderDetailsQuestionnaireGBBaseDto:
+      type: object
+      properties:
+        questions:
+          readOnly: true
+          description: Launch questions specific for UK.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireGBQuestionsDto'
+      required:
+      - questions
+    RcsSenderDetailsQuestionnaireVerificationQuestionsDto:
+      type: object
+      properties:
+        name:
+          readOnly: true
+          description: Name of verification contact.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        email:
+          readOnly: true
+          description: Email of verification contact.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        title:
+          readOnly: true
+          description: Title of verification contact.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        website:
+          readOnly: true
+          description: Website of verification contact.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        phone:
+          readOnly: true
+          description: Phone number of verification contact in E.164 format.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        partner:
+          readOnly: true
+          description: Brand partner contact details. Only supported for reseller (ASP) accounts; otherwise ignored.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireVerificationPartnerQuestionsDto'
+      required:
+      - name
+      - email
+      - title
+      - website
+      - phone
+      - partner
+    RcsNonUsPrivateBrandCampaignSenderDetailsQuestionnaireUSQuestionsDto:
+      type: object
+      properties:
+        ownershipType:
+          readOnly: true
+          description: Ownership type of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyLegalName:
+          readOnly: true
+          description: The registered legal name of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyPhoneNumber:
+          readOnly: true
+          description: The registered phone number of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyEmailAddress:
+          readOnly: true
+          description: The email address of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandName:
+          readOnly: true
+          description: Brand name or Doing Business As (DBA). Must be legally associated with the provided legal company name. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandIndustry:
+          readOnly: true
+          description: Sector or industry of business. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        legalForm:
+          readOnly: true
+          description: Legal form of the company.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        taxIdCountry:
+          readOnly: true
+          description: Country of the company's tax registration.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        taxId:
+          readOnly: true
+          description: Tax registration identifier associated with the provided legal company name.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressLine:
+          readOnly: true
+          description: Street address line. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressCity:
+          readOnly: true
+          description: City. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressCountry:
+          readOnly: true
+          description: Country. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressPostalCode:
+          readOnly: true
+          description: Postal code. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        websiteUrl:
+          readOnly: true
+          description: Primary website URL. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactFirstName:
+          readOnly: true
+          description: First name of the responsible contact person. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactSurname:
+          readOnly: true
+          description: Surname of the responsible contact person. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        sampleMessages:
+          readOnly: true
+          description: Sample messages for each use case or message type sent by the brand. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        messagesVolume:
+          readOnly: true
+          description: Messages volume. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        embeddedLink:
+          readOnly: true
+          description: Flag indicating if URL links will be embedded within message payloads. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        embeddedPhone:
+          readOnly: true
+          description: Flag indicating if phone numbers will be embedded within message payloads. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        ageGatedContent:
+          readOnly: true
+          description: Indicates if the campaign content is restricted by age (e.g., alcohol, tobacco). Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        directLending:
+          readOnly: true
+          description: Indicates if the campaign involves direct financial lending, requiring stricter compliance. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        optInConfirmationMessage:
+          readOnly: true
+          description: Opt-in confirmation message sent to users. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        helpMessage:
+          readOnly: true
+          description: Help message of the campaign. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        callToActionMessage:
+          readOnly: true
+          description: Call to action message of the campaign. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+      required:
+      - ownershipType
+      - companyLegalName
+      - companyPhoneNumber
+      - companyEmailAddress
+      - brandName
+      - brandIndustry
+      - legalForm
+      - taxIdCountry
+      - taxId
+      - addressLine
+      - addressCity
+      - addressCountry
+      - addressPostalCode
+      - websiteUrl
+      - contactFirstName
+      - contactSurname
+      - sampleMessages
+      - messagesVolume
+      - embeddedLink
+      - embeddedPhone
+      - ageGatedContent
+      - directLending
+      - optInConfirmationMessage
+      - helpMessage
+      - callToActionMessage
+    RcsSenderDetailsQuestionnaireGeneralQuestionsDto:
+      type: object
+      properties:
+        optInDescription:
+          readOnly: true
+          description: How you obtain opt-in to message users.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        triggerDescription:
+          readOnly: true
+          description: Actions that triggers messages to users.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        interactionsDescription:
+          readOnly: true
+          description: Interactions with users.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        optOutDescription:
+          readOnly: true
+          description: The message the sender sends when a user opts out.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        videoUris:
+          readOnly: true
+          description: Publicly available URIs for videos of the sender, for review purposes only.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        screenshotUris:
+          readOnly: true
+          description: Publicly available URIs for screenshots of the sender, for review purposes only.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+      required:
+      - optInDescription
+      - triggerDescription
+      - interactionsDescription
+      - optOutDescription
+      - videoUris
+      - screenshotUris
+    RcsUsQuestionnaireBrandCampaignVersionsEnum:
+      type: string
+      enum:
+      - NON_US_PRIVATE
+      - NON_US_PUBLIC
+      - US_PRIVATE
+      - US_PUBLIC
+    RcsSenderDetailsQuestionnaireUSQuestionsDto:
+      type: object
+      properties:
+        companyLegalName:
+          readOnly: true
+          description: The registered legal name of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        ein:
+          readOnly: true
+          description: Employer Identification Number (EIN).
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandIndustry:
+          readOnly: true
+          description: Sector or industry of business. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        fullCompanyAddress:
+          readOnly: true
+          description: Full company address.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        smsCampaign:
+          readOnly: true
+          description: US SMS campaign used as fallback.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        messagesVolume:
+          readOnly: true
+          description: Messages volume. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+      description: SenderDetailsQuestionnaireUSQuestionsDto is deprecated and will be removed in future versions. Please use BrandCampaignSenderDetailsQuestionnaireUSQuestionsDto instead.
+      required:
+      - companyLegalName
+      - ein
+      - brandIndustry
+      - fullCompanyAddress
+      - smsCampaign
+      - messagesVolume
+    RcsBrandCampaignSenderDetailsQuestionnaireUSBaseDto:
+      type: object
+      properties:
+        questions:
+          oneOf:
+          - $ref: '#/components/schemas/RcsUsPublicBrandCampaignSenderDetailsQuestionnaireUSQuestionsDto'
+          - $ref: '#/components/schemas/RcsUsPrivateBrandCampaignSenderDetailsQuestionnaireUSQuestionsDto'
+          - $ref: '#/components/schemas/RcsNonUsPublicBrandCampaignSenderDetailsQuestionnaireUSQuestionsDto'
+          - $ref: '#/components/schemas/RcsNonUsPrivateBrandCampaignSenderDetailsQuestionnaireUSQuestionsDto'
+          - $ref: '#/components/schemas/RcsBrandCampaignSenderDetailsQuestionnaireUSQuestionsDto'
+          readOnly: true
+          description: Launch questions specific for US.
+          uniqueItems: false
+      required:
+      - questions
+    RcsSenderDetailsQuestionnaireVerificationPartnerQuestionsDto:
+      type: object
+      properties:
+        companyName:
+          readOnly: true
+          description: Company name of the brand partner.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactName:
+          readOnly: true
+          description: Name of the contact person of the brand partner.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactEmailAddress:
+          readOnly: true
+          description: Email of the contact person of the brand partner.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+      required:
+      - companyName
+      - contactName
+      - contactEmailAddress
+    RcsSenderDetailsQuestionnaireQuestionObjectDto:
+      type: object
+      properties:
+        question:
+          type: string
+          readOnly: true
+          description: Human readable question.
+          uniqueItems: false
+        suggestedAnswers:
+          readOnly: true
+          description: Suggested answers to the question.
+          uniqueItems: false
+          type: array
+          items:
+            type: string
+      required:
+      - question
+      - suggestedAnswers
+    RcsSenderDetailsQuestionnaireFRQuestionsDto:
+      type: object
+      properties:
+        fullCompanyAddress:
+          readOnly: true
+          description: Full company address.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        siren:
+          readOnly: true
+          description: Company directory identification system number.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+      required:
+      - fullCompanyAddress
+      - siren
+    RcsUsPrivateBrandCampaignSenderDetailsQuestionnaireUSQuestionsDto:
+      type: object
+      properties:
+        ownershipType:
+          readOnly: true
+          description: Ownership type of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyLegalName:
+          readOnly: true
+          description: The registered legal name of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyPhoneNumber:
+          readOnly: true
+          description: The registered phone number of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyEmailAddress:
+          readOnly: true
+          description: The email address of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandName:
+          readOnly: true
+          description: Brand name or Doing Business As (DBA). Must be legally associated with the provided legal company name. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandIndustry:
+          readOnly: true
+          description: Sector or industry of business. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        legalForm:
+          readOnly: true
+          description: Legal form of the company.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        taxIdCountry:
+          readOnly: true
+          description: Country of the company's tax registration.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        taxId:
+          readOnly: true
+          description: Tax registration identifier associated with the provided legal company name.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressLine:
+          readOnly: true
+          description: Street address line. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressCity:
+          readOnly: true
+          description: City. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressCountry:
+          readOnly: true
+          description: Country. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressState:
+          readOnly: true
+          description: State (US only). Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressPostalCode:
+          readOnly: true
+          description: Postal code. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        websiteUrl:
+          readOnly: true
+          description: Primary website URL. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactFirstName:
+          readOnly: true
+          description: First name of the responsible contact person. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactSurname:
+          readOnly: true
+          description: Surname of the responsible contact person. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        sampleMessages:
+          readOnly: true
+          description: Sample messages for each use case or message type sent by the brand. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        messagesVolume:
+          readOnly: true
+          description: Messages volume. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        embeddedLink:
+          readOnly: true
+          description: Flag indicating if URL links will be embedded within message payloads. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        embeddedPhone:
+          readOnly: true
+          description: Flag indicating if phone numbers will be embedded within message payloads. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        ageGatedContent:
+          readOnly: true
+          description: Indicates if the campaign content is restricted by age (e.g., alcohol, tobacco). Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        directLending:
+          readOnly: true
+          description: Indicates if the campaign involves direct financial lending, requiring stricter compliance. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        optInConfirmationMessage:
+          readOnly: true
+          description: Opt-in confirmation message sent to users. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        helpMessage:
+          readOnly: true
+          description: Help message of the campaign. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        callToActionMessage:
+          readOnly: true
+          description: Call to action message of the campaign. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+      required:
+      - ownershipType
+      - companyLegalName
+      - companyPhoneNumber
+      - companyEmailAddress
+      - brandName
+      - brandIndustry
+      - legalForm
+      - taxIdCountry
+      - taxId
+      - addressLine
+      - addressCity
+      - addressCountry
+      - addressState
+      - addressPostalCode
+      - websiteUrl
+      - contactFirstName
+      - contactSurname
+      - sampleMessages
+      - messagesVolume
+      - embeddedLink
+      - embeddedPhone
+      - ageGatedContent
+      - directLending
+      - optInConfirmationMessage
+      - helpMessage
+      - callToActionMessage
+    RcsSenderDetailsQuestionnaireVerificationBaseDto:
+      type: object
+      properties:
+        questions:
+          readOnly: true
+          description: Verification questions.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireVerificationQuestionsDto'
+      required:
+      - questions
+    RcsSenderDetailsQuestionnaireUSBaseDto:
+      type: object
+      properties:
+        questions:
+          readOnly: true
+          description: Launch questions specific for US.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireUSQuestionsDto'
+      description: SenderDetailsQuestionnaireUSBaseDto is deprecated and will be removed in future versions. Please use BrandCampaignSenderDetailsQuestionnaireUSBaseDto instead.
+      required:
+      - questions
+    RcsPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+    RcsInputRcsCountryCodesEnum:
+      type: string
+      enum:
+      - AT
+      - BE
+      - BR
+      - CA
+      - CZ
+      - DK
+      - FI
+      - FR
+      - DE
+      - GR
+      - HU
+      - IT
+      - LT
+      - MX
+      - NL
+      - 'NO'
+      - PE
+      - PL
+      - PT
+      - SG
+      - SK
+      - ES
+      - SE
+      - US
+      - GB
+      description: List of two-letter country codes in ISO 3166 standard, specifying the countries to launch RCS sender in.
+    RcsSenderDetailsQuestionnaireGBQuestionsDto:
+      type: object
+      properties:
+        brandIndustry:
+          readOnly: true
+          description: Sector or industry of business. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyLegalName:
+          readOnly: true
+          description: The registered legal name of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyRegistrationNumber:
+          readOnly: true
+          description: The company registration number.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        fullCompanyAddress:
+          readOnly: true
+          description: Full company address.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        messagesVolume:
+          readOnly: true
+          description: Messages volume. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        messagesFrequency:
+          readOnly: true
+          description: Messages frequency.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        campaignLength:
+          readOnly: true
+          description: Length of campaign.
+          deprecated: true
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+      required:
+      - brandIndustry
+      - companyLegalName
+      - companyRegistrationNumber
+      - fullCompanyAddress
+      - messagesVolume
+      - messagesFrequency
+      - campaignLength
+    RcsNonUsPublicBrandCampaignSenderDetailsQuestionnaireUSQuestionsDto:
+      type: object
+      properties:
+        ownershipType:
+          readOnly: true
+          description: Ownership type of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyLegalName:
+          readOnly: true
+          description: The registered legal name of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyPhoneNumber:
+          readOnly: true
+          description: The registered phone number of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyEmailAddress:
+          readOnly: true
+          description: The email address of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandName:
+          readOnly: true
+          description: Brand name or Doing Business As (DBA). Must be legally associated with the provided legal company name. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandIndustry:
+          readOnly: true
+          description: Sector or industry of business. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        legalForm:
+          readOnly: true
+          description: Legal form of the company.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        taxIdCountry:
+          readOnly: true
+          description: Country of the company's tax registration.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        taxId:
+          readOnly: true
+          description: Tax registration identifier associated with the provided legal company name.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressLine:
+          readOnly: true
+          description: Street address line. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressCity:
+          readOnly: true
+          description: City. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressCountry:
+          readOnly: true
+          description: Country. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressPostalCode:
+          readOnly: true
+          description: Postal code. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        websiteUrl:
+          readOnly: true
+          description: Primary website URL. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactFirstName:
+          readOnly: true
+          description: First name of the responsible contact person. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactSurname:
+          readOnly: true
+          description: Surname of the responsible contact person. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        stockExchange:
+          readOnly: true
+          description: Primary home country stock exchange abbreviation. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        stockSymbol:
+          readOnly: true
+          description: Primary home country stock symbol associated with stock exchange. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        sampleMessages:
+          readOnly: true
+          description: Sample messages for each use case or message type sent by the brand. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        messagesVolume:
+          readOnly: true
+          description: Messages volume. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        embeddedLink:
+          readOnly: true
+          description: Flag indicating if URL links will be embedded within message payloads. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        embeddedPhone:
+          readOnly: true
+          description: Flag indicating if phone numbers will be embedded within message payloads. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        ageGatedContent:
+          readOnly: true
+          description: Indicates if the campaign content is restricted by age (e.g., alcohol, tobacco). Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        directLending:
+          readOnly: true
+          description: Indicates if the campaign involves direct financial lending, requiring stricter compliance. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        optInConfirmationMessage:
+          readOnly: true
+          description: Opt-in confirmation message sent to users. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        helpMessage:
+          readOnly: true
+          description: Help message of the campaign. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        callToActionMessage:
+          readOnly: true
+          description: Call to action message of the campaign. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+      required:
+      - ownershipType
+      - companyLegalName
+      - companyPhoneNumber
+      - companyEmailAddress
+      - brandName
+      - brandIndustry
+      - legalForm
+      - taxIdCountry
+      - taxId
+      - addressLine
+      - addressCity
+      - addressCountry
+      - addressPostalCode
+      - websiteUrl
+      - contactFirstName
+      - contactSurname
+      - stockExchange
+      - stockSymbol
+      - sampleMessages
+      - messagesVolume
+      - embeddedLink
+      - embeddedPhone
+      - ageGatedContent
+      - directLending
+      - optInConfirmationMessage
+      - helpMessage
+      - callToActionMessage
+    RcsUsQuestionnaireVersionsEnum:
+      type: string
+      enum:
+      - v1
+      - v2
+    RcsBrandCampaignSenderDetailsQuestionnaireUSQuestionsDto:
+      type: object
+      properties:
+        ownershipType:
+          readOnly: true
+          description: Ownership type of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyLegalName:
+          readOnly: true
+          description: The registered legal name of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyPhoneNumber:
+          readOnly: true
+          description: The registered phone number of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        companyEmailAddress:
+          readOnly: true
+          description: The email address of the company. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandName:
+          readOnly: true
+          description: Brand name or Doing Business As (DBA). Must be legally associated with the provided legal company name. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        brandIndustry:
+          readOnly: true
+          description: Sector or industry of business. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        legalForm:
+          readOnly: true
+          description: Legal form of the company.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        taxIdCountry:
+          readOnly: true
+          description: Country of the company's tax registration.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        taxId:
+          readOnly: true
+          description: Tax registration identifier associated with the provided legal company name.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressLine:
+          readOnly: true
+          description: Street address line. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressCity:
+          readOnly: true
+          description: City. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressCountry:
+          readOnly: true
+          description: Country. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressState:
+          readOnly: true
+          description: State (US only). Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        addressPostalCode:
+          readOnly: true
+          description: Postal code. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        websiteUrl:
+          readOnly: true
+          description: Primary website URL. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactFirstName:
+          readOnly: true
+          description: First name of the responsible contact person. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        contactSurname:
+          readOnly: true
+          description: Surname of the responsible contact person. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        stockExchange:
+          readOnly: true
+          description: Primary home country stock exchange abbreviation. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        stockSymbol:
+          readOnly: true
+          description: Primary home country stock symbol associated with stock exchange. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        sampleMessages:
+          readOnly: true
+          description: Sample messages for each use case or message type sent by the brand. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        messagesVolume:
+          readOnly: true
+          description: Messages volume. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        embeddedLink:
+          readOnly: true
+          description: Flag indicating if URL links will be embedded within message payloads. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        embeddedPhone:
+          readOnly: true
+          description: Flag indicating if phone numbers will be embedded within message payloads. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        ageGatedContent:
+          readOnly: true
+          description: Indicates if the campaign content is restricted by age (e.g., alcohol, tobacco). Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        directLending:
+          readOnly: true
+          description: Indicates if the campaign involves direct financial lending, requiring stricter compliance. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        optInConfirmationMessage:
+          readOnly: true
+          description: Opt-in confirmation message sent to users. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        helpMessage:
+          readOnly: true
+          description: Help message of the campaign. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+        callToActionMessage:
+          readOnly: true
+          description: Call to action message of the campaign. Not required for create, but required for launch.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/RcsSenderDetailsQuestionnaireQuestionObjectDto'
+      required:
+      - ownershipType
+      - companyLegalName
+      - companyPhoneNumber
+      - companyEmailAddress
+      - brandName
+      - brandIndustry
+      - legalForm
+      - taxIdCountry
+      - taxId
+      - addressLine
+      - addressCity
+      - addressCountry
+      - addressState
+      - addressPostalCode
+      - websiteUrl
+      - contactFirstName
+      - contactSurname
+      - stockExchange
+      - stockSymbol
+      - sampleMessages
+      - messagesVolume
+      - embeddedLink
+      - embeddedPhone
+      - ageGatedContent
+      - directLending
+      - optInConfirmationMessage
+      - helpMessage
+      - callToActionMessage
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
+x-tagGroup-upscale:
+  name: Upscale
+  tags:
+  - Upscale Admin Feature Flag
+  - Upscale Admin Log Operation
+  - Upscale Admin Migrations
+  - Upscale Admin Sms
+  - Upscale Admin Upscales
+  - Internal
+  - Upscale Sms
+  - Upscale Upscales
+x-tagGroup-notification:
+  name: Notification
+  tags:
+  - Notification Admin Feature Flag
+  - Notification Admin Log Operation
+  - Internal
+x-tagGroups:
+- name: Webhook
+  tags:
+  - Webhooks
+- name: WhatsApp
+  tags:
+  - WhatsApp Accounts
+  - WhatsApp
+  - WhatsApp Flows
+  - WhatsApp Senders
+  - WhatsApp Solutions
+  - WhatsApp Templates
+- name: Bundles
+  tags:
+  - Bundles
+- name: KakaoTalk
+  tags:
+  - KakaoTalk Categories
+  - KakaoTalk Senders
+  - KakaoTalk Templates
+- name: Conversation
+  tags:
+  - Conversation
+- name: RCS
+  tags:
+  - RCS Accounts
+  - RCS Questionnaire
+  - RCS Senders
+- name: SMS
+  tags:
+  - SMS Apps

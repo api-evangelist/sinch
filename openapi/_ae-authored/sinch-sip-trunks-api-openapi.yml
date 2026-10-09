@@ -1,0 +1,228 @@
+openapi: 3.2.0
+info:
+  title: Sinch Elastic SIP Trunking SIP Trunks API
+  description: The Sinch Elastic SIP Trunking (EST) API enables developers to programmatically create and manage SIP trunks for connecting existing telephony infrastructure to the Sinch network. It provides endpoints for managing SIP endpoints, trunk configurations, and access control lists. The API supports elastic scaling of voice capacity without requiring fixed-capacity commitments, allowing businesses to connect their PBX systems, contact centers, or communication platforms to global PSTN connectivity.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://elastic-trunking.api.sinch.com
+  description: Global Production Server
+security:
+- oAuth2: []
+- basicAuth: []
+tags:
+- name: SIP Trunks
+  description: Create, view, update, and remove SIP trunks that connect your telephony infrastructure to the Sinch network.
+paths:
+  /v1/projects/{project_id}/trunks:
+    get:
+      operationId: listTrunks
+      summary: List Sip Trunks
+      description: Returns a list of all SIP trunks in the project with pagination support.
+      tags:
+      - SIP Trunks
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: page
+        in: query
+        description: The page number to retrieve
+        schema:
+          type: integer
+      - name: pageSize
+        in: query
+        description: The number of trunks per page
+        schema:
+          type: integer
+          default: 20
+      responses:
+        '200':
+          description: List of SIP trunks
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrunkList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createTrunk
+      summary: Create a Sip Trunk
+      description: Creates a new SIP trunk for connecting your telephony infrastructure to the Sinch network.
+      tags:
+      - SIP Trunks
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateTrunkRequest'
+      responses:
+        '200':
+          description: Trunk created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trunk'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/trunks/{trunk_id}:
+    get:
+      operationId: getTrunk
+      summary: Get a Sip Trunk
+      description: Returns the details and configuration of a specific SIP trunk.
+      tags:
+      - SIP Trunks
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: Trunk details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trunk'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Trunk not found
+    patch:
+      operationId: updateTrunk
+      summary: Update a Sip Trunk
+      description: Updates the configuration of an existing SIP trunk.
+      tags:
+      - SIP Trunks
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTrunkRequest'
+      responses:
+        '200':
+          description: Trunk updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Trunk'
+        '401':
+          description: Unauthorized
+        '404':
+          description: Trunk not found
+    delete:
+      operationId: deleteTrunk
+      summary: Delete a Sip Trunk
+      description: Deletes a specific SIP trunk and all its associated configuration.
+      tags:
+      - SIP Trunks
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: Trunk deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: Trunk not found
+components:
+  parameters:
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  schemas:
+    CreateTrunkRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The trunk name
+        hostName:
+          type: string
+          description: The Sinch SIP hostname
+    Trunk:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique trunk identifier
+        name:
+          type: string
+          description: The trunk name
+        hostName:
+          type: string
+          description: The Sinch SIP hostname for the trunk
+        topLevelDomain:
+          type: string
+          description: The top-level domain
+        domain:
+          type: string
+          description: The full SIP domain for the trunk
+        callsPerSecond:
+          type: integer
+          description: Maximum calls per second
+        enableCallingToBeta:
+          type: boolean
+          description: Whether calling to beta numbers is enabled
+        createTime:
+          type: string
+          format: date-time
+          description: When the trunk was created
+        updateTime:
+          type: string
+          format: date-time
+          description: When the trunk was last updated
+    TrunkList:
+      type: object
+      properties:
+        trunks:
+          type: array
+          description: List of SIP trunks
+          items:
+            $ref: '#/components/schemas/Trunk'
+        totalSize:
+          type: integer
+          description: Total number of trunks
+    UpdateTrunkRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Updated trunk name
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Key ID as username and key secret as password.
+externalDocs:
+  description: Sinch Elastic SIP Trunking API Documentation
+  url: https://developers.sinch.com/docs/est

@@ -1,0 +1,130 @@
+generated: '2026-10-08'
+method: derived
+generator: derive-problem-types.py
+source:
+- openapi/sinch-10dlc-registration-api-openapi.yml
+- openapi/sinch-access-keys-api-openapi.yml
+- openapi/sinch-access-keys-legacy-api-openapi.yml
+- openapi/sinch-batches-api-openapi.yml
+- openapi/sinch-brands-api-openapi.yml
+- openapi/sinch-chatlayer-analytics-api-openapi.yml
+- openapi/sinch-compliance-brands-api-openapi.yml
+- openapi/sinch-conversation-api-openapi.yml
+- openapi/sinch-delivery-reports-api-openapi.yml
+- openapi/sinch-elastic-sip-trunking-api-openapi.yml
+- openapi/sinch-fax-api-openapi.yml
+- openapi/sinch-groups-api-openapi.yml
+format: rfc9457
+envelope:
+  media_type: application/json
+  schema: runtimeError
+coverage:
+  operations: 447
+  statuses_declared: 14
+problems:
+- status: 400
+  title: Bad Request
+  description: BadRequest
+  operations: 222
+  media_types:
+  - application/json
+  - application/problem+json
+  schema: runtimeError
+- status: 401
+  title: Unauthorized
+  description: Unauthorized
+  operations: 203
+  media_types:
+  - application/json
+  - application/problem+json
+  schema: WhatsappPapiErrorDto
+- status: 402
+  title: Payment Required
+  description: Account Locked
+  operations: 2
+  media_types:
+  - application/json
+  - application/problem+json
+  schema: ProblemDetails
+- status: 403
+  title: Forbidden
+  description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conv
+  operations: 120
+  media_types:
+  - application/json
+  - application/problem+json
+  schema: runtimeError
+- status: 404
+  title: Not Found
+  description: NotFound
+  operations: 205
+  media_types:
+  - application/json
+  - application/problem+json
+  schema: RestError
+- status: 409
+  title: Conflict
+  description: Conflict
+  operations: 43
+  media_types:
+  - application/json
+  - application/problem+json
+  schema: WhatsappPapiErrorDto
+- status: 412
+  title: Precondition Failed
+  description: PreconditionFailed
+  operations: 2
+  media_types:
+  - application/json
+  schema: KakaotalkPapiErrorDto
+- status: 413
+  title: Content Too Large
+  description: Document is too large to upload
+  operations: 1
+  media_types:
+  - application/json
+  schema: RequestEntityTooLarge
+- status: 424
+  title: Failed Dependency
+  description: FailedDependency
+  operations: 7
+  media_types:
+  - application/json
+  schema: WhatsappPapiErrorDto
+- status: 429
+  title: Too Many Requests
+  description: Over limit
+  operations: 72
+  media_types:
+  - application/json
+  - application/problem+json
+  schema: error
+- status: 500
+  title: Internal Server Error
+  description: InternalServerError
+  operations: 267
+  media_types:
+  - application/json
+  - application/problem+json
+  schema: RestError
+- status: 501
+  title: Not Implemented
+  description: Something went wrong on our end, try again with exponential back-off. See [common error responses](https://developers.sinch.com/docs/convers
+  operations: 45
+  media_types:
+  - application/json
+  schema: runtimeError
+- status: 503
+  title: Service Unavailable
+  description: Unavailable, try again with exponential back-off
+  operations: 10
+  media_types:
+  - application/json
+  schema: Error
+- status: default
+  title: null
+  description: An unexpected error response.
+  operations: 6
+  media_types:
+  - application/json
+  schema: runtimeError

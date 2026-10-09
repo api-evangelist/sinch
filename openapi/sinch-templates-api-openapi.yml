@@ -1,0 +1,286 @@
+openapi: 3.2.0
+info:
+  version: '3.0'
+  title: Fax Templates API
+  description: This document provides a detailed user guide and reference documentation on the Fax REST API.
+  contact:
+    name: Contact Fax API Team
+    url: https://www.sinch.com/contact/
+    email: faxteam@sinch.com
+  license:
+    url: https://www.sinch.com/toc
+    name: MIT
+servers:
+- url: https://fax.api.sinch.com
+  description: v3.0 of the Fax API
+security:
+- BasicAuth: []
+- OAuth2: []
+tags:
+- name: Templates
+  description: You can use templates to control the look and content of the email notifications for your fax service. These templates are stored on a email domain that you can configure and manage using the `/domains` endpoints.
+paths:
+  /v3/projects/{projectId}/services/{serviceId}/domains/{domainName}/templates:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+      - Templates
+      parameters:
+      - name: serviceId
+        in: path
+        description: The serviceId containing the templates you want to list.
+        required: true
+        schema:
+          type: string
+          example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      - name: domainName
+        in: path
+        description: The name of the domain containing the templates you want to list.
+        required: true
+        schema:
+          type: string
+          example: yourdomain.com
+      summary: List templates for domain
+      description: List templates for a specific domain for the specified service.
+      operationId: listTemplates
+      responses:
+        '200':
+          description: The returned templates.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplatesDomainNameResponse'
+  /v3/projects/{projectId}/services/{serviceId}/domains/{domainName}/templates/{templateName}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+      - Templates
+      parameters:
+      - name: serviceId
+        in: path
+        description: The serviceId containing the templates you want to list.
+        required: true
+        schema:
+          type: string
+          example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      - name: domainName
+        in: path
+        description: The name of the domain containing the template you want to get.
+        required: true
+        schema:
+          type: string
+          example: yourdomain.com
+      - name: templateName
+        in: path
+        description: The name of the template you want to get.
+        required: true
+        schema:
+          $ref: '#/components/schemas/TemplateName'
+      summary: Get template
+      description: Retrieve a named template for a specific domain for the specified service.
+      operationId: getTemplate
+      responses:
+        '200':
+          description: The returned template.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateByNameResponse'
+    put:
+      tags:
+      - Templates
+      parameters:
+      - name: serviceId
+        in: path
+        description: The serviceId containing the templates you want to update.
+        required: true
+        schema:
+          type: string
+          example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      - name: domainName
+        in: path
+        description: The name of the domain containing the templates you want to update.
+        required: true
+        schema:
+          type: string
+          example: yourdomain.com
+      - name: templateName
+        in: path
+        description: The name of the template you want to update.
+        required: true
+        schema:
+          $ref: '#/components/schemas/TemplateName'
+      summary: Update template
+      description: Update a template for a specific domain for the specified service.
+      operationId: updateTemplate
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateTemplateRequest'
+            examples:
+              successfulOutboundFax:
+                summary: successful outbound fax
+                value:
+                  template: '<!DOCTYPE html><html lang=''en''><head><meta charset=''utf-8''><meta name=''viewport'' content=''width=device-width''></head><body style=''margin:0;padding:0;background:#f3f4f6;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''background:#f3f4f6;''><tr><td align=''center'' style=''padding:24px;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''max-width:600px;background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;''><tr><td style=''padding:24px 28px;font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#111827;font-size:14px;line-height:1.5;''><p style=''margin:0 0 16px 0;''>Hi,</p><p style=''margin:0 0 20px 0;''>You have sent a successful fax to: <strong>{{to}}</strong>!</p><table role=''presentation'' cellpadding=''0'' cellspacing=''0'' style=''border-collapse:collapse;''><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Fax Id:</td><td style=''padding:0 0 6px 0;''>{{id}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>From:</td><td style=''padding:0 0 6px 0;''>{{from}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>To:</td><td style=''padding:0 0 6px 0;''>{{to}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Number of pages:</td><td style=''padding:0 0 6px 0;''>{{numberOfPages}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Completed at:</td><td style=''padding:0 0 6px 0;''>{{completedTime}}</td></tr><tr><td style=''padding:0 10px 0 0;font-weight:600;''>Price:</td><td style=''padding:0 0 0 0;''>{{currencyCode}} {{amount}}</td></tr></table><p style=''margin:20px 0 0 0;''>Thanks!</p></td></tr></table></td></tr></table></body></html>'
+              successfulInboundFax:
+                summary: successful inbound fax
+                value:
+                  template: '<!DOCTYPE html><html lang=''en''><head><meta charset=''utf-8''><meta name=''viewport'' content=''width=device-width''></head><body style=''margin:0;padding:0;background:#f3f4f6;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''background:#f3f4f6;''><tr><td align=''center'' style=''padding:24px;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''max-width:600px;background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;''><tr><td style=''padding:24px 28px;font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#111827;font-size:14px;line-height:1.5;''><p style=''margin:0 0 16px 0;''>Hi,</p><p style=''margin:0 0 20px 0;''>You have received a successful fax from: <strong>{{from}}</strong>!</p><table role=''presentation'' cellpadding=''0'' cellspacing=''0'' style=''border-collapse:collapse;''><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Fax Id:</td><td style=''padding:0 0 6px 0;''>{{id}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>From:</td><td style=''padding:0 0 6px 0;''>{{from}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>To:</td><td style=''padding:0 0 6px 0;''>{{to}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Number of pages:</td><td style=''padding:0 0 6px 0;''>{{numberOfPages}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Completed at:</td><td style=''padding:0 0 6px 0;''>{{completedTime}}</td></tr><tr><td style=''padding:0 10px 0 0;font-weight:600;''>Price:</td><td style=''padding:0 0 0 0;''>{{currencyCode}} {{amount}}</td></tr></table><p style=''margin:20px 0 0 0;''>Thanks!</p></td></tr></table></td></tr></table></body></html>'
+              unsuccessfulOutboundFax:
+                summary: unsuccessful outbound fax
+                value:
+                  template: '<!DOCTYPE html><html lang=''en''><head><meta charset=''utf-8''><meta name=''viewport'' content=''width=device-width''></head><body style=''margin:0;padding:0;background:#f3f4f6;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''background:#f3f4f6;''><tr><td align=''center'' style=''padding:24px;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''max-width:600px;background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;''><tr><td style=''padding:24px 28px;font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#111827;font-size:14px;line-height:1.5;''><p style=''margin:0 0 16px 0;''>Hi,</p><p style=''margin:0 0 20px 0;''>A fax you sent to: <strong>{{to}}</strong> was not sent successfully.</p><table role=''presentation'' cellpadding=''0'' cellspacing=''0'' style=''border-collapse:collapse;''><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Fax Id:</td><td style=''padding:0 0 6px 0;''>{{id}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>From:</td><td style=''padding:0 0 6px 0;''>{{from}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>To:</td><td style=''padding:0 0 6px 0;''>{{to}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Number of pages:</td><td style=''padding:0 0 6px 0;''>{{numberOfPages}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Number of retries:</td><td style=''padding:0 0 6px 0;''>{{retryCount}}</td></tr><tr><td style=''padding:0 10px 0 0;font-weight:600;''>Price:</td><td style=''padding:0 0 0 0;''>{{currencyCode}} {{amount}}</td></tr></table><p style=''margin:20px 0 0 0;''>Thanks!</p></td></tr></table></td></tr></table></body></html>'
+              unsuccessfulInboundFax:
+                summary: unsuccessful inbound fax
+                value:
+                  template: '<!DOCTYPE html><html lang=''en''><head><meta charset=''utf-8''><meta name=''viewport'' content=''width=device-width''></head><body style=''margin:0;padding:0;background:#f3f4f6;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''background:#f3f4f6;''><tr><td align=''center'' style=''padding:24px;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''max-width:600px;background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;''><tr><td style=''padding:24px 28px;font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#111827;font-size:14px;line-height:1.5;''><p style=''margin:0 0 16px 0;''>Hi,</p><p style=''margin:0 0 20px 0;''>A fax sent to you from: <strong>{{from}}</strong> was not received successfully.</p><table role=''presentation'' cellpadding=''0'' cellspacing=''0'' style=''border-collapse:collapse;''><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Fax Id:</td><td style=''padding:0 0 6px 0;''>{{id}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>From:</td><td style=''padding:0 0 6px 0;''>{{from}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>To:</td><td style=''padding:0 0 6px 0;''>{{to}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Number of pages:</td><td style=''padding:0 0 6px 0;''>{{numberOfPages}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Number of retries:</td><td style=''padding:0 0 6px 0;''>{{retryCount}}</td></tr><tr><td style=''padding:0 10px 0 0;font-weight:600;''>Price:</td><td style=''padding:0 0 0 0;''>{{currencyCode}} {{amount}}</td></tr></table><p style=''margin:20px 0 0 0;''>Thanks!</p></td></tr></table></td></tr></table></body></html>'
+      responses:
+        '200':
+          description: The updated template.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TemplateByNameResponse'
+components:
+  schemas:
+    TemplateName:
+      type: string
+      description: The name of the email template.
+      enum:
+      - successful outbound fax
+      - unsuccessful outbound fax
+      - successful inbound fax
+      - unsuccessful inbound fax
+      x-enumDescriptions:
+        successful outbound fax: The template for a successful outbound fax.
+        unsuccessful outbound fax: The template for an unsuccessful outbound fax.
+        successful inbound fax: The template for a successful inbound fax.
+        unsuccessful inbound fax: The template for an unsuccessful inbound fax.
+      example: successful outbound fax
+    TemplateByNameResponse:
+      type: object
+      properties:
+        template:
+          type: object
+          description: The email template.
+          properties:
+            name:
+              $ref: '#/components/schemas/TemplateName'
+            createdAt:
+              type: string
+              description: The timestamp on which the template was created.
+              format: date-time
+              example: '2025-10-24 19:11:50.235000+00:00'
+            id:
+              type: string
+              description: The ID of the template.
+              example: 8836986f-050c-4b2d-afb9-8069d1520b17
+            version:
+              type: object
+              properties:
+                tag:
+                  type: string
+                  description: The tag for the template.
+                  example: initial
+                template:
+                  type: string
+                  description: The contents of the template.
+                  example: '<!DOCTYPE html><html lang=''en''><head><meta charset=''utf-8''><meta name=''viewport'' content=''width=device-width''></head><body style=''margin:0;padding:0;background:#f3f4f6;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''background:#f3f4f6;''><tr><td align=''center'' style=''padding:24px;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''max-width:600px;background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;''><tr><td style=''padding:24px 28px;font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#111827;font-size:14px;line-height:1.5;''><p style=''margin:0 0 16px 0;''>Hi,</p><p style=''margin:0 0 20px 0;''>You have sent a successful fax to: <strong>{{to}}</strong>!</p><table role=''presentation'' cellpadding=''0'' cellspacing=''0'' style=''border-collapse:collapse;''><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Fax Id:</td><td style=''padding:0 0 6px 0;''>{{id}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>From:</td><td style=''padding:0 0 6px 0;''>{{from}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>To:</td><td style=''padding:0 0 6px 0;''>{{to}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Number of pages:</td><td style=''padding:0 0 6px 0;''>{{numberOfPages}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Completed at:</td><td style=''padding:0 0 6px 0;''>{{completedTime}}</td></tr><tr><td style=''padding:0 10px 0 0;font-weight:600;''>Price:</td><td style=''padding:0 0 0 0;''>{{currencyCode}} {{amount}}</td></tr></table><p style=''margin:20px 0 0 0;''>Thanks!</p></td></tr></table></td></tr></table></body></html>'
+                createdAt:
+                  type: string
+                  description: The timestamp on which the template was created.
+                  format: date-time
+                  example: '2025-10-24 19:11:50.235000+00:00'
+                comment:
+                  type: string
+                  description: Optional field for comments if necessary.
+                  example: ''
+                active:
+                  type: boolean
+                  description: Displays whether the template is active or not.
+                  example: true
+                id:
+                  type: string
+                  description: The ID for the template version.
+                  example: fa01442c-e3d5-482b-be67-e3fdda931b00
+                headers:
+                  type: object
+                  description: Headers that are sent along with the template.
+    UpdateTemplateRequest:
+      type: object
+      properties:
+        template:
+          type: string
+          description: 'The contents of the template. The following variables are available for you to use in templates:
+
+
+            | Variable | Description |
+
+            | -------- | ----------- |
+
+            | id | The ID of the fax. |
+
+            | from | The phone number sending the fax. |
+
+            | to | The phone number receiving the fax. |
+
+            | completedTime | The date and time that the fax was completed. |
+
+            | numberOfPages | The number of pages included in the fax. |
+
+            | currencyCode | The currency in which the fax was billed. |
+
+            | amount | The total cost of the fax. |
+
+            | retryCount | The number of times the fax was retried. |
+
+            '
+          example: '<!DOCTYPE html><html lang=''en''><head><meta charset=''utf-8''><meta name=''viewport'' content=''width=device-width''></head><body style=''margin:0;padding:0;background:#f3f4f6;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''background:#f3f4f6;''><tr><td align=''center'' style=''padding:24px;''><table role=''presentation'' width=''100%'' cellpadding=''0'' cellspacing=''0'' style=''max-width:600px;background:#ffffff;border-radius:8px;border:1px solid #e5e7eb;''><tr><td style=''padding:24px 28px;font-family:Segoe UI,Helvetica,Arial,sans-serif;color:#111827;font-size:14px;line-height:1.5;''><p style=''margin:0 0 16px 0;''>Hi,</p><p style=''margin:0 0 20px 0;''>You have sent a successful fax to: <strong>{{to}}</strong>!</p><table role=''presentation'' cellpadding=''0'' cellspacing=''0'' style=''border-collapse:collapse;''><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Fax Id:</td><td style=''padding:0 0 6px 0;''>{{id}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>From:</td><td style=''padding:0 0 6px 0;''>{{from}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>To:</td><td style=''padding:0 0 6px 0;''>{{to}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Number of pages:</td><td style=''padding:0 0 6px 0;''>{{numberOfPages}}</td></tr><tr><td style=''padding:0 10px 6px 0;font-weight:600;''>Completed at:</td><td style=''padding:0 0 6px 0;''>{{completedTime}}</td></tr><tr><td style=''padding:0 10px 0 0;font-weight:600;''>Price:</td><td style=''padding:0 0 0 0;''>{{currencyCode}} {{amount}}</td></tr></table><p style=''margin:20px 0 0 0;''>Thanks!</p></td></tr></table></td></tr></table></body></html>'
+    TemplateDomainItem:
+      type: object
+      description: The named templates.
+      properties:
+        name:
+          $ref: '#/components/schemas/TemplateName'
+        createdAt:
+          type: string
+          description: The timestamp on which the template was created.
+          format: date-time
+          example: '2025-10-24 19:11:50.235000+00:00'
+        description:
+          type: string
+          description: The description for the template.
+          example: Successful fax template
+    TemplatesDomainNameResponse:
+      type: array
+      description: An array of the named templates for the domain specified.
+      items:
+        $ref: '#/components/schemas/TemplateDomainItem'
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: The `projectId` is a required parameter you must include when making any API calls. You can find your project ID on your [Build dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+  securitySchemes:
+    WebhookBasicAuth:
+      type: http
+      scheme: basic
+      description: 'You can validate whether a webhook is genuine by providing credentials you set and will check on your server side along with the callback URL, as in this example: `https://username:password@www.YourWebhookWebsite.com`'
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: The user name and password is your keyId and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+    OAuth2:
+      type: oauth2
+      description: The user name and password is your key id and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

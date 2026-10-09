@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-sip-trunk-schema.json",
+  "title": "SipTrunk",
+  "description": "A created SIP trunk.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-elastic-sip-trunking-api-openapi.yml#/components/schemas/SipTrunk",
+  "required": [
+    "name",
+    "hostName"
+  ],
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The SIP trunk id."
+    },
+    "hostName": {
+      "type": "string",
+      "description": "The host of the domain you would like to have for you trunk."
+    },
+    "topLevelDomain": {
+      "readOnly": true,
+      "type": "string",
+      "description": "The top level domain to which the SIP trunk belongs."
+    },
+    "domain": {
+      "readOnly": true,
+      "type": "string",
+      "description": "The fully qualified name of the domain, which is a combination of your 'hostName' and the 'topLevelDomain'."
+    },
+    "name": {
+      "type": "string",
+      "description": "The friendly name of your SIP trunk."
+    },
+    "callsPerSecond": {
+      "minimum": 1,
+      "readOnly": true,
+      "type": "integer",
+      "description": "Number of calls started per second, to increase this please contact your account manager.",
+      "default": 1
+    },
+    "enableCallerName": {
+      "type": "boolean",
+      "description": "Enable caller name lookup for incoming calls. US and canada only.",
+      "default": false
+    },
+    "callForwardNumber": {
+      "type": "string",
+      "description": "The valid E.164 phone number that will be dialed on inbound calls when no SIP endpoints are available. Required if `enableCallForward` property is `true`.",
+      "default": ""
+    },
+    "enableCallForward": {
+      "type": "boolean",
+      "description": "When enabled, if an inbound call can not be delivered to a SIP endpoint, calls will be forwarded to the configured `callForwardNumber`. To forward all calls without trying SIP, simply disable (or delete) all SIP endpoints on this trunk. Logs (and billing) will be created for 2 calls (inbound and outbound). \n**Note:** Since there is no SIP connection, PCAPs will not be generated.",
+      "default": false
+    },
+    "createTime": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The date and time that the SIP trunk was created.",
+      "format": "date-time"
+    },
+    "updateTime": {
+      "type": "string",
+      "description": "The date and time that the SIP trunk was last modified.",
+      "format": "date-time",
+      "readOnly": true
+    },
+    "projectId": {
+      "type": "string",
+      "readOnly": true,
+      "description": "The ID of the account."
+    }
+  }
+}

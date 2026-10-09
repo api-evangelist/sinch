@@ -1,12 +1,9 @@
 asyncapi: 2.6.0
 info:
   title: Sinch SMS Webhooks
-  description: >-
-    Event-driven webhooks for the Sinch SMS API. The SMS API delivers delivery
-    reports and inbound messages via HTTP POST callbacks to your configured
-    webhook URL. Delivery reports notify you of the delivery status of sent
-    messages, while inbound message callbacks deliver messages sent to your
-    numbers by end users.
+  description: Event-driven webhooks for the Sinch SMS API. The SMS API delivers delivery reports and inbound messages via
+    HTTP POST callbacks to your configured webhook URL. Delivery reports notify you of the delivery status of sent messages,
+    while inbound message callbacks deliver messages sent to your numbers by end users.
   version: '1.0'
   contact:
     name: Sinch Support
@@ -15,55 +12,46 @@ servers:
   customerServer:
     url: '{callbackUrl}'
     protocol: https
-    description: >-
-      Your server endpoint configured to receive SMS webhook callbacks.
-      The URL is configured per batch or globally in the Sinch Dashboard.
+    description: Your server endpoint configured to receive SMS webhook callbacks. The URL is configured per batch or globally
+      in the Sinch Dashboard.
     variables:
       callbackUrl:
         description: Your webhook endpoint URL
     security:
-      - basicAuth: []
+    - basicAuth: []
 channels:
   /sms/delivery-report:
-    description: >-
-      Receives delivery report callbacks for sent SMS and MMS messages.
-      Reports can be summary or full depending on the delivery_report
-      setting when sending the batch.
+    description: Receives delivery report callbacks for sent SMS and MMS messages. Reports can be summary or full depending
+      on the delivery_report setting when sending the batch.
     publish:
       operationId: receiveDeliveryReport
       summary: Receive a delivery report
-      description: >-
-        Called when the delivery status of a batch or individual recipient
-        changes. The type field indicates whether this is a summary report
-        for the entire batch or a per-recipient report.
+      description: Called when the delivery status of a batch or individual recipient changes. The type field indicates whether
+        this is a summary report for the entire batch or a per-recipient report.
       message:
         oneOf:
-          - $ref: '#/components/messages/DeliveryReportSms'
-          - $ref: '#/components/messages/RecipientDeliveryReportSms'
-          - $ref: '#/components/messages/DeliveryReportMms'
-          - $ref: '#/components/messages/RecipientDeliveryReportMms'
+        - $ref: '#/components/messages/DeliveryReportSms'
+        - $ref: '#/components/messages/RecipientDeliveryReportSms'
+        - $ref: '#/components/messages/DeliveryReportMms'
+        - $ref: '#/components/messages/RecipientDeliveryReportMms'
   /sms/incoming:
-    description: >-
-      Receives inbound SMS and MMS messages sent to your short codes or
-      long numbers from mobile phones.
+    description: Receives inbound SMS and MMS messages sent to your short codes or long numbers from mobile phones.
     publish:
       operationId: receiveIncomingSms
       summary: Receive an incoming SMS
-      description: >-
-        Called when an end user sends an SMS or MMS message to one of your
-        configured numbers. The callback URL must be configured in the
-        Sinch Dashboard.
+      description: Called when an end user sends an SMS or MMS message to one of your configured numbers. The callback URL
+        must be configured in the Sinch Dashboard.
       message:
         oneOf:
-          - $ref: '#/components/messages/IncomingSms'
-          - $ref: '#/components/messages/IncomingMms'
+        - $ref: '#/components/messages/IncomingSms'
+        - $ref: '#/components/messages/IncomingMms'
 components:
   securitySchemes:
     basicAuth:
-      type: httpBasicAuth
-      description: >-
-        Optional Basic Authentication for webhook callbacks. Custom headers
-        and OAuth 2.0 are also supported for callback authentication.
+      type: http
+      description: Optional Basic Authentication for webhook callbacks. Custom headers and OAuth 2.0 are also supported for
+        callback authentication.
+      scheme: basic
   messages:
     DeliveryReportSms:
       name: delivery_report_sms
@@ -114,7 +102,7 @@ components:
         type:
           type: string
           enum:
-            - delivery_report_sms
+          - delivery_report_sms
           description: The callback event type
         batch_id:
           type: string
@@ -131,13 +119,13 @@ components:
               status:
                 type: string
                 enum:
-                  - Queued
-                  - Dispatched
-                  - Delivered
-                  - Failed
-                  - Expired
-                  - Cancelled
-                  - Rejected
+                - Queued
+                - Dispatched
+                - Delivered
+                - Failed
+                - Expired
+                - Cancelled
+                - Rejected
                 description: The delivery status
               count:
                 type: integer
@@ -156,8 +144,8 @@ components:
         type:
           type: string
           enum:
-            - recipient_delivery_report_sms
-            - recipient_delivery_report_mms
+          - recipient_delivery_report_sms
+          - recipient_delivery_report_mms
           description: The callback event type
         batch_id:
           type: string
@@ -194,7 +182,7 @@ components:
         type:
           type: string
           enum:
-            - delivery_report_mms
+          - delivery_report_mms
           description: The callback event type
         batch_id:
           type: string
@@ -223,7 +211,7 @@ components:
         type:
           type: string
           enum:
-            - mo_text
+          - mo_text
           description: The callback event type
         id:
           type: string
@@ -257,7 +245,7 @@ components:
         type:
           type: string
           enum:
-            - mo_media
+          - mo_media
           description: The callback event type
         id:
           type: string

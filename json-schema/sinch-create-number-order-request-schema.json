@@ -1,0 +1,458 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-create-number-order-request-schema.json",
+  "title": "CreateNumberOrderRequest",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-numbers-api-openapi.yml#/components/schemas/CreateNumberOrderRequest",
+  "allOf": [
+    {
+      "$ref": "#/$defs/CreateNumberOrderRequestBase"
+    },
+    {
+      "oneOf": [
+        {
+          "title": "Order specific phone numbers",
+          "type": "object",
+          "description": "Order specific phone numbers using `numberOrderOption`. Only one phone number per order is currently supported.",
+          "properties": {
+            "numberOrderOption": {
+              "$ref": "#/$defs/CreateNumberOrderOption"
+            }
+          },
+          "required": [
+            "numberOrderOption"
+          ]
+        },
+        {
+          "title": "Order by quantity",
+          "type": "object",
+          "description": "Order between 1 and 100 numbers that match the given criteria using `quantityOrderOption`.",
+          "properties": {
+            "quantityOrderOption": {
+              "$ref": "#/$defs/CreateQuantityOrderOption"
+            }
+          },
+          "required": [
+            "quantityOrderOption"
+          ]
+        }
+      ]
+    }
+  ],
+  "$defs": {
+    "CreateNumberOrderOption": {
+      "type": "object",
+      "properties": {
+        "phoneNumbers": {
+          "type": "array",
+          "description": "The phone numbers to order, in E.164 format. Although this is an array, only one phone number per order is currently supported.",
+          "minItems": 1,
+          "maxItems": 1,
+          "items": {
+            "type": "string",
+            "description": "phone numbers in E.164 format"
+          }
+        }
+      }
+    },
+    "CreateNumberOrderRequestBase": {
+      "type": "object",
+      "description": "Create a number order",
+      "properties": {
+        "regionCode": {
+          "$ref": "#/$defs/RegionCode"
+        },
+        "numberType": {
+          "$ref": "#/$defs/NumberType"
+        },
+        "smsConfiguration": {
+          "$ref": "#/$defs/OrderSmsConfiguration"
+        },
+        "voiceConfiguration": {
+          "$ref": "#/$defs/OrderVoiceConfiguration"
+        },
+        "callbackUrl": {
+          "type": "string",
+          "format": "uri"
+        }
+      },
+      "required": [
+        "regionCode",
+        "numberType"
+      ]
+    },
+    "CreateQuantityOrderOption": {
+      "type": "object",
+      "properties": {
+        "numberPattern": {
+          "$ref": "#/$defs/NumberPattern"
+        },
+        "requestedQuantity": {
+          "type": "integer",
+          "format": "int32",
+          "description": "The number of phone numbers to order, between 1 and 100.",
+          "minimum": 1,
+          "maximum": 100
+        },
+        "sequential": {
+          "type": "boolean"
+        },
+        "capabilities": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/NumberCapability"
+          }
+        }
+      },
+      "required": [
+        "requestedQuantity"
+      ]
+    },
+    "NumberCapability": {
+      "type": "string",
+      "enum": [
+        "SMS",
+        "VOICE"
+      ],
+      "x-enumDescriptions": {
+        "SMS": "The SMS product can use the number.",
+        "VOICE": "The Voice product can use the number."
+      },
+      "default": "SMS",
+      "description": "The capabilities the phone number supports: SMS, Voice, or both",
+      "title": "Capability"
+    },
+    "NumberPattern": {
+      "type": "object",
+      "properties": {
+        "pattern": {
+          "type": "string",
+          "description": "Sequence of digits to search for."
+        },
+        "searchPattern": {
+          "$ref": "#/$defs/NumberPatternSearchPattern"
+        }
+      },
+      "title": "Search Pattern"
+    },
+    "NumberPatternSearchPattern": {
+      "type": "string",
+      "enum": [
+        "START",
+        "CONTAINS",
+        "END"
+      ],
+      "x-enumDescriptions": {
+        "START": "Numbers that start with the provided sequence of digits.",
+        "CONTAINS": "Numbers that contain the sequence of digits entered.",
+        "END": "Numbers that end with the sequence of digits entered."
+      },
+      "description": "The pattern to apply to searches.",
+      "title": "Search Pattern"
+    },
+    "NumberType": {
+      "type": "string",
+      "enum": [
+        "MOBILE",
+        "LOCAL",
+        "TOLL_FREE"
+      ],
+      "x-enumDescriptions": {
+        "MOBILE": "Numbers that belong to a specific range.",
+        "LOCAL": "Numbers that are assigned to a specific geographic region.",
+        "TOLL_FREE": "Numbers that are free of charge for the calling party but billed for all arriving calls."
+      },
+      "description": "The number type.",
+      "title": "Type",
+      "nullable": false
+    },
+    "OrderSmsConfiguration": {
+      "type": "object",
+      "title": "KYC SMS Configuration",
+      "description": "SMS Configuration for KYC numbers, containing the `servicePlanId` and `campaignId`.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/smsConfigurationBase"
+        }
+      ]
+    },
+    "OrderVoiceConfiguration": {
+      "title": "OrderVoiceConfiguration",
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/OrderVoiceConfigurationRTC"
+        },
+        {
+          "$ref": "#/$defs/OrderVoiceConfigurationEST"
+        },
+        {
+          "$ref": "#/$defs/OrderVoiceConfigurationFAX"
+        }
+      ]
+    },
+    "OrderVoiceConfigurationBase": {
+      "title": "OrderVoiceConfigurationBase",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/VoiceApplicationType"
+        }
+      }
+    },
+    "OrderVoiceConfigurationEST": {
+      "title": "OrderVoiceConfigurationEST",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/OrderVoiceConfigurationBase"
+        },
+        {
+          "$ref": "#/$defs/VoiceConfigurationEST"
+        }
+      ]
+    },
+    "OrderVoiceConfigurationFAX": {
+      "title": "OrderVoiceConfigurationFAX",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/OrderVoiceConfigurationBase"
+        },
+        {
+          "$ref": "#/$defs/VoiceConfigurationFAX"
+        }
+      ]
+    },
+    "OrderVoiceConfigurationRTC": {
+      "title": "OrderVoiceConfigurationRTC",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/OrderVoiceConfigurationBase"
+        },
+        {
+          "$ref": "#/$defs/VoiceAppId"
+        }
+      ]
+    },
+    "ProvisioningStatus": {
+      "default": "WAITING",
+      "description": "The provisioning status. It will be either `WAITING`, `IN_PROGRESS` or `FAILED`. If the provisioning fails, a reason for the failure will be provided. [See a full list of provisioning error descriptions]<(https://developers.sinch.com/docs/numbers/api-reference/error-codes/provisioning-errors) and troubleshooting recommendations.",
+      "enum": [
+        "PROVISIONING_STATUS_UNSPECIFIED",
+        "WAITING",
+        "IN_PROGRESS",
+        "FAILED"
+      ],
+      "x-enumDescriptions": {
+        "PROVISIONING_STATUS_UNSPECIFIED": "The status is currently unknown.",
+        "WAITING": "Waiting for provisioning",
+        "IN_PROGRESS": "Provisioning in progress",
+        "FAILED": "Provisioning failed. See [provisioning error descriptions](https://developers.sinch.com/docs/numbers/api-reference/error-codes/provisioning-errors)"
+      },
+      "title": "Provisioning Status"
+    },
+    "RegionCode": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code of the phone number. Example: US, GB or SE.",
+      "title": "Region Code",
+      "nullable": false
+    },
+    "ScheduledVoiceProvisioning": {
+      "type": "object",
+      "readOnly": true,
+      "description": "Represents the ongoing or failed scheduled voice provisioning job. This field will be empty if the number was successfully provisioned provisioned for voice.",
+      "required": [
+        "type"
+      ],
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningEST"
+        },
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningFAX"
+        },
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningRTC"
+        }
+      ],
+      "title": "Scheduled Voice Provisioning"
+    },
+    "ScheduledVoiceProvisioningCommon": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "$ref": "#/$defs/VoiceApplicationType"
+            },
+            "lastUpdatedTime": {
+              "type": "string",
+              "description": "Timestamp when the status was last updated.",
+              "format": "date-time",
+              "readOnly": true
+            },
+            "status": {
+              "$ref": "#/$defs/ProvisioningStatus"
+            }
+          }
+        }
+      ]
+    },
+    "ScheduledVoiceProvisioningEST": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceTrunkId"
+        }
+      ]
+    },
+    "ScheduledVoiceProvisioningFAX": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceServiceId"
+        }
+      ]
+    },
+    "ScheduledVoiceProvisioningRTC": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceAppId"
+        }
+      ]
+    },
+    "VoiceAppId": {
+      "type": "object",
+      "properties": {
+        "appId": {
+          "type": "string",
+          "description": "Your app ID for the Voice API. The `appId` can be found in your [Sinch Customer Dashboard](https://dashboard.sinch.com/voice/apps)."
+        }
+      }
+    },
+    "VoiceApplicationType": {
+      "type": "string",
+      "description": "The voice application type. Examples are RTC, EST, FAX",
+      "x-enumDescriptions": {
+        "RTC": "Voice [see documentation](https://developers.sinch.com/docs/voice)",
+        "EST": "Elastic SIP Trunking [see documentation](https://developers.sinch.com/docs/est)",
+        "FAX": "FAX application [see documentation](https://developers.sinch.com/docs/fax/overview)"
+      },
+      "enum": [
+        "RTC",
+        "EST",
+        "FAX"
+      ],
+      "default": "RTC"
+    },
+    "VoiceConfigurationCommon": {
+      "title": "Common VoiceConfiguration fields",
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/VoiceApplicationType"
+        },
+        "lastUpdatedTime": {
+          "type": "string",
+          "description": "Timestamp when the status was last updated.",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "scheduledVoiceProvisioning": {
+          "readOnly": true,
+          "allOf": [
+            {
+              "$ref": "#/$defs/ScheduledVoiceProvisioning"
+            }
+          ]
+        }
+      }
+    },
+    "VoiceConfigurationEST": {
+      "title": "EST VoiceConfiguration",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/VoiceConfigurationCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceTrunkId"
+        }
+      ]
+    },
+    "VoiceConfigurationFAX": {
+      "title": "FAX VoiceConfiguration",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/VoiceConfigurationCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceServiceId"
+        }
+      ]
+    },
+    "VoiceServiceId": {
+      "type": "object",
+      "properties": {
+        "serviceId": {
+          "type": "string",
+          "description": "The service ID if the type is FAX. The `serviceId` can be found in your [Sinch Customer Dashboard](https://dashboard.sinch.com/fax/services)."
+        }
+      }
+    },
+    "VoiceTrunkId": {
+      "type": "object",
+      "properties": {
+        "trunkId": {
+          "type": "string",
+          "description": "The trunk ID if the type is EST. The `trunkId` can be found in your [Sinch Customer Dashboard](https://dashboard.sinch.com/trunks/your-trunks)."
+        }
+      }
+    },
+    "smsConfigurationBase": {
+      "title": "Base SMS Configuration",
+      "type": "object",
+      "required": [
+        "servicePlanId"
+      ],
+      "properties": {
+        "servicePlanId": {
+          "type": "string",
+          "description": "The `servicePlanId` can be found in the [Sinch Customer Dashboard](https://dashboard.sinch.com/sms/api/rest). The service plan ID is what ties this number to the configured SMS service."
+        },
+        "campaignId": {
+          "type": "string",
+          "description": "Only for US phone numbers. This `campaignId` is required to send SMS traffic to US; click [here](https://community.sinch.com/t5/10DLC/What-is-10DLC/ta-p/7845) to read more about 10DLC A2P messaging. So, it is the current campaign ID for this number. The `campaignId` is found on your TCR platform."
+        }
+      }
+    }
+  }
+}

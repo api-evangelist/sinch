@@ -1,0 +1,374 @@
+openapi: 3.2.0
+info:
+  title: Chatlayer Analytics Flows API
+  version: 1.0.0
+  contact:
+    name: Support
+    url: www.sinch.com
+    email: support@sinch.com
+servers:
+- url: https://analytics.api.chatlayer.ai
+  description: Europe
+- url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+  description: US
+- url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+  description: APAC
+- url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+  description: South America
+security:
+- basicAuth: []
+tags:
+- name: Flows
+paths:
+  /v1/bots/{bot_id}/flows:
+    get:
+      tags:
+      - Flows
+      operationId: Analytics_GetFlows
+      parameters:
+      - name: bot_id
+        in: path
+        description: Identifies the bot.
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Identifies the bot version.
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the data series.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the data series, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: channel_type
+        in: query
+        description: Filter by specific channels, multiple values separated by comma.
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: Filter by specific languages, multiple values separated by comma.
+        schema:
+          type: string
+      - name: path
+        in: query
+        description: "Filter by specific path, multiple values with each value specifying the nodes in that path.\n  eg. path[0]=somepath&path[1]=someOtherPath\n   or path=somepath&path=someOtherPath"
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFlowsResponse'
+      summary: Analytics get flows
+      x-summary-source: derived
+  /v1/bots/{bot_id}/flows/funnel:
+    post:
+      tags:
+      - Flows
+      operationId: Analytics_ComputeFlowFunnel
+      parameters:
+      - name: bot_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - end_time
+              - start_time
+              - steps
+              - version
+              type: object
+              properties:
+                version:
+                  type: string
+                start_time:
+                  type: string
+                end_time:
+                  type: string
+                steps:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FunnelStep'
+                breakdown_property:
+                  type: string
+                order_type:
+                  title: one of 'strict' or  'sequential'
+                  type: string
+                  default: sequential
+                properties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FunnelStepFilter'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputeFunnelResponse'
+      summary: Analytics compute flow funnel
+      x-summary-source: derived
+  /v1/bots/{bot_id}/flows/{step_id}:
+    get:
+      tags:
+      - Flows
+      operationId: Analytics_GetFlowStepDetails
+      parameters:
+      - name: bot_id
+        in: path
+        description: Identifies the bot.
+        required: true
+        schema:
+          type: string
+      - name: step_id
+        in: path
+        description: Filter by specific step in the flow identified by dialogstate id
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Identifies the bot version.
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the data series.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the data series, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: channel_type
+        in: query
+        description: Filter by specific channels, multiple values separated by comma.
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: Filter by specific languages, multiple values separated by comma.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFlowStepDetailsResponse'
+      summary: Analytics get flow step details
+      x-summary-source: derived
+  /v1/bots/{bot_id}/flows/{step_id}/edges:
+    get:
+      tags:
+      - Flows
+      operationId: Analytics_GetFlowStepEdges
+      parameters:
+      - name: bot_id
+        in: path
+        description: Identifies the bot.
+        required: true
+        schema:
+          type: string
+      - name: step_id
+        in: path
+        description: Filter by specific step in the flow identified by dialogstate id
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Identifies the bot version.
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the data series.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the data series, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: channel_type
+        in: query
+        description: Filter by specific channels, multiple values separated by comma.
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: Filter by specific languages, multiple values separated by comma.
+        schema:
+          type: string
+      - name: type
+        in: query
+        description: The edge type to return, one of 'sources' or 'targets'
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetFlowStepEdgesResponse'
+      summary: Analytics get flow step edges
+      x-summary-source: derived
+components:
+  schemas:
+    GetFlowsResponse:
+      type: object
+      properties:
+        nodes:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowStep'
+    GetFlowStepDetailsResponse:
+      type: object
+      properties:
+        message_count:
+          title: Total number of times the specified step was invoked
+          type: integer
+          format: int64
+        drop_off_count:
+          title: Number of dropoffs from the specified step
+          type: integer
+          format: int64
+        conversation_count:
+          title: Number of conversations which includes the specified step
+          type: integer
+          format: int64
+    FunnelStepResult:
+      type: object
+      properties:
+        event_id:
+          type: string
+        count:
+          type: integer
+          format: int32
+        order:
+          type: integer
+          format: int64
+        breakdown_value:
+          type: string
+    FunnelStepResultByCohort:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStepResult'
+    FunnelStep:
+      type: object
+      properties:
+        order:
+          type: integer
+          format: int32
+        event_id:
+          type: string
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStepFilter'
+    ComputeFunnelResponse:
+      type: object
+      properties:
+        result:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStepResultByCohort'
+    Step:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+    FlowStep:
+      type: object
+      properties:
+        occurrences:
+          type: integer
+          description: The number of times this flow step occurred.
+          format: int64
+        id:
+          type: string
+          description: Identifies a bot dialog or a dropoff if the special value "DROPOFF is used.
+    Edge:
+      type: object
+      properties:
+        count:
+          title: Total number of times this edge was traversed
+          type: integer
+          format: int64
+        id:
+          title: The id of the destination/source step (Deprecated)
+          type: string
+        type:
+          title: The type of the destination/source step (Deprecated)
+          type: string
+        from_step:
+          $ref: '#/components/schemas/Step'
+        to_step:
+          $ref: '#/components/schemas/Step'
+    GetFlowStepEdgesResponse:
+      type: object
+      properties:
+        edges:
+          type: array
+          items:
+            $ref: '#/components/schemas/Edge'
+    FunnelStepFilter:
+      type: object
+      properties:
+        key:
+          type: string
+        operator:
+          type: string
+        type:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Generate your access token on the [Chatlayer platform](https://app.chatlayer.ai/settings/api-access/tokens).
+externalDocs:
+  description: Learn more
+  url: https://developers.sinch.com/docs/chatlayer-analytics/
+x-original-swagger-version: '2.0'

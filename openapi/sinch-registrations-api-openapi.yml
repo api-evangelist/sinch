@@ -160,17 +160,22 @@ paths:
         '404':
           description: Registration not found
 components:
+  parameters:
+    RegistrationId:
+      name: registration_id
+      in: path
+      required: true
+      description: The unique registration identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   schemas:
-    UpdateRegistrationRequest:
-      type: object
-      properties:
-        displayName:
-          type: string
-          description: Updated display name
-        registrationDetails:
-          type: object
-          description: Updated registration details
-          additionalProperties: true
     CreateRegistrationRequest:
       type: object
       required:
@@ -192,6 +197,30 @@ components:
         registrationDetails:
           type: object
           description: Market-specific registration details
+          additionalProperties: true
+    RegistrationList:
+      type: object
+      properties:
+        registrations:
+          type: array
+          description: List of registrations
+          items:
+            $ref: '#/components/schemas/Registration'
+        nextPageToken:
+          type: string
+          description: Pagination token
+        totalSize:
+          type: integer
+          description: Total number of registrations
+    UpdateRegistrationRequest:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Updated display name
+        registrationDetails:
+          type: object
+          description: Updated registration details
           additionalProperties: true
     Registration:
       type: object
@@ -243,35 +272,6 @@ components:
           type: string
           format: date-time
           description: When the registration was submitted
-    RegistrationList:
-      type: object
-      properties:
-        registrations:
-          type: array
-          description: List of registrations
-          items:
-            $ref: '#/components/schemas/Registration'
-        nextPageToken:
-          type: string
-          description: Pagination token
-        totalSize:
-          type: integer
-          description: Total number of registrations
-  parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
-    RegistrationId:
-      name: registration_id
-      in: path
-      required: true
-      description: The unique registration identifier
-      schema:
-        type: string
   securitySchemes:
     oAuth2:
       type: oauth2

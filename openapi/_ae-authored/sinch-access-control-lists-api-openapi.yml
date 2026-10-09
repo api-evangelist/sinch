@@ -1,0 +1,242 @@
+openapi: 3.2.0
+info:
+  title: Sinch Elastic SIP Trunking Access Control Lists API
+  description: The Sinch Elastic SIP Trunking (EST) API enables developers to programmatically create and manage SIP trunks for connecting existing telephony infrastructure to the Sinch network. It provides endpoints for managing SIP endpoints, trunk configurations, and access control lists. The API supports elastic scaling of voice capacity without requiring fixed-capacity commitments, allowing businesses to connect their PBX systems, contact centers, or communication platforms to global PSTN connectivity.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://elastic-trunking.api.sinch.com
+  description: Global Production Server
+security:
+- oAuth2: []
+- basicAuth: []
+tags:
+- name: Access Control Lists
+  description: Manage IP address access control lists for securing SIP trunk access.
+paths:
+  /v1/projects/{project_id}/trunks/{trunk_id}/accessControlLists:
+    get:
+      operationId: listAccessControlLists
+      summary: List Access Control Lists
+      description: Returns the access control lists configured for a specific SIP trunk.
+      tags:
+      - Access Control Lists
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      responses:
+        '200':
+          description: List of ACLs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AclList'
+        '401':
+          description: Unauthorized
+    post:
+      operationId: createAccessControlList
+      summary: Create an Access Control List
+      description: Creates a new IP address access control list for a SIP trunk to restrict which IP addresses can connect.
+      tags:
+      - Access Control Lists
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateAclRequest'
+      responses:
+        '200':
+          description: ACL created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Acl'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+  /v1/projects/{project_id}/trunks/{trunk_id}/accessControlLists/{acl_id}:
+    get:
+      operationId: getAccessControlList
+      summary: Get an Access Control List
+      description: Returns the details of a specific access control list.
+      tags:
+      - Access Control Lists
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      - $ref: '#/components/parameters/AclId'
+      responses:
+        '200':
+          description: ACL details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Acl'
+        '401':
+          description: Unauthorized
+        '404':
+          description: ACL not found
+    patch:
+      operationId: updateAccessControlList
+      summary: Update an Access Control List
+      description: Updates the configuration of a specific access control list.
+      tags:
+      - Access Control Lists
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      - $ref: '#/components/parameters/AclId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateAclRequest'
+      responses:
+        '200':
+          description: ACL updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Acl'
+        '401':
+          description: Unauthorized
+        '404':
+          description: ACL not found
+    delete:
+      operationId: deleteAccessControlList
+      summary: Delete an Access Control List
+      description: Deletes a specific access control list from the trunk.
+      tags:
+      - Access Control Lists
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/TrunkId'
+      - $ref: '#/components/parameters/AclId'
+      responses:
+        '200':
+          description: ACL deleted
+        '401':
+          description: Unauthorized
+        '404':
+          description: ACL not found
+components:
+  parameters:
+    TrunkId:
+      name: trunk_id
+      in: path
+      required: true
+      description: The unique SIP trunk identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+    AclId:
+      name: acl_id
+      in: path
+      required: true
+      description: The unique access control list identifier
+      schema:
+        type: string
+  schemas:
+    CreateAclRequest:
+      type: object
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The ACL name
+        enabled:
+          type: boolean
+          description: Whether the ACL is active
+          default: true
+        entries:
+          type: array
+          description: IP address entries
+          items:
+            $ref: '#/components/schemas/AclEntry'
+    AclList:
+      type: object
+      properties:
+        accessControlLists:
+          type: array
+          description: List of access control lists
+          items:
+            $ref: '#/components/schemas/Acl'
+    Acl:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ACL identifier
+        name:
+          type: string
+          description: The ACL name
+        enabled:
+          type: boolean
+          description: Whether the ACL is active
+        entries:
+          type: array
+          description: List of IP address entries
+          items:
+            $ref: '#/components/schemas/AclEntry'
+        createTime:
+          type: string
+          format: date-time
+          description: When the ACL was created
+        updateTime:
+          type: string
+          format: date-time
+          description: When the ACL was last updated
+    AclEntry:
+      type: object
+      properties:
+        ipRange:
+          type: string
+          description: The IP address or CIDR range
+        description:
+          type: string
+          description: A description of this entry
+    UpdateAclRequest:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Updated ACL name
+        enabled:
+          type: boolean
+          description: Updated enabled status
+        entries:
+          type: array
+          description: Updated IP entries
+          items:
+            $ref: '#/components/schemas/AclEntry'
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Key ID as username and key secret as password.
+externalDocs:
+  description: Sinch Elastic SIP Trunking API Documentation
+  url: https://developers.sinch.com/docs/est

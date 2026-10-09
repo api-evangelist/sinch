@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-update-numbers-schema.json",
+  "title": "updateNumbers",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-voice-api-openapi.yml#/components/schemas/updateNumbers",
+  "type": "object",
+  "properties": {
+    "numbers": {
+      "type": "array",
+      "description": "The phone number or list of numbers in E.164 format.",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "maxItems": 100
+    },
+    "applicationkey": {
+      "description": "indicates the application where the number(s) will be assigned. If empty, the application key that is used to sign the request will be used.",
+      "type": "string"
+    },
+    "capability": {
+      "description": "indicates the DID capability that needs to be assigned to the chosen application. Please note that the DID needs to support the selected capability.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/capability"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "capability": {
+      "type": "string",
+      "x-enumDescriptions": {
+        "voice": "Able to make Voice calls.",
+        "sms": "Able to send SMS messages."
+      },
+      "enum": [
+        "voice",
+        "sms"
+      ],
+      "description": "Valid values are `voice` and `sms`"
+    }
+  }
+}

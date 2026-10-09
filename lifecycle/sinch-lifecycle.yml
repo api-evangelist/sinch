@@ -1,0 +1,47 @@
+generated: '2026-10-08'
+method: searched
+source: https://developers.sinch.com/docs/conversation/release-notes.md (2026-12-16 upcoming removal of v1alpha/v1beta Batch
+  endpoints); https://developers.sinch.com/docs/numbers/api-reference/numbers.md (rentNumber/rentAny deprecation wording);
+  https://developers.sinch.com/docs/voice-2.0/migration.md (Voice API v1 -> v2); https://status.sinch.com/ (dossier-probed
+  200); deprecated flags in the published contracts
+name: Sinch API lifecycle
+versioning:
+  scheme: URL path versions per product (/v1, /v2, /v3; Voice API v1 at calling.api.sinch.com and Voice API v2 at voice.api.sinch.com
+    are separate contracts); Template Management is v2; Fax is v3; the Conversation Batch API moved from v1alpha/v1beta to
+    v1
+  docs: https://developers.sinch.com/docs/voice-2.0/migration
+  sdk_migration: https://developers.sinch.com/docs/numbers/sdk/java/1.0/migration-guides/migration-to-versioned
+deprecation:
+  policy_text: This endpoint is deprecated. It remains available for existing integrations, but new integrations should use
+    the number orders endpoints
+  policy_url: https://developers.sinch.com/docs/numbers/api-reference/numbers
+  announced_removals:
+  - what: Conversation Batch API v1alpha and v1beta endpoints
+    date: '2026-12-16'
+    text: The v1alpha and v1beta Batch API endpoints have been deprecated. Beginning December 16, 2026, they will no longer
+      be accessible.
+    url: https://developers.sinch.com/docs/conversation/release-notes
+  headers: No Sunset or Deprecation response headers are documented (searched the reference pages and the contracts)
+  deprecated_operations:
+  - api: Numbers API
+    operationId: NumberService_RentNumber
+    path: POST /v1/projects/{projectId}/availableNumbers/{phoneNumber}:rent
+  - api: Numbers API
+    operationId: NumberService_RentAnyNumber
+    path: POST /v1/projects/{projectId}/availableNumbers:rentAny
+  - api: Fax API
+    operationId: getFaxFileByIdDeprecated
+    path: GET /v3/projects/{projectId}/faxes/{id}/file.{fileFormat}
+  - api: Provisioning API
+    operationId: WhatsappEmbeddedSignupHelperController_createLongLivedAccessToken_v1
+    path: POST /v1/projects/{projectId}/whatsapp/longLivedAccessToken
+  - api: Provisioning API
+    operationId: WhatsappEmbeddedSignupHelperController_listWabaDetailsForToken_v1
+    path: POST /v1/projects/{projectId}/whatsapp/wabaDetails
+  - api: Voice API
+    operationId: Calling_QueryNumber
+    path: GET /v1/calling/query/number/{number}
+status_page: https://status.sinch.com/
+sla: No public API SLA page found on sinch.com or the developer portal (searched legal index at https://sinch.com/legal/ and
+  llms.txt)
+release_notes: changelog/sinch-changelog.yml

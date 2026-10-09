@@ -1,0 +1,370 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-create-brand-request-schema.json",
+  "title": "CreateBrandRequest",
+  "description": "Request body for creating a new Draft Brand.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-compliance-brands-api-openapi.yml#/components/schemas/CreateBrandRequest",
+  "type": "object",
+  "allOf": [
+    {
+      "$ref": "#/$defs/BrandProperties"
+    },
+    {
+      "if": {
+        "properties": {
+          "scType": {
+            "const": "VANITY"
+          }
+        },
+        "required": [
+          "scType"
+        ]
+      },
+      "then": {
+        "required": [
+          "scText"
+        ],
+        "properties": {
+          "scText": {
+            "$ref": "#/$defs/scText"
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
+      "required": [
+        "displayName"
+      ],
+      "properties": {
+        "contentProvider": {
+          "type": "boolean",
+          "description": "Indicates whether the brand is a Content Provider (true) or a standard Brand (false). This choice determines the types of orders that can be requested, as they follow different registration processes and are available for different products."
+        },
+        "attachmentInputs": {
+          "description": "Attachments can be added by url or using the specified endpoint. Only the latest version of each attachment type is kept per Brand.",
+          "items": {
+            "$ref": "#/$defs/AttachmentInput"
+          },
+          "type": "array"
+        }
+      }
+    }
+  ],
+  "$defs": {
+    "AttachmentInput": {
+      "description": "Attachment input when creating/updating a brand. Attachments can be added by url or using the specified endpoint. Only the latest version of each attachment type is kept per Brand.",
+      "type": "object",
+      "properties": {
+        "fileName": {
+          "description": "Human readable name of the attachment.",
+          "type": "string"
+        },
+        "attachmentType": {
+          "description": "Attachment type",
+          "$ref": "#/$defs/AttachmentType"
+        },
+        "fileUrl": {
+          "description": "File Url to be uploaded.",
+          "type": "string"
+        }
+      }
+    },
+    "AttachmentType": {
+      "description": "Attachment type",
+      "enum": [
+        "COMPANY_BANNER",
+        "COMPANY_LOGO"
+      ],
+      "x-enum-varnames": [
+        "COMPANY_BANNER",
+        "COMPANY_LOGO"
+      ],
+      "x-enumDescriptions": {
+        "COMPANY_BANNER": "Banner attachment",
+        "COMPANY_LOGO": "Logo attachment"
+      },
+      "type": "string"
+    },
+    "BrandProperties": {
+      "description": "Writable properties shared across brand request and response schemas.",
+      "type": "object",
+      "properties": {
+        "displayName": {
+          "description": "The name of the brand. DisplayName must be unique per projectId and marketCode (US)",
+          "type": "string"
+        },
+        "legalCompanyName": {
+          "type": "string",
+          "description": "Legal company name. Required for all product verification."
+        },
+        "dba": {
+          "type": "string",
+          "description": "Doing Business As. Optional for Short Code verification (not necessary for RCS/10DLC)"
+        },
+        "entityType": {
+          "type": "string",
+          "enum": [
+            "CORPORATION",
+            "LLC",
+            "PARTNERSHIP",
+            "S_CORPORATION"
+          ],
+          "x-enumDescriptions": {
+            "CORPORATION": "A standard corporation (often a C Corp), a legal entity that is separate from its owners (shareholders). Choose this unless you are specifically registered as an S Corp.",
+            "LLC": "Limited Liability Company. A business structure that combines the pass-through taxation of a partnership or sole proprietorship with the limited liability of a corporation.",
+            "PARTNERSHIP": "A business owned and operated by two or more individuals or entities. Includes various types like General Partnerships (GP) and Limited Partnerships (LP).",
+            "S_CORPORATION": "A special type of corporation that passes corporate income, losses, deductions, and credits through to its shareholders for federal tax purposes."
+          },
+          "description": "Specifies the legal structure of the business or organization being registered. This is a critical field that affects compliance requirements, verification processes, and the availability of certain products. Required for all product verification."
+        },
+        "verticalType": {
+          "type": "string",
+          "enum": [
+            "PROFESSIONAL",
+            "REAL_ESTATE",
+            "HEALTHCARE",
+            "HUMAN_RESOURCES",
+            "ENERGY",
+            "ENTERTAINMENT",
+            "RETAIL",
+            "TRANSPORTATION",
+            "AGRICULTURE",
+            "INSURANCE",
+            "POSTAL",
+            "EDUCATION",
+            "HOSPITALITY",
+            "FINANCIAL",
+            "POLITICAL",
+            "GAMBLING",
+            "LEGAL",
+            "CONSTRUCTION",
+            "NGO",
+            "MANUFACTURING",
+            "GOVERNMENT",
+            "TECHNOLOGY",
+            "COMMUNICATION"
+          ],
+          "x-enumDescriptions": {
+            "PROFESSIONAL": "Professional services firms such as law, accounting, consulting, staffing, and financial advisory.",
+            "REAL_ESTATE": "Businesses involved in buying, selling, renting, or managing residential or commercial real estate.",
+            "HEALTHCARE": "Hospitals, clinics, pharmacies, medical device manufacturers, and other health services providers.",
+            "HUMAN_RESOURCES": "HR software, staffing agencies, payroll processors, and workforce management services.",
+            "ENERGY": "Utilities, oil and gas companies, renewable energy producers, and energy services providers.",
+            "ENTERTAINMENT": "Media, gaming, live events, streaming platforms, and entertainment content producers.",
+            "RETAIL": "Brick-and-mortar or e-commerce retailers selling goods directly to consumers.",
+            "TRANSPORTATION": "Logistics, freight carriers, ride-sharing services, airlines, and other transport providers.",
+            "AGRICULTURE": "Farming, agribusiness, food production, and agricultural technology companies.",
+            "INSURANCE": "Property, casualty, life, health, and specialty insurance carriers and brokers.",
+            "POSTAL": "Postal services, courier companies, and parcel delivery providers.",
+            "EDUCATION": "Schools, universities, e-learning platforms, tutoring services, and educational content providers.",
+            "HOSPITALITY": "Hotels, restaurants, travel agencies, and other hospitality and tourism businesses.",
+            "FINANCIAL": "Banks, credit unions, payment processors, investment firms, and other financial services.",
+            "POLITICAL": "Political parties, campaigns, PACs, and other organizations engaged in political messaging.",
+            "GAMBLING": "Casinos, online betting platforms, lottery operators, and other gaming and wagering services.",
+            "LEGAL": "Law firms, legal technology providers, and other organizations delivering legal services.",
+            "CONSTRUCTION": "General contractors, sub-contractors, engineering firms, and building materials suppliers.",
+            "NGO": "Non-governmental and non-profit organizations with a charitable or humanitarian mission.",
+            "MANUFACTURING": "Factories, industrial producers, and companies that fabricate or assemble physical goods.",
+            "GOVERNMENT": "Federal, state, provincial, or local government agencies and public sector entities.",
+            "TECHNOLOGY": "Software companies, hardware makers, IT services firms, and technology platform providers.",
+            "COMMUNICATION": "Telecommunications carriers, internet service providers, and messaging platform operators."
+          },
+          "description": "It is required for 10DLC, RCS"
+        },
+        "programType": {
+          "type": "string",
+          "enum": [
+            "STANDARD",
+            "GOVERNMENT",
+            "CHARITY",
+            "POLITICAL"
+          ],
+          "x-enumDescriptions": {
+            "STANDARD": "A standard commercial program used by businesses for general messaging purposes, including marketing, customer service, and transactional notifications.",
+            "GOVERNMENT": "A program operated by a federal, state, provincial, or local government entity or agency. Used for public service announcements, emergency alerts, and official government communications.",
+            "CHARITY": "A program operated by a non-profit or charitable organization, typically a 501(c) entity, used for fundraising, donor outreach, and mission-related communications.",
+            "POLITICAL": "A program used for political messaging, including campaigns, voter outreach, and political action committees (PACs). Subject to specific regulatory and compliance requirements."
+          },
+          "description": "Specifies the type of messaging program associated with the brand. This field helps classify the intended use case and may affect compliance requirements and carrier routing."
+        },
+        "registrationCountry": {
+          "type": "string",
+          "description": "Country of registration, 2 letters country ISO Code. Required for Short Code product verification."
+        },
+        "registrationState": {
+          "type": "string",
+          "description": "State of registration. Required for Short Code product verification."
+        },
+        "stockMarketSymbol": {
+          "type": "string",
+          "description": "Stock market symbol. Optional for all product verification processes."
+        },
+        "exchange": {
+          "type": "string",
+          "description": "Where the stock market is set. Optional for 10DLC and RCS."
+        },
+        "website": {
+          "type": "string",
+          "description": "Company website. Required for all product verification processes. It must have valid url format."
+        },
+        "companyEmail": {
+          "type": "string",
+          "description": "Company email account. Required for 10DLC, RCS. It must have valid email format. Contains PII Data."
+        },
+        "estimatedAnnualRevenue": {
+          "type": "string",
+          "description": "Optional for Short Code product verification."
+        },
+        "country": {
+          "type": "string",
+          "description": "Country of brand address, 2 letters country ISO Code. Required for all product verification processes."
+        },
+        "street": {
+          "type": "string",
+          "description": "brand street address. Required for all product verification processes. Contains PII Data."
+        },
+        "street2": {
+          "type": "string",
+          "description": "brand street 2 address. Optional for Short Code product verification. Contains PII Data."
+        },
+        "city": {
+          "type": "string",
+          "description": "brand city address. Required for all product verification processes. Contains PII Data."
+        },
+        "state": {
+          "type": "string",
+          "description": "brand state address. Required for all product verification processes. Contains PII Data."
+        },
+        "stateCode": {
+          "type": "string",
+          "description": "brand state code address. Required for Short Code product verification. Contains PII Data."
+        },
+        "zip": {
+          "type": "string",
+          "description": "brand zip code address. Required for all product verification processes. Contains PII Data."
+        },
+        "taxCountry": {
+          "type": "string",
+          "description": "Tax country, 2 letters country ISO Code. Required for 10DLC, RCS."
+        },
+        "federalTaxId": {
+          "type": "string",
+          "description": "If US, EIN must be provided. If not, VAT ID. Required for all product verification processes."
+        },
+        "duns": {
+          "type": "string",
+          "description": "Optional for all product verification processes."
+        },
+        "giin": {
+          "type": "string",
+          "description": "Optional for all product verification processes."
+        },
+        "lei": {
+          "type": "string",
+          "description": "Optional for all product verification processes."
+        },
+        "firstName": {
+          "type": "string",
+          "description": "Required for Short Code product verification. Contains PII Data."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "Required for Short Code product verification. Contains PII Data."
+        },
+        "phoneNumber": {
+          "type": "string",
+          "description": "Required for Short Code product verification. Contains PII Data. Must be in E.164 format (e.g. +19176393200)."
+        },
+        "phoneNumberExtension": {
+          "type": "string",
+          "description": "Optional for Short Code product verification"
+        },
+        "mobilePhoneNumber": {
+          "type": "string",
+          "description": "Required for sending OTP request in 10DLC Sole Proprietor registration process. It must be a US/CA number."
+        },
+        "contactEmail": {
+          "type": "string",
+          "description": "It is required for all product verification processes. It must have valid email format. Contains PII Data."
+        },
+        "politicalToken": {
+          "type": "string",
+          "format": "password",
+          "description": "A required authorization token for political campaigns sending messages in the US. This token is issued by Campaign Verify and serves as a credential to verify the legitimacy of a political committee (e.g., candidate, party, or PAC). Mandatory for Short Code verification when Political program type."
+        },
+        "politicalType": {
+          "type": "string",
+          "description": "The classification of the political campaign. This is crucial for determining the specific compliance requirements that apply. Mandatory for Short Code verification when Political program type.",
+          "enum": [
+            "FEDERAL",
+            "LOCAL",
+            "TRIBAL",
+            "STATE",
+            "OTHER"
+          ],
+          "x-enumDescriptions": {
+            "FEDERAL": "For political campaigns at the national or federal level.",
+            "LOCAL": "For political campaigns at the city, county, or municipal level.",
+            "STATE": "For political campaigns at the state, provincial, or regional level.",
+            "TRIBAL": "For tribal political campaigns.",
+            "OTHER": "For any other type of political campaigns not listed above."
+          }
+        },
+        "politicalUrl": {
+          "type": "string",
+          "description": "A URL or other reference number that links to official political filing records. This information serves as verifiable proof of the campaign's registration with a relevant government body (like the FEC in the US). Mandatory for Short Code verification when Political program type."
+        },
+        "governmentWebsite": {
+          "type": "string",
+          "description": "The official website URL for the government agency. The URL must be a valid, active, and secure (HTTPS) link to a government-owned domain (e.g., .gov, .gov.uk, .gc.ca, etc.). This information is used for verification purposes. Mandatory for Short Code verification when Government program type."
+        },
+        "governmentType": {
+          "type": "string",
+          "description": "Specifies the type of government agency. This helps categorize the entity for compliance and routing purposes. Select the most appropriate value from the accepted list. This field is mandatory for Short Code verification when Government program type.",
+          "enum": [
+            "FEDERAL",
+            "LOCAL",
+            "TRIBAL",
+            "STATE",
+            "OTHER"
+          ],
+          "x-enumDescriptions": {
+            "FEDERAL": "For agencies at the national or federal level.",
+            "LOCAL": "For agencies at the city, county, or municipal level.",
+            "STATE": "For agencies at the state, provincial, or regional level.",
+            "TRIBAL": "For recognized tribal governments.",
+            "OTHER": "For any other type of government agency not listed above. If selected, the governmentTypeOther field must be filled."
+          }
+        },
+        "governmentTypeOther": {
+          "type": "string",
+          "description": "A free-text field to provide details if OTHER is selected in the governmentType field. This field is required and should be used only when none of the predefined agency types apply, only for Short Code verification when Government program type."
+        },
+        "charitableAccreditation": {
+          "type": "string",
+          "description": "The name of the organization that has accredited the charitable entity. This is used to verify the non-profit status and legitimacy of the organization. This field is mandatory for Short Code verification when Charity program type."
+        },
+        "scType": {
+          "description": "Short Code type. It is required for Short Code product verification US_SC_REGISTRY and it determines the type of Short Code that will be requested in the order. Vanity Short Codes are custom and can be chosen by the customer, while Random Short Codes are assigned by the provider without customer input. When VANITY is selected, scText must be provided with the list of requested short codes.",
+          "type": "string",
+          "enum": [
+            "VANITY",
+            "RANDOM"
+          ],
+          "x-enumDescriptions": {
+            "VANITY": "Vanity Short Code",
+            "RANDOM": "Random Short Code"
+          }
+        },
+        "scText": {
+          "type": "string",
+          "description": "Comma separated list of potential vanity short codes requested by the customer, in order of preference. Required when scType is VANITY. Optional otherwise for Short Code verification."
+        }
+      }
+    }
+  }
+}

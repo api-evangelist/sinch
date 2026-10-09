@@ -1,0 +1,108 @@
+openapi: 3.2.0
+info:
+  title: Sinch Conversation Events API
+  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://us.conversation.api.sinch.com
+  description: US Production Server
+- url: https://eu.conversation.api.sinch.com
+  description: EU Production Server
+- url: https://br.conversation.api.sinch.com
+  description: Brazil Production Server
+security:
+- oAuth2: []
+- basicAuth: []
+tags:
+- name: Events
+  description: Send and receive events such as composing indicators across supported channels.
+paths:
+  /v1/projects/{project_id}/events:send:
+    post:
+      operationId: sendEvent
+      summary: Send an Event
+      description: Sends an event such as a composing indicator to a contact on a specific channel.
+      tags:
+      - Events
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SendEventRequest'
+      responses:
+        '200':
+          description: Event sent
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SendEventResponse'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+components:
+  schemas:
+    SendEventRequest:
+      type: object
+      required:
+      - app_id
+      - recipient
+      - event
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        recipient:
+          type: object
+          description: The event recipient
+          properties:
+            contact_id:
+              type: string
+              description: The contact ID
+        event:
+          type: object
+          description: The event to send
+          properties:
+            composing_event:
+              type: object
+              description: Composing indicator event
+    SendEventResponse:
+      type: object
+      properties:
+        event_id:
+          type: string
+          description: The unique event identifier
+        accepted_time:
+          type: string
+          format: date-time
+          description: When the event was accepted
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow using project key ID and secret.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Key ID as username and key secret as password.
+externalDocs:
+  description: Sinch Conversation API Documentation
+  url: https://developers.sinch.com/docs/conversation

@@ -1,0 +1,3576 @@
+openapi: 3.1.0
+externalDocs:
+  description: >-
+    All endpoints available under this API require Bearer token authentication.
+    Please check oauth api documentation if you need more details.
+  url: >-
+    https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth/
+info:
+  x-sinch-standards-version: standards-2026-03-31
+  description: >-
+    This API describes the set of endpoints available to create customer brands.
+
+
+    The list of endpoints allows to create, update and delete a customer brand
+    and also get the current state.
+  title: Sinch Compliance API - Brands
+  version: 1.0.0
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+webhooks:
+  BrandOrderStatusUpdated:
+    post:
+      x-sinch-stability: preview
+      tags:
+        - brand-webhooks-delivery
+      summary: Callback for brand order status update
+      description: >-
+        The endpoint receives a callback when the brand order status is updated.
+        To receive callback notifications, the customer must provide a callback
+        URL in the create Order (/us/brands/{brandId}/orders) request body or
+        when importing (/us/brands/import) a brand. The callback URL must be a
+        valid URL and must be reachable from Sinch. Read brands callback
+        configuration documentation for more details.
+      operationId: brandOrderStatusCallback
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackBrandOrderStatusUpdatedBody'
+      responses:
+        '200':
+          description: OK
+      security:
+        - hmacAuth: []
+paths:
+  /v1/projects/{projectId}/us/brands:
+    post:
+      x-sinch-stability: preview
+      description: >-
+        Creates a new Draft Brand in US with the request data.
+
+
+        Note: The `Idempotency-Key` header is not supported in this version.
+        Submitting the same request twice may create duplicate resources.
+        Callers are responsible for deduplicating on their end. Idempotency-Key
+        support will be added when this operation reaches Stable stability.
+      operationId: createBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: >-
+          Brand object to be created. The request body must include all the
+          required fields for the brand creation, as well as the optional field
+          contentProvider that indicates whether the brand is a Content Provider
+          or a standard Brand. Depending on the value of this field, the brand
+          will follow different registration processes and will have access to
+          different types of orders and products.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBrandRequest'
+      responses:
+        '201':
+          description: Brand created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+              example:
+                brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                displayName: Alpha Adventures Corp.
+                status: DRAFT
+                legalCompanyName: Alpha Adventures Corp.
+                entityType: CORPORATION
+                verticalType: RETAIL
+                country: US
+                street: 129 MacDougal Street, Manhattan
+                city: New York
+                state: New York
+                zip: '10012'
+                taxCountry: US
+                federalTaxId: '123456789'
+                website: https://www.alphaadventures.com
+                companyEmail: contact@alphaadventures.com
+                contactEmail: contact@alphaadventures.com
+                contentProvider: false
+                channels: []
+                attachments: []
+                logs: []
+                createTime: '2024-01-15T10:00:00Z'
+                updateTime: '2024-01-15T10:00:00Z'
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Creates a new Draft Brand in US with the request data.
+      tags:
+        - brands
+    get:
+      x-sinch-stability: preview
+      description: List existing brands according to the specified filters.
+      operationId: listBrands
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: query
+          description: The brand status to filter the brands.
+          name: status
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BrandStatus'
+        - in: query
+          name: displayName
+          description: Filter brands by brand name.
+          schema:
+            type: string
+        - in: query
+          description: Filter by specific channel available.
+          name: channelName
+          required: false
+          schema:
+            $ref: '#/components/schemas/Channel'
+        - in: query
+          name: contentProvider
+          description: >-
+            Optional boolean flag to filter by content provider. If true, it
+            returns content providers. If false, it returns standard brands.
+            Default is false.
+          schema:
+            type: boolean
+            default: false
+        - in: query
+          name: thirdPartyMetadataId
+          description: >-
+            Filter brands by an external system's identifier, such as a 10DLC or
+            US Short Code Registry brand ID. Matches against the `value` of any
+            `thirdPartyMetadata` entry (see the `ThirdPartyElement` schema) on
+            any of the brand's registration processes, regardless of which
+            `name` (e.g. `TCR_BRAND_ID`, `gch_brand_id`) it was stored under.
+          schema:
+            type: string
+        - in: query
+          name: sort
+          description: >-
+            Sorting of the results using SQL-like syntax: comma-separated field
+            names with an optional ':desc' or ':asc' suffix. Fields that support
+            sorting are 'displayName', 'status', 'createTime', 'updateTime'.
+            Defaults to ascending order when no suffix is provided.
+          schema:
+            type: string
+          example: displayName,status:desc
+        - in: query
+          name: pageSize
+          description: Size of the page to be returned. Default is 20. Maximum is 100.
+          schema:
+            format: int32
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - in: query
+          name: pageToken
+          description: >-
+            Page token to request subsequent pages when using pagination. This
+            should be the value generated by the system in a previous list
+            request.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Link:
+              description: >-
+                Pagination links per RFC 8288. A `rel="next"` link is present
+                when there are more results. Absence of a `next` link indicates
+                the last page.
+              schema:
+                type: string
+                example: >-
+                  <https://compliance.api.sinch.com/v1/projects/{projectId}/us/brands?pageToken=abc123>;
+                  rel="next"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBrandResponse'
+              example:
+                brands:
+                  - brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                    displayName: Alpha Adventures Corp.
+                    status: DRAFT
+                    channels: []
+                    createTime: '2024-01-15T10:00:00Z'
+                    updateTime: '2024-01-15T10:00:00Z'
+                links:
+                  next: >-
+                    https://compliance.api.sinch.com/v1/projects/proj-123/us/brands?pageToken=eyJsYXN0SWQiOiJiMWM3Y2NiZiJ9
+                meta:
+                  totalCount: 42
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: List brands for a project
+      tags:
+        - brands
+  /v1/projects/{projectId}/us/brands/import:
+    post:
+      x-sinch-stability: preview
+      description: >-
+        This endpoint allows you to import a brand that has already been
+        registered through another reseller or directly by the end-customer,
+        enabling you to manage it through your account. To initiate the
+        transfer, you must specify one of the available import options
+        (IMPORT_TCR_BRAND or IMPORT_GCH_BRAND) and provide the brand's unique ID
+        from its original registry.
+
+
+        Upon receiving the request, the system will copy the brand's information
+        from the source and create an import order that includes all existing
+        third-party metadata from the original registration. Depending on the
+        brand's original registry, an email will be sent to the brand's
+        registered contact address to approve or deny the import request.
+
+
+        Please note that an imported brand cannot be directly modified or
+        updated through our system. For example, a brand imported via
+        IMPORT_GCH_BRAND cannot have its Short Code registration details
+        changed, although it can be extended for other services like 10DLC if
+        required. All maintenance and update operations for the brand remain the
+        responsibility of the original register.
+      operationId: importBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: >-
+          Import Brand request body. It includes the import option to be used
+          and the unique identifier of the brand in its original registry.
+          Depending on the import option selected, the required identifier will
+          differ, for IMPORT_TCR_BRAND, the required identifier is the 10DLC
+          Brand ID; for IMPORT_GCH_BRAND, the required identifier is the US
+          Short Code Registry Account ID.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportBrandRequest'
+      responses:
+        '201':
+          description: Brand import initiated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportBrandResponse'
+              example:
+                brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                brandOrderId: '212421442412'
+                brandOwnerContactEmail: jo***@alphaadventures.com
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Imports an existing Brand in US.
+      tags:
+        - brands
+  /v1/projects/{projectId}/us/brands/{brandId}:
+    get:
+      x-sinch-stability: preview
+      description: >-
+        The endpoint receives as path param project id and brand id. If the
+        project and brand exist, the details of the brand are returned.
+      operationId: getBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Customer's brand id
+          name: brandId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+              example:
+                brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                displayName: Alpha Adventures Corp.
+                status: DRAFT
+                legalCompanyName: Alpha Adventures Corp.
+                entityType: CORPORATION
+                verticalType: RETAIL
+                country: US
+                street: 129 MacDougal Street, Manhattan
+                city: New York
+                state: New York
+                zip: '10012'
+                taxCountry: US
+                federalTaxId: '123456789'
+                website: https://www.alphaadventures.com
+                companyEmail: contact@alphaadventures.com
+                contactEmail: contact@alphaadventures.com
+                contentProvider: false
+                channels: []
+                attachments: []
+                logs: []
+                createTime: '2024-01-15T10:00:00Z'
+                updateTime: '2024-01-15T10:00:00Z'
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project or brand id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: Get a brand by project and brand id.
+      tags:
+        - brands
+    delete:
+      x-sinch-stability: preview
+      description: >-
+        The endpoint receives as path param project id and brand id. If the
+        project and brand exist, the brand is deleted.
+      operationId: deleteBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Customer's brand id
+          name: brandId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Brand deleted successfully. No content is returned.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project or brand id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Delete a brand by project and brand id.
+      tags:
+        - brands
+    patch:
+      x-sinch-stability: preview
+      description: >-
+        Patches an existing brand. Fields omitted from the request body are
+        unchanged. Fields set to `null` are treated as an explicit request to
+        clear the field; if a field does not support clearing, the request will
+        fail with 400.
+      operationId: patchBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Brand Id
+          name: brandId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: >-
+          Brand object to be updated. The request body can include any subset of
+          the fields required for the brand creation. Only the fields included
+          in the request body with a non-null value will be updated, while the
+          rest of the fields will remain unchanged. This method allows partial
+          updates to the brand properties without the need to provide all the
+          details as in the case of a full update. About attachments, the patch
+          endpoint will not delete any existing attachments, and will include
+          the new ones.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchBrandRequest'
+      responses:
+        '200':
+          description: Brand Content OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+              example:
+                brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                displayName: Alpha Adventures Corp.
+                status: DRAFT
+                legalCompanyName: Alpha Adventures Corp.
+                entityType: CORPORATION
+                verticalType: RETAIL
+                country: US
+                street: 129 MacDougal Street, Manhattan
+                city: New York
+                state: New York
+                zip: '10012'
+                taxCountry: US
+                federalTaxId: '123456789'
+                website: https://www.alphaadventures.com
+                companyEmail: contact@alphaadventures.com
+                contactEmail: contact@alphaadventures.com
+                contentProvider: false
+                channels: []
+                attachments: []
+                logs: []
+                createTime: '2024-01-15T10:00:00Z'
+                updateTime: '2024-01-15T10:00:00Z'
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Patches an existing Brand in US with the request data.
+      tags:
+        - brands
+  /v1/projects/{projectId}/us/brands/{brandId}/attachments:
+    post:
+      x-sinch-stability: preview
+      description: Upload an attachment to be linked to a brand.
+      operationId: uploadBrandAttachment
+      parameters:
+        - description: Customer's project id
+          in: path
+          name: projectId
+          required: true
+          schema:
+            examples:
+              - eeew32344324edewe2e3
+            type: string
+        - in: path
+          description: Customer's brand id
+          name: brandId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - file
+                - attachmentType
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  examples:
+                    - file.txt
+                  description: File content body
+                attachmentType:
+                  $ref: '#/components/schemas/AttachmentType'
+        description: File content body
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Attachment'
+              example:
+                attachmentId: d1c7ccbf-919d-462f-8587-dec95a1b11ee
+                fileName: company_logo.png
+                attachmentType: COMPANY_LOGO
+                mimeType: image/png
+                uploadStatus: COMPLETED
+                createTime: '2024-01-15T10:00:00Z'
+                updateTime: '2024-01-15T10:00:00Z'
+          description: Attachment uploaded successfully.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: Brand ID not found'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: >-
+        Uploads an attachment to be linked to a brand. The attachment will be
+        automatically assigned to the new Brand Orders when needed.
+      tags:
+        - brands
+  /v1/projects/{projectId}/us/brands/{brandId}/attachments/{attachmentId}:
+    get:
+      x-sinch-stability: preview
+      description: Download Brand Attachment.
+      operationId: downloadBrandAttachment
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Customer's brand id
+          name: brandId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Attachment ID
+          name: attachmentId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/octet-stream:
+              schema:
+                format: binary
+                type: string
+          description: Request Successful with binary file returned in octet stream
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: Brand ID/Attachment ID not found'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: Download brand attachment
+      tags:
+        - brands
+    delete:
+      x-sinch-stability: preview
+      description: Delete a Brand attachment.
+      operationId: deleteBrandAttachment
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Brand ID
+          name: brandId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Attachment ID
+          name: attachmentId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Resource successfully deleted. No content is returned.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: Brand ID/Attachment ID not found'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Delete Brand Attachment
+      tags:
+        - brands
+  /v1/projects/{projectId}/us/orders:
+    get:
+      x-sinch-stability: preview
+      description: >-
+        List Brand Orders, according to the filters applied. This endpoint
+        allows filtering over all brands.
+      operationId: listBrandOrders
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: query
+          description: The brand Order status to filter the brand orders.
+          name: status
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BrandOrderStatus'
+        - in: query
+          name: metadataName
+          description: Filter brand orders by brand registration process metadata name.
+          schema:
+            $ref: '#/components/schemas/BrandOrderMetadata'
+        - in: query
+          name: sort
+          description: >-
+            Sorting of the results using SQL-like syntax: comma-separated field
+            names with an optional ':desc' or ':asc' suffix. Fields that support
+            sorting are 'metadataName', 'status', 'createTime', 'updateTime'.
+            Defaults to ascending order when no suffix is provided.
+          schema:
+            type: string
+          example: metadataName,status:desc
+        - in: query
+          name: pageSize
+          description: Size of the page to be returned. Default is 20. Maximum is 100.
+          schema:
+            format: int32
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - in: query
+          name: pageToken
+          description: >-
+            Page token to request subsequent pages when using pagination. This
+            should be the value generated by the system in a previous list
+            request.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Link:
+              description: >-
+                Pagination links per RFC 8288. A `rel="next"` link is present
+                when there are more results. Absence of a `next` link indicates
+                the last page.
+              schema:
+                type: string
+                example: >-
+                  <https://compliance.api.sinch.com/v1/projects/{projectId}/us/orders?pageToken=abc123>;
+                  rel="next"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBrandOrderResponse'
+              example:
+                orders:
+                  - brandOrderId: '212421442412'
+                    brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                    status: NEW
+                    metadataName: US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION
+                    createTime: '2024-01-15T10:00:00Z'
+                    updateTime: '2024-01-15T10:00:00Z'
+                links:
+                  next: >-
+                    https://compliance.api.sinch.com/v1/projects/proj-123/us/orders?pageToken=eyJsYXN0SWQiOiIyMTI0MjEifQ
+                meta:
+                  totalCount: 15
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: List Brand Orders according to the filters applied.
+      tags:
+        - orders
+  /v1/projects/{projectId}/us/brands/{brandId}/orders:
+    post:
+      x-sinch-stability: preview
+      description: >-
+        Creates a new Brand Order for the specified brand ID and process
+        selected.
+
+
+        Note: The `Idempotency-Key` header is not supported in this version.
+        Submitting the same request twice may create duplicate orders. Callers
+        are responsible for deduplicating on their end. Idempotency-Key support
+        will be added when this operation reaches Stable stability.
+      operationId: createBrandOrder
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Brand ID reference
+          name: brandId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: >-
+          Brand Order object to be created. The request body must include all
+          the required fields for the brand order creation, as well as the
+          optional field callbackUrl that indicates the URL that will receive
+          callbacks with updates on the brand order status. Depending on the
+          process selected for the brand order, different fields will be
+          required and different validations will be applied. Please check the
+          Brand Order object definition for more details on the required fields
+          depending on the process.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandOrderRequest'
+      responses:
+        '201':
+          description: Brand Order Created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandOrder'
+              example:
+                brandOrderId: '212421442412'
+                brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                status: NEW
+                metadataName: US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION
+                logs: []
+                channels: []
+                thirdPartyMetadata: []
+                pricing:
+                  amount: '5.00'
+                  currencyCode: USD
+                callbackUrl: https://example.com/callback
+                createTime: '2024-01-15T10:00:00Z'
+                updateTime: '2024-01-15T10:00:00Z'
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Creates a new Brand Order for the specified process.
+      tags:
+        - orders
+    get:
+      x-sinch-stability: preview
+      description: List Brand Orders per brand id, according to the filters applied.
+      operationId: listBrandOrderByBrandId
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Brand ID reference
+          name: brandId
+          required: true
+          schema:
+            type: string
+        - in: query
+          description: The brand Order status to filter the brand orders.
+          name: status
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BrandOrderStatus'
+        - in: query
+          name: metadataName
+          description: Filter brand orders by brand registration process metadata name.
+          schema:
+            $ref: '#/components/schemas/BrandOrderMetadata'
+        - in: query
+          name: sort
+          description: >-
+            Sorting of the results using SQL-like syntax: comma-separated field
+            names with an optional ':desc' or ':asc' suffix. Fields that support
+            sorting are 'metadataName', 'status', 'createTime', 'updateTime'.
+            Defaults to ascending order when no suffix is provided.
+          schema:
+            type: string
+          example: metadataName,status:desc
+        - in: query
+          name: pageSize
+          description: Size of the page to be returned. Default is 20. Maximum is 100.
+          schema:
+            format: int32
+            type: integer
+            minimum: 1
+            maximum: 100
+            default: 20
+          example: 20
+        - in: query
+          name: pageToken
+          description: >-
+            Page token to request subsequent pages when using pagination. This
+            should be the value generated by the system in a previous list
+            request.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          headers:
+            Link:
+              description: >-
+                Pagination links per RFC 8288. A `rel="next"` link is present
+                when there are more results. Absence of a `next` link indicates
+                the last page.
+              schema:
+                type: string
+                example: >-
+                  <https://compliance.api.sinch.com/v1/projects/{projectId}/us/brands/{brandId}/orders?pageToken=abc123>;
+                  rel="next"
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBrandOrderResponse'
+              example:
+                orders:
+                  - brandOrderId: '212421442412'
+                    brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                    status: NEW
+                    metadataName: US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION
+                    createTime: '2024-01-15T10:00:00Z'
+                    updateTime: '2024-01-15T10:00:00Z'
+                links:
+                  next: >-
+                    https://compliance.api.sinch.com/v1/projects/proj-123/us/brands/b1c7ccbf-919d-462f-8587-dec95a1b11ee/orders?pageToken=eyJsYXN0SWQiOiIyMTI0MjEifQ
+                meta:
+                  totalCount: 15
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: List Brand Orders by Brand Id according to the filters applied.
+      tags:
+        - orders
+  /v1/projects/{projectId}/us/brands/{brandId}/orders/{orderId}:
+    get:
+      x-sinch-stability: preview
+      description: >-
+        The endpoint receives as path param project id, brand id and order id.
+        If the project and order exist, the details of the brand are returned.
+      operationId: getBrandOrder
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Brand ID reference
+          name: brandId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Order id
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandOrder'
+              example:
+                brandOrderId: '212421442412'
+                brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                status: PENDING
+                metadataName: US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION
+                logs:
+                  - createTime: '2024-01-15T10:00:00Z'
+                    message: Brand order created.
+                    brandCurrentState: NEW
+                channels: []
+                thirdPartyMetadata: []
+                pricing:
+                  amount: '5.00'
+                  currencyCode: USD
+                callbackUrl: https://example.com/callback
+                createTime: '2024-01-15T10:00:00Z'
+                updateTime: '2024-01-15T10:01:00Z'
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project or order id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: Get a brand order by project id, brand id and order id.
+      tags:
+        - orders
+    delete:
+      x-sinch-stability: preview
+      description: Delete a Brand Order.
+      operationId: deleteBrandOrder
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Brand ID reference
+          name: brandId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Order ID
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Resource successfully deleted. No content is returned.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: Order ID not found'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Delete Brand Order
+      tags:
+        - orders
+  /v1/projects/{projectId}/us/brands/{brandId}/orders/{orderId}/retry:
+    post:
+      x-sinch-stability: preview
+      description: >-
+        Updates a brand Order. Only INCOMPLETE or NEW orders can be retried.
+        Retry flow will get new properties and attachments from the brand and
+        apply the same validations as create Order. No body is needed.
+      operationId: retryBrandOrder
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Brand ID reference
+          name: brandId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Order ID
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Brand Order Updated
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandOrder'
+              example:
+                brandOrderId: '212421442412'
+                brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                status: NEW
+                metadataName: US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION
+                logs: []
+                channels: []
+                thirdPartyMetadata: []
+                pricing:
+                  amount: '5.00'
+                  currencyCode: USD
+                callbackUrl: https://example.com/callback
+                createTime: '2024-01-15T10:00:00Z'
+                updateTime: '2024-01-15T10:05:00Z'
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Updates a Brand Order.
+      tags:
+        - orders
+  /v1/projects/{projectId}/us/brands/{brandId}/orders/{orderId}/resendConfirmationEmail:
+    post:
+      x-sinch-stability: preview
+      description: >-
+        Resends the brand registration confirmation email to the end-customer.
+        Certain product verification processes require the end-customer's
+        approval via email to complete a brand's registration for a specific use
+        case. If the end-customer has lost or did not receive the original
+        email, you can call this endpoint to trigger a resend, enabling them to
+        finalize the registration process.
+
+
+        This action can only be requested if the order is in a PENDING state.
+        Furthermore, this functionality is currently available only for
+        10DLC/RCS (TCR) registration processes.
+      operationId: brandOrderResendConfirmationEmail
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Brand ID reference
+          name: brandId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Order ID
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandOrder'
+              example:
+                brandOrderId: '212421442412'
+                brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                status: PENDING
+                metadataName: US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION
+                logs: []
+                channels: []
+                thirdPartyMetadata: []
+                pricing:
+                  amount: '5.00'
+                  currencyCode: USD
+                callbackUrl: https://example.com/callback
+                createTime: '2024-01-15T10:00:00Z'
+                updateTime: '2024-01-15T10:06:00Z'
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: resendConfirmationEmail request for Brand Order.
+      tags:
+        - orders
+  /v1/projects/{projectId}/us/brands/{brandId}/orders/{orderId}/verifyOtp:
+    post:
+      x-sinch-stability: preview
+      description: >-
+        Verifies the One-Time Password (OTP) received by the brand's registered
+        mobile phone number to complete the US_10DLC_TCR_SOLE_PROPRIETOR order.
+        After creating the order, an OTP is automatically sent via SMS to the
+        mobilePhoneNumber associated with the brand. Submit the OTP code using
+        this endpoint to finalise the registration.
+
+
+        Important Requirement: To successfully receive the OTP, the brand's
+        mobilePhoneNumber must be a valid United States (US) or Canadian (CA)
+        phone number.
+      summary: Verify OTP code for 10DLC Sole Proprietor verification
+      tags:
+        - orders
+      security:
+        - OAuth2:
+            - write
+      operationId: brandOrderVerifyOtp
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Brand ID reference
+          name: brandId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Order ID
+          name: orderId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: OTP received in the mobilePhoneNumber after creating the brand order.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandOrderOtpRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandOrder'
+              example:
+                brandOrderId: '212421442412'
+                brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                status: COMPLETED
+                metadataName: US_10DLC_TCR_SOLE_PROPRIETOR
+                logs: []
+                channels:
+                  - TENDLC
+                thirdPartyMetadata:
+                  - name: TCR_BRAND_ID
+                    value: B123ABC
+                pricing:
+                  amount: '5.50'
+                  currencyCode: USD
+                callbackUrl: https://example.com/callback
+                createTime: '2024-01-15T10:00:00Z'
+                updateTime: '2024-01-15T10:10:00Z'
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+  /v1/projects/{projectId}/us/brands/{brandId}/orders/{orderId}/resendOtp:
+    post:
+      x-sinch-stability: preview
+      description: >-
+        This endpoint triggers a resend of the One-Time Password (OTP) required
+        for verifying US_10DLC_TCR_SOLE_PROPRIETOR orders. Use this if the
+        initial OTP expired or was not received by the brand. The new OTP will
+        be sent to the brand's registered mobilePhoneNumber.
+
+
+        Important Requirement: Just like the initial request, the brand's
+        mobilePhoneNumber must be a valid United States (US) or Canadian (CA)
+        phone number.
+      summary: Resend OTP for 10DLC Sole Proprietor verification
+      tags:
+        - orders
+      security:
+        - OAuth2:
+            - write
+      operationId: brandOrderResendOtp
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Brand ID reference
+          name: brandId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Order ID
+          name: orderId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandOrder'
+              example:
+                brandOrderId: '212421442412'
+                brandId: b1c7ccbf-919d-462f-8587-dec95a1b11ee
+                status: PENDING
+                metadataName: US_10DLC_TCR_SOLE_PROPRIETOR
+                logs: []
+                channels: []
+                thirdPartyMetadata: []
+                pricing:
+                  amount: '5.50'
+                  currencyCode: USD
+                callbackUrl: https://example.com/callback
+                createTime: '2024-01-15T10:00:00Z'
+                updateTime: '2024-01-15T10:07:00Z'
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+  /v1/projects/{projectId}/callbackConfig:
+    get:
+      x-sinch-stability: preview
+      description: >-
+        Returns the callback configuration for the specified project. The HMAC
+        secret is masked —
+
+        only the last 6 characters are visible. To retrieve the full secret,
+        rotate it using
+
+        `POST /v1/projects/{projectId}/callbackConfig/rotate` or set a new one
+        via `PATCH`.
+      operationId: getCallbackConfig
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigResponse'
+              example:
+                projectId: proj-123
+                hmacSecretMask: ••••••1b11ee
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: Get a callback configuration by project id.
+      tags:
+        - brand-callbacks
+    patch:
+      x-sinch-stability: preview
+      description: >-
+        Sets a customer-provided HMAC secret for the specified project. The full
+        secret is returned
+
+        once in the response body — this is the only time it is visible in plain
+        text. Store it
+
+        securely immediately after this call.
+      operationId: updateCallbackConfig
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        description: The new HMAC secret to associate with the project ID.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackConfigUpdateBody'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigSecretResponse'
+              example:
+                projectId: proj-123
+                hmacSecret: d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          description: >-
+            Secret updated. The full secret is returned once — store it
+            securely.
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Project validation error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Set a customer-provided HMAC secret for webhook signing.
+      tags:
+        - brand-callbacks
+  /v1/projects/{projectId}/callbackConfig/rotate:
+    post:
+      x-sinch-stability: preview
+      description: >-
+        Generates a new server-side HMAC secret for the specified project and
+        replaces the
+
+        existing one. The full secret is returned once in the response body —
+        this is the only
+
+        time it is visible in plain text. Store it securely immediately after
+        this call.
+
+
+        Use this endpoint when you want Sinch to generate a cryptographically
+        random secret
+
+        rather than supplying your own.
+      operationId: rotateCallbackSecret
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigSecretResponse'
+              example:
+                projectId: proj-123
+                hmacSecret: f9a3dd71-4c2e-4f87-b901-abc123def456
+          description: >-
+            New secret generated. The full secret is returned once — store it
+            securely.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Rotate the HMAC secret for webhook signing.
+      tags:
+        - brand-callbacks
+components:
+  schemas:
+    BrandProperties:
+      description: Writable properties shared across brand request and response schemas.
+      type: object
+      properties:
+        displayName:
+          description: >-
+            The name of the brand. DisplayName must be unique per projectId and
+            marketCode (US)
+          examples:
+            - My End Customer Brand Name
+          type: string
+        legalCompanyName:
+          type: string
+          description: Legal company name. Required for all product verification.
+          examples:
+            - Alpha Adventures Corp.
+        dba:
+          type: string
+          description: >-
+            Doing Business As. Optional for Short Code verification (not
+            necessary for RCS/10DLC)
+          examples:
+            - Alpha Adventures
+        entityType:
+          type: string
+          enum:
+            - CORPORATION
+            - LLC
+            - PARTNERSHIP
+            - S_CORPORATION
+          x-enumDescriptions:
+            CORPORATION: >-
+              A standard corporation (often a C Corp), a legal entity that is
+              separate from its owners (shareholders). Choose this unless you
+              are specifically registered as an S Corp.
+            LLC: >-
+              Limited Liability Company. A business structure that combines the
+              pass-through taxation of a partnership or sole proprietorship with
+              the limited liability of a corporation.
+            PARTNERSHIP: >-
+              A business owned and operated by two or more individuals or
+              entities. Includes various types like General Partnerships (GP)
+              and Limited Partnerships (LP).
+            S_CORPORATION: >-
+              A special type of corporation that passes corporate income,
+              losses, deductions, and credits through to its shareholders for
+              federal tax purposes.
+          description: >-
+            Specifies the legal structure of the business or organization being
+            registered. This is a critical field that affects compliance
+            requirements, verification processes, and the availability of
+            certain products. Required for all product verification.
+        verticalType:
+          type: string
+          enum:
+            - PROFESSIONAL
+            - REAL_ESTATE
+            - HEALTHCARE
+            - HUMAN_RESOURCES
+            - ENERGY
+            - ENTERTAINMENT
+            - RETAIL
+            - TRANSPORTATION
+            - AGRICULTURE
+            - INSURANCE
+            - POSTAL
+            - EDUCATION
+            - HOSPITALITY
+            - FINANCIAL
+            - POLITICAL
+            - GAMBLING
+            - LEGAL
+            - CONSTRUCTION
+            - NGO
+            - MANUFACTURING
+            - GOVERNMENT
+            - TECHNOLOGY
+            - COMMUNICATION
+          x-enumDescriptions:
+            PROFESSIONAL: >-
+              Professional services firms such as law, accounting, consulting,
+              staffing, and financial advisory.
+            REAL_ESTATE: >-
+              Businesses involved in buying, selling, renting, or managing
+              residential or commercial real estate.
+            HEALTHCARE: >-
+              Hospitals, clinics, pharmacies, medical device manufacturers, and
+              other health services providers.
+            HUMAN_RESOURCES: >-
+              HR software, staffing agencies, payroll processors, and workforce
+              management services.
+            ENERGY: >-
+              Utilities, oil and gas companies, renewable energy producers, and
+              energy services providers.
+            ENTERTAINMENT: >-
+              Media, gaming, live events, streaming platforms, and entertainment
+              content producers.
+            RETAIL: >-
+              Brick-and-mortar or e-commerce retailers selling goods directly to
+              consumers.
+            TRANSPORTATION: >-
+              Logistics, freight carriers, ride-sharing services, airlines, and
+              other transport providers.
+            AGRICULTURE: >-
+              Farming, agribusiness, food production, and agricultural
+              technology companies.
+            INSURANCE: >-
+              Property, casualty, life, health, and specialty insurance carriers
+              and brokers.
+            POSTAL: Postal services, courier companies, and parcel delivery providers.
+            EDUCATION: >-
+              Schools, universities, e-learning platforms, tutoring services,
+              and educational content providers.
+            HOSPITALITY: >-
+              Hotels, restaurants, travel agencies, and other hospitality and
+              tourism businesses.
+            FINANCIAL: >-
+              Banks, credit unions, payment processors, investment firms, and
+              other financial services.
+            POLITICAL: >-
+              Political parties, campaigns, PACs, and other organizations
+              engaged in political messaging.
+            GAMBLING: >-
+              Casinos, online betting platforms, lottery operators, and other
+              gaming and wagering services.
+            LEGAL: >-
+              Law firms, legal technology providers, and other organizations
+              delivering legal services.
+            CONSTRUCTION: >-
+              General contractors, sub-contractors, engineering firms, and
+              building materials suppliers.
+            NGO: >-
+              Non-governmental and non-profit organizations with a charitable or
+              humanitarian mission.
+            MANUFACTURING: >-
+              Factories, industrial producers, and companies that fabricate or
+              assemble physical goods.
+            GOVERNMENT: >-
+              Federal, state, provincial, or local government agencies and
+              public sector entities.
+            TECHNOLOGY: >-
+              Software companies, hardware makers, IT services firms, and
+              technology platform providers.
+            COMMUNICATION: >-
+              Telecommunications carriers, internet service providers, and
+              messaging platform operators.
+          description: It is required for 10DLC, RCS
+        programType:
+          type: string
+          enum:
+            - STANDARD
+            - GOVERNMENT
+            - CHARITY
+            - POLITICAL
+          x-enumDescriptions:
+            STANDARD: >-
+              A standard commercial program used by businesses for general
+              messaging purposes, including marketing, customer service, and
+              transactional notifications.
+            GOVERNMENT: >-
+              A program operated by a federal, state, provincial, or local
+              government entity or agency. Used for public service
+              announcements, emergency alerts, and official government
+              communications.
+            CHARITY: >-
+              A program operated by a non-profit or charitable organization,
+              typically a 501(c) entity, used for fundraising, donor outreach,
+              and mission-related communications.
+            POLITICAL: >-
+              A program used for political messaging, including campaigns, voter
+              outreach, and political action committees (PACs). Subject to
+              specific regulatory and compliance requirements.
+          description: >-
+            Specifies the type of messaging program associated with the brand.
+            This field helps classify the intended use case and may affect
+            compliance requirements and carrier routing.
+        registrationCountry:
+          type: string
+          description: >-
+            Country of registration, 2 letters country ISO Code. Required for
+            Short Code product verification.
+          examples:
+            - US
+            - CA
+        registrationState:
+          type: string
+          description: State of registration. Required for Short Code product verification.
+          examples:
+            - California
+            - Nebraska
+        stockMarketSymbol:
+          type: string
+          description: >-
+            Stock market symbol. Optional for all product verification
+            processes.
+          examples:
+            - SINCH
+        exchange:
+          type: string
+          description: Where the stock market is set. Optional for 10DLC and RCS.
+          examples:
+            - NASDAQ
+            - AMEX
+        website:
+          type: string
+          description: >-
+            Company website. Required for all product verification processes. It
+            must have valid url format.
+          examples:
+            - https://www.sinch.com
+        companyEmail:
+          type: string
+          description: >-
+            Company email account. Required for 10DLC, RCS. It must have valid
+            email format. Contains PII Data.
+          examples:
+            - john.doe@sinch.com
+        estimatedAnnualRevenue:
+          type: string
+          description: Optional for Short Code product verification.
+          examples:
+            - 100K-1M USD
+        country:
+          type: string
+          description: >-
+            Country of brand address, 2 letters country ISO Code. Required for
+            all product verification processes.
+          examples:
+            - US
+            - CA
+        street:
+          type: string
+          description: >-
+            brand street address. Required for all product verification
+            processes. Contains PII Data.
+          examples:
+            - 129 MacDougal Street, Manhattan
+        street2:
+          type: string
+          description: >-
+            brand street 2 address. Optional for Short Code product
+            verification. Contains PII Data.
+          examples:
+            - D, 7th floor
+        city:
+          type: string
+          description: >-
+            brand city address. Required for all product verification processes.
+            Contains PII Data.
+          examples:
+            - New York
+        state:
+          type: string
+          description: >-
+            brand state address. Required for all product verification
+            processes. Contains PII Data.
+          examples:
+            - New York
+        stateCode:
+          type: string
+          description: >-
+            brand state code address. Required for Short Code product
+            verification. Contains PII Data.
+          examples:
+            - NY
+        zip:
+          type: string
+          description: >-
+            brand zip code address. Required for all product verification
+            processes. Contains PII Data.
+          examples:
+            - '10012'
+        taxCountry:
+          type: string
+          description: Tax country, 2 letters country ISO Code. Required for 10DLC, RCS.
+          examples:
+            - US
+        federalTaxId:
+          type: string
+          description: >-
+            If US, EIN must be provided. If not, VAT ID. Required for all
+            product verification processes.
+          examples:
+            - '123456789'
+        duns:
+          type: string
+          description: Optional for all product verification processes.
+          examples:
+            - '123456789'
+        giin:
+          type: string
+          description: Optional for all product verification processes.
+          examples:
+            - ABC9EF.A23FF.US.724
+        lei:
+          type: string
+          description: Optional for all product verification processes.
+          examples:
+            - 549300L4R7HSB20U5D88
+        firstName:
+          type: string
+          description: Required for Short Code product verification. Contains PII Data.
+          examples:
+            - John
+        lastName:
+          type: string
+          description: Required for Short Code product verification. Contains PII Data.
+          examples:
+            - Doe
+        phoneNumber:
+          type: string
+          description: >-
+            Required for Short Code product verification. Contains PII Data.
+            Must be in E.164 format (e.g. +19176393200).
+          examples:
+            - '+19176393200'
+        phoneNumberExtension:
+          type: string
+          description: Optional for Short Code product verification
+          examples:
+            - '343'
+        mobilePhoneNumber:
+          type: string
+          description: >-
+            Required for sending OTP request in 10DLC Sole Proprietor
+            registration process. It must be a US/CA number.
+          examples:
+            - '+12015550143'
+        contactEmail:
+          type: string
+          description: >-
+            It is required for all product verification processes. It must have
+            valid email format. Contains PII Data.
+          examples:
+            - john.doe@sinch.com
+        politicalToken:
+          type: string
+          format: password
+          description: >-
+            A required authorization token for political campaigns sending
+            messages in the US. This token is issued by Campaign Verify and
+            serves as a credential to verify the legitimacy of a political
+            committee (e.g., candidate, party, or PAC). Mandatory for Short Code
+            verification when Political program type.
+          examples:
+            - cv_a1b2c3d4e5f67890a1b2c3d4e5f67890
+        politicalType:
+          type: string
+          description: >-
+            The classification of the political campaign. This is crucial for
+            determining the specific compliance requirements that apply.
+            Mandatory for Short Code verification when Political program type.
+          enum:
+            - FEDERAL
+            - LOCAL
+            - TRIBAL
+            - STATE
+            - OTHER
+          x-enumDescriptions:
+            FEDERAL: For political campaigns at the national or federal level.
+            LOCAL: For political campaigns at the city, county, or municipal level.
+            STATE: >-
+              For political campaigns at the state, provincial, or regional
+              level.
+            TRIBAL: For tribal political campaigns.
+            OTHER: For any other type of political campaigns not listed above.
+        politicalUrl:
+          type: string
+          description: >-
+            A URL or other reference number that links to official political
+            filing records. This information serves as verifiable proof of the
+            campaign's registration with a relevant government body (like the
+            FEC in the US). Mandatory for Short Code verification when Political
+            program type.
+          examples:
+            - https://www.fec.gov/data/committee/C00123456/
+            - 'FEC Committee ID: C00123456'
+        governmentWebsite:
+          type: string
+          description: >-
+            The official website URL for the government agency. The URL must be
+            a valid, active, and secure (HTTPS) link to a government-owned
+            domain (e.g., .gov, .gov.uk, .gc.ca, etc.). This information is used
+            for verification purposes. Mandatory for Short Code verification
+            when Government program type.
+          examples:
+            - https://www.fcc.gov
+        governmentType:
+          type: string
+          description: >-
+            Specifies the type of government agency. This helps categorize the
+            entity for compliance and routing purposes. Select the most
+            appropriate value from the accepted list. This field is mandatory
+            for Short Code verification when Government program type.
+          enum:
+            - FEDERAL
+            - LOCAL
+            - TRIBAL
+            - STATE
+            - OTHER
+          x-enumDescriptions:
+            FEDERAL: For agencies at the national or federal level.
+            LOCAL: For agencies at the city, county, or municipal level.
+            STATE: For agencies at the state, provincial, or regional level.
+            TRIBAL: For recognized tribal governments.
+            OTHER: >-
+              For any other type of government agency not listed above. If
+              selected, the governmentTypeOther field must be filled.
+        governmentTypeOther:
+          type: string
+          description: >-
+            A free-text field to provide details if OTHER is selected in the
+            governmentType field. This field is required and should be used only
+            when none of the predefined agency types apply, only for Short Code
+            verification when Government program type.
+          examples:
+            - International Port Authority Commission
+        charitableAccreditation:
+          type: string
+          description: >-
+            The name of the organization that has accredited the charitable
+            entity. This is used to verify the non-profit status and legitimacy
+            of the organization. This field is mandatory for Short Code
+            verification when Charity program type.
+          examples:
+            - BBB Wise Giving Alliance
+        scType:
+          description: >-
+            Short Code type. It is required for Short Code product verification
+            US_SC_REGISTRY and it determines the type of Short Code that will be
+            requested in the order. Vanity Short Codes are custom and can be
+            chosen by the customer, while Random Short Codes are assigned by the
+            provider without customer input. When VANITY is selected, scText
+            must be provided with the list of requested short codes.
+          type: string
+          enum:
+            - VANITY
+            - RANDOM
+          x-enumDescriptions:
+            VANITY: Vanity Short Code
+            RANDOM: Random Short Code
+        scText:
+          type: string
+          description: >-
+            Comma separated list of potential vanity short codes requested by
+            the customer, in order of preference. Required when scType is
+            VANITY. Optional otherwise for Short Code verification.
+          examples:
+            - We need 11111, if not available please provide SINCH
+    CreateBrandRequest:
+      description: Request body for creating a new Draft Brand.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BrandProperties'
+        - if:
+            properties:
+              scType:
+                const: VANITY
+            required:
+              - scType
+          then:
+            required:
+              - scText
+            properties:
+              scText:
+                $ref: '#/components/schemas/BrandProperties/properties/scText'
+        - type: object
+          required:
+            - displayName
+          properties:
+            contentProvider:
+              type: boolean
+              description: >-
+                Indicates whether the brand is a Content Provider (true) or a
+                standard Brand (false). This choice determines the types of
+                orders that can be requested, as they follow different
+                registration processes and are available for different products.
+              examples:
+                - true
+            attachmentInputs:
+              description: >-
+                Attachments can be added by url or using the specified endpoint.
+                Only the latest version of each attachment type is kept per
+                Brand.
+              items:
+                $ref: '#/components/schemas/AttachmentInput'
+              type: array
+    PatchBrandRequest:
+      description: >-
+        Request body for partially updating an existing Brand. Only fields
+        present in the request body are updated; omitted fields remain
+        unchanged. Fields set to null explicitly clear the value.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BrandProperties'
+        - type: object
+          properties:
+            attachmentInputs:
+              description: >-
+                Attachments can be added by url or using the specified endpoint.
+                Only the latest version of each attachment type is kept per
+                Brand.
+              items:
+                $ref: '#/components/schemas/AttachmentInput'
+              type: array
+    ImportBrandRequest:
+      type: object
+      description: Import Brand request
+      required:
+        - displayName
+        - importType
+        - externalBrandId
+      properties:
+        displayName:
+          description: >-
+            The name of the brand. DisplayName must be unique per projectId and
+            marketCode (US)
+          examples:
+            - My End Customer Brand Name
+          type: string
+        importType:
+          description: >-
+            Type of import, options are IMPORT_TCR_BRAND for 10DLC / RCS and
+            IMPORT_GCH_BRAND for Short Code
+          type: string
+          enum:
+            - IMPORT_TCR_BRAND
+            - IMPORT_GCH_BRAND
+          x-enumDescriptions:
+            IMPORT_TCR_BRAND: >-
+              Import an existing brand in 10DLC. Imported brand will get same
+              channels as in original request (10DLC, 10DLC+RCS). 10DLC brand Id
+              must be included as external brand.
+            IMPORT_GCH_BRAND: >-
+              Import an existing brand in the US Short Code Registry. Imported
+              brand will get Short Code channel. The US Short Code Registry
+              brand Id must be included as external brand.
+          examples:
+            - IMPORT_TCR_BRAND
+            - IMPORT_GCH_BRAND
+        externalBrandId:
+          description: >-
+            The external brand ID obtained in the original order. It can be the
+            10DLC brand Id or the US Short Code Registry brand Id.
+          type: string
+          examples:
+            - GW12345
+        callbackUrl:
+          description: >-
+            The URL to receive the order status update callback. The URL must be
+            a valid URL and must be reachable from Sinch.
+          examples:
+            - https://example.com/callback
+          type: string
+          format: uri
+    ImportBrandResponse:
+      type: object
+      description: Import Brand response
+      properties:
+        brandId:
+          description: The unique identifier for the brand.
+          examples:
+            - '1234567890'
+          type: string
+          readOnly: true
+        brandOrderId:
+          description: The unique identifier for the brand order.
+          examples:
+            - '212421442412'
+          type: string
+          readOnly: true
+        brandOwnerContactEmail:
+          type: string
+          description: >-
+            The email of the brand owner contact provided in the original order,
+            masked for privacy reasons. This field is included for informational
+            purposes, but it is not intended for communication as the email is
+            masked.
+          examples:
+            - bo***********@sinch.com
+          readOnly: true
+    ListBrandOrderResponse:
+      type: object
+      description: List of Brands response
+      properties:
+        orders:
+          description: List of brand orders
+          items:
+            $ref: '#/components/schemas/BrandOrderSummary'
+          type: array
+          readOnly: true
+        links:
+          description: Pagination links.
+          $ref: '#/components/schemas/Links'
+        meta:
+          description: Pagination metadata.
+          $ref: '#/components/schemas/PaginationMeta'
+    ListBrandResponse:
+      type: object
+      description: List of Brands response
+      properties:
+        brands:
+          description: List of brands
+          items:
+            $ref: '#/components/schemas/BasicBrand'
+          type: array
+          readOnly: true
+        links:
+          description: Pagination links.
+          $ref: '#/components/schemas/Links'
+        meta:
+          description: Pagination metadata.
+          $ref: '#/components/schemas/PaginationMeta'
+    PaginationMeta:
+      type: object
+      description: Pagination metadata for list responses.
+      properties:
+        totalCount:
+          description: >-
+            Total count of resources matching the provided search criteria. This
+            field cannot be null; an empty result will return 0.
+          format: int32
+          type: integer
+    Links:
+      type: object
+      description: Pagination links.
+      properties:
+        next:
+          description: >-
+            Link to the next page of results, following RFC 8288. Absence of
+            this link indicates the last page.
+          type: string
+          examples:
+            - >-
+              https://compliance.api.sinch.com/v1/projects/{projectId}/us/brands?pageToken=abc123
+    BasicBrand:
+      description: >-
+        Basic brand content used for listing brands matching the search
+        criteria.
+      type: object
+      properties:
+        brandId:
+          description: The unique identifier for the brand.
+          examples:
+            - '1234567890'
+          type: string
+          readOnly: true
+        displayName:
+          description: >-
+            The name of the brand. DisplayName must be unique per projectId and
+            marketCode (US)
+          examples:
+            - My End Customer Brand Name
+          type: string
+        status:
+          description: Brand status, it can be DRAFT, ACTIVE and ARCHIVED.
+          readOnly: true
+          allOf:
+            - $ref: '#/components/schemas/BrandStatus'
+        channels:
+          description: Channels available for this Brand
+          items:
+            $ref: '#/components/schemas/Channel'
+          type: array
+          readOnly: true
+        createTime:
+          description: The date and time when the brand was created.
+          examples:
+            - '2023-10-01T12:00:00Z'
+          type: string
+          format: date-time
+          readOnly: true
+        updateTime:
+          description: The date and time when the brand was updated.
+          examples:
+            - '2023-10-01T12:00:00Z'
+          type: string
+          format: date-time
+          readOnly: true
+    Brand:
+      description: The brand object that contains the brand details.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/BrandProperties'
+        - type: object
+          required:
+            - brandId
+            - displayName
+            - status
+            - contentProvider
+            - createTime
+            - updateTime
+          properties:
+            brandId:
+              description: The unique identifier for the brand.
+              examples:
+                - '1234567890'
+              type: string
+              readOnly: true
+            status:
+              description: Brand status, it can be DRAFT, ACTIVE and ARCHIVED.
+              $ref: '#/components/schemas/BrandStatus'
+            contentProvider:
+              type: boolean
+              description: >-
+                Indicates whether the brand is a Content Provider (true) or a
+                standard Brand (false). This choice determines the types of
+                orders that can be requested, as they follow different
+                registration processes and are available for different products.
+                It cannot be updated after the brand creation.
+              examples:
+                - true
+              readOnly: true
+            attachments:
+              description: Files attached to this brand
+              items:
+                $ref: '#/components/schemas/Attachment'
+              type: array
+              readOnly: true
+            logs:
+              description: Detailed history of the status changes this brand went through
+              items:
+                $ref: '#/components/schemas/BrandLog'
+              type: array
+              readOnly: true
+            channels:
+              description: Channels available for this Brand
+              items:
+                $ref: '#/components/schemas/Channel'
+              type: array
+              readOnly: true
+            createTime:
+              description: The date and time when the brand was created.
+              examples:
+                - '2023-10-01T12:00:00Z'
+              type: string
+              format: date-time
+              readOnly: true
+            updateTime:
+              description: The date and time when the brand was updated.
+              examples:
+                - '2023-10-01T12:00:00Z'
+              type: string
+              format: date-time
+              readOnly: true
+    BrandLog:
+      description: >-
+        A log entry for a brand, which contains details of the brand status
+        update or new channel added. It can contain information provided by the
+        agent handling the request.
+      properties:
+        createTime:
+          description: Create time of this log entry. ISO date time format in UTC.
+          examples:
+            - '2021-11-03T14:30:03Z'
+          type: string
+          format: date-time
+          readOnly: true
+        message:
+          description: >-
+            Optional message with details of the brand status update or new
+            channel added. It can contain information provided by the agent
+            handling the request.
+          examples:
+            - Please update the attachment connected to your request.
+          type: string
+        brandCurrentState:
+          description: State of the brand after this entry was created
+          $ref: '#/components/schemas/BrandStatus'
+          readOnly: true
+      type: object
+    BrandOrderLog:
+      description: >-
+        A log entry for a brand order, which contains details of the brand order
+        status update or new channel added. It can contain information provided
+        by the agent handling the request.
+      properties:
+        createTime:
+          description: Create time of this log entry. ISO date time format in UTC.
+          examples:
+            - '2021-11-03T14:30:03Z'
+          type: string
+          format: date-time
+          readOnly: true
+        message:
+          description: >-
+            Optional message with details of the brand status update or new
+            channel added. It can contain information provided by the agent
+            handling the request.
+          examples:
+            - Please update the attachment connected to your request.
+          type: string
+        brandCurrentState:
+          description: State of the order after this entry was created
+          $ref: '#/components/schemas/BrandOrderStatus'
+          readOnly: true
+        brandPreviousState:
+          description: State of the order before this entry was created
+          $ref: '#/components/schemas/BrandOrderStatus'
+          readOnly: true
+      type: object
+    BrandOrderSummary:
+      description: >-
+        Summary of a brand order, used for listing brand orders matching the
+        search criteria.
+      type: object
+      properties:
+        brandOrderId:
+          description: The unique identifier for the brand order.
+          examples:
+            - '212421442412'
+          type: string
+          readOnly: true
+        brandId:
+          description: Brand ID this Order belongs to.
+          examples:
+            - '3242343243243'
+          type: string
+          readOnly: true
+        status:
+          description: >-
+            Brand Order status. This field is useful to quickly check the status
+            of the order without having to call the Get Brand Order endpoint.
+          $ref: '#/components/schemas/BrandOrderStatus'
+          readOnly: true
+        metadataName:
+          description: >-
+            Metadata name of the brand order, which identifies the type of the
+            order and the process it follows. This field is useful to quickly
+            check the type of the order without having to call the Get Brand
+            Order endpoint.
+          $ref: '#/components/schemas/BrandOrderMetadata'
+          readOnly: true
+        createTime:
+          description: Create time of the request. ISO date time format in UTC.
+          examples:
+            - '2021-11-03T14:30:03Z'
+          type: string
+          readOnly: true
+          format: date-time
+        updateTime:
+          description: Update time of the request. ISO date time format in UTC.
+          examples:
+            - '2021-11-03T14:30:03Z'
+          type: string
+          readOnly: true
+          format: date-time
+    BrandOrderRequest:
+      description: A brand order request.
+      type: object
+      required:
+        - metadataName
+      properties:
+        metadataName:
+          description: >-
+            Metadata name of the brand order, which identifies the type of the
+            order and the process it follows. This field is useful to quickly
+            check the type of the order without having to call the Get Brand
+            Order endpoint.
+          $ref: '#/components/schemas/BrandOrderRequestMetadata'
+        callbackUrl:
+          description: >-
+            The URL to receive the order status update callback. The URL must be
+            a valid URL and must be reachable from Sinch.
+          examples:
+            - https://example.com/callback
+          type: string
+          format: uri
+    BrandOrderOtpRequest:
+      description: Request to send an OTP for Sole Proprietor orders.
+      type: object
+      required:
+        - otp
+      properties:
+        otp:
+          description: OTP code received in the mobilePhoneNumber.
+          examples:
+            - 27FUY2
+          type: string
+    BrandOrder:
+      description: A brand order created for a brand and a specific process metadata.
+      type: object
+      properties:
+        brandOrderId:
+          description: The unique identifier for the brand order.
+          examples:
+            - '212421442412'
+          type: string
+          readOnly: true
+        brandId:
+          description: Brand ID this Order belongs to.
+          examples:
+            - '3242343243243'
+          type: string
+          readOnly: true
+        status:
+          description: >-
+            Brand order status represents the current state of the brand order
+            in the system. When a brand order is created, it is in NEW status.
+            After that, it can be moved to PENDING status when the validation
+            process starts, then it can be moved to REJECTED or INCOMPLETE if
+            the validation process fails, or to COMPLETED if the validation
+            process is successful. When a brand order is in INCOMPLETE status,
+            customer can update the brand/brand order. Updating the brand order
+            moves the brand order to PENDING_REVIEW state, what means that is
+            waiting for another review after the customer changes. Finally, a
+            brand order can be moved to ARCHIVED status after a cancellation.
+          $ref: '#/components/schemas/BrandOrderStatus'
+          readOnly: true
+        metadataName:
+          description: >-
+            Metadata name of the brand order, which identifies the type of the
+            order and the process it follows. This field is useful to quickly
+            check the type of the order without having to call the Get Brand
+            Order endpoint.
+          $ref: '#/components/schemas/BrandOrderMetadata'
+          readOnly: true
+        logs:
+          description: Detailed history of the status changes this brand went through
+          items:
+            $ref: '#/components/schemas/BrandOrderLog'
+          type: array
+          readOnly: true
+        channels:
+          description: Channels available for this Brand Order
+          items:
+            $ref: '#/components/schemas/Channel'
+          type: array
+          readOnly: true
+        thirdPartyMetadata:
+          description: Third party metadata available for this Brand Order
+          items:
+            $ref: '#/components/schemas/ThirdPartyElement'
+          type: array
+          readOnly: true
+        pricing:
+          description: >-
+            Includes details of the fee associated with the process to be
+            carried out. For more information about pricing, you may consult
+            your Account Manager or the Sinch Customer Dashboard.
+          $ref: '#/components/schemas/Money'
+          readOnly: true
+        callbackUrl:
+          description: >-
+            The URL to receive the order status update callback. The URL must be
+            a valid URL and must be reachable from Sinch.
+          examples:
+            - https://example.com/callback
+          type: string
+          format: uri
+        createTime:
+          description: Create time of the request. ISO date time format in UTC.
+          examples:
+            - '2021-11-03T14:30:03Z'
+          type: string
+          readOnly: true
+          format: date-time
+        updateTime:
+          description: Update time of the request. ISO date time format in UTC.
+          examples:
+            - '2021-11-03T14:30:03Z'
+          type: string
+          readOnly: true
+          format: date-time
+    CloudEventBase:
+      description: >-
+        Base fields required by the CloudEvents spec v1.0
+        (https://cloudevents.io). All Sinch webhook payloads conform to this
+        structure.
+      type: object
+      required:
+        - specversion
+        - id
+        - source
+        - type
+        - time
+      properties:
+        specversion:
+          description: >-
+            The version of the CloudEvents specification which the event uses.
+            Always "1.0".
+          type: string
+          enum:
+            - '1.0'
+          x-enumDescriptions:
+            '1.0': CloudEvents specification version 1.0.
+          examples:
+            - '1.0'
+          readOnly: true
+        id:
+          description: >-
+            Unique identifier for the event within the scope of the source.
+            Clients MUST treat events with the same source+id as duplicates.
+          type: string
+          examples:
+            - ee34ccbf-919d-462f-8587-dec95a1b11ee
+          readOnly: true
+        source:
+          description: >-
+            URI-reference identifying the context in which the event occurred.
+            Combined with id, this MUST be globally unique per event.
+          type: string
+          format: uri
+          examples:
+            - >-
+              https://compliance.api.sinch.com/v1/projects/us/brand/212421442412/orders/dec95a1b11b0
+          readOnly: true
+        type:
+          description: >-
+            Reverse-DNS-prefixed event type string. The last component
+            identifies the event version (e.g.
+            com.sinch.registrations.brand.order.v1.BrandOrderStatusUpdate).
+          type: string
+          examples:
+            - com.sinch.registrations.brand.order.v1.BrandOrderStatusUpdate
+          readOnly: true
+        time:
+          description: >-
+            Timestamp of when the event was produced, in RFC-3339 format with
+            timezone.
+          type: string
+          format: date-time
+          examples:
+            - '2023-10-01T12:00:00Z'
+          readOnly: true
+    BrandOrderEventData:
+      description: >-
+        Business payload carried in the `data` property of a brand order
+        CloudEvent. Contains the brand order status update details that
+        triggered the event.
+      type: object
+      properties:
+        projectId:
+          description: The ID of the project to which the event belongs.
+          examples:
+            - aad4ccbf-919d-462f-8587-dec95a1b11b0
+          type: string
+          readOnly: true
+        resourceId:
+          description: Corresponds to the order id the event belongs to.
+          examples:
+            - aad4ccbf-919d-462f-8587-dec953242342
+          type: string
+          readOnly: true
+        resourceType:
+          description: The brand order type.
+          $ref: '#/components/schemas/BrandOrderMetadata'
+        status:
+          description: >-
+            Status of the brand order after the update that triggered the event.
+            This field is useful to quickly check the status of the order
+            without having to call the Get Brand Order endpoint.
+          $ref: '#/components/schemas/BrandOrderStatus'
+        comments:
+          description: >-
+            Comments related to the brand order status update. For instance, an
+            incomplete brand order status update can include the reason why the
+            brand order is incomplete, or the fields that must be updated.
+          examples:
+            - Brand Order is incomplete. Please update the address field.
+          type: string
+          readOnly: true
+    CallbackBrandOrderStatusUpdatedBody:
+      description: >-
+        CloudEvents v1.0 payload delivered by Sinch when a brand order status
+        changes. The envelope follows the CloudEvents structured content mode
+        with `Content-Type: application/json`.
+
+
+        The `type` field uses the reverse-DNS prefix
+        `com.sinch.registrations.brand.order.v1` and the event version is the
+        last component. The `data` property carries the brand-order-specific
+        payload.
+      type: object
+      allOf:
+        - $ref: '#/components/schemas/CloudEventBase'
+        - type: object
+          properties:
+            data:
+              description: >-
+                Brand order event payload. Contains the details of the brand
+                order status update that triggered the event.
+              allOf:
+                - $ref: '#/components/schemas/BrandOrderEventData'
+    Money:
+      description: Money amount with currency.
+      properties:
+        amount:
+          description: The amount of money.
+          type: string
+          examples:
+            - '25.00'
+        currencyCode:
+          description: The currency of the money amount, in ISO 4217 format.
+          type: string
+          examples:
+            - USD
+      type: object
+    ThirdPartyElement:
+      description: >-
+        Third party metadata element. This is used to include any additional
+        information that is required for the brand order process that is not
+        included in the standard fields. For instance, it can be used to include
+        the 10DLC brand ID when the import type is IMPORT_TCR_BRAND, or the US
+        Short Code Registry brand ID when the import type is IMPORT_GCH_BRAND.
+      properties:
+        name:
+          description: Third Party metadata property name.
+          type: string
+          examples:
+            - TCR_BRAND_ID
+            - gch_brand_id
+        value:
+          description: Third party metadata property value.
+          type: string
+          examples:
+            - '324234242342'
+      type: object
+    AttachmentInput:
+      description: >-
+        Attachment input when creating/updating a brand. Attachments can be
+        added by url or using the specified endpoint. Only the latest version of
+        each attachment type is kept per Brand.
+      type: object
+      properties:
+        fileName:
+          description: Human readable name of the attachment.
+          examples:
+            - sender_id_registration_form.docx
+          type: string
+        attachmentType:
+          description: Attachment type
+          $ref: '#/components/schemas/AttachmentType'
+        fileUrl:
+          description: File Url to be uploaded.
+          examples:
+            - https://www.files.com/myfile.png
+          type: string
+    Attachment:
+      description: >-
+        Attachment file linked to the brand. It can be added by url or using the
+        specified endpoint. Only the latest version of each attachment type is
+        kept per Brand.
+      type: object
+      properties:
+        attachmentId:
+          description: Unique identifier of the attachment.
+          examples:
+            - d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+          readOnly: true
+        fileName:
+          description: Human readable name of the attachment.
+          examples:
+            - sender_id_registration_form.docx
+          type: string
+        attachmentType:
+          description: Attachment type
+          $ref: '#/components/schemas/AttachmentType'
+        mimeType:
+          description: MIME type of the attachment file.
+          examples:
+            - application/pdf
+            - >-
+              application/vnd.openxmlformats-officedocument.wordprocessingml.document
+          type: string
+          readOnly: true
+        uploadStatus:
+          description: Status of the file uploaded
+          enum:
+            - COMPLETED
+            - WAITING
+            - FAILED
+          x-enumDescriptions:
+            COMPLETED: Attachment successfully uploaded and linked to the registration
+            WAITING: Attachment processing is still ongoing.
+            FAILED: Attachment uploading has failed for any reason.
+          examples:
+            - COMPLETED
+          type: string
+          readOnly: true
+        createTime:
+          description: Create time of the request. ISO date time format in UTC.
+          examples:
+            - '2021-11-03T14:30:03Z'
+          type: string
+          readOnly: true
+          format: date-time
+        updateTime:
+          description: Update time of the request. ISO date time format in UTC.
+          examples:
+            - '2021-11-03T14:30:03Z'
+          type: string
+          readOnly: true
+          format: date-time
+    AttachmentType:
+      description: Attachment type
+      enum:
+        - COMPANY_BANNER
+        - COMPANY_LOGO
+      x-enum-varnames:
+        - COMPANY_BANNER
+        - COMPANY_LOGO
+      x-enumDescriptions:
+        COMPANY_BANNER: Banner attachment
+        COMPANY_LOGO: Logo attachment
+      examples:
+        - COMPANY_BANNER
+      type: string
+    BrandStatus:
+      description: >-
+        Brand status represents the current state of the brand in the system. It
+        is determined by the status of the brand orders and the channels
+        assigned to the brand. The status can be DRAFT when the brand is being
+        created or updated, ACTIVE when the brand has at least one channel
+        assigned and it is ready to be used, or ARCHIVED when the brand has been
+        cancelled and it can not be used anymore.
+      enum:
+        - DRAFT
+        - ACTIVE
+        - ARCHIVED
+      x-enumDescriptions:
+        DRAFT: >-
+          The brand is in draft status. It can be updated and submitted for
+          validation.
+        ACTIVE: The brand has at least one channel assigned.
+        ARCHIVED: >-
+          The brand is archived after a cancellation. It can not be updated or
+          submitted for validation.
+      type: string
+      examples:
+        - ACTIVE
+        - DRAFT
+    BrandOrderStatus:
+      description: >-
+        Brand order status represents the current state of the brand order in
+        the system. When a brand order is created, it is in NEW status. After
+        that, it can be moved to PENDING status when the validation process
+        starts, then it can be moved to REJECTED or INCOMPLETE if the validation
+        process fails, or to COMPLETED if the validation process is successful.
+        When a brand order is in INCOMPLETE status, customer can update the
+        brand/brand order. Updating the brand order moves the brand order to
+        PENDING_REVIEW state, what means that is waiting for another review
+        after the customer changes. Finally, a brand order can be moved to
+        ARCHIVED status after a cancellation.
+      enum:
+        - NEW
+        - PENDING
+        - PENDING_REVIEW
+        - REJECTED
+        - INCOMPLETE
+        - COMPLETED
+        - ARCHIVED
+      x-enumDescriptions:
+        NEW: A new brand order created, not processed yet.
+        PENDING: The brand order info is under review.
+        PENDING_REVIEW: >-
+          When a brand order is in incomplete status, customer can update the
+          brand/brand order. Updating the brand order moves the brand order to
+          PENDING_REVIEW state, what means that is waiting for another review
+          after the customer changes.
+        REJECTED: The brand order has been rejected.
+        INCOMPLETE: >-
+          The brand order is incomplete. The customer can update the brand/brand
+          order to complete it.
+        COMPLETED: >-
+          The brand order validation has been completed and the brand order is
+          approved for integration against the channel specification.
+        ARCHIVED: >-
+          The brand order is archived after a cancellation. It can not be
+          updated or submitted for validation.
+      type: string
+      examples:
+        - INCOMPLETE
+    Channel:
+      description: >-
+        Channel represents the different channels that can be assigned to a
+        brand after completing a brand order. Each channel has different
+        requirements and it is assigned after completing a specific brand order
+        process.
+      enum:
+        - RCS
+        - SHORT_CODE
+        - TENDLC
+      x-enumDescriptions:
+        RCS: RCS Channel enables RCS traffic and it is provided by RCS.
+        SHORT_CODE: >-
+          The SHORT_CODE Channel enables Short Code traffic and it is provided
+          by the US Short Code Registry.
+        TENDLC: >-
+          Ten Digit Long Code (10DLC) channel enables Long Number traffic and it
+          is provided by 10DLC.
+      type: string
+      examples:
+        - RCS
+        - SHORT_CODE
+    BrandOrderRequestMetadata:
+      description: >-
+        These are the different processes the customers can request to add
+        different channels to the Brand.
+
+
+        **Note:** US_SC_REGISTRY is excluded — it is a legacy read-only process
+        and cannot be used for new orders. It may appear in existing brand order
+        responses.
+      enum:
+        - US_SC_GCH
+        - US_SC_GCH_CONTENT_PROVIDER
+        - US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION
+        - US_10DLC_TCR_PUBLIC_BRAND_REGISTRATION
+        - US_10DLC_TCR_PRIVATE_BRAND_UPDATE
+        - US_10DLC_TCR_PUBLIC_BRAND_UPDATE
+        - US_10DLC_TCR_PRIVATE_MOCK
+        - US_10DLC_TCR_PUBLIC_MOCK
+        - US_10DLC_TCR_SOLE_PROPRIETOR
+        - US_10DLC_TCR_PRIVATE_STANDARD_BRAND_REGISTRATION
+        - US_10DLC_TCR_PRIVATE_ENHANCED_BRAND_REGISTRATION
+        - US_10DLC_TCR_PUBLIC_STANDARD_BRAND_REGISTRATION
+        - US_10DLC_TCR_PUBLIC_ENHANCED_BRAND_REGISTRATION
+        - US_RCS_TCR_PRIVATE_BRAND_REGISTRATION
+        - US_RCS_TCR_PUBLIC_BRAND_REGISTRATION
+        - US_RCS_TCR_UPDATE_ASSETS
+      x-enumDescriptions:
+        US_SC_GCH: >-
+          Unified US Short Code verification process via the US Short Code
+          Registry. The specific process to be applied is automatically
+          determined by the brand's programType field: Standard → standard
+          process, Government → government process, Charitable Organization →
+          charity process, Political → political process. This process is free
+          of charge and, upon successful completion, the SHORT_CODE channel will
+          be granted to the brand.
+        US_SC_GCH_CONTENT_PROVIDER: >-
+          US Short Code verification process for Content Provider entities. This
+          process internally uses the US Short Code Registry and is free of
+          charge. Upon successful completion, the SHORT_CODE channel will be
+          granted to the content provider.
+        US_10DLC_TCR_SOLE_PROPRIETOR: >-
+          To register as a Sole Proprietor for 10-Digit Long Code (10DLC)
+          messaging via 10DLC, you can complete the registration process without
+          needing an Employer Identification Number (EIN). Upon initiating the
+          registration, a One-Time Password (OTP) will be automatically sent to
+          the provided mobile number for identity verification, which you must
+          subsequently submit using the endpoint
+          /v1/projects/{projectId}/us/brands/{brandId}/orders/{orderId}/verifyOtp
+          to successfully authorize and finalize the process.
+        US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION: >-
+          Simple brand registration with 10DLC for private companies to obtain
+          the 10DLC channel in the US. This process does not include vetting.
+          You will receive a TCR ID upon completion (approx. 1 minute). Provides
+          lower throughput and a maximum of 3 numbers. Once completed, this
+          process can be re-requested if any data needs to be modified (there
+          are some fields not allowed for edition: legalCompanyName, entityType,
+          federalTaxId and taxCountry). This process can be initiated again for
+          revetting the brand, in case that critical information needs to be
+          updated: entityType, legalCompanyName, federalTaxId or taxCountry. In
+          this case, the brand will go through the same process as a new
+          registration, with the same time of completion, but keeping the same
+          TCR ID and the history of previous registrations.
+        US_10DLC_TCR_PUBLIC_BRAND_REGISTRATION: >-
+          Simple brand registration with 10DLC for public companies to obtain
+          the 10DLC channel in the US. This process does not include vetting.
+          You will receive a TCR ID upon completion (approx. 1 minutes).
+          Provides lower throughput and a maximum of 3 numbers. Once completed,
+          this process can be re-requested if any data needs to be modified
+          (there are some fields not allowed for edition: legalCompanyName,
+          entityType, federalTaxId and taxCountry). This process can be
+          initiated again for revetting the brand, in case that critical
+          information needs to be updated: entityType, legalCompanyName,
+          federalTaxId or taxCountry. In this case, the brand will go through
+          the same process as a new registration, with the same time of
+          completion, but keeping the same TCR ID and the history of previous
+          registrations.
+        US_10DLC_TCR_PRIVATE_BRAND_UPDATE: >-
+          Brand data update process with 10DLC for private companies that
+          already have the 10DLC channel. This process is used to update any
+          brand data that needs to be modified after a successful registration,
+          except for critical information such as entityType, legalCompanyName,
+          federalTaxId or taxCountry. Cost: free. You will receive a
+          confirmation of the update upon completion (approx. 1 minute). This
+          process does not affect the TCR ID, the throughput or the number of
+          phone numbers allowed. Update process cannot be used after standard or
+          enhanced vetting, as the brand needs to be revetted in case of any
+          critical information update.
+        US_10DLC_TCR_PUBLIC_BRAND_UPDATE: >-
+          Brand data update process with 10DLC for public companies that already
+          have the 10DLC channel. This process is used to update any brand data
+          that needs to be modified after a successful registration, except for
+          critical information such as entityType, legalCompanyName,
+          federalTaxId or taxCountry. Cost: free. You will receive a
+          confirmation of the update upon completion (approx. 1 minute). This
+          process does not affect the TCR ID, the throughput or the number of
+          phone numbers allowed. Update process cannot be used after standard or
+          enhanced vetting, as the brand needs to be revetted in case of any
+          critical information update.
+        US_10DLC_TCR_PRIVATE_MOCK: >-
+          A free-of-charge mock process for private companies to test the 10DLC
+          integration. Successfully completing this process does not grant the
+          10DLC channel but serves as a preliminary check to ensure that
+          subsequent paid TCR registrations will be successful.
+        US_10DLC_TCR_PUBLIC_MOCK: >-
+          A free-of-charge mock process for public companies to test the 10DLC
+          integration. Successfully completing this process does not grant the
+          10DLC channel but serves as a preliminary check to ensure that
+          subsequent paid TCR registrations will be successful.
+        US_10DLC_TCR_PRIVATE_STANDARD_BRAND_REGISTRATION: >-
+          Initiates a standard brand registration with 10DLC for a private
+          company, which involves an automated review of compliance history,
+          employee count, and other business metrics. The process, which
+          typically takes 5-10 days, is used to verify the brand and assign a
+          vetting score from 0-100 that determines the brand's throughput level
+          with network carriers. A successful registration provides higher
+          throughput and allows for unlimited campaigns and numbers. Once
+          completed, this process can be re-requested if any data not included
+          in US_TCR_PATCH_BRAND needs to be modified. Once completed, this
+          process can be re-requested if any data needs to be modified (there
+          are some fields not allowed for edition: legalCompanyName, entityType,
+          federalTaxId and taxCountry)
+        US_10DLC_TCR_PUBLIC_STANDARD_BRAND_REGISTRATION: >-
+          Initiates a standard brand registration with 10DLC for a public
+          company, which involves an automated review of compliance history,
+          employee count, and other business metrics. The process, which
+          typically takes 5-10 days, is used to verify the brand and assign a
+          vetting score from 0-100 that determines the brand's throughput level
+          with network carriers. A successful registration provides higher
+          throughput and allows for unlimited campaigns and numbers. Once
+          completed, this process can be re-requested if any data needs to be
+          modified (there are some fields not allowed for edition:
+          legalCompanyName, entityType, federalTaxId and taxCountry)
+        US_10DLC_TCR_PRIVATE_ENHANCED_BRAND_REGISTRATION: >-
+          Initiates an enhanced brand registration for a private company, which
+          is recommended if you are dissatisfied with your Standard vet score
+          and believe a more thorough review could yield a higher rating. This
+          process is designed to improve the brand's vetting score and
+          potentially achieve better throughput. Please note that this enhanced
+          vet can only be ordered after a STANDARD registration is complete.
+        US_10DLC_TCR_PUBLIC_ENHANCED_BRAND_REGISTRATION: >-
+          Initiates an enhanced brand registration for a public company, which
+          is recommended if you are dissatisfied with your Standard vet score
+          and believe a more thorough review could yield a higher rating. This
+          process is designed to improve the brand's vetting score and
+          potentially achieve better throughput. Please note that this enhanced
+          vet can only be ordered after a STANDARD registration is complete.
+        US_RCS_TCR_PRIVATE_BRAND_REGISTRATION: >-
+          US RCS brand registration process with RCS for private companies. This
+          process is used to verify a private brand for RCS in the US. Upon
+          successful completion, the RCS channel will be granted to the brand.
+        US_RCS_TCR_PUBLIC_BRAND_REGISTRATION: >-
+          US RCS brand registration process with RCS for public companies. This
+          process is used to verify a public brand for RCS in the US. Upon
+          successful completion, the RCS channel will be granted to the brand.
+        US_RCS_TCR_UPDATE_ASSETS: >-
+          US RCS asset update process with RCS. This process is used to update
+          the brand assets required for RCS, such as logos or banners, after the
+          brand has already been registered.
+      type: string
+      examples:
+        - US_SC_GCH
+        - US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION
+        - US_RCS_TCR_PRIVATE_BRAND_REGISTRATION
+    BrandOrderMetadata:
+      description: >-
+        These are the different processes the customers can request to add
+        different channels to the Brand.
+
+
+        **Note:** US_SC_REGISTRY is only used to retrieve existing brand orders.
+        It cannot be used for new ones.
+      enum:
+        - US_SC_REGISTRY
+        - US_SC_GCH
+        - US_SC_GCH_CONTENT_PROVIDER
+        - US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION
+        - US_10DLC_TCR_PUBLIC_BRAND_REGISTRATION
+        - US_10DLC_TCR_PRIVATE_BRAND_UPDATE
+        - US_10DLC_TCR_PUBLIC_BRAND_UPDATE
+        - US_10DLC_TCR_PRIVATE_MOCK
+        - US_10DLC_TCR_PUBLIC_MOCK
+        - US_10DLC_TCR_SOLE_PROPRIETOR
+        - US_10DLC_TCR_PRIVATE_STANDARD_BRAND_REGISTRATION
+        - US_10DLC_TCR_PRIVATE_ENHANCED_BRAND_REGISTRATION
+        - US_10DLC_TCR_PUBLIC_STANDARD_BRAND_REGISTRATION
+        - US_10DLC_TCR_PUBLIC_ENHANCED_BRAND_REGISTRATION
+        - US_RCS_TCR_PRIVATE_BRAND_REGISTRATION
+        - US_RCS_TCR_PUBLIC_BRAND_REGISTRATION
+        - US_RCS_TCR_UPDATE_ASSETS
+      x-enumDescriptions:
+        US_SC_REGISTRY: >-
+          For US Short Code brand verification. This is a legacy manual process
+          that is now disabled and read-only. New registrations are not possible
+          through this process. For new Short Code registrations, please use
+          US_SC_GCH.
+        US_SC_GCH: >-
+          Unified US Short Code verification process via the US Short Code
+          Registry. The specific process to be applied is automatically
+          determined by the brand's programType field: Standard → standard
+          process, Government → government process, Charitable Organization →
+          charity process, Political → political process. This process is free
+          of charge and, upon successful completion, the SHORT_CODE channel will
+          be granted to the brand.
+        US_SC_GCH_CONTENT_PROVIDER: >-
+          US Short Code verification process for Content Provider entities. This
+          process internally uses the US Short Code Registry and is free of
+          charge. Upon successful completion, the SHORT_CODE channel will be
+          granted to the content provider.
+        US_10DLC_TCR_SOLE_PROPRIETOR: >-
+          To register as a Sole Proprietor for 10-Digit Long Code (10DLC)
+          messaging via 10DLC, you can complete the registration process without
+          needing an Employer Identification Number (EIN). Upon initiating the
+          registration, a One-Time Password (OTP) will be automatically sent to
+          the provided mobile number for identity verification, which you must
+          subsequently submit using the endpoint
+          /v1/projects/{projectId}/us/brands/{brandId}/orders/{orderId}/verifyOtp
+          to successfully authorize and finalize the process.
+        US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION: >-
+          Simple brand registration with 10DLC for private companies to obtain
+          the 10DLC channel in the US. This process does not include vetting.
+          You will receive a TCR ID upon completion (approx. 1 minute). Provides
+          lower throughput and a maximum of 3 numbers. Once completed, this
+          process can be re-requested if any data needs to be modified (there
+          are some fields not allowed for edition: legalCompanyName, entityType,
+          federalTaxId and taxCountry). This process can be initiated again for
+          revetting the brand, in case that critical information needs to be
+          updated: entityType, legalCompanyName, federalTaxId or taxCountry. In
+          this case, the brand will go through the same process as a new
+          registration, with the same time of completion, but keeping the same
+          TCR ID and the history of previous registrations.
+        US_10DLC_TCR_PUBLIC_BRAND_REGISTRATION: >-
+          Simple brand registration with 10DLC for public companies to obtain
+          the 10DLC channel in the US. This process does not include vetting.
+          You will receive a TCR ID upon completion (approx. 1 minutes).
+          Provides lower throughput and a maximum of 3 numbers. Once completed,
+          this process can be re-requested if any data needs to be modified
+          (there are some fields not allowed for edition: legalCompanyName,
+          entityType, federalTaxId and taxCountry). This process can be
+          initiated again for revetting the brand, in case that critical
+          information needs to be updated: entityType, legalCompanyName,
+          federalTaxId or taxCountry. In this case, the brand will go through
+          the same process as a new registration, with the same time of
+          completion, but keeping the same TCR ID and the history of previous
+          registrations.
+        US_10DLC_TCR_PRIVATE_BRAND_UPDATE: >-
+          Brand data update process with 10DLC for private companies that
+          already have the 10DLC channel. This process is used to update any
+          brand data that needs to be modified after a successful registration,
+          except for critical information such as entityType, legalCompanyName,
+          federalTaxId or taxCountry. Cost: free. You will receive a
+          confirmation of the update upon completion (approx. 1 minute). This
+          process does not affect the TCR ID, the throughput or the number of
+          phone numbers allowed. Update process cannot be used after standard or
+          enhanced vetting, as the brand needs to be revetted in case of any
+          critical information update.
+        US_10DLC_TCR_PUBLIC_BRAND_UPDATE: >-
+          Brand data update process with 10DLC for public companies that already
+          have the 10DLC channel. This process is used to update any brand data
+          that needs to be modified after a successful registration, except for
+          critical information such as entityType, legalCompanyName,
+          federalTaxId or taxCountry. Cost: free. You will receive a
+          confirmation of the update upon completion (approx. 1 minute). This
+          process does not affect the TCR ID, the throughput or the number of
+          phone numbers allowed. Update process cannot be used after standard or
+          enhanced vetting, as the brand needs to be revetted in case of any
+          critical information update.
+        US_10DLC_TCR_PRIVATE_MOCK: >-
+          A free-of-charge mock process for private companies to test the 10DLC
+          integration. Successfully completing this process does not grant the
+          10DLC channel but serves as a preliminary check to ensure that
+          subsequent paid TCR registrations will be successful.
+        US_10DLC_TCR_PUBLIC_MOCK: >-
+          A free-of-charge mock process for public companies to test the 10DLC
+          integration. Successfully completing this process does not grant the
+          10DLC channel but serves as a preliminary check to ensure that
+          subsequent paid TCR registrations will be successful.
+        US_10DLC_TCR_PRIVATE_STANDARD_BRAND_REGISTRATION: >-
+          Initiates a standard brand registration with 10DLC for a private
+          company, which involves an automated review of compliance history,
+          employee count, and other business metrics. The process, which
+          typically takes 5-10 days, is used to verify the brand and assign a
+          vetting score from 0-100 that determines the brand's throughput level
+          with network carriers. A successful registration provides higher
+          throughput and allows for unlimited campaigns and numbers. Once
+          completed, this process can be re-requested if any data not included
+          in US_TCR_PATCH_BRAND needs to be modified. Once completed, this
+          process can be re-requested if any data needs to be modified (there
+          are some fields not allowed for edition: legalCompanyName, entityType,
+          federalTaxId and taxCountry)
+        US_10DLC_TCR_PUBLIC_STANDARD_BRAND_REGISTRATION: >-
+          Initiates a standard brand registration with 10DLC for a public
+          company, which involves an automated review of compliance history,
+          employee count, and other business metrics. The process, which
+          typically takes 5-10 days, is used to verify the brand and assign a
+          vetting score from 0-100 that determines the brand's throughput level
+          with network carriers. A successful registration provides higher
+          throughput and allows for unlimited campaigns and numbers. Once
+          completed, this process can be re-requested if any data needs to be
+          modified (there are some fields not allowed for edition:
+          legalCompanyName, entityType, federalTaxId and taxCountry)
+        US_10DLC_TCR_PRIVATE_ENHANCED_BRAND_REGISTRATION: >-
+          Initiates an enhanced brand registration for a private company, which
+          is recommended if you are dissatisfied with your Standard vet score
+          and believe a more thorough review could yield a higher rating. This
+          process is designed to improve the brand's vetting score and
+          potentially achieve better throughput. Please note that this enhanced
+          vet can only be ordered after a STANDARD registration is complete.
+        US_10DLC_TCR_PUBLIC_ENHANCED_BRAND_REGISTRATION: >-
+          Initiates an enhanced brand registration for a public company, which
+          is recommended if you are dissatisfied with your Standard vet score
+          and believe a more thorough review could yield a higher rating. This
+          process is designed to improve the brand's vetting score and
+          potentially achieve better throughput. Please note that this enhanced
+          vet can only be ordered after a STANDARD registration is complete.
+        US_RCS_TCR_PRIVATE_BRAND_REGISTRATION: >-
+          US RCS brand registration process with RCS for private companies. This
+          process is used to verify a private brand for RCS in the US. Upon
+          successful completion, the RCS channel will be granted to the brand.
+        US_RCS_TCR_PUBLIC_BRAND_REGISTRATION: >-
+          US RCS brand registration process with RCS for public companies. This
+          process is used to verify a public brand for RCS in the US. Upon
+          successful completion, the RCS channel will be granted to the brand.
+        US_RCS_TCR_UPDATE_ASSETS: >-
+          US RCS asset update process with RCS. This process is used to update
+          the brand assets required for RCS, such as logos or banners, after the
+          brand has already been registered.
+      type: string
+      examples:
+        - US_SC_REGISTRY
+        - US_SC_GCH
+        - US_10DLC_TCR_PRIVATE_BRAND_REGISTRATION
+        - US_RCS_TCR_PRIVATE_BRAND_REGISTRATION
+    CallbackConfigResponse:
+      description: >-
+        Response body for the GET Callback Configuration endpoint. The HMAC
+        secret is masked — only the last 6 characters are shown.
+      type: object
+      properties:
+        projectId:
+          description: Project ID this callback configuration belongs to.
+          type: string
+          readOnly: true
+        hmacSecretMask:
+          description: >-
+            Masked representation of the HMAC secret. Only the last 6 characters
+            are visible
+
+            (e.g. `••••••1b11ee`). To see the full secret, rotate it via
+
+            `POST /v1/projects/{projectId}/callbackConfig/rotate` or set a new
+            one via `PATCH`.
+          type: string
+          readOnly: true
+          examples:
+            - ••••••1b11ee
+    CallbackConfigSecretResponse:
+      description: >-
+        Response body returned once after setting or rotating the HMAC secret.
+        The full secret is
+
+        included here and will not be returned again in plain text. Store it
+        securely immediately.
+      type: object
+      properties:
+        projectId:
+          description: Project ID this callback configuration belongs to.
+          type: string
+          readOnly: true
+        hmacSecret:
+          description: >-
+            The full HMAC secret for webhook signature verification. Returned
+            only once — on creation or rotation.
+          type: string
+          format: password
+          readOnly: true
+          examples:
+            - d1c7ccbf-919d-462f-8587-dec95a1b11ee
+    CallbackConfigUpdateBody:
+      description: Request body for the Update Callback Configuration endpoint.
+      properties:
+        hmacSecret:
+          description: The HMAC secret to be updated for the specified project
+          examples:
+            - d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+          format: password
+      type: object
+    RestError:
+      description: >-
+        Standard error response body for the Sinch Compliance API. It follows
+        the RFC 7807 specification for problem details. The body contains either
+        an `errors` list with structured field-level details or a `detail` field
+        with a plain text explanation.
+      type: object
+      required:
+        - type
+        - title
+      properties:
+        type:
+          description: >-
+            A URI reference that identifies the problem type. This URI reference
+            should provide a human-readable explanation of the problem type when
+            dereferenced.
+          type: string
+          format: uri
+          examples:
+            - https://developers.sinch.com/docs/errors/registry/validation-error
+        title:
+          description: >-
+            A short, human-readable summary of the problem type. It should not
+            change from occurrence to occurrence of the problem, except for
+            localization purposes.
+          type: string
+          examples:
+            - Validation Error
+      oneOf:
+        - description: >-
+            Response with a list of structured error details, each pointing to a
+            specific field.
+          properties:
+            errors:
+              description: >-
+                Detailed information about the error. This field can contain
+                multiple error details to provide more context about the error
+                that occurred.
+              type: array
+              items:
+                $ref: '#/components/schemas/InternalRestError'
+        - description: Response with a plain text explanation of the error.
+          properties:
+            detail:
+              description: A human-readable explanation of the error that occurred.
+              type: string
+              examples:
+                - Project not found
+    InternalRestError:
+      description: >-
+        Detailed information about a specific error that occurred during the
+        processing of a request. This is used in the `errors` field of the
+        `RestError` schema to provide more granular information about the error.
+      properties:
+        pointer:
+          description: JSON pointer to the field that caused the error, following RFC 6901.
+          type: string
+          examples:
+            - /brandName
+            - /entityType
+        detail:
+          description: >-
+            A human-readable explanation specific to this occurrence of the
+            problem. Like title, this field is not intended for end users, but
+            rather for developers to understand the details of the error that
+            occurred.
+          type: string
+          examples:
+            - Brand Name already exists for this brand type
+      type: object
+  responses:
+    Unauthorized:
+      description: 'UNAUTHENTICATED: Missing or invalid authentication credentials.'
+      headers:
+        WWW-Authenticate:
+          description: Authentication challenge per RFC 7235.
+          schema:
+            type: string
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+    Forbidden:
+      description: >-
+        PERMISSION_DENIED: The authenticated user does not have permission to
+        perform this operation.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+    TooManyRequests:
+      description: >-
+        RESOURCE_EXHAUSTED: Too many requests. The client has exceeded the rate
+        limit.
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+  securitySchemes:
+    OAuth2:
+      description: >-
+        The username and password are your Key ID and Key Secret from the Access
+        keys section in the Sinch Customer Dashboard. Exchange these for a
+        bearer token (access token).
+      flows:
+        clientCredentials:
+          scopes:
+            read: read
+            write: write
+          tokenUrl: https://auth.sinch.com/oauth2/token
+      type: oauth2
+    hmacAuth:
+      type: apiKey
+      in: header
+      name: X-Sinch-Signature
+      description: >-
+        HMAC-SHA256 signature used to authenticate webhook deliveries. The
+        signature is computed over the request body using the project's HMAC
+        secret and sent in the X-Sinch-Signature header. Please refer to the
+        Brand Callback endpoints for more information.
+servers:
+  - description: Production server. Data processed and stored within Europe.
+    url: https://compliance.api.sinch.com
+tags:
+  - description: Create and manage Customer Brands
+    name: brands
+    x-displayName: Brands
+  - description: Create and manage Customer Brand Orders
+    name: orders
+    x-displayName: Orders
+  - description: Brand Webhook events.
+    name: brand-webhooks-delivery
+    x-displayName: Brand Webhooks
+  - description: >-
+      You can set up callback URLs to receive event notifications when your
+      brand status is updated.
+
+      When delivering events the order is not guaranteed (for example, a failed
+      event scheduled for retry will not block other events that were queued).
+
+      The client's callback handler must implement the state machine that can
+      decide what to do with unexpected events, for example, "old" events or
+      invalid state transitions. In these cases the handler could use the API to
+      GET the latest state for the resource.
+
+      The callback handler is expected to "ingest" the event and respond with
+      200 OK. The domain-specific business logic and processes should be
+      executed outside of the callback request, as internal asynchronous jobs.
+
+      An HMAC encrypted secret is used for hashing the payload and sending the
+      hashed String via the X-Sinch-Signature header - that you can use to
+      validate that an incoming request is secure. Hmac secret value can be
+      checked with GET endpoint, and it can be updated with PUT endpoint
+    name: brand-callbacks
+    x-displayName: Brand Callbacks
+x-explorer-enabled: false
+x-samples-languages:
+  - curl
+  - java
+  - csharp
+  - node
+  - php

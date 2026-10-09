@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-manage-conference-participant-request-schema.json",
+  "title": "manageConferenceParticipantRequest",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-voice-api-openapi.yml#/components/schemas/manageConferenceParticipantRequest",
+  "type": "object",
+  "required": [
+    "command"
+  ],
+  "properties": {
+    "command": {
+      "type": "string",
+      "description": "Action to apply on conference participant.",
+      "x-enumDescriptions": {
+        "mute": "Mutes participant.",
+        "unmute": "Unmutes participant.",
+        "onhold": "Puts participant on hold.",
+        "resume": "Returns participant to conference."
+      },
+      "enum": [
+        "mute",
+        "unmute",
+        "onhold",
+        "resume"
+      ]
+    },
+    "moh": {
+      "description": "Means \"music on hold\". If this optional parameter is included, plays music to the first participant in a conference while they're alone and waiting for other participants to join. If `moh` isn't specified, the user will only hear silence while alone in the conference. This property is only available to use with the `onhold` command.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/musicOnHold"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "musicOnHold": {
+      "type": "string",
+      "description": "Available Music On Hold values",
+      "x-enumDescriptions": {
+        "ring": "Plays a progress tone.",
+        "music1": "Plays music choice 1.",
+        "music2": "Plays music choice 2.",
+        "music3": "Plays music choice 3."
+      },
+      "enum": [
+        "ring",
+        "music1",
+        "music2",
+        "music3"
+      ]
+    }
+  }
+}

@@ -1,0 +1,2597 @@
+openapi: 3.2.0
+info:
+  title: Provisioning WhatsApp Accounts API
+  description: The WhatsApp accounts endpoint lets you create and update WhatsApp accounts as well as get account activity and leave comments.
+  version: 1.2.117
+servers:
+- url: https://provisioning.api.sinch.com
+  description: Production server
+security:
+- BasicAuth: []
+  BearerAuth: []
+  OAuth2Production: []
+tags:
+- name: WhatsApp Accounts
+  description: The WhatsApp accounts endpoint lets you create and update WhatsApp accounts as well as get account activity and leave comments.
+paths:
+  /v1/projects/{projectId}/whatsapp:
+    get:
+      description: Returns an account for a project.
+      operationId: WhatsappAccountsController_getAccount_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappAccountDto'
+              examples:
+                response:
+                  summary: Get response
+                  description: "\n    Response with an account.\n    "
+                  value:
+                    state: ONBOARDED
+                    isEmbeddedSignup: false
+                    businessManager: SINCH_UK
+                    wabaId: '1234567890'
+                    details:
+                      companyLegalName: Legal name of company
+                      wabaName: Legal name of company
+                      clientBusinessManagerId: '1234567890'
+                    wabaMaxPriceOnboarded: false
+                    wabaEnabledForInsights: false
+                    wabaEnabledForDirectSend: false
+                    compatibleRegions:
+                    - eu
+                    - us
+                    currency: EUR
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                account_not_found-0:
+                  summary: AccountNotFoundError
+                  value:
+                    errorCode: account_not_found
+                    message: Account not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                account_data_is_corrupt-0:
+                  summary: AccountDataIsCorruptError
+                  value:
+                    errorCode: account_data_is_corrupt
+                    message: Account data is corrupt.
+                    resolution: Please contact support.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get account for project
+      tags:
+      - WhatsApp Accounts
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+    post:
+      callbacks:
+        Comment:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Comment on account
+              description: "\n        Received when a comment has been added to the account.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event in this case `WHATSAPP_ACCOUNT_COMMENT_ADDED`.
+                          type: string
+                        payload:
+                          description: Account at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/WhatsappAccountDto'
+                        comment:
+                          description: Comment for account.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                      - comment
+                    example:
+                      type: WHATSAPP_ACCOUNT_COMMENT_ADDED
+                      payload:
+                        state: ONBOARDED
+                        isEmbeddedSignup: false
+                        businessManager: SINCH_UK
+                        wabaId: '1234567890'
+                        details:
+                          companyLegalName: Legal name of company
+                          wabaName: Legal name of company
+                          clientBusinessManagerId: '1234567890'
+                        wabaMaxPriceOnboarded: false
+                        wabaEnabledForInsights: false
+                        wabaEnabledForDirectSend: false
+                        compatibleRegions:
+                        - eu
+                        - us
+                        currency: EUR
+                      comment: Example comment
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+        Onboard:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Account onboarded
+              description: "\n        Received when an Account is onboarded.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event in this case `WHATSAPP_ACCOUNT_ONBOARDED`.
+                          type: string
+                        payload:
+                          description: Account at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/WhatsappAccountDto'
+                        comment:
+                          description: Comment for account.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                    example:
+                      type: WHATSAPP_ACCOUNT_ONBOARDED
+                      payload:
+                        state: ONBOARDED
+                        isEmbeddedSignup: false
+                        businessManager: SINCH_UK
+                        wabaId: '1234567890'
+                        details:
+                          companyLegalName: Legal name of company
+                          wabaName: Legal name of company
+                          clientBusinessManagerId: '1234567890'
+                        wabaMaxPriceOnboarded: false
+                        wabaEnabledForInsights: false
+                        wabaEnabledForDirectSend: false
+                        compatibleRegions:
+                        - eu
+                        - us
+                        currency: EUR
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+        Rejected:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Account rejected
+              description: "\n        Received when an Account is rejected.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event in this case `WHATSAPP_ACCOUNT_REJECTED`.
+                          type: string
+                        payload:
+                          description: Account at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/WhatsappAccountDto'
+                        comment:
+                          description: Comment for account.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                    example:
+                      type: WHATSAPP_ACCOUNT_REJECTED
+                      payload:
+                        isEmbeddedSignup: false
+                        businessManager: SINCH_UK
+                        wabaId: '1234567890'
+                        changes:
+                          status: REJECTED
+                          details:
+                            companyLegalName: Legal name of company
+                            wabaName: Legal name of company
+                            clientBusinessManagerId: '1234567890'
+                        wabaMaxPriceOnboarded: false
+                        compatibleRegions:
+                        - eu
+                        - us
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+        PendingVerification:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Account pending verification
+              description: "\n        Received when an Account is in pending verification.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event in this case `WHATSAPP_ACCOUNT_PENDING_VERIFICATION`.
+                          type: string
+                        payload:
+                          description: Account at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/WhatsappAccountDto'
+                        comment:
+                          description: Comment for account.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                    example:
+                      type: WHATSAPP_ACCOUNT_PENDING_VERIFICATION
+                      payload:
+                        isEmbeddedSignup: false
+                        businessManager: SINCH_UK
+                        wabaId: '1234567890'
+                        changes:
+                          status: PENDING_FACEBOOK_VERIFICATION
+                          details:
+                            companyLegalName: Legal name of company
+                            wabaName: Legal name of company
+                            clientBusinessManagerId: '1234567890'
+                        wabaMaxPriceOnboarded: false
+                        compatibleRegions:
+                        - eu
+                        - us
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+        BusinessDailyLimitChanged:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Account daily limit changed
+              description: "\n        Received when Account daily limit has been changed by Meta.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event in this case `WHATSAPP_ACCOUNT_DAILY_LIMIT_CHANGED`.
+                          type: string
+                        payload:
+                          description: Account at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/WhatsappAccountDto'
+                        comment:
+                          description: Comment for account.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                    example:
+                      type: WHATSAPP_ACCOUNT_DAILY_LIMIT_CHANGED
+                      payload:
+                        state: ONBOARDED
+                        isEmbeddedSignup: false
+                        businessManager: SINCH_BR
+                        wabaId: '1234567890'
+                        details:
+                          companyLegalName: Legal name of company
+                          wabaName: Legal name of company
+                          clientBusinessManagerId: '1234567890'
+                        wabaMaxPriceOnboarded: false
+                        wabaEnabledForInsights: true
+                        wabaEnabledForDirectSend: false
+                        compatibleRegions:
+                        - br
+                        primaryBusinessLocation: BR
+                        currency: EUR
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+        WabaInformationChanged:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: Account business information changed
+              description: "\n        Received when Account has some of its business information changed by Meta.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event in this case `WHATSAPP_WABA_ACCOUNT_CHANGED`.
+                          type: string
+                        payload:
+                          description: Account at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/WhatsappAccountDto'
+                        comment:
+                          description: Comment for account.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                    example:
+                      type: WHATSAPP_WABA_ACCOUNT_CHANGED
+                      payload:
+                        state: ONBOARDED
+                        isEmbeddedSignup: false
+                        businessManager: SINCH_BR
+                        wabaId: '1234567890'
+                        details:
+                          companyLegalName: Legal name of company
+                          wabaName: Legal name of company
+                          clientBusinessManagerId: '1234567890'
+                        wabaMaxPriceOnboarded: false
+                        wabaEnabledForInsights: true
+                        wabaEnabledForDirectSend: false
+                        compatibleRegions:
+                        - br
+                        primaryBusinessLocation: BR
+                        currency: EUR
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+      description: Create the WhatsApp account for the project. Each project can only have one account.
+      operationId: WhatsappAccountsController_createAccount_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Account data
+        content:
+          application/json:
+            schema:
+              oneOf:
+              - $ref: '#/components/schemas/WhatsappInputAccountPartnerInitiatedDto'
+              - $ref: '#/components/schemas/WhatsappInputAccountDtoDeprecated'
+            examples:
+              input:
+                summary: Body request
+                description: "\n    Example body request to create an account.\n      "
+                value:
+                  companyLegalName: Legal name of company
+                  clientBusinessManagerId: '1234567890'
+              partnerInitiated:
+                summary: Body request - Partner Initiated
+                description: "\n    Example body request to create a partner-initiated account.\n      "
+                value:
+                  clientBusinessManagerId: '1234567890'
+                  businessManager: SINCH_UK
+                  wabaName: Legal name of company
+                  senderDetails:
+                    displayName: My Sender Name
+                    businessCategory: OTC_DRUGS
+                    region: EU
+                    metaLocalStorage: BH
+      responses:
+        '201':
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappAccountDto'
+              examples:
+                pending:
+                  summary: Create response
+                  description: "\n    Response when successfully creating an account.\n    "
+                  value:
+                    isEmbeddedSignup: false
+                    businessManager: SINCH_UK
+                    wabaId: '1234567890'
+                    changes:
+                      status: IN_PROGRESS
+                      details:
+                        companyLegalName: Legal name of company
+                        wabaName: Legal name of company
+                        clientBusinessManagerId: '1234567890'
+                    wabaMaxPriceOnboarded: false
+                    compatibleRegions:
+                    - eu
+                    - us
+                onboarded:
+                  summary: Create response
+                  description: "\n    Response when successfully created an account.\n    "
+                  value:
+                    state: ONBOARDED
+                    isEmbeddedSignup: false
+                    businessManager: SINCH_UK
+                    wabaId: '1234567890'
+                    details:
+                      companyLegalName: Legal name of company
+                      wabaName: Legal name of company
+                      clientBusinessManagerId: '1234567890'
+                    wabaMaxPriceOnboarded: false
+                    wabaEnabledForInsights: false
+                    wabaEnabledForDirectSend: false
+                    compatibleRegions:
+                    - eu
+                    - us
+                    currency: EUR
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                invalid_input-0:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - companyLegalName must be a string
+                invalid_business_manager_for_environment-1:
+                  summary: InvalidBusinessManagerForEnvironmentError
+                  value:
+                    errorCode: invalid_business_manager_for_environment
+                    message: Invalid business manager for environment.
+                    resolution: Verify that business manager is valid for environment. Allowed business managers for environment SINCH_AMERICA, SINCH_UK.
+                invalid_payload-2:
+                  summary: InvalidPayloadError
+                  value:
+                    errorCode: invalid_payload
+                    message: Invalid payload.
+                    resolution: Correct payload and submit again.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_found-0:
+                  summary: ProjectNotFoundError
+                  value:
+                    errorCode: project_not_found
+                    message: Project not found.
+                    resolution: Verify that the projectId is correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                account_exists-0:
+                  summary: AccountExistsError
+                  value:
+                    errorCode: account_exists
+                    message: Account already exists.
+                    resolution: There can only be one WhatsApp account for each project. Choose another one project to create a new WhatsApp account.
+                account_data_is_corrupt-1:
+                  summary: AccountDataIsCorruptError
+                  value:
+                    errorCode: account_data_is_corrupt
+                    message: Account data is corrupt.
+                    resolution: Please contact support.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Create account for project
+      tags:
+      - WhatsApp Accounts
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+    delete:
+      description: 'Deletes the account for a project.
+
+
+        Deleting an account is only possible if there is no sender assigned to the account.'
+      operationId: WhatsappAccountsController_deleteAccount_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Account deleted
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for WhatsApp.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for WhatsApp.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                account_has_senders-0:
+                  summary: AccountHasSendersError
+                  value:
+                    errorCode: account_has_senders
+                    message: Account has senders.
+                    resolution: Delete senders before deleting the account.
+                    additionalInformation:
+                      projectId: 6a13764f-97ab-4584-b7f2-4b2d11a0ce59
+                      senderIds:
+                      - 437f8791-69ec-42af-9271-59b86b80178d
+                      - 62550a35-2307-4ff1-86e4-41b0cbc7b7cb
+                account_has_sender_changes-1:
+                  summary: AccountHasSenderChangesError
+                  value:
+                    errorCode: account_has_sender_changes
+                    message: Account has pending sender changes.
+                    resolution: All sender changes must be resolved before deleting the account. If the error persists, please contact support.
+                    additionalInformation:
+                      projectId: 6a13764f-97ab-4584-b7f2-4b2d11a0ce59
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                template_could_not_delete_drafts-0:
+                  summary: TemplateCouldNotDeleteDraftsError
+                  value:
+                    errorCode: template_could_not_delete_drafts
+                    message: Couldn't delete template drafts.
+                    resolution: Please try again later, if the error persists, please contact support.
+                internal_error-1:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Delete account for project
+      tags:
+      - WhatsApp Accounts
+      x-badges:
+      - name: Closed Beta
+        position: after
+        color: red
+    patch:
+      description: 'Update an account.
+
+
+        It is only possible to update an account that has been rejected. After update the status will be set to `IN_PROGRESS`.'
+      operationId: WhatsappAccountsController_updateAccount_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Supported account fields to update.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhatsappInputUpdateAccountDto'
+            examples:
+              input:
+                summary: Body request
+                description: "\n      Example body request to update an account.\n      "
+                value:
+                  companyLegalName: Updated legal name of company
+                  wabaName: Updated legal name of company
+                  clientBusinessManagerId: '1234567890'
+              partnerInitiated:
+                summary: Body request - Partner Initiated
+                description: "\n      Example body request to update an account using Partner Initiated flow.\n      "
+                value:
+                  companyLegalName: Updated legal name of company
+                  wabaName: Updated legal name of company
+                  clientBusinessManagerId: '1234567890'
+                  senderDetails:
+                    displayName: Updated display name
+                    businessCategory: NON_PROFIT
+                    region: BR
+                    metaLocalStorage: AE
+      responses:
+        '200':
+          description: Account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappAccountDto'
+              examples:
+                response:
+                  summary: Update response
+                  description: "\n    Response when successfully update an account.\n    "
+                  value:
+                    state: REJECTED
+                    isEmbeddedSignup: false
+                    businessManager: SINCH_UK
+                    wabaId: '1234567890'
+                    changes:
+                      status: IN_PROGRESS
+                      details:
+                        companyLegalName: Update legal name of company
+                        wabaName: Legal name of company
+                        clientBusinessManagerId: '1234567890'
+                    details:
+                      companyLegalName: Legal name of company
+                      wabaName: Legal name of company
+                      clientBusinessManagerId: '1234567890'
+                    wabaMaxPriceOnboarded: false
+                    wabaEnabledForInsights: true
+                    wabaEnabledForDirectSend: false
+                    compatibleRegions:
+                    - eu
+                    - us
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                invalid_input-0:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - wabaName must be a string
+                no_fields_to_update-1:
+                  summary: NoFieldsToUpdateError
+                  value:
+                    errorCode: no_fields_to_update
+                    message: No fields to be updated.
+                    resolution: Supply at least one field to be updated.
+                no_fields_to_update-2:
+                  summary: NoFieldsToUpdateError
+                  value:
+                    errorCode: no_fields_to_update
+                    message: No fields to be updated.
+                    resolution: Supply at least one field to be updated.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                account_not_found-0:
+                  summary: AccountNotFoundError
+                  value:
+                    errorCode: account_not_found
+                    message: Account not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                account_not_updatable-0:
+                  summary: AccountNotUpdatableError
+                  value:
+                    errorCode: account_not_updatable
+                    message: Account is not updatable.
+                    resolution: Only account that are in "REJECTED" state can be updated.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Update account for project
+      tags:
+      - WhatsApp Accounts
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/whatsapp/activities:
+    get:
+      description: Lists activities on account from the most recent one to the oldest one.
+      operationId: WhatsappAccountsController_listActivities_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: pageToken
+        required: false
+        in: query
+        schema:
+          type: string
+        description: The page token if retrieving the next page from a previous query.
+      - name: pageSize
+        required: false
+        in: query
+        schema:
+          type: number
+          minimum: 1
+          maximum: 100
+        description: The page size requested.
+      responses:
+        '200':
+          description: Recent activities on account
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappAccountNotificationListDto'
+              examples:
+                response:
+                  summary: List account activities response
+                  description: "\n    Response for all account activities.\n    "
+                  value:
+                    totalSize: 2
+                    pageSize: 50
+                    notifications:
+                    - type: CREATED
+                      created: '2023-01-19T13:11:08.204Z'
+                      author: Provisioning API user
+                    - type: COMMENT_ADDED
+                      created: '2023-01-19T13:11:08.204Z'
+                      comment: Example comment
+                      author: Provisioning API user
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                invalid_page_token-0:
+                  summary: InvalidPageTokenError
+                  value:
+                    errorCode: invalid_page_token
+                    message: Invalid page token.
+                    resolution: The page token to use is provided in the previous query response, for new queries simply leave this field undefined.
+                invalid_page_size-1:
+                  summary: InvalidPageSizeError
+                  value:
+                    errorCode: invalid_page_size
+                    message: Page size must be numeric.
+                    resolution: Use a integer value for pageSize parameter.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                account_not_found-0:
+                  summary: AccountNotFoundError
+                  value:
+                    errorCode: account_not_found
+                    message: Account not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Lists activities on account
+      tags:
+      - WhatsApp Accounts
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/whatsapp/comments:
+    post:
+      description: Creates a comment for an account.
+      operationId: WhatsappAccountsController_createComment_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Comment data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhatsappCommentInputDto'
+            examples:
+              input:
+                summary: Body request
+                description: "\n      Example body request to create a comment.\n      "
+                value:
+                  comment: Example comment.
+      responses:
+        '201':
+          description: Created comment for an account.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappCommentDto'
+              examples:
+                created:
+                  summary: Create response
+                  description: "\n    Response when successfully creating a comment.\n    "
+                  value:
+                    type: CREATED
+                    comment: Example comment
+                    created: '2023-01-19T13:11:08.204Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                invalid_input-0:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - comment must be longer than or equal to 1 characters
+                invalid_payload-1:
+                  summary: InvalidPayloadError
+                  value:
+                    errorCode: invalid_payload
+                    message: Invalid payload.
+                    resolution: Correct payload and submit again.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                account_not_found-0:
+                  summary: AccountNotFoundError
+                  value:
+                    errorCode: account_not_found
+                    message: Account not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                account_data_is_corrupt-0:
+                  summary: AccountDataIsCorruptError
+                  value:
+                    errorCode: account_data_is_corrupt
+                    message: Account data is corrupt.
+                    resolution: Please contact support.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Creates a comment for an account
+      tags:
+      - WhatsApp Accounts
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+components:
+  schemas:
+    WhatsappSenderInputMetaLocalStoragesEnum:
+      type: string
+      enum:
+      - AE
+      - AU
+      - BH
+      - BR
+      - CA
+      - CH
+      - DE
+      - GB
+      - ID
+      - IN
+      - JP
+      - KR
+      - SG
+      - US
+      - ZA
+      description: Region sender store the data in Meta. If not provided, the default value set for the chosen region will be used.
+    WhatsappCommentInputDto:
+      type: object
+      properties:
+        comment:
+          type: string
+          minLength: 1
+          maxLength: 65535
+          uniqueItems: false
+      required:
+      - comment
+    WhatsappCommentTypeEnum:
+      type: string
+      const: CREATED
+    WhatsappSenderWhatsAppVerticalEnum:
+      type: string
+      enum:
+      - ALCOHOL
+      - AUTOMOTIVE
+      - BEAUTY_SPA_SALON
+      - CLOTHING_AND_APPAREL
+      - EDUCATION
+      - ENTERTAINMENT
+      - EVENT_PLANNING_AND_SERVICE
+      - FINANCE_AND_BANKING
+      - FOOD_AND_GROCERY
+      - HOTEL_AND_LODGING
+      - MEDICAL_AND_HEALTH
+      - NON_PROFIT
+      - NOT_SET
+      - ONLINE_GAMBLING
+      - OTC_DRUGS
+      - OTHER
+      - PHYSICAL_GAMBLING
+      - PROFESSIONAL_SERVICES
+      - PUBLIC_SERVICE
+      - RESTAURANT
+      - SHOPPING_AND_RETAIL
+      - TRAVEL_AND_TRANSPORTATION
+      - UNRECOGNIZED
+      description: Category of the sender displayed in the Business Info within WhatsApp.
+    WhatsappAccountChangeStateEnum:
+      type: string
+      enum:
+      - DRAFT
+      - IN_PROGRESS
+      - PENDING_FACEBOOK_VERIFICATION
+      - REJECTED
+      description: Current status of the pending changes.
+    WhatsappInputAccountPartnerInitiatedDto:
+      type: object
+      properties:
+        wabaName:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: 'The registered name of the brand who will be engaging with their users needs to be specified. This name must match the name associated with the Facebook Business Manager ID below. You can verify the registered name by visiting: https://business.facebook.com/select/?business_id=<your_business_manager_id> Ensure that the name shown exactly matches the one you enter here.'
+          uniqueItems: false
+        clientBusinessManagerId:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: The Business Manager ID for the client to create the account. This can be found in the Meta Business Manager in Business Settings > Business Info below the Business Manager Account Name.
+          uniqueItems: false
+        businessManager:
+          x-enumDescriptions:
+            SINCH_AMERICA: Associates the input configuration with the Sinch America Meta Business Manager account.
+            SINCH_BR: Associates the input configuration with the Sinch Brazil Meta Business Manager account.
+            SINCH_MX: Associates the input configuration with the Sinch Mexico Meta Business Manager account.
+            SINCH_SEP: Associates the input configuration with the Sinch SEP Meta Business Manager account.
+            SINCH_UK: Associates the input configuration with the Sinch UK Meta Business Manager account.
+          description: Business manager.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappInputBusinessManagersEnum'
+        senderDetails:
+          description: Details of the sender to be created.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappInputAccountSenderRelatedDetailsDto'
+      required:
+      - wabaName
+      - clientBusinessManagerId
+      - senderDetails
+    WhatsappConversationAppRegionsEnum:
+      type: string
+      enum:
+      - br
+      - eu
+      - us
+      description: Conversation API app regions the sender can be used for.
+    WhatsappInputAccountDtoDeprecated:
+      type: object
+      properties:
+        clientBusinessManagerId:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: The Business Manager ID for the client to create the account. This can be found in the Meta Business Manager in Business Settings > Business Info below the Business Manager Account Name.
+          uniqueItems: false
+        businessManager:
+          x-enumDescriptions:
+            SINCH_AMERICA: Associates the input configuration with the Sinch America Meta Business Manager account.
+            SINCH_BR: Associates the input configuration with the Sinch Brazil Meta Business Manager account.
+            SINCH_MX: Associates the input configuration with the Sinch Mexico Meta Business Manager account.
+            SINCH_SEP: Associates the input configuration with the Sinch SEP Meta Business Manager account.
+            SINCH_UK: Associates the input configuration with the Sinch UK Meta Business Manager account.
+          description: Business manager.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappInputBusinessManagersEnum'
+        companyLegalName:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: 'The registered name of the brand who will be engaging with their users needs to be specified. This name must match the name associated with the Facebook Business Manager ID below. You can verify the registered name by visiting: https://business.facebook.com/select/?business_id=<your_business_manager_id> Ensure that the name shown exactly matches the one you enter here.'
+          uniqueItems: false
+      description: InputAccountDto is deprecated as Meta officially has declared End-Of-Life (EOL) of OBO on September 30, 2025.
+      required:
+      - clientBusinessManagerId
+      - companyLegalName
+    WhatsappSenderMetaLocalStoragesEnum:
+      type: string
+      enum:
+      - AE
+      - AU
+      - BH
+      - BR
+      - CA
+      - CH
+      - DE
+      - GB
+      - ID
+      - IN
+      - JP
+      - KR
+      - SG
+      - US
+      - ZA
+      - UNRECOGNIZED
+      - UNSPECIFIED
+      description: Region sender store the data in Meta.
+    WhatsappSenderBotRegionEnum:
+      type: string
+      enum:
+      - BR
+      - EU
+      - US
+      - UNRECOGNIZED
+      description: Region sender is provisioned in.
+    WhatsappAccountSenderRelatedDetailsDto:
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Waba display name / used as default display name of new phone at Meta
+          uniqueItems: false
+        businessCategory:
+          x-enumDescriptions:
+            ALCOHOL: The brand operates within the alcohol sector.
+            AUTOMOTIVE: The brand operates within the automotive sector.
+            BEAUTY_SPA_SALON: The brand operates within beauty, spa, or salon services.
+            CLOTHING_AND_APPAREL: The brand operates within clothing and apparel commerce.
+            EDUCATION: The brand operates within the education field.
+            ENTERTAINMENT: The brand operates within the entertainment and media industry.
+            EVENT_PLANNING_AND_SERVICE: The brand operates within event planning and corporate services.
+            FINANCE_AND_BANKING: The brand operates within financial and banking services.
+            FOOD_AND_GROCERY: The brand operates within the food supply or grocery sector.
+            HOTEL_AND_LODGING: The brand operates within hospitality, hotels, or lodging.
+            MEDICAL_AND_HEALTH: The brand operates within healthcare, medical services, or pharmaceuticals.
+            NON_PROFIT: The brand is a registered non-profit organization.
+            NOT_SET: The operational business vertical has not been selected.
+            ONLINE_GAMBLING: The brand operates within the online gambling or betting industry.
+            OTC_DRUGS: The brand operates within over-the-counter drug sales and distribution.
+            OTHER: The brand operates in an industry outside the standard defined taxonomy.
+            PHYSICAL_GAMBLING: The brand operates within physical gambling establishments or casinos.
+            PROFESSIONAL_SERVICES: The brand provides corporate, professional, or technical services.
+            PUBLIC_SERVICE: The brand provides public utilities or governmental services.
+            RESTAURANT: The brand operates a restaurant or food service establishment.
+            SHOPPING_AND_RETAIL: The brand operates within retail or wholesale commerce.
+            TRAVEL_AND_TRANSPORTATION: The brand operates within transportation, travel, or logistics services.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Vertical / business category for the business account.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSenderWhatsAppVerticalEnum'
+        region:
+          x-enumDescriptions:
+            BR: Specifies that the bot infrastructure should be hosted within the Brazil region.
+            EU: Specifies that the bot infrastructure should be hosted within the Europe region.
+            US: Specifies that the bot infrastructure should be hosted within the United States region.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Region for the partner-initiated sender.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSenderBotRegionEnum'
+        metaLocalStorage:
+          x-enumDescriptions:
+            AE: Specifies that Meta-managed user and compliance data should be stored within the United Arab Emirates.
+            AU: Specifies that Meta-managed user and compliance data should be stored within Australia.
+            BH: Specifies that Meta-managed user and compliance data should be stored within Bahrain.
+            BR: Specifies that Meta-managed user and compliance data should be stored within Brazil.
+            CA: Specifies that Meta-managed user and compliance data should be stored within Canada.
+            CH: Specifies that Meta-managed user and compliance data should be stored within Switzerland.
+            DE: Specifies that Meta-managed user and compliance data should be stored within Germany.
+            GB: Specifies that Meta-managed user and compliance data should be stored within the United Kingdom.
+            ID: Specifies that Meta-managed user and compliance data should be stored within Indonesia.
+            IN: Specifies that Meta-managed user and compliance data should be stored within India.
+            JP: Specifies that Meta-managed user and compliance data should be stored within Japan.
+            KR: Specifies that Meta-managed user and compliance data should be stored within South Korea.
+            SG: Specifies that Meta-managed user and compliance data should be stored within Singapore.
+            US: Specifies that Meta-managed user and compliance data should be stored within the United States.
+            ZA: Specifies that Meta-managed user and compliance data should be stored within South Africa.
+            UNSPECIFIED: The Meta data storage residency location is unspecified.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Local storage region for the partner-initiated sender.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSenderMetaLocalStoragesEnum'
+      required:
+      - displayName
+      - businessCategory
+      - region
+      - metaLocalStorage
+    WhatsappAccountSenderRelatedChangesDetailsDto:
+      type: object
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Waba display name / used as default display name of new phone at Meta
+          uniqueItems: false
+        businessCategory:
+          x-enumDescriptions:
+            ALCOHOL: The brand operates within the alcohol sector.
+            AUTOMOTIVE: The brand operates within the automotive sector.
+            BEAUTY_SPA_SALON: The brand operates within beauty, spa, or salon services.
+            CLOTHING_AND_APPAREL: The brand operates within clothing and apparel commerce.
+            EDUCATION: The brand operates within the education field.
+            ENTERTAINMENT: The brand operates within the entertainment and media industry.
+            EVENT_PLANNING_AND_SERVICE: The brand operates within event planning and corporate services.
+            FINANCE_AND_BANKING: The brand operates within financial and banking services.
+            FOOD_AND_GROCERY: The brand operates within the food supply or grocery sector.
+            HOTEL_AND_LODGING: The brand operates within hospitality, hotels, or lodging.
+            MEDICAL_AND_HEALTH: The brand operates within healthcare, medical services, or pharmaceuticals.
+            NON_PROFIT: The brand is a registered non-profit organization.
+            NOT_SET: The operational business vertical has not been selected.
+            ONLINE_GAMBLING: The brand operates within the online gambling or betting industry.
+            OTC_DRUGS: The brand operates within over-the-counter drug sales and distribution.
+            OTHER: The brand operates in an industry outside the standard defined taxonomy.
+            PHYSICAL_GAMBLING: The brand operates within physical gambling establishments or casinos.
+            PROFESSIONAL_SERVICES: The brand provides corporate, professional, or technical services.
+            PUBLIC_SERVICE: The brand provides public utilities or governmental services.
+            RESTAURANT: The brand operates a restaurant or food service establishment.
+            SHOPPING_AND_RETAIL: The brand operates within retail or wholesale commerce.
+            TRAVEL_AND_TRANSPORTATION: The brand operates within transportation, travel, or logistics services.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Vertical / business category for the business account.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSenderWhatsAppVerticalEnum'
+        region:
+          x-enumDescriptions:
+            BR: Specifies that the bot infrastructure should be hosted within the Brazil region.
+            EU: Specifies that the bot infrastructure should be hosted within the Europe region.
+            US: Specifies that the bot infrastructure should be hosted within the United States region.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Region for the partner-initiated sender.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSenderBotRegionEnum'
+        metaLocalStorage:
+          x-enumDescriptions:
+            AE: Specifies that Meta-managed user and compliance data should be stored within the United Arab Emirates.
+            AU: Specifies that Meta-managed user and compliance data should be stored within Australia.
+            BH: Specifies that Meta-managed user and compliance data should be stored within Bahrain.
+            BR: Specifies that Meta-managed user and compliance data should be stored within Brazil.
+            CA: Specifies that Meta-managed user and compliance data should be stored within Canada.
+            CH: Specifies that Meta-managed user and compliance data should be stored within Switzerland.
+            DE: Specifies that Meta-managed user and compliance data should be stored within Germany.
+            GB: Specifies that Meta-managed user and compliance data should be stored within the United Kingdom.
+            ID: Specifies that Meta-managed user and compliance data should be stored within Indonesia.
+            IN: Specifies that Meta-managed user and compliance data should be stored within India.
+            JP: Specifies that Meta-managed user and compliance data should be stored within Japan.
+            KR: Specifies that Meta-managed user and compliance data should be stored within South Korea.
+            SG: Specifies that Meta-managed user and compliance data should be stored within Singapore.
+            US: Specifies that Meta-managed user and compliance data should be stored within the United States.
+            ZA: Specifies that Meta-managed user and compliance data should be stored within South Africa.
+            UNSPECIFIED: The Meta data storage residency location is unspecified.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Local storage region for the partner-initiated sender.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSenderMetaLocalStoragesEnum'
+      required:
+      - displayName
+      - businessCategory
+      - region
+      - metaLocalStorage
+    WhatsappAccountChangesDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            DRAFT: The modifications to the account profile are saved as a draft only.
+            IN_PROGRESS: The modifications to the account profile have been submitted and are still processing.
+            PENDING_FACEBOOK_VERIFICATION: The modifications to the account profile await completed Facebook business verification workflows.
+            REJECTED: The modifications to the account profile have been reviewed and rejected.
+          description: Current status of the pending changes.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappAccountChangeStateEnum'
+        details:
+          anyOf:
+          - $ref: '#/components/schemas/WhatsappAccountDetailsDto'
+            description: For newly created account
+          - $ref: '#/components/schemas/WhatsappAccountChangesDetailsDto'
+            description: For update account
+          description: The pending changes to account details and information
+          uniqueItems: false
+      required:
+      - status
+    WhatsappInputAccountWhatsAppVerticalsEnum:
+      type: string
+      enum:
+      - ALCOHOL
+      - AUTOMOTIVE
+      - BEAUTY_SPA_SALON
+      - CLOTHING_AND_APPAREL
+      - EDUCATION
+      - ENTERTAINMENT
+      - EVENT_PLANNING_AND_SERVICE
+      - FINANCE_AND_BANKING
+      - FOOD_AND_GROCERY
+      - HOTEL_AND_LODGING
+      - MEDICAL_AND_HEALTH
+      - NON_PROFIT
+      - OTC_DRUGS
+      - OTHER
+      - PHYSICAL_GAMBLING
+      - PROFESSIONAL_SERVICES
+      - PUBLIC_SERVICE
+      - RESTAURANT
+      - SHOPPING_AND_RETAIL
+      - TRAVEL_AND_TRANSPORTATION
+      description: Vertical / business category for the business account.
+    WhatsappInputAccountSenderRelatedDetailsDto:
+      type: object
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Waba display name / used as default display name of new phone at Meta
+          uniqueItems: false
+        businessCategory:
+          x-enumDescriptions:
+            ALCOHOL: Configures the account profile for a brand operating within the alcohol sector.
+            AUTOMOTIVE: Configures the account profile for a brand operating within the automotive sector.
+            BEAUTY_SPA_SALON: Configures the account profile for a brand operating within beauty, spa, or salon services.
+            CLOTHING_AND_APPAREL: Configures the account profile for a brand operating within clothing and apparel commerce.
+            EDUCATION: Configures the account profile for a brand operating within the education field.
+            ENTERTAINMENT: Configures the account profile for a brand operating within the entertainment and media industry.
+            EVENT_PLANNING_AND_SERVICE: Configures the account profile for a brand operating within event planning and corporate services.
+            FINANCE_AND_BANKING: Configures the account profile for a brand operating within financial and banking services.
+            FOOD_AND_GROCERY: Configures the account profile for a brand operating within the food supply or grocery sector.
+            HOTEL_AND_LODGING: Configures the account profile for a brand operating within hospitality, hotels, or lodging.
+            MEDICAL_AND_HEALTH: Configures the account profile for a brand operating within healthcare or medical services.
+            NON_PROFIT: Configures the account profile for a registered non-profit organization.
+            OTC_DRUGS: Configures the account profile for a brand operating within over-the-counter drug sales and distribution.
+            OTHER: Configures the account profile for an industry operating outside the standard defined taxonomy.
+            PHYSICAL_GAMBLING: Configures the account profile for a brand operating within physical gambling establishments or casinos.
+            PROFESSIONAL_SERVICES: Configures the account profile for a brand providing corporate, professional, or technical services.
+            PUBLIC_SERVICE: Configures the account profile for a brand providing public utilities or governmental services.
+            RESTAURANT: Configures the account profile for a brand operating a restaurant or food service establishment.
+            SHOPPING_AND_RETAIL: Configures the account profile for a brand operating within retail or wholesale commerce.
+            TRAVEL_AND_TRANSPORTATION: Configures the account profile for a brand operating within transportation, travel, or logistics services.
+          description: Vertical / business category for the business account.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappInputAccountWhatsAppVerticalsEnum'
+        region:
+          x-enumDescriptions:
+            BR: Specifies that the sender operations should be initialized within the Brazil region.
+            EU: Specifies that the sender operations should be initialized within the Europe region.
+            US: Specifies that the sender operations should be initialized within the United States region.
+          description: Region sender will be provisioned in. If not provided, default region for the country set in the billing account will be used.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSenderInputRegionEnum'
+        metaLocalStorage:
+          x-enumDescriptions:
+            AE: Specifies that Meta-managed user and compliance data should be stored within the United Arab Emirates.
+            AU: Specifies that Meta-managed user and compliance data should be stored within Australia.
+            BH: Specifies that Meta-managed user and compliance data should be stored within Bahrain.
+            BR: Specifies that Meta-managed user and compliance data should be stored within Brazil.
+            CA: Specifies that Meta-managed user and compliance data should be stored within Canada.
+            CH: Specifies that Meta-managed user and compliance data should be stored within Switzerland.
+            DE: Specifies that Meta-managed user and compliance data should be stored within Germany.
+            GB: Specifies that Meta-managed user and compliance data should be stored within the United Kingdom.
+            ID: Specifies that Meta-managed user and compliance data should be stored within Indonesia.
+            IN: Specifies that Meta-managed user and compliance data should be stored within India.
+            JP: Specifies that Meta-managed user and compliance data should be stored within Japan.
+            KR: Specifies that Meta-managed user and compliance data should be stored within South Korea.
+            SG: Specifies that Meta-managed user and compliance data should be stored within Singapore.
+            US: Specifies that Meta-managed user and compliance data should be stored within the United States.
+            ZA: Specifies that Meta-managed user and compliance data should be stored within South Africa.
+          description: Region Meta will store data in Meta. If not provided, the default value set for the chosen region will be used.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSenderInputMetaLocalStoragesEnum'
+      required:
+      - displayName
+      - businessCategory
+    WhatsappAccountDetailsDto:
+      type: object
+      properties:
+        clientBusinessManagerId:
+          type: string
+          description: The Business Manager ID for the client.
+          uniqueItems: false
+        companyLegalName:
+          type: string
+          deprecated: true
+          description: The registered name of the brand who will be engaging with their users.
+          uniqueItems: false
+        wabaName:
+          type: string
+          description: The registered name of the brand who will be engaging with their users.
+          uniqueItems: false
+        senderDetails:
+          description: Details of the sender firstly created.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappAccountSenderRelatedDetailsDto'
+      required:
+      - clientBusinessManagerId
+      - wabaName
+    WhatsappDailyLimitEnum:
+      type: string
+      enum:
+      - NOT_SET
+      - TIER_100K
+      - TIER_10K
+      - TIER_1K
+      - TIER_250
+      - TIER_2K
+      - TIER_50
+      - TIER_UNLIMITED
+      - UNRECOGNIZED
+      description: 'This property is deprecated. Use `AccountDto.businessDailyLimit` instead. Current daily message limit of the sender. '
+    WhatsappPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+    WhatsappAccountDto:
+      type: object
+      properties:
+        state:
+          x-enumDescriptions:
+            ONBOARDED: The onboarding sequence is complete, and the channels linked to the account are active.
+            PENDING_FACEBOOK_VERIFICATION: The account setup awaits completed Facebook business verification workflows.
+            REJECTED: The account profile registration or verification sequence was reviewed and rejected.
+          description: The current state of your account.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappAccountStateEnum'
+        isEmbeddedSignup:
+          type: boolean
+          description: '`true` if the Account was created through Embedded Signup. `false` otherwise.'
+          uniqueItems: false
+        businessManager:
+          x-enumDescriptions:
+            SINCH_AMERICA: Associates the profile configuration with the Sinch America Meta Business Manager account.
+            SINCH_BR: Associates the profile configuration with the Sinch Brazil Meta Business Manager account.
+            SINCH_MX: Associates the profile configuration with the Sinch Mexico Meta Business Manager account.
+            SINCH_SEP: Associates the profile configuration with the Sinch SEP Meta Business Manager account.
+            SINCH_UK: Associates the profile configuration with the Sinch UK Meta Business Manager account.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Business manager.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappBusinessManagersEnum'
+        wabaId:
+          type: string
+          description: WhatsApp Business Manager ID.
+          uniqueItems: false
+        changes:
+          description: Any pending changes to the account.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappAccountChangesDto'
+        details:
+          description: Account details and information.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappAccountDetailsDto'
+        wabaBanState:
+          x-enumDescriptions:
+            DISABLE: The WhatsApp Business Account has been disabled due to administrative or policy enforcement.
+            REINSTATE: The WhatsApp Business Account has been successfully reinstated and cleared of restrictions.
+            SCHEDULE_FOR_DISABLE: The WhatsApp Business Account is scheduled for automatic disablement following a grace or appeal period.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Ban state when account has been banned.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappWabaBanStatesEnum'
+        wabaBanDate:
+          type: string
+          description: The UTC Date Time in ISO 8601 for when account has been banned.
+          uniqueItems: false
+        wabaEnabledForInsights:
+          type: boolean
+          description: Template analytics status for account.
+          uniqueItems: false
+        wabaEnabledForDirectSend:
+          type: boolean
+          description: Direct Send API status for account.
+          uniqueItems: false
+        wabaMaxPriceOnboarded:
+          type: boolean
+          description: Indicates whether the account has the maximum price feature enabled.
+          uniqueItems: false
+        compatibleRegions:
+          type: array
+          x-enumDescriptions:
+            br: The messaging applications and session contexts are hosted within the Brazil region.
+            eu: The messaging applications and session contexts are hosted within the Europe region.
+            us: The messaging applications and session contexts are hosted within the United States region.
+          uniqueItems: true
+          description: Conversation API app regions the sender can be used for.
+          items:
+            $ref: '#/components/schemas/WhatsappConversationAppRegionsEnum'
+        primaryBusinessLocation:
+          x-enumDescriptions:
+            AD: The country code for Andorra.
+            AE: The country code for the United Arab Emirates.
+            AF: The country code for Afghanistan.
+            AG: The country code for Antigua and Barbuda.
+            AI: The country code for Anguilla.
+            AL: The country code for Albania.
+            AM: The country code for Armenia.
+            AO: The country code for Angola.
+            AQ: The country code for Antarctica.
+            AR: The country code for Argentina.
+            AS: The country code for American Samoa.
+            AT: The country code for Austria.
+            AU: The country code for Australia.
+            AW: The country code for Aruba.
+            AZ: The country code for Azerbaijan.
+            BA: The country code for Bosnia and Herzegovina.
+            BB: The country code for Barbados.
+            BD: The country code for Bangladesh.
+            BE: The country code for Belgium.
+            BF: The country code for Burkina Faso.
+            BG: The country code for Bulgaria.
+            BH: The country code for Bahrain.
+            BI: The country code for Burundi.
+            BJ: The country code for Benin.
+            BM: The country code for Bermuda.
+            BN: The country code for Brunei.
+            BO: The country code for Bolivia.
+            BQ: The country code for Bonaire.
+            BR: The country code for Brazil.
+            BS: The country code for the Bahamas.
+            BT: The country code for Bhutan.
+            BW: The country code for Botswana.
+            BY: The country code for Belarus.
+            BZ: The country code for Belize.
+            CA: The country code for Canada.
+            CD: The country code for the Democratic Republic of the Congo.
+            CF: The country code for the Central African Republic.
+            CG: The country code for the Republic of the Congo.
+            CH: The country code for Switzerland.
+            CI: The country code for the Ivory Coast.
+            CK: The country code for the Cook Islands.
+            CL: The country code for Chile.
+            CM: The country code for Cameroon.
+            CN: The country code for China.
+            CO: The country code for Colombia.
+            CR: The country code for Costa Rica.
+            CU: The country code for Cuba.
+            CV: The country code for Cape Verde.
+            CW: The country code for Curaçao.
+            CY: The country code for Cyprus.
+            CZ: The country code for the Czech Republic.
+            DE: The country code for Germany.
+            DJ: The country code for Djibouti.
+            DK: The country code for Denmark.
+            DM: The country code for Dominica.
+            DO: The country code for the Dominican Republic.
+            DZ: The country code for Algeria.
+            EC: The country code for Ecuador.
+            EE: The country code for Estonia.
+            EG: The country code for Egypt.
+            ER: The country code for Eritrea.
+            ES: The country code for Spain.
+            ET: The country code for Ethiopia.
+            FI: The country code for Finland.
+            FJ: The country code for Fiji.
+            FK: The country code for the Falkland Islands.
+            FM: The country code for Micronesia.
+            FO: The country code for the Faroe Islands.
+            FR: The country code for France.
+            GA: The country code for Gabon.
+            GB: The country code for the United Kingdom of Great Britain.
+            GD: The country code for Grenada.
+            GE: The country code for Georgia.
+            GF: The country code for French Guiana.
+            GG: The country code for Guernsey.
+            GH: The country code for Ghana.
+            GI: The country code for Gibraltar.
+            GL: The country code for Greenland.
+            GM: The country code for the Gambia.
+            GN: The country code for Guinea.
+            GP: The country code for Guadeloupe.
+            GQ: The country code for Equatorial Guinea.
+            GR: The country code for Greece.
+            GT: The country code for Guatemala.
+            GU: The country code for Guam.
+            GW: The country code for Guinea-Bissau.
+            GY: The country code for Guyana.
+            HK: The country code for Hong Kong.
+            HN: The country code for Honduras.
+            HR: The country code for Croatia.
+            HT: The country code for Haiti.
+            HU: The country code for Hungary.
+            ID: The country code for Indonesia.
+            IE: The country code for Ireland.
+            IL: The country code for Israel.
+            IM: The country code for the Isle of Man.
+            IN: The country code for India.
+            IO: The country code for the British Indian Ocean Territory.
+            IQ: The country code for Iraq.
+            IR: The country code for Iran.
+            IS: The country code for Iceland.
+            IT: The country code for Italy.
+            JE: The country code for Jersey.
+            JM: The country code for Jamaica.
+            JO: The country code for Jordan.
+            JP: The country code for Japan.
+            KE: The country code for Kenya.
+            KG: The country code for Kyrgyzstan.
+            KH: The country code for Cambodia.
+            KI: The country code for Kiribati.
+            KM: The country code for Comoros.
+            KN: The country code for Saint Kitts and Nevis.
+            KP: The country code for North Korea.
+            KR: The country code for South Korea.
+            KW: The country code for Kuwait.
+            KY: The country code for the Cayman Islands.
+            KZ: The country code for Kazakhstan.
+            LA: The country code for Laos.
+            LB: The country code for Lebanon.
+            LC: The country code for Saint Lucia.
+            LI: The country code for Liechtenstein.
+            LK: The country code for Sri Lanka.
+            LR: The country code for Liberia.
+            LS: The country code for Lesotho.
+            LT: The country code for Lithuania.
+            LU: The country code for Luxembourg.
+            LV: The country code for Latvia.
+            LY: The country code for Libya.
+            MA: The country code for Morocco.
+            MC: The country code for Monaco.
+            MD: The country code for Moldova.
+            ME: The country code for Montenegro.
+            MG: The country code for Madagascar.
+            MH: The country code for the Marshall Islands.
+            MK: The country code for North Macedonia.
+            ML: The country code for Mali.
+            MM: The country code for Myanmar.
+            MN: The country code for Mongolia.
+            MO: The country code for Macao.
+            MP: The country code for the Northern Mariana Islands.
+            MQ: The country code for Martinique.
+            MR: The country code for Mauritania.
+            MS: The country code for Montserrat.
+            MT: The country code for Malta.
+            MU: The country code for Mauritius.
+            MV: The country code for the Maldives.
+            MW: The country code for Malawi.
+            MX: The country code for Mexico.
+            MY: The country code for Malaysia.
+            MZ: The country code for Mozambique.
+            NA: The country code for Namibia.
+            NC: The country code for New Caledonia.
+            NE: The country code for Niger.
+            NF: The country code for Norfolk Island.
+            NG: The country code for Nigeria.
+            NI: The country code for Nicaragua.
+            NL: The country code for the Netherlands.
+            'NO': The country code for Norway.
+            NP: The country code for Nepal.
+            NR: The country code for Nauru.
+            NU: The country code for Niue.
+            NZ: The country code for New Zealand.
+            OM: The country code for Oman.
+            PA: The country code for Panama.
+            PE: The country code for Peru.
+            PF: The country code for French Polynesia.
+            PG: The country code for Papua New Guinea.
+            PH: The country code for the Philippines.
+            PK: The country code for Pakistan.
+            PL: The country code for Poland.
+            PM: The country code for Saint Pierre and Miquelon.
+            PR: The country code for Puerto Rico.
+            PS: The country code for Palestine.
+            PT: The country code for Portugal.
+            PW: The country code for Palau.
+            PY: The country code for Paraguay.
+            QA: The country code for Qatar.
+            RE: The country code for Réunion.
+            RO: The country code for Romania.
+            RS: The country code for Serbia.
+            RU: The country code for Russia.
+            RW: The country code for Rwanda.
+            SA: The country code for Saudi Arabia.
+            SB: The country code for the Solomon Islands.
+            SC: The country code for Seychelles.
+            SD: The country code for Sudan.
+            SE: The country code for Sweden.
+            SG: The country code for Singapore.
+            SH: The country code for Saint Helena.
+            SI: The country code for Slovenia.
+            SK: The country code for Slovakia.
+            SL: The country code for Sierra Leone.
+            SM: The country code for San Marino.
+            SN: The country code for Senegal.
+            SO: The country code for Somalia.
+            SR: The country code for Suriname.
+            SS: The country code for South Sudan.
+            ST: The country code for São Tomé and Príncipe.
+            SV: The country code for El Salvador.
+            SX: The country code for Sint Maarten.
+            SY: The country code for Syria.
+            SZ: The country code for Eswatini.
+            TC: The country code for the Turks and Caicos Islands.
+            TD: The country code for Chad.
+            TG: The country code for Togo.
+            TH: The country code for Thailand.
+            TJ: The country code for Tajikistan.
+            TK: The country code for Tokelau.
+            TL: The country code for East Timor.
+            TM: The country code for Turkmenistan.
+            TN: The country code for Tunisia.
+            TO: The country code for Tonga.
+            TR: The country code for Turkey.
+            TT: The country code for Trinidad and Tobago.
+            TV: The country code for Tuvalu.
+            TW: The country code for Taiwan.
+            TZ: The country code for Tanzania.
+            UA: The country code for Ukraine.
+            UG: The country code for Uganda.
+            UM: The country code for the United States Minor Outlying Islands.
+            US: The country code for the United States of America.
+            UY: The country code for Uruguay.
+            UZ: The country code for Uzbekistan.
+            VC: The country code for Saint Vincent and the Grenadines.
+            VE: The country code for Venezuela.
+            VG: The country code for the British Virgin Islands.
+            VI: The country code for the United States Virgin Islands.
+            VN: The country code for Vietnam.
+            VU: The country code for Vanuatu.
+            WF: The country code for Wallis and Futuna.
+            WS: The country code for Samoa.
+            XK: The country code for Kosovo.
+            YE: The country code for Yemen.
+            YT: The country code for Mayotte.
+            ZA: The country code for South Africa.
+            ZM: The country code for Zambia.
+            ZW: The country code for Zimbabwe.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Two-letter country code in ISO 3166 standard, specifying the country where business is based
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappCountryCodesEnum'
+        partnerInitiatedRequestId:
+          type: string
+          deprecated: true
+          description: Deprecated. This field is retained for backward compatibility and is always returned as undefined.
+          uniqueItems: false
+        businessDailyLimit:
+          x-enumDescriptions:
+            NOT_SET: The daily messaging threshold tier has not been assigned.
+            TIER_100K: Restricts outbound traffic up to 100,000 business-initiated conversations per rolling 24-hour cycle.
+            TIER_10K: Restricts outbound traffic up to 10,000 business-initiated conversations per rolling 24-hour cycle.
+            TIER_1K: Restricts outbound traffic up to 1,000 business-initiated conversations per rolling 24-hour cycle.
+            TIER_250: Restricts outbound traffic up to 250 business-initiated conversations per rolling 24-hour cycle.
+            TIER_2K: Restricts outbound traffic up to 2,000 business-initiated conversations per rolling 24-hour cycle.
+            TIER_50: Restricts outbound traffic up to 50 business-initiated conversations per rolling 24-hour cycle.
+            TIER_UNLIMITED: No daily throttling thresholds or messaging limit restrictions apply to this profile.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Current daily message limit of the account.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappDailyLimitEnum'
+        currency:
+          type: string
+          description: The currency code for the account.
+          uniqueItems: false
+      required:
+      - isEmbeddedSignup
+      - businessManager
+      - wabaMaxPriceOnboarded
+      - compatibleRegions
+    WhatsappInputBusinessManagersEnum:
+      type: string
+      enum:
+      - SINCH_AMERICA
+      - SINCH_BR
+      - SINCH_MX
+      - SINCH_SEP
+      - SINCH_UK
+      description: Business manager.
+    WhatsappAccountNotificationListDto:
+      type: object
+      properties:
+        totalSize:
+          type: number
+          description: Total size of the entries matching the search query.
+          uniqueItems: false
+        pageSize:
+          type: number
+          description: Requested size of the page.
+          uniqueItems: false
+        previousPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch previous batch of entries.
+          uniqueItems: false
+        nextPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch next batch of entries.
+          uniqueItems: false
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/WhatsappAccountNotificationDto'
+          uniqueItems: false
+      required:
+      - totalSize
+      - pageSize
+      - notifications
+    WhatsappAccountStateEnum:
+      type: string
+      enum:
+      - ONBOARDED
+      - PENDING_FACEBOOK_VERIFICATION
+      - REJECTED
+      description: The current state of your account.
+    WhatsappCommentDto:
+      type: object
+      properties:
+        type:
+          x-enumDescriptions:
+            CREATED: Indicates the comment has been successfully created and published.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappCommentTypeEnum'
+        comment:
+          type: string
+          uniqueItems: false
+        created:
+          type: string
+          uniqueItems: false
+      required:
+      - type
+      - comment
+    WhatsappInputAccountSenderRelatedUpdateDetailsDto:
+      type: object
+      properties:
+        displayName:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: Waba display name / used as default display name of new phone at Meta
+          uniqueItems: false
+        businessCategory:
+          x-enumDescriptions:
+            ALCOHOL: Configures the account profile for a brand operating within the alcohol sector.
+            AUTOMOTIVE: Configures the account profile for a brand operating within the automotive sector.
+            BEAUTY_SPA_SALON: Configures the account profile for a brand operating within beauty, spa, or salon services.
+            CLOTHING_AND_APPAREL: Configures the account profile for a brand operating within clothing and apparel commerce.
+            EDUCATION: Configures the account profile for a brand operating within the education field.
+            ENTERTAINMENT: Configures the account profile for a brand operating within the entertainment and media industry.
+            EVENT_PLANNING_AND_SERVICE: Configures the account profile for a brand operating within event planning and corporate services.
+            FINANCE_AND_BANKING: Configures the account profile for a brand operating within financial and banking services.
+            FOOD_AND_GROCERY: Configures the account profile for a brand operating within the food supply or grocery sector.
+            HOTEL_AND_LODGING: Configures the account profile for a brand operating within hospitality, hotels, or lodging.
+            MEDICAL_AND_HEALTH: Configures the account profile for a brand operating within healthcare or medical services.
+            NON_PROFIT: Configures the account profile for a registered non-profit organization.
+            OTC_DRUGS: Configures the account profile for a brand operating within over-the-counter drug sales and distribution.
+            OTHER: Configures the account profile for an industry operating outside the standard defined taxonomy.
+            PHYSICAL_GAMBLING: Configures the account profile for a brand operating within physical gambling establishments or casinos.
+            PROFESSIONAL_SERVICES: Configures the account profile for a brand providing corporate, professional, or technical services.
+            PUBLIC_SERVICE: Configures the account profile for a brand providing public utilities or governmental services.
+            RESTAURANT: Configures the account profile for a brand operating a restaurant or food service establishment.
+            SHOPPING_AND_RETAIL: Configures the account profile for a brand operating within retail or wholesale commerce.
+            TRAVEL_AND_TRANSPORTATION: Configures the account profile for a brand operating within transportation, travel, or logistics services.
+          description: Vertical / business category for the business account.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappInputAccountWhatsAppVerticalsEnum'
+        region:
+          x-enumDescriptions:
+            BR: Specifies that the sender operations should be initialized within the Brazil region.
+            EU: Specifies that the sender operations should be initialized within the Europe region.
+            US: Specifies that the sender operations should be initialized within the United States region.
+          description: Region sender will be provisioned in. If not provided, default region for the country set in the billing account will be used.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSenderInputRegionEnum'
+        metaLocalStorage:
+          x-enumDescriptions:
+            AE: Specifies that Meta-managed user and compliance data should be stored within the United Arab Emirates.
+            AU: Specifies that Meta-managed user and compliance data should be stored within Australia.
+            BH: Specifies that Meta-managed user and compliance data should be stored within Bahrain.
+            BR: Specifies that Meta-managed user and compliance data should be stored within Brazil.
+            CA: Specifies that Meta-managed user and compliance data should be stored within Canada.
+            CH: Specifies that Meta-managed user and compliance data should be stored within Switzerland.
+            DE: Specifies that Meta-managed user and compliance data should be stored within Germany.
+            GB: Specifies that Meta-managed user and compliance data should be stored within the United Kingdom.
+            ID: Specifies that Meta-managed user and compliance data should be stored within Indonesia.
+            IN: Specifies that Meta-managed user and compliance data should be stored within India.
+            JP: Specifies that Meta-managed user and compliance data should be stored within Japan.
+            KR: Specifies that Meta-managed user and compliance data should be stored within South Korea.
+            SG: Specifies that Meta-managed user and compliance data should be stored within Singapore.
+            US: Specifies that Meta-managed user and compliance data should be stored within the United States.
+            ZA: Specifies that Meta-managed user and compliance data should be stored within South Africa.
+          description: Region Meta will store data in Meta. If not provided, the default value set for the chosen region will be used.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSenderInputMetaLocalStoragesEnum'
+    WhatsappAccountNotificationTypeEnum:
+      type: string
+      enum:
+      - COMMENT_ADDED
+      - CREATED
+      - DRAFT
+      - EDITED
+      - IN_PROGRESS
+      - PENDING_FACEBOOK_VERIFICATION
+      - REJECTED
+    WhatsappAccountNotificationDto:
+      type: object
+      properties:
+        type:
+          x-enumDescriptions:
+            COMMENT_ADDED: A new comment has been added to the notification trail.
+            CREATED: The notification configuration has been successfully created.
+            DRAFT: The notification configuration is currently in a draft state.
+            EDITED: The notification configuration has been edited or updated.
+            IN_PROGRESS: The notification process is currently executing.
+            PENDING_FACEBOOK_VERIFICATION: The notification setup is pending Facebook account verification.
+            REJECTED: The notification configuration has been rejected.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappAccountNotificationTypeEnum'
+        created:
+          type: string
+          uniqueItems: false
+        author:
+          type: string
+          uniqueItems: false
+        comment:
+          type: string
+          uniqueItems: false
+      required:
+      - type
+    WhatsappSenderInputRegionEnum:
+      type: string
+      enum:
+      - BR
+      - EU
+      - US
+      description: Region sender is provisioned in. If not provided, default region for the country set in the billing account will be used. For partner-initiated accounts, the value set for WhatsApp account will be used.
+    WhatsappCountryCodesEnum:
+      type: string
+      enum:
+      - AD
+      - AE
+      - AF
+      - AG
+      - AI
+      - AL
+      - AM
+      - AO
+      - AQ
+      - AR
+      - AS
+      - AT
+      - AU
+      - AW
+      - AZ
+      - BA
+      - BB
+      - BD
+      - BE
+      - BF
+      - BG
+      - BH
+      - BI
+      - BJ
+      - BM
+      - BN
+      - BO
+      - BQ
+      - BR
+      - BS
+      - BT
+      - BW
+      - BY
+      - BZ
+      - CA
+      - CD
+      - CF
+      - CG
+      - CH
+      - CI
+      - CK
+      - CL
+      - CM
+      - CN
+      - CO
+      - CR
+      - CU
+      - CV
+      - CW
+      - CY
+      - CZ
+      - DE
+      - DJ
+      - DK
+      - DM
+      - DO
+      - DZ
+      - EC
+      - EE
+      - EG
+      - ER
+      - ES
+      - ET
+      - FI
+      - FJ
+      - FK
+      - FM
+      - FO
+      - FR
+      - GA
+      - GB
+      - GD
+      - GE
+      - GF
+      - GG
+      - GH
+      - GI
+      - GL
+      - GM
+      - GN
+      - GP
+      - GQ
+      - GR
+      - GT
+      - GU
+      - GW
+      - GY
+      - HK
+      - HN
+      - HR
+      - HT
+      - HU
+      - ID
+      - IE
+      - IL
+      - IM
+      - IN
+      - IO
+      - IQ
+      - IR
+      - IS
+      - IT
+      - JE
+      - JM
+      - JO
+      - JP
+      - KE
+      - KG
+      - KH
+      - KI
+      - KM
+      - KN
+      - KP
+      - KR
+      - KW
+      - KY
+      - KZ
+      - LA
+      - LB
+      - LC
+      - LI
+      - LK
+      - LR
+      - LS
+      - LT
+      - LU
+      - LV
+      - LY
+      - MA
+      - MC
+      - MD
+      - ME
+      - MG
+      - MH
+      - MK
+      - ML
+      - MM
+      - MN
+      - MO
+      - MP
+      - MQ
+      - MR
+      - MS
+      - MT
+      - MU
+      - MV
+      - MW
+      - MX
+      - MY
+      - MZ
+      - NA
+      - NC
+      - NE
+      - NF
+      - NG
+      - NI
+      - NL
+      - 'NO'
+      - NP
+      - NR
+      - NU
+      - NZ
+      - OM
+      - PA
+      - PE
+      - PF
+      - PG
+      - PH
+      - PK
+      - PL
+      - PM
+      - PR
+      - PS
+      - PT
+      - PW
+      - PY
+      - QA
+      - RE
+      - RO
+      - RS
+      - RU
+      - RW
+      - SA
+      - SB
+      - SC
+      - SD
+      - SE
+      - SG
+      - SH
+      - SI
+      - SK
+      - SL
+      - SM
+      - SN
+      - SO
+      - SR
+      - SS
+      - ST
+      - SV
+      - SX
+      - SY
+      - SZ
+      - TC
+      - TD
+      - TG
+      - TH
+      - TJ
+      - TK
+      - TL
+      - TM
+      - TN
+      - TO
+      - TR
+      - TT
+      - TV
+      - TW
+      - TZ
+      - UA
+      - UG
+      - UM
+      - US
+      - UY
+      - UZ
+      - VC
+      - VE
+      - VG
+      - VI
+      - VN
+      - VU
+      - WF
+      - WS
+      - XK
+      - YE
+      - YT
+      - ZA
+      - ZM
+      - ZW
+      - UNRECOGNIZED
+      description: Upscalable country codes (ISO 3166-1 alpha-2).
+    WhatsappBusinessManagersEnum:
+      type: string
+      enum:
+      - SINCH_AMERICA
+      - SINCH_BR
+      - SINCH_MX
+      - SINCH_SEP
+      - SINCH_UK
+      - UNRECOGNIZED
+      description: Business manager.
+    WhatsappAccountChangesDetailsDto:
+      type: object
+      properties:
+        clientBusinessManagerId:
+          type: string
+          description: The Business Manager ID for the client.
+          uniqueItems: false
+        companyLegalName:
+          type: string
+          deprecated: true
+          description: The registered name of the brand who will be engaging with their users.
+          uniqueItems: false
+        wabaName:
+          type: string
+          description: The registered name of the brand who will be engaging with their users.
+          uniqueItems: false
+        senderDetails:
+          description: Details of the sender firstly created.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappAccountSenderRelatedChangesDetailsDto'
+    WhatsappInputUpdateAccountDto:
+      type: object
+      properties:
+        companyLegalName:
+          type: string
+          deprecated: true
+          minLength: 1
+          maxLength: 255
+          description: 'The registered name of the brand who will be engaging with their users needs to be specified. This name must match the name associated with the Facebook Business Manager ID below. You can verify the registered name by visiting: https://business.facebook.com/select/?business_id=<your_business_manager_id> Ensure that the name shown exactly matches the one you enter here.'
+          uniqueItems: false
+        wabaName:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: 'The registered name of the brand who will be engaging with their users needs to be specified. This name must match the name associated with the Facebook Business Manager ID below. You can verify the registered name by visiting: https://business.facebook.com/select/?business_id=<your_business_manager_id> Ensure that the name shown exactly matches the one you enter here.'
+          uniqueItems: false
+        clientBusinessManagerId:
+          type: string
+          minLength: 1
+          maxLength: 255
+          description: The Business Manager ID for the client to create the account. This can be found in the Meta Business Manager in Business Settings > Business Info below the Business Manager Account Name.
+          uniqueItems: false
+        senderDetails:
+          description: Details of the sender to be created.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappInputAccountSenderRelatedUpdateDetailsDto'
+    WhatsappWabaBanStatesEnum:
+      type: string
+      enum:
+      - DISABLE
+      - REINSTATE
+      - SCHEDULE_FOR_DISABLE
+      - UNRECOGNIZED
+      description: Please use get account endpoint for this information.
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
+x-tagGroup-upscale:
+  name: Upscale
+  tags:
+  - Upscale Admin Feature Flag
+  - Upscale Admin Log Operation
+  - Upscale Admin Migrations
+  - Upscale Admin Sms
+  - Upscale Admin Upscales
+  - Internal
+  - Upscale Sms
+  - Upscale Upscales
+x-tagGroup-notification:
+  name: Notification
+  tags:
+  - Notification Admin Feature Flag
+  - Notification Admin Log Operation
+  - Internal
+x-tagGroups:
+- name: Webhook
+  tags:
+  - Webhooks
+- name: WhatsApp
+  tags:
+  - WhatsApp Accounts
+  - WhatsApp
+  - WhatsApp Flows
+  - WhatsApp Senders
+  - WhatsApp Solutions
+  - WhatsApp Templates
+- name: Bundles
+  tags:
+  - Bundles
+- name: KakaoTalk
+  tags:
+  - KakaoTalk Categories
+  - KakaoTalk Senders
+  - KakaoTalk Templates
+- name: Conversation
+  tags:
+  - Conversation
+- name: RCS
+  tags:
+  - RCS Accounts
+  - RCS Questionnaire
+  - RCS Senders
+- name: SMS
+  tags:
+  - SMS Apps

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-import-brand-request-schema.json",
+  "title": "ImportBrandRequest",
+  "description": "Import Brand request",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-compliance-brands-api-openapi.yml#/components/schemas/ImportBrandRequest",
+  "type": "object",
+  "required": [
+    "displayName",
+    "importType",
+    "externalBrandId"
+  ],
+  "properties": {
+    "displayName": {
+      "description": "The name of the brand. DisplayName must be unique per projectId and marketCode (US)",
+      "type": "string"
+    },
+    "importType": {
+      "description": "Type of import, options are IMPORT_TCR_BRAND for 10DLC / RCS and IMPORT_GCH_BRAND for Short Code",
+      "type": "string",
+      "enum": [
+        "IMPORT_TCR_BRAND",
+        "IMPORT_GCH_BRAND"
+      ],
+      "x-enumDescriptions": {
+        "IMPORT_TCR_BRAND": "Import an existing brand in 10DLC. Imported brand will get same channels as in original request (10DLC, 10DLC+RCS). 10DLC brand Id must be included as external brand.",
+        "IMPORT_GCH_BRAND": "Import an existing brand in the US Short Code Registry. Imported brand will get Short Code channel. The US Short Code Registry brand Id must be included as external brand."
+      }
+    },
+    "externalBrandId": {
+      "description": "The external brand ID obtained in the original order. It can be the 10DLC brand Id or the US Short Code Registry brand Id.",
+      "type": "string"
+    },
+    "callbackUrl": {
+      "description": "The URL to receive the order status update callback. The URL must be a valid URL and must be reachable from Sinch.",
+      "type": "string",
+      "format": "uri"
+    }
+  }
+}

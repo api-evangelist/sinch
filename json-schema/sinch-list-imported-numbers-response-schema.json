@@ -1,0 +1,365 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-list-imported-numbers-response-schema.json",
+  "title": "List Imported Numbers Response",
+  "description": "Response message to list your imported phone numbers",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-imported-numbers-hosting-orders-api-openapi.yml#/components/schemas/ListImportedNumbersResponse",
+  "type": "object",
+  "properties": {
+    "importedNumbers": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ImportedNumberResponse"
+      },
+      "description": "List of numbers associated to the client project specified in `ListImportedNumbers`."
+    },
+    "nextPageToken": {
+      "type": "string",
+      "description": "The token to be used for listing the next page."
+    },
+    "totalSize": {
+      "type": "integer",
+      "description": "https://cloud.google.com/apis/design/design_patterns#list_pagination",
+      "format": "int32"
+    }
+  },
+  "$defs": {
+    "CampaignProvisioning": {
+      "description": "An object giving details about the campaign provisioning of the number.",
+      "type": "object",
+      "properties": {
+        "campaignProvisioning": {
+          "description": "An object giving details about the campaign provisioning of the number.",
+          "type": "object",
+          "properties": {
+            "serviceType": {
+              "$ref": "#/$defs/ServiceType"
+            },
+            "serviceId": {
+              "description": "A unique identifier for the service being provisioned.",
+              "type": "string"
+            },
+            "type": {
+              "$ref": "#/$defs/Type"
+            },
+            "state": {
+              "$ref": "#/$defs/State"
+            },
+            "updateTime": {
+              "type": "string",
+              "description": "A timestamp in ISO 8601 format (UTC) indicating the last time the provisioning status was updated."
+            },
+            "errorMessage": {
+              "type": "string",
+              "description": "If an error occurred during provisioning, this field will contain a descriptive message. It will be an empty string if no error is present."
+            },
+            "errorCode": {
+              "type": "string",
+              "description": "If an error occurred during provisioning, this field will contain the error code. This field is also an empty string when no error has occurred."
+            }
+          }
+        }
+      }
+    },
+    "CarrierState": {
+      "type": "object",
+      "description": "Contains information about the state of the carrier.",
+      "properties": {
+        "state": {
+          "$ref": "#/$defs/State"
+        },
+        "errorCode": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "errorMessage": {
+          "$ref": "#/$defs/ErrorMessage"
+        },
+        "updateTime": {
+          "$ref": "#/$defs/UpdateTime"
+        }
+      }
+    },
+    "ErrorCode": {
+      "type": "string",
+      "description": "An optional string field that contains an error code if the operation failed. This field is empty (\"\") when there is no error."
+    },
+    "ErrorMessage": {
+      "type": "string",
+      "description": "An optional string field that provides a human-readable message describing the error. This field is empty (\"\") when no error has occurred."
+    },
+    "ImportedNumber": {
+      "type": "object",
+      "properties": {
+        "phoneNumber": {
+          "type": "string",
+          "description": "The phone number in e.164 format with leading +."
+        },
+        "projectId": {
+          "type": "string",
+          "description": "The ID of the project resource. You can find your project ID on dashboard.sinch.com."
+        },
+        "regionCode": {
+          "type": "string",
+          "description": "ISO 3166-1 alpha-2 country code of the phone number. Example US, UK or SE."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "User supplied name for the phone number."
+        },
+        "smsConfiguration": {
+          "$ref": "#/$defs/SmsConfiguration"
+        },
+        "callbackUrl": {
+          "type": "string",
+          "description": "The client's callback URL to be called upon finishing the number import."
+        }
+      }
+    },
+    "ImportedNumberResponse": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ImportedNumber"
+        },
+        {
+          "$ref": "#/$defs/MnoConfiguration"
+        },
+        {
+          "$ref": "#/$defs/SmsProvisioning"
+        },
+        {
+          "$ref": "#/$defs/CampaignProvisioning"
+        }
+      ]
+    },
+    "MnoConfiguration": {
+      "type": "object",
+      "properties": {
+        "mnoConfiguration": {
+          "type": "object",
+          "description": "The mnoConfiguration object represents the status and progress of configuration operations for SMS and MMS services across different carriers (AT&T and T-Mobile). Each key within this object (smsAtt, smsTmo, mmsAtt and mmsTmo) corresponds to a specific service type (SMS or MMS) associated with a particular mobile network operator.",
+          "properties": {
+            "smsAtt": {
+              "description": "Contains information about SMS-enabled ATT&T numbers.",
+              "allOf": [
+                {
+                  "$ref": "#/$defs/CarrierState"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "operation": {
+                      "$ref": "#/$defs/Operation"
+                    }
+                  }
+                }
+              ]
+            },
+            "smsTmo": {
+              "description": "Contains information about SMS-enabled T-Mobile numbers.",
+              "allOf": [
+                {
+                  "$ref": "#/$defs/CarrierState"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "operation": {
+                      "$ref": "#/$defs/Operation"
+                    }
+                  }
+                }
+              ]
+            },
+            "mmsAtt": {
+              "description": "Contains information about MMS-enabled AT&T numbers.",
+              "allOf": [
+                {
+                  "$ref": "#/$defs/CarrierState"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "operation": {
+                      "$ref": "#/$defs/Operation"
+                    }
+                  }
+                }
+              ]
+            },
+            "mmsTmo": {
+              "description": "Contains information about MMS-enabled T-Mobile numbers.",
+              "allOf": [
+                {
+                  "$ref": "#/$defs/CarrierState"
+                },
+                {
+                  "type": "object",
+                  "properties": {
+                    "operation": {
+                      "$ref": "#/$defs/Operation"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        }
+      }
+    },
+    "Operation": {
+      "type": "string",
+      "description": "Specifies the type of action being performed.",
+      "enum": [
+        "PROVISIONING",
+        "DEPROVISIONING",
+        "OPERATION_UNSPECIFIED"
+      ],
+      "x-enumDescriptions": {
+        "PROVISIONING": "The service is being configured or activated.",
+        "DEPROVISIONING": "The service is being deactivated or removed.",
+        "OPERATION_UNSPECIFIED": "The operation is unspecified."
+      }
+    },
+    "ScheduledProvisioning": {
+      "readOnly": true,
+      "type": "object",
+      "properties": {
+        "servicePlanId": {
+          "type": "string",
+          "description": "Service plan of the scheduled provisioning task."
+        },
+        "status": {
+          "type": "integer",
+          "description": "Status of the pending change.",
+          "format": "enum"
+        },
+        "lastUpdatedTime": {
+          "type": "string",
+          "description": "Timestamp when the status was last updated.",
+          "format": "date-time"
+        },
+        "campaignId": {
+          "type": "string",
+          "description": "The campaign of the scheduled provisioning task."
+        },
+        "errorCodes": {
+          "type": "array",
+          "items": {
+            "type": "integer",
+            "format": "enum"
+          },
+          "description": "A list of error codes, if applicable, for the scheduled provisioning task."
+        }
+      },
+      "description": "Ongoing Provisioning for SMS service"
+    },
+    "ServiceType": {
+      "description": "The type of service.",
+      "type": "string",
+      "enum": [
+        "SMS",
+        "CAMPAIGN"
+      ],
+      "x-enumDescriptions": {
+        "SMS": "SMS provisioning.",
+        "CAMPAIGN": "Campaign provisioning."
+      }
+    },
+    "SmsConfiguration": {
+      "type": "object",
+      "properties": {
+        "servicePlanId": {
+          "type": "string",
+          "description": "The current SMS configuration for this number.\r The `servicePlanId`` can be found when logging into dashboard.sinch.com\r in the SMS>APIs section."
+        },
+        "scheduledProvisioning": {
+          "$ref": "#/$defs/ScheduledProvisioning"
+        },
+        "campaignId": {
+          "type": "string",
+          "description": "The current campaign ID assigned to this number."
+        },
+        "migrateToSinchTmo": {
+          "type": "boolean",
+          "readOnly": true,
+          "description": "Displays if a number is assigned to another aggregator in T-Mobile's platform, and requires migration from previous aggregator to Sinch."
+        }
+      },
+      "description": "Configuration for SMS"
+    },
+    "SmsProvisioning": {
+      "description": "An object giving details about the SMS provisioning of the number.",
+      "type": "object",
+      "properties": {
+        "smsProvisioning": {
+          "description": "An object giving details about the SMS provisioning of the number.",
+          "type": "object",
+          "properties": {
+            "serviceType": {
+              "$ref": "#/$defs/ServiceType"
+            },
+            "serviceId": {
+              "description": "A unique identifier for the service being provisioned.",
+              "type": "string"
+            },
+            "type": {
+              "$ref": "#/$defs/Type"
+            },
+            "state": {
+              "$ref": "#/$defs/State"
+            },
+            "updateTime": {
+              "type": "string",
+              "description": "A timestamp in ISO 8601 format (UTC) indicating the last time the provisioning status was updated."
+            },
+            "errorMessage": {
+              "type": "string",
+              "description": "If an error occurred during provisioning, this field will contain a descriptive message. It will be an empty string if no error is present."
+            },
+            "errorCode": {
+              "type": "string",
+              "description": "If an error occurred during provisioning, this field will contain the error code. This field is also an empty string when no error has occurred."
+            }
+          }
+        }
+      }
+    },
+    "State": {
+      "type": "string",
+      "description": "Indicates the current state of the operation.",
+      "enum": [
+        "DONE",
+        "FAILED",
+        "IN_PROGRESS",
+        "WAITING",
+        "STATE_UNSPECIFIED"
+      ],
+      "x-enumDescriptions": {
+        "DONE": "The operation was completed successfully.",
+        "FAILED": "The operation has failed.",
+        "IN_PROGRESS": "The operation is currently in progress.",
+        "WAITING": "The operation is pending and has not yet started.",
+        "STATE_UNSPECIFIED": "The state is unspecified."
+      }
+    },
+    "Type": {
+      "description": "Specifies the type of operation. This value of this field is either \"PROVISIONING\" or \"DEPROVISIONING\".",
+      "type": "string",
+      "enum": [
+        "PROVISIONING",
+        "DEPROVISIONING"
+      ],
+      "x-enumDescriptions": {
+        "PROVISIONING": "The operation is provisioning the number.",
+        "DEPROVISIONING": "The operation is deprovisioning the number."
+      }
+    },
+    "UpdateTime": {
+      "type": "string",
+      "description": "A timestamp in ISO 8601 format indicating the last time the status was updated."
+    }
+  }
+}

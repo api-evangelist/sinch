@@ -1,0 +1,508 @@
+openapi: 3.2.0
+info:
+  title: Verification | Sinch Verification callbacks API
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    name: Sinch
+    url: https://www.sinch.com/contact-us/
+    email: support@sinch.com
+  version: 2.0.1
+  description: Sinch offers a platform for phone number verification.
+servers:
+- url: https://verification.api.sinch.com
+security:
+- Basic: []
+- Application: []
+tags:
+- name: Verification callbacks
+  description: Callback events are used to authorize and manage your verification requests and return verification results.
+  x-displayName: Verifications callbacks
+paths: {}
+webhooks:
+  VerificationRequestEvent:
+    post:
+      security: []
+      tags:
+      - Verification callbacks
+      summary: Verification Request Event
+      operationId: VerificationRequestEvent
+      description: This callback event is a POST request to the specified verification callback URL and is triggered when a new verification request is made from the SDK client or the Verification Request API. This callback event is only triggered when a verification callback URL is specified in your dashboard.
+      requestBody:
+        $ref: '#/components/requestBodies/VerificationRequestEventRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/VerificationRequestEventResponse'
+  VerificationResultEvent:
+    post:
+      security: []
+      tags:
+      - Verification callbacks
+      summary: Verification Result Event
+      operationId: VerificationResultEvent
+      description: This callback event is a POST request to the specified verification callback URL and triggered when a verification has been completed and the result is known. It's used to report the verification result to the developer's backend application. This callback event is only triggered when the verification callback URL is specified in your dashboard.
+      requestBody:
+        $ref: '#/components/requestBodies/VerificationResultEventRequest'
+      responses:
+        '200':
+          description: You must return an empty `200` response.
+          content:
+            schema: {}
+  SmsDeliveredEvent:
+    post:
+      security: []
+      tags:
+      - Verification callbacks
+      summary: SMS Delivered Event
+      operationId: SmsDeliveredEvent
+      description: This callback event is a POST request to the specified verification callback URL and is triggered when an SMS delivery receipt is received. It is used to report the final delivery status of the verification SMS. This callback event is only triggered when a verification callback URL is specified in your dashboard.
+      requestBody:
+        $ref: '#/components/requestBodies/VerificationSmsDeliveredEventRequest'
+      responses:
+        '200':
+          description: You must return an empty `200` response.
+          content:
+            schema: {}
+components:
+  schemas:
+    VerificationRequestEventResponseWhatsApp:
+      title: WhatsApp Request Event Response
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/VerificationRequestEventResponseBase'
+      - type: object
+        properties:
+          whatsapp:
+            type: object
+            additionalProperties: true
+            properties:
+              codeType:
+                $ref: '#/components/schemas/WhatsAppCodeType'
+              acceptLanguage:
+                type: array
+                description: The WhatsApp verification content language. Set in the verification request.
+                items:
+                  type: string
+                  example: es-ES
+      example:
+        summary: WhatsApp OTP
+        value:
+          action: allow
+          whatsapp:
+            acceptLanguage:
+            - en-US
+    Price:
+      title: Price
+      type: object
+      additionalProperties: false
+      properties:
+        currencyId:
+          type: string
+          description: ISO 4217 currency code
+          example: USD
+        amount:
+          type: number
+          format: float
+          example: 0.0127
+    VerificationEventBase:
+      required:
+      - id
+      - event
+      - method
+      - identity
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the verification request.
+          example: '1234567890'
+        event:
+          $ref: '#/components/schemas/VerificationEventType'
+        method:
+          $ref: '#/components/schemas/VerificationMethodReport'
+        identity:
+          $ref: '#/components/schemas/Identity'
+        reference:
+          $ref: '#/components/schemas/VerificationEventReference'
+        custom:
+          $ref: '#/components/schemas/VerificationEventCustom'
+    VerificationEventCustom:
+      type: string
+      description: Can be used to pass custom data in the request. Will be passed to all events. Max length 4096 characters, can be arbitrary text data.
+    VerificationRequestEventResponseFlashCall:
+      title: Flash Call Request Event Response
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/VerificationRequestEventResponseBase'
+      - type: object
+        properties:
+          flashCall:
+            type: object
+            additionalProperties: true
+            properties:
+              cli:
+                type: string
+                description: The phone number that will be displayed to the user when the flash call is received on the user's phone. By default, the Sinch dashboard will randomly select the CLI that will be displayed during a phone call from a pool of numbers. If you want to set your own CLI, you can specify it in the response to the Verification Request Event.
+              dialTimeout:
+                $ref: '#/components/schemas/FlashCallDialTimeout'
+              interceptionTimeout:
+                $ref: '#/components/schemas/FlashCallInterceptionTimeout'
+      example:
+        summary: Flash Call
+        value:
+          action: allow
+          flashCall:
+            cli: '+46700000000'
+            dialTimeout: 10
+    VerificationRequestEventResponseSms:
+      title: SMS Request Event Response
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/VerificationRequestEventResponseBase'
+      - type: object
+        properties:
+          sms:
+            type: object
+            additionalProperties: true
+            properties:
+              code:
+                type: string
+                description: The SMS OTP code that should be used. By default, the Sinch dashboard will automatically generate OTP codes for SMS verification. If you want to set your own OTP, you can specify it in the response to the Verification Request Event.
+                example: '12345'
+              codeType:
+                $ref: '#/components/schemas/SmsCodeType'
+              expiry:
+                $ref: '#/components/schemas/SmsExpiry'
+              acceptLanguage:
+                type: array
+                description: The SMS verification content language. Set in the verification request.
+                items:
+                  type: string
+                  example: es-ES
+      example:
+        summary: SMS OTP
+        value:
+          action: allow
+          sms:
+            code: '3688'
+            acceptLanguage:
+            - en-US
+    VerificationEventReference:
+      type: string
+      description: Used to pass your own reference in the request for tracking purposes. Must be a unique value for each started verification request. The value must be encodable in the URL path segment. This value is passed to all events and returned from the status and report endpoints. The reference can be used to check the [status of verifications](https://developers.sinch.com/docs/verification/api-reference/verification/verification-status/verificationstatusbyreference), like with ID or identity.
+    PhoneCallSpeech:
+      type: object
+      description: Text-To-Speech engine settings
+      properties:
+        locale:
+          type: string
+          description: A `language-region` identifier according to [IANA](https://www.iana.org/assignments/language-subtag-registry/language-subtag-registry). Only a subset of those identifiers is accepted.
+          default: en-US
+    FlashCallDialTimeout:
+      type: integer
+      description: The amount of time that a phone will ring.
+      maximum: 120
+      minimum: 5
+    VerificationRequestEventResponseBase:
+      type: object
+      required:
+      - action
+      additionalProperties: false
+      properties:
+        action:
+          $ref: '#/components/schemas/VerificationEventResponseAction'
+    Source:
+      type: string
+      description: With the SMS verification method, a user's phone number is verified by sending an SMS containing an OTP code that must be manually returned. If you are are using an Android handset, you could instead intercept the SMS message delivery and capture the OTP code automatically.
+      x-enumDescriptions:
+        intercepted: OTP verification was performed automatically
+        manual: OTP verification was manually performed
+      enum:
+      - intercepted
+      - manual
+      example: intercepted
+    SmsCodeType:
+      type: string
+      description: Selects type of code which will be sent to customer
+      default: Numeric
+      x-enumDescriptions:
+        Numeric: Code contains numbers only.
+        Alpha: Code contains letters only.
+        Alphanumeric: Code contains both numbers and letters.
+      enum:
+      - Numeric
+      - Alpha
+      - Alphanumeric
+    VerificationMethodReport:
+      type: string
+      description: The type of the verification.
+      example: sms
+      x-enumDescriptions:
+        sms: Verification by SMS message with an OTP code.
+        flashcall: Verification by placing a flashVerificationResultEvent call (missed call) and detecting the incoming calling number (CLI).
+        callout: Verification by placing a PSTN call to the user's phone and playing an announcement, asking the user to press a particular digit to verify the phone number.
+        whatsapp: Verification by WhatsApp message with an OTP code.
+      enum:
+      - sms
+      - flashcall
+      - callout
+      - whatsapp
+    VerificationRequestEventResponse:
+      oneOf:
+      - $ref: '#/components/schemas/VerificationRequestEventResponseSms'
+      - $ref: '#/components/schemas/VerificationRequestEventResponseFlashCall'
+      - $ref: '#/components/schemas/VerificationRequestEventResponsePhoneCall'
+      - $ref: '#/components/schemas/VerificationRequestEventResponseWhatsApp'
+    FlashCallInterceptionTimeout:
+      type: integer
+      description: The maximum time that a phone call verification will be active and can be completed. If the phone number hasn't been verified successfully during this time, then the verification request will fail. By default, the Sinch dashboard will automatically optimize dial time out during a phone call.
+      maximum: 120
+      minimum: 5
+    WhatsAppCodeType:
+      type: string
+      description: Selects type of code which will be sent to customer
+      default: Numeric
+      x-enumDescriptions:
+        Numeric: Code contains numbers only.
+        Alpha: Code contains letters only.
+        Alphanumeric: Code contains both numbers and letters.
+      enum:
+      - Numeric
+      - Alpha
+      - Alphanumeric
+    Identity:
+      type: object
+      additionalProperties: false
+      description: Specifies the type of endpoint that will be verified and the particular endpoint. `number` is currently the only supported endpoint type.
+      required:
+      - type
+      - endpoint
+      properties:
+        type:
+          type: string
+          description: Currently only `number` type is supported.
+          x-enumDescriptions:
+            number: Identity is of number type
+          enum:
+          - number
+        endpoint:
+          type: string
+          description: For type `number` use an [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537)-compatible phone number.
+          example: '+11235551234'
+    VerificationRequestEventResponsePhoneCall:
+      title: Phone Call Request Event Response
+      additionalProperties: false
+      allOf:
+      - $ref: '#/components/schemas/VerificationRequestEventResponseBase'
+      - type: object
+        properties:
+          callout:
+            type: object
+            additionalProperties: true
+            properties:
+              code:
+                type: string
+                description: The Phone Call OTP code that should be entered by the user. Sinch servers automatically generate OTP codes for Phone Call verification. If you want to set your own code, you can specify it in the response to the Verification Request Event.
+              speech:
+                $ref: '#/components/schemas/PhoneCallSpeech'
+      example:
+        summary: Phone Call
+        value:
+          action: allow
+          callout:
+            code: '1234'
+            speech:
+              locale: en_US
+    SmsExpiry:
+      type: string
+      description: The expiration time for a verification process is represented in the format `HH:MM:SS`.
+    VerificationResultEvent:
+      required:
+      - status
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/VerificationEventBase'
+      - type: object
+        properties:
+          event:
+            type: string
+            description: The type of the event.
+            example: VerificationResultEvent
+            x-enumDescriptions:
+              VerificationResultEvent: Notification Event received onto verification result
+            enum:
+            - VerificationResultEvent
+          status:
+            $ref: '#/components/schemas/VerificationStatus'
+          reason:
+            $ref: '#/components/schemas/VerificationStatusReason'
+          source:
+            $ref: '#/components/schemas/Source'
+    VerificationEventType:
+      type: string
+      description: The type of the event.
+      x-enumDescriptions:
+        VerificationRequestEvent: Define a request event type
+        VerificationResultEvent: Define a result event type
+        VerificationSmsDeliveredEvent: Define an SMS delivered result event type
+      enum:
+      - VerificationRequestEvent
+      - VerificationResultEvent
+      - VerificationSmsDeliveredEvent
+    VerificationRequestEvent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/VerificationEventBase'
+      - type: object
+        properties:
+          event:
+            type: string
+            description: The type of the event.
+            example: VerificationRequestEvent
+            x-enumDescriptions:
+              VerificationRequestEvent: Event received onto verification request
+            enum:
+            - VerificationRequestEvent
+          price:
+            $ref: '#/components/schemas/Price'
+          acceptLanguage:
+            type: array
+            description: Allows you to set or override if provided in the API request, the SMS verification content language. Only used with the SMS verification method. The content language specified in the API request or in the callback can be overridden by carrier provider specific templates, due to compliance and legal requirements, such as [US shortcode requirements (pdf)](https://community.sinch.com/t5/SMS/Sinch-US-Short-Code-Onboarding-Overview/ta-p/7085).
+            deprecated: true
+            items:
+              type: string
+              example: es-ES
+    VerificationStatusReason:
+      type: string
+      description: Displays the reason why a verification has `FAILED`, was `DENIED`, or was `ABORTED`.
+      x-enumDescriptions:
+        Fraud: Fraudulent activity.
+        Not enough credit: Not enough credit in dashboard account.
+        Blocked: Blocked number.
+        Denied by callback: Callback response denied the verification.
+        Invalid callback: Callback was invalid.
+        Internal error: Internal server error.
+        Destination denied: Verification destination denied.
+        Network error or number unreachable: Network error or destination number is otherwise unreachable.
+        Failed pending: Pending failure.
+        SMS delivery failure: Could not deliver SMS.
+        Invalid CLI: CLI is invalid.
+        Invalid code: Input code is invalid.
+        Expired: Verification request has expired.
+        Hung up without entering valid code: Phone call ended without entering code.
+      enum:
+      - Fraud
+      - Not enough credit
+      - Blocked
+      - Denied by callback
+      - Invalid callback
+      - Internal error
+      - Destination denied
+      - Network error or number unreachable
+      - Failed pending
+      - SMS delivery failure
+      - Invalid CLI
+      - Invalid code
+      - Expired
+      - Hung up without entering valid code
+      example: Expired
+    VerificationStatus:
+      type: string
+      description: The status of the verification
+      example: PENDING
+      x-enumDescriptions:
+        PENDING: The verification is ongoing.
+        SUCCESSFUL: The verification was successful.
+        FAIL: The verification attempt was made, but the number wasn't verified.
+        DENIED: The verification attempt was denied by Sinch or your backend.
+        ABORTED: The verification attempt was aborted by requesting a new verification.
+        ERROR: The verification couldn't be completed due to a network error or the number being unreachable.
+      enum:
+      - PENDING
+      - SUCCESSFUL
+      - FAIL
+      - DENIED
+      - ABORTED
+      - ERROR
+    VerificationSmsDeliveredEvent:
+      required:
+      - smsResult
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/VerificationEventBase'
+      - type: object
+        properties:
+          event:
+            type: string
+            description: The type of the event.
+            example: VerificationSmsDeliveredEvent
+            x-enumDescriptions:
+              VerificationSmsDeliveredEvent: Event received onto verification request
+            enum:
+            - VerificationSmsDeliveredEvent
+          smsResult:
+            type: string
+            description: The result of the SMS delivery. Possible values can be extended in the future.
+            x-enumDescriptions:
+              Successful: SMS delivered to user successfully
+              Failed: SMS delivery to user failed
+            enum:
+            - Successful
+            - Failed
+            example: Successful
+    VerificationEventResponseAction:
+      type: string
+      description: Determines whether the verification can be executed.
+      x-enumDescriptions:
+        allow: Verification allowed
+        deny: Verification denied
+      enum:
+      - allow
+      - deny
+      example: allow
+  requestBodies:
+    VerificationSmsDeliveredEventRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/VerificationSmsDeliveredEvent'
+    VerificationResultEventRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/VerificationResultEvent'
+    VerificationRequestEventRequest:
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/VerificationRequestEvent'
+  responses:
+    VerificationRequestEventResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/VerificationRequestEventResponse'
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/verification/api-reference/authentication/).
+    Application:
+      type: apiKey
+      in: header
+      name: Authentication
+      description: For more information about application request signing authentication, see [Request Signing](https://developers.sinch.com/docs/verification/api-reference/authentication/application-signed-request).
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- csharp
+- java
+- node
+- php
+x-proxy-enabled: true
+x-samples-enabled: true

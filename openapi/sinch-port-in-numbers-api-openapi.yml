@@ -1,0 +1,966 @@
+openapi: 3.2.0
+info:
+  title: Porting Port-in numbers API
+  description: Automated processing of port-in phone number operations
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- url: https://porting.api.sinch.com/v1/projects/{projectId}
+  description: v1.0 of the porting API
+  variables:
+    projectId:
+      description: The project with which you are working.
+      default: YOUR_project_id
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Port-in numbers
+  description: You can create orders, check portability, and more.
+paths:
+  /portabilityChecks:
+    post:
+      tags:
+      - Port-in numbers
+      operationId: checkPortingAvailability
+      summary: Porting availability
+      description: Use this before creating a order to make sure all numbers are available for port in to Sinch. Please note that if you try to port a number that is not portable the order will fail.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PortabilityCheckRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortabilityCheckResponse'
+  /orders/portIns:
+    post:
+      operationId: orderPortIn
+      tags:
+      - Port-in numbers
+      summary: Create port-in order
+      description: 'Create an order to port phone numbers from another carrier into Sinch. Refer to the Port-In Status section for more information on port-in order updates.
+
+        Please note that order will fail if you try to port numbers that are not portable, so you should always use the portability check before creating an order.
+
+
+        Note: For port orders of over 500 numbers, please contact the support team.
+
+
+        **Note:** In order to send SMS and MMS messages in the US using 10DLC phone numbers, all messages must be sent via an approved campaign. Your campaigns are managed under US 10DLC Campaigns in the SMS section. A number can be associated to an approved campaign after the port completes.'
+      requestBody:
+        description: Order Port-In phone numbers
+        $ref: '#/components/requestBodies/OrderPortInRequest'
+      responses:
+        '201':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderBaseItem'
+    get:
+      tags:
+      - Port-in numbers
+      operationId: getPortInOrders
+      summary: List port-in orders
+      description: Retrieve a list of port-in based on the search parameters, you can also specify view here to get less detail
+      parameters:
+      - in: query
+        name: orderId
+        schema:
+          type: number
+        description: Search by the ID of the order.
+      - in: query
+        name: orderStatus
+        schema:
+          $ref: '#/components/schemas/OrderStatus'
+        description: Search by the status of the order.
+      - in: query
+        name: customerOrderReference
+        description: The reference you specified when creating the order.
+        schema:
+          type: string
+      - in: query
+        name: createdDateStart
+        schema:
+          type: string
+          format: date-time
+          example: '2024-09-24T12:00:00Z'
+        description: 'Search by the created date. This query sets the start date of the search period. Formatted as [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss.SSSZ`.'
+      - in: query
+        name: createdDateEnd
+        schema:
+          type: string
+          format: date-time
+          example: '2024-09-24T12:00:00Z'
+        description: 'Search by the created date. This query sets the end date of the search period. Formatted as [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss.SSSZ`.'
+      - in: query
+        name: phoneNumber
+        description: Search by a phone number.
+        schema:
+          type: string
+      - in: query
+        name: focStartDate
+        schema:
+          type: string
+          format: date-time
+          example: '2024-09-24T12:00:00Z'
+        description: 'Search by the firm order confirmation. This query sets the start date of the search period. Formatted as [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss.SSSZ`.'
+      - in: query
+        name: focEndDate
+        schema:
+          type: string
+          format: date-time
+          example: '2024-09-24T12:00:00Z'
+        description: 'Search by the firm order confirmation. This query sets the end date of the search period. Formatted as [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss.SSSZ`.'
+      - $ref: '#/components/parameters/PageSize'
+      - $ref: '#/components/parameters/Page'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    orders:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/OrderListItem'
+                - $ref: '#/components/schemas/Pagination'
+  /orders/portIns/{orderId}:
+    get:
+      tags:
+      - Port-in numbers
+      operationId: getOrderDetails
+      summary: Get order Detail
+      description: 'Get details about an existing order along with order notes and process notes (for Port-In orders).
+
+        For realtime updates on the order status, please refer to the Webhooks section. wich is the recommended way to get updates on the order status.'
+      parameters:
+      - in: path
+        name: orderId
+        schema:
+          type: number
+        required: true
+        description: Order Identifier
+        example: 897867
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderBaseItem'
+    delete:
+      tags:
+      - Port-in numbers
+      operationId: deleteOrder
+      summary: Cancel Pending Order
+      description: This operation allows you to cancel an order in Pending status.
+      parameters:
+      - in: path
+        name: orderId
+        schema:
+          type: number
+        required: true
+        description: Order Identifier
+        example: 897867
+      responses:
+        '200':
+          description: Successful operation
+    put:
+      operationId: updatePortInOrder
+      tags:
+      - Port-in numbers
+      summary: Update port-in order
+      description: This operation allows you to update information on a Pending order. Please note that you need to send the full object, its not a patch
+      parameters:
+      - name: orderId
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The unique identifier for the order.
+      requestBody:
+        required: true
+        description: Update Pending Order
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderBaseItem'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderBaseItem'
+  /orders/portIns/{orderId}/notes:
+    post:
+      tags:
+      - Port-in numbers
+      operationId: addOrderNote
+      summary: Add Order Note
+      description: This operation allows you to add a note to an existing order.
+      parameters:
+      - in: path
+        name: orderId
+        schema:
+          type: number
+        required: true
+        description: Order Identifier
+      requestBody:
+        required: true
+        description: Add Order Note
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                note:
+                  type: string
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: number
+                  note:
+                    type: string
+  /orders/portIns/{orderId}/documents:
+    post:
+      operationId: addOrderDocuments
+      tags:
+      - Port-in numbers
+      summary: Add Order Document
+      description: This operation allows you to add a document to an existing order.
+      parameters:
+      - in: path
+        name: orderId
+        schema:
+          type: number
+        required: true
+        description: Order Identifier
+      requestBody:
+        required: true
+        description: Add Order Document
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/OrderDocumentWithContent'
+      responses:
+        '200':
+          description: Successful operation, the file name/description would be returned, but the content would not be returned in the response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/OrderDocumentBase'
+  /orders/{orderId}/documents/{documentId}:
+    get:
+      operationId: getOrderDocumentContent
+      tags:
+      - Port-in numbers
+      summary: Get document content
+      description: This operation allows you to retrieve specific document contents attached to an existing order.
+      parameters:
+      - in: path
+        name: orderId
+        schema:
+          type: number
+        required: true
+        description: Order Identifier
+      - in: path
+        name: documentId
+        description: Document content for
+        schema:
+          type: string
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    documentId:
+                      type: number
+                - $ref: '#/components/schemas/OrderDocumentWithContent'
+                - type: object
+                  properties:
+                    contentType:
+                      type: string
+components:
+  schemas:
+    OrderWebhookItem:
+      type: object
+      description: Order payload included in webhook events. Identical to OrderBaseItem but excludes `id`, since the order identifier is already present as `orderId` at the top level of the webhook event.
+      required:
+      - desiredPortSchedule
+      properties:
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        customerOrderReference:
+          type: string
+          description: Your reference you specified when creating the order
+          example: '123456'
+          default: ''
+        onDemandActivation:
+          type: boolean
+          description: 'If you use onDemand activation you will need to make sure the numbers are both confirmed and released for activation, if you don''t use onDemand the numbers will be activated on the desiredPortDate is the recommended way.
+
+            If true the numbers will be activated as when you call `:activate`, if false they will be activated on the desiredPortDate'
+          default: false
+        desiredPortSchedule:
+          description: The date and time you want the numbers to be ported in. If you set a `defaultPortTime` and `defaultPortTimeZone` in defaults those settings will be used if not set per order. If you haven't set defaults and do not set the time and time zone on the order the system default will be used. **System Default Time:** 09:00:00 US/Eastern
+          $ref: '#/components/schemas/DesiredPortDateTime'
+        loaUploadedBy:
+          type: string
+          description: Name of the user uploading the LOA.
+          example: john doe
+        loaAttachmentDate:
+          description: 'Date when the LOA was uploaded. Formatted as [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss.SSSZ`.'
+          type: string
+          format: date-time
+          example: '2024-09-24T12:00:00Z'
+        phoneNumbers:
+          type: array
+          title: Phone numbers
+          description: The numbers for the order in e164 format
+          items:
+            $ref: '#/components/schemas/PhoneNumberMinItem'
+        notes:
+          readOnly: true
+          description: Notes if any on the order, you will get notes if there is any problems with the order and you send notes as reply to those problems
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderNote'
+        documents:
+          readOnly: true
+          description: Documents if any on the order, you will get documents if there is any problems with the order and you send documents as reply to those problems
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderDocumentBase'
+        createdDate:
+          readOnly: true
+          description: The date the order was created, in `YYYY-MM-DD` format.
+          type: string
+          format: date
+          example: '2024-09-24'
+        resellerName:
+          type: string
+          description: '**This is requirement for canadian numbers only, we need to figure out what we expect here and where the customer can find this info**'
+          default: ''
+    PortabilityCheckNumber:
+      type: object
+      description: An object containing information about whether a phone number can be ported or not.
+      properties:
+        phoneNumber:
+          type: string
+          description: A phone number in E.164 format.
+          example: '+12345678901'
+        portable:
+          type: boolean
+          description: Indicates if a number is portable or not.
+          example: true
+        carrier:
+          type: string
+          description: The carrier to which the number belongs.
+          example: T-Mobile
+        reason:
+          type: string
+          description: If applicable, the reason why the number cannot be ported.
+          example: ''
+    OrderDocumentBase:
+      type: object
+      description: Response object containing information about the order document.
+      properties:
+        id:
+          type: number
+          readOnly: true
+          description: The ID of the order document.
+        documentName:
+          type: string
+          description: The name of the document.
+        description:
+          type: string
+          description: A description of the contents of the document.
+    ESTConfiguration:
+      type: object
+      title: EST
+      description: When you want to use the number for elastic sip trunking
+      properties:
+        type:
+          type: string
+          enum:
+          - EST
+          x-enumDescriptions:
+            EST: Indicates Elastic SIP Trunking capability.
+          default: EST
+        trunkId:
+          type: string
+          example: 01G65Z755AFWAKHE12NY0CQ9FH
+    RTCConfiguration:
+      type: object
+      title: RTC
+      description: If you want to use the number with programmable voice
+      properties:
+        type:
+          type: string
+          enum:
+          - RTC
+          x-enumDescriptions:
+            RTC: Indicates programmable voice capability.
+          default: RTC
+        appId:
+          type: string
+          description: The app id from the dashboard where you want to use the number
+          example: 6afd2da3-1692-4443-834c-8a2f386ec284
+    PortabilityCheckResponse:
+      type: object
+      description: The response body for the checkPortability endpoint.
+      properties:
+        phoneNumbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/PortabilityCheckNumber'
+    SmsConfiguration:
+      type: object
+      description: Configuration for what sms service id to use, and other sms related configurations
+      properties:
+        smsAppId:
+          type: string
+    PortabilityCheckRequest:
+      type: object
+      description: The request body for the checkPortability endpoint.
+      properties:
+        phoneNumbers:
+          type: array
+          items:
+            type: string
+            description: A phone number in E.164 format.
+            example: '+12311234567'
+    DesiredPortDateTime:
+      required:
+      - desiredPortDate
+      type: object
+      properties:
+        desiredPortDate:
+          type: string
+          description: The date you want the numbers to be ported in, in ISO format.
+          example: '2025-01-31'
+        desiredPortTime:
+          type: string
+          example: 09:00:00
+          description: The time you want the numbers to be ported in.
+        desiredPortTimeZone:
+          type: string
+          enum:
+          - US/Eastern
+          - US/Central
+          - US/Mountain
+          - US/Pacific
+          - GMT
+          x-enumDescriptions:
+            US/Eastern: US Eastern Timezone
+            US/Central: US Central Timezone
+            US/Mountain: US Mountain Timezone
+            US/Pacific: US Pacific Timezone
+            GMT: Greenwich Mean Time
+          description: The time zone you want to use for the desired port time.
+          example: US/Eastern
+    PhoneNumberItem:
+      type: object
+      required:
+      - phoneNumber
+      - endUser
+      - portOutInfo
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format.
+          format: e164
+          example: '+12345678901'
+        status:
+          type: string
+          description: The porting status of the phone number.
+          default: PENDING
+          readOnly: true
+          enum:
+          - PENDING
+          - CONFIRMED
+          - REJECTED
+          - ACTIVATED
+          - CANCELED
+          - EXCLUDED
+          x-enumDescriptions:
+            PENDING: The number is pending, and can be updated.
+            CONFIRMED: The number is confirmed, and can not be updated but if onDemand is true it can be activated.
+            REJECTED: The number is rejected. Look at the rejectReason for more details. Reasons can be either its not portable or wrong port out information.
+            ACTIVATED: The number is activated.
+            CANCELED: The number is cancelled, either by the customer or by the system.
+            EXCLUDED: The number is excluded from the order. Look at the exclusionReason for more details.
+        exclusionReason:
+          description: If the phone number is excluded or rejected, the status here would reflect as such. In this case, there would be an exclusion reason along with date of exclusion.
+          type: string
+          readOnly: true
+          default: ''
+        exclusionDate:
+          description: 'The date and time the phone number was excluded or rejected. Formatted as [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss.SSSZ`. Accompanied by `exclusionReason`.'
+          type: string
+          readOnly: true
+          format: date-time
+          example: '2024-09-24T00:00:00Z'
+        countryCode:
+          description: The ISO 3166-1 formatted country code of the phone number, for example, US or CA. At the moment, only North American numbers are supported.
+          type: string
+          readOnly: true
+          example: US
+        activatedDate:
+          description: 'The date and time the number was activated. Formatted as [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss.SSSZ`.'
+          type: string
+          readOnly: true
+          format: date-time
+          example: '2024-09-24T14:00:00Z'
+        confirmedDate:
+          description: 'The date the number was confirmed. Formatted as [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss.SSSZ`.'
+          type: string
+          readOnly: true
+          format: date-time
+          example: '2024-09-24T12:00:00Z'
+        activateUser:
+          readOnly: true
+          description: The user that activated the number.
+          type: string
+        voiceConfiguration:
+          description: If specified, this will override the voice configuration for the order.
+          $ref: '#/components/schemas/VoiceConfiguration'
+        smsConfiguration:
+          description: If specified, this will override the sms configuration for the order.
+          $ref: '#/components/schemas/SmsConfiguration'
+        endUser:
+          description: If specified, this will override the endUser for the order.
+          $ref: '#/components/schemas/EndUser'
+        portOutInfo:
+          $ref: '#/components/schemas/PortOutItem'
+        features:
+          $ref: '#/components/schemas/Feature'
+        newPortOutPin:
+          type: string
+        rejectReason:
+          readOnly: true
+          type: string
+          description: The reason the number was rejected.
+        excludedFeatures:
+          readOnly: true
+          description: Features that are excluded for the phone number being ported.
+          type: array
+          items:
+            type: object
+            properties:
+              featureName:
+                description: The name of the excluded feature.
+                type: string
+              exclusionReason:
+                description: The reason the feature was excluded.
+                type: string
+        phoneNumberGroup:
+          readOnly: true
+          type: string
+          example: GW Verizon Grp1
+        focDate:
+          description: 'Once the phone number has a firm order confirmation (FOC) date, it will be returned as part of the phone number details. Formatted as [ISO-8601](https://en.wikipedia.org/wiki/ISO_8601): `YYYY-MM-DDThh:mm:ss.SSSZ`.'
+          readOnly: true
+          type: string
+          format: date-time
+          example: '2024-09-24T12:00:00Z'
+    OrderBaseItem:
+      allOf:
+      - $ref: '#/components/schemas/OrderWebhookItem'
+      - type: object
+        properties:
+          id:
+            type: number
+            description: The unique identifier for the order
+            readOnly: true
+            example: 890192331
+    PortOutItem:
+      type: object
+      description: The port out information at the previous carrier for the number. Usually only a port-out PIN is required.
+      properties:
+        existingPortOutPin:
+          type: string
+          description: The existing port-out PIN from the previous carrier.
+        accountNum:
+          type: string
+          description: The account number associated with the number from the previous carrier.
+        accountPhoneNumber:
+          type: string
+          description: The contact phone number on the account.
+        authorizingName:
+          type: string
+          description: Name of the person authorizing the port-in.
+        authorizingDate:
+          type: string
+          description: Date of authorizing the port-in (must be today or earlier and cannot be in the future), in `YYYY-MM-DD` format.
+          format: date
+          example: '2024-09-24'
+    Pagination:
+      type: object
+      description: An object describing how pages of items are displayed.
+      readOnly: true
+      properties:
+        page:
+          readOnly: true
+          type: integer
+          description: Current page.
+        totalPages:
+          readOnly: true
+          type: integer
+          description: Total number of pages.
+        pageSize:
+          readOnly: true
+          type: integer
+          description: Number of items per page.
+        totalItems:
+          type: integer
+          readOnly: true
+          format: int32
+          description: Total size of the result.
+    EndUser:
+      type: object
+      required:
+      - name
+      - streetNum
+      - streetName
+      - city
+      - state
+      - zipCode
+      properties:
+        name:
+          type: string
+          description: The name of the end user can be a person's name or company name. Please note if you are not using this yourself it should be the name/company of the actual user.
+          example: Joe Doe
+        streetNum:
+          description: The end user's street number.
+          type: string
+          example: '123'
+        streetName:
+          description: The end user's street name.
+          type: string
+          example: Main
+        streetPreDir:
+          description: The prefix direction in the end user's address, if any.
+          type: string
+          default: ''
+          example: N
+        streetType:
+          description: The end user's street type, for example Road or Court.
+          type: string
+          default: ''
+          example: Court
+        streetPostDir:
+          description: The suffix direction in the end user's address, if any.
+          type: string
+          default: ''
+          example: SW
+        locationType1:
+          type: string
+          description: Any additional location information, such as suite or apartment.
+          example: Suite
+        locationValue1:
+          description: Any additional location information, such as suite number or apartment number.
+          type: string
+          example: '2134'
+        locationType2:
+          description: Field for additional location information, such as suite number or apartment number.
+          type: string
+          example: ''
+          default: ''
+        locationValue2:
+          description: Field for additional location information, such as suite number or apartment number.
+          type: string
+          example: ''
+          default: ''
+        locationType3:
+          description: Field for additional location information, such as suite number or apartment number.
+          type: string
+          example: ''
+          default: ''
+        locationValue3:
+          description: Field for additional location information, such as suite number or apartment number.
+          type: string
+          example: ''
+          default: ''
+        city:
+          description: The end user's city.
+          type: string
+          example: Anytown
+        state:
+          type: string
+          description: The end user's state, using the two letter abbreviation.
+          example: CA
+        zipCode:
+          description: The end user's zip code.
+          type: string
+          example: '12345'
+          default: ''
+        typeOfService:
+          type: string
+          description: The type of address. Available values are `B` for Business or `R` for Residence
+          enum:
+          - B
+          - R
+          x-enumDescriptions:
+            B: Business
+            R: Residence
+          example: B
+          default: B
+    VoiceConfiguration:
+      description: Configuration for voice
+      discriminator:
+        propertyName: type
+        mapping:
+          RTC: '#/components/schemas/RTCConfiguration'
+          EST: '#/components/schemas/ESTConfiguration'
+          FAX: '#/components/schemas/FAXConfiguration'
+      oneOf:
+      - $ref: '#/components/schemas/RTCConfiguration'
+      - $ref: '#/components/schemas/ESTConfiguration'
+      - $ref: '#/components/schemas/FAXConfiguration'
+    FAXConfiguration:
+      type: object
+      title: FAX
+      description: When you want to use the number for fax
+      properties:
+        type:
+          type: string
+          enum:
+          - FAX
+          x-enumDescriptions:
+            FAX: Indicates Fax capability.
+          default: FAX
+        serviceId:
+          type: string
+          example: 01G65Z755GHWAKHE12NY0CQO0T
+    OrderListItem:
+      type: object
+      properties:
+        id:
+          type: number
+          description: The unique identifier for the order
+          readOnly: true
+          example: 890192331
+        status:
+          $ref: '#/components/schemas/OrderStatus'
+        customerOrderReference:
+          type: string
+          description: Your reference you specified when creating the order
+          example: '123456'
+          default: ''
+        createdDate:
+          readOnly: true
+          description: The date the order was created, in `YYYY-MM-DD` format.
+          type: string
+          format: date
+          example: '2024-09-24'
+        phoneNumberQuantity:
+          type: number
+          readOnly: true
+          description: The number of phone numbers in the order, a helper property for you, this can also be done by and counting on the `numbers` collection
+        focQuantity:
+          type: number
+          readOnly: true
+          description: The number of phone numbers that are confirmed, a helper property for you, this can also be done by and counting on the `numbers` collection and  filtering on status `CONFIRMED`
+        activatedQuantity:
+          type: number
+          readOnly: true
+          description: The number of phone numbers that are activated, The number of phone numbers that are confirmed, a helper property for you, this can also be done by and counting on the `numbers` collection and  filtering on status `COMPLETE`
+        rejectedQuantity:
+          type: number
+          readOnly: true
+          description: The number of phone numbers that are rejected, This can be done by counting on the `phoneNumbers` collection and  filtering on status `REJECTED`
+        excludedQuantity:
+          type: number
+          readOnly: true
+          description: The number of phone numbers that are activated, The number of phone numbers that are confirmed, a helper property for you, this can also be done by and counting on the `numbers` collection and filtering on status `EXCLUDED`
+    Feature:
+      type: object
+      properties:
+        e911:
+          type: object
+          description: An object describing the emergency 911 contact address associated with the number.
+          properties:
+            name:
+              type: string
+              description: The contact name.
+            streetNum:
+              type: string
+              description: The street number for the emergency address.
+              example: '12345'
+            streetInfo:
+              type: string
+              description: The street name of the emergency location.
+              example: Main St
+            location:
+              type: string
+              description: The location for address.
+              example: Apt 5
+            city:
+              type: string
+              description: The city of the emergency location.
+              example: Springfield
+            state:
+              type: string
+              description: The state or province of the emergency location.
+              example: IL
+            postalCode:
+              type: string
+              description: The postal code of the emergency location.
+              example: '62701'
+            postalCodePlusFour:
+              type: string
+              description: The postal code of the emergency location.
+              example: '1234'
+            enhStreetNum:
+              description: The validated street number.
+              type: string
+              readOnly: true
+            enhStreetInfo:
+              description: The validated street.
+              type: string
+              readOnly: true
+            enhLocation:
+              description: The validated street location.
+              type: string
+              readOnly: true
+            enhCity:
+              description: The validated city.
+              type: string
+              readOnly: true
+            enhState:
+              description: The validated state.
+              type: string
+              readOnly: true
+            enhPostalCode:
+              description: The validated postal code.
+              type: string
+              readOnly: true
+            enhPostalCodePlusFour:
+              description: The validated postal code +4 digits.
+              type: string
+              readOnly: true
+    OrderStatus:
+      type: string
+      description: The current status of the port order.
+      enum:
+      - PENDING
+      - CONFIRMED
+      - COMPLETED
+      - CANCELED
+      readOnly: true
+      x-enumDescriptions:
+        ORDER_BUILDING: The order is being created
+        PENDING: The order is pending, and can be updated
+        CONFIRMED: The order is confirmed, and can not be updated but if onDemand is true it can be activated
+        COMPLETED: The order is completed, the port has completed and the numbers are active
+        CANCELED: The order is cancelled, either by the customer or by the system
+    OrderNote:
+      type: object
+      properties:
+        note:
+          type: string
+          description: The message of the note.
+        createdTime:
+          type: string
+          description: The date and time when the note was created in UTC ISO https://www.ietf.org/rfc/rfc3339.txt.
+        createdBy:
+          type: string
+          description: The user who created the note.
+    PhoneNumberMinItem:
+      type: object
+      description: The minimum required fields for a phone number to be ported.
+      required:
+      - phoneNumber
+      - endUser
+      allOf:
+      - $ref: '#/components/schemas/PhoneNumberItem'
+    OrderDocumentWithContent:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/OrderDocumentBase'
+      - type: object
+        properties:
+          fileContent:
+            type: string
+            description: Base64-encoded content representing the file contents.
+  parameters:
+    Page:
+      in: query
+      name: page
+      description: The page you want to retrieve returned from a previous List request, if any
+      schema:
+        type: string
+    PageSize:
+      name: pageSize
+      in: query
+      description: The maximum number of items to return per request. The default is 100 and the maximum is 1000. If you need to export larger amounts and pagination is not suitable for you can use the Export function in the dashboard.
+      schema:
+        type: integer
+        maximum: 1000
+        minimum: 1
+  requestBodies:
+    OrderPortInRequest:
+      content:
+        application/json:
+          schema:
+            required:
+            - desiredPortSchedule
+            - phoneNumbers
+            allOf:
+            - $ref: '#/components/schemas/OrderBaseItem'
+          example:
+            desiredPortSchedule:
+              desiredPortDate: '2025-01-31'
+              desiredPortTime: '10:00:00'
+              desiredPortTimeZone: US/Eastern
+            phoneNumbers:
+            - phoneNumber: '+12345678901'
+              voiceConfiguration:
+                type: EST
+                trunkId: '123456'
+              portOutInfo:
+                existingPortOutPin: '1234'
+              endUser:
+                name: John Doe
+                streetName: Main St
+                streetNum: '123'
+                city: Anytown
+                state: NY
+                zipCode: '12345'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Your key ID and Key secret serve as the username and password, respectively. Both can be found in the [Sinch Build Dashboard](https://dashboard.sinch.com/settings/access-keys). For more information about basic authentication in the Numbers API, click [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/basic).
+    bearerAuth:
+      type: oauth2
+      description: The username and password are your Key ID and Key Secret from the [Sinch Build Dashboard](https://dashboard.sinch.com/settings/access-keys). Exchange these for a bearer token (access token). Learn how [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

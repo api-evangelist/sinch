@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-cover-page-schema.json",
+  "title": "CoverPage",
+  "description": "A cover page resource",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-fax-api-openapi.yml#/components/schemas/CoverPage",
+  "type": "object",
+  "required": [
+    "file",
+    "name"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "format": "ulid",
+      "readOnly": true,
+      "description": "ID of the cover page"
+    },
+    "name": {
+      "description": "The friendly name of the cover page."
+    },
+    "file": {
+      "type": "object",
+      "required": [
+        "fileContent",
+        "fileType"
+      ],
+      "properties": {
+        "fileContent": {
+          "type": "string",
+          "format": "base64",
+          "contentEncoding": "base64",
+          "description": "A PDF Cover encoded as base64"
+        },
+        "fileType": {
+          "type": "string",
+          "enum": [
+            "PDF"
+          ],
+          "description": "For now only PDF is supported.",
+          "x-enumDescriptions": {
+            "PDF": "A PDF file."
+          },
+          "default": "PDF"
+        }
+      },
+      "description": "A PDF Cover encoded as base64"
+    },
+    "projectId": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ProjectId"
+        }
+      ],
+      "readOnly": true
+    },
+    "serviceId": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/ServiceId"
+        }
+      ],
+      "readOnly": true
+    },
+    "createdTime": {
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true,
+      "description": "The date and time the cover page was created."
+    },
+    "updatedTime": {
+      "type": "string",
+      "readOnly": true,
+      "format": "date-time",
+      "description": "The date and time the cover page was updated."
+    }
+  },
+  "$defs": {
+    "ProjectId": {
+      "type": "string",
+      "x-PII": false,
+      "x-v1": false,
+      "description": "The `Id` of the project associated with the call.",
+      "x-Internal": "to support future account keys",
+      "readOnly": true
+    },
+    "ServiceId": {
+      "x-PII": false,
+      "x-v1": true,
+      "readOnly": true,
+      "type": "string",
+      "description": "ID of the fax service used."
+    }
+  }
+}

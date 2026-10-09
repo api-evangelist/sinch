@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-attachment-schema.json",
+  "title": "Attachment",
+  "description": "Attachment file linked to the brand. It can be added by url or using the specified endpoint. Only the latest version of each attachment type is kept per Brand.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-compliance-brands-api-openapi.yml#/components/schemas/Attachment",
+  "type": "object",
+  "properties": {
+    "attachmentId": {
+      "description": "Unique identifier of the attachment.",
+      "type": "string",
+      "readOnly": true
+    },
+    "fileName": {
+      "description": "Human readable name of the attachment.",
+      "type": "string"
+    },
+    "attachmentType": {
+      "description": "Attachment type",
+      "$ref": "#/$defs/AttachmentType"
+    },
+    "mimeType": {
+      "description": "MIME type of the attachment file.",
+      "type": "string",
+      "readOnly": true
+    },
+    "uploadStatus": {
+      "description": "Status of the file uploaded",
+      "enum": [
+        "COMPLETED",
+        "WAITING",
+        "FAILED"
+      ],
+      "x-enumDescriptions": {
+        "COMPLETED": "Attachment successfully uploaded and linked to the registration",
+        "WAITING": "Attachment processing is still ongoing.",
+        "FAILED": "Attachment uploading has failed for any reason."
+      },
+      "type": "string",
+      "readOnly": true
+    },
+    "createTime": {
+      "description": "Create time of the request. ISO date time format in UTC.",
+      "type": "string",
+      "readOnly": true,
+      "format": "date-time"
+    },
+    "updateTime": {
+      "description": "Update time of the request. ISO date time format in UTC.",
+      "type": "string",
+      "readOnly": true,
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "AttachmentType": {
+      "description": "Attachment type",
+      "enum": [
+        "COMPANY_BANNER",
+        "COMPANY_LOGO"
+      ],
+      "x-enum-varnames": [
+        "COMPANY_BANNER",
+        "COMPANY_LOGO"
+      ],
+      "x-enumDescriptions": {
+        "COMPANY_BANNER": "Banner attachment",
+        "COMPANY_LOGO": "Logo attachment"
+      },
+      "type": "string"
+    }
+  }
+}

@@ -1,0 +1,84 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-voice-configuration-schema.json",
+  "title": "VoiceConfiguration",
+  "description": "Configuration for voice",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-porting-api-openapi.yml#/components/schemas/VoiceConfiguration",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/RTCConfiguration"
+    },
+    {
+      "$ref": "#/$defs/ESTConfiguration"
+    },
+    {
+      "$ref": "#/$defs/FAXConfiguration"
+    }
+  ],
+  "$defs": {
+    "ESTConfiguration": {
+      "type": "object",
+      "title": "EST",
+      "description": "When you want to use the number for elastic sip trunking",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "EST"
+          ],
+          "x-enumDescriptions": {
+            "EST": "Indicates Elastic SIP Trunking capability."
+          },
+          "default": "EST"
+        },
+        "trunkId": {
+          "type": "string"
+        }
+      }
+    },
+    "FAXConfiguration": {
+      "type": "object",
+      "title": "FAX",
+      "description": "When you want to use the number for fax",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "FAX"
+          ],
+          "x-enumDescriptions": {
+            "FAX": "Indicates Fax capability."
+          },
+          "default": "FAX"
+        },
+        "serviceId": {
+          "type": "string"
+        }
+      }
+    },
+    "RTCConfiguration": {
+      "type": "object",
+      "title": "RTC",
+      "description": "If you want to use the number with programmable voice",
+      "properties": {
+        "type": {
+          "type": "string",
+          "enum": [
+            "RTC"
+          ],
+          "x-enumDescriptions": {
+            "RTC": "Indicates programmable voice capability."
+          },
+          "default": "RTC"
+        },
+        "appId": {
+          "type": "string",
+          "description": "The app id from the dashboard where you want to use the number"
+        }
+      }
+    }
+  }
+}

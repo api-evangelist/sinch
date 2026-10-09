@@ -1,0 +1,159 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-brand-metadata-schema.json",
+  "title": "BrandMetadata",
+  "description": "The metadata required to build the brand registration form.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-brands-api-openapi.yml#/components/schemas/BrandMetadata",
+  "properties": {
+    "brandMetadataId": {
+      "description": "The unique identifier for the brand metadata.",
+      "type": "string"
+    },
+    "brandType": {
+      "$ref": "#/$defs/BrandType"
+    },
+    "marketCode": {
+      "description": "The market code for the brand metadata type.",
+      "type": "string"
+    },
+    "majorVersion": {
+      "description": "The major version of the brand metadata type.",
+      "type": "integer"
+    },
+    "minorVersion": {
+      "description": "The minor version of the brand metadata type.",
+      "type": "integer"
+    },
+    "createTime": {
+      "description": "The date and time when the brand metadata was created.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "data": {
+      "description": "The list of categories included in the brand metadata. Each of them includes a list of attributes.",
+      "items": {
+        "$ref": "#/$defs/BrandMetadataCategory"
+      },
+      "type": "array"
+    }
+  },
+  "$defs": {
+    "BrandMetadataCategory": {
+      "description": "A category of data that contains a set of attributes and validation rules.",
+      "properties": {
+        "categoryType": {
+          "description": "Category type",
+          "type": "string"
+        },
+        "title": {
+          "description": "Title is useful to display the category in the UI.",
+          "type": "string"
+        },
+        "attributes": {
+          "description": "The list of attributes included in the category.",
+          "items": {
+            "$ref": "#/$defs/BrandMetadataCategoryAttribute"
+          },
+          "type": "array"
+        }
+      }
+    },
+    "BrandMetadataCategoryAttribute": {
+      "description": "An attribute of a category that contains a set of validation rules.",
+      "properties": {
+        "description": {
+          "description": "Attribute description. It should be used as a description, hoover or helping text in a UI.",
+          "type": "string"
+        },
+        "title": {
+          "description": "Title of the attribute that can be used in the UI to request the attribute field.",
+          "type": "string"
+        },
+        "required": {
+          "description": "Indicates whether the attribute is required or not.",
+          "type": "boolean"
+        },
+        "type": {
+          "description": "The type of the attribute.",
+          "type": "string"
+        },
+        "maxLength": {
+          "description": "Max length of text field",
+          "type": "integer"
+        },
+        "minLength": {
+          "description": "Min length of text field",
+          "type": "integer"
+        },
+        "name": {
+          "description": "Name of the field. Serves as a key (reference) to a field",
+          "type": "string"
+        },
+        "pattern": {
+          "description": "Regex pattern validation",
+          "type": "string"
+        },
+        "message": {
+          "description": "Pattern validation message",
+          "properties": {
+            "pattern": {
+              "description": "Pattern validation message",
+              "type": "string"
+            },
+            "maxLength": {
+              "description": "Max length of the field value",
+              "type": "string"
+            },
+            "minLength": {
+              "description": "Min length of the field value",
+              "type": "string"
+            },
+            "minItems": {
+              "description": "The minimum number of items in the array that must be selected. Used in array types.",
+              "type": "string"
+            }
+          }
+        },
+        "items": {
+          "description": "Some attributes can be an array of items. This field is used to define the values the customer can select.",
+          "properties": {
+            "type": {
+              "description": "The type of the attribute. Along with the type, api can provide a set of values under enum property",
+              "type": "string"
+            },
+            "enum": {
+              "description": "The list of possible values for the attribute.",
+              "items": {
+                "type": "string"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "minItems": {
+          "description": "The minimum number of items in the array that must be selected. Used in array types.",
+          "type": "integer"
+        },
+        "multiline": {
+          "description": "Indicates whether the attribute is a multiline text field or not.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "BrandType": {
+      "enum": [
+        "US_SHORT_CODE_REGISTRY"
+      ],
+      "x-enumDescriptions": {
+        "US_SHORT_CODE_REGISTRY": "US Short Code Registry, for US Short Code Campaigns."
+      },
+      "type": "string",
+      "format": "enum"
+    }
+  }
+}

@@ -1,0 +1,203 @@
+openapi: 3.2.0
+info:
+  title: Advanced porting API
+  description: Automated processing of port-in phone number operations
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- url: https://porting.api.sinch.com/v1/projects/{projectId}
+  description: v1.0 of the porting API
+  variables:
+    projectId:
+      description: The project with which you are working.
+      default: YOUR_project_id
+security:
+- basicAuth: []
+- bearerAuth: []
+tags:
+- name: Advanced porting
+  description: This section is for advanced porting operations, like on demand activating numbers, getting available numbers for activation, and more.
+paths:
+  /orders/portIns/{orderId}/availableActivations:
+    get:
+      operationId: getPortInAvailableActivation
+      tags:
+      - Advanced porting
+      description: 'Retrieve Port-In Order Available Activation Groups
+
+        This operation allows you to get a list of phone number groups currently available for activation on a port-in order. FOC (portDate) must be today or earlier, and the numbers must be in routing on the Sinch network.'
+      summary: List port-in activation groups
+      parameters:
+      - in: path
+        name: orderId
+        schema:
+          type: string
+        example: 897867
+        required: true
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    phoneNumberGroup:
+                      type: string
+                      example: GW Verizon Grp1
+                    focDate:
+                      type: string
+                    phoneNumbers:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          phoneNumber:
+                            type: string
+                          voiceConfiguration:
+                            $ref: '#/components/schemas/VoiceConfiguration'
+                          smsConfiguration:
+                            $ref: '#/components/schemas/SmsConfiguration'
+  /orders/portIns/{orderId}/activate:
+    post:
+      tags:
+      - Advanced porting
+      operationId: activatePortIn
+      summary: On demand activation
+      description: 'Activate numbers that are ready to be ported.
+
+        Confirmation date (FOC) must be today or earlier,
+
+        and the numbers must be in routing on the Sinch network (occurs at midnight on the date of the port, after concurrence,
+
+        or following the 18-hour wireline port timer expiration on expedited ports).
+
+
+        **Note:** In order to send SMS and MMS messages in the US using 10DLC phone numbers, all messages must be sent via an approved campaign. Your campaigns are managed under US 10DLC Campaigns in the SMS section. A number can be associated to an approved campaign after the port completes.'
+      parameters:
+      - in: path
+        name: orderId
+        schema:
+          type: string
+        example: 897867
+        required: true
+      requestBody:
+        $ref: '#/components/requestBodies/ActivatePortInRequest'
+      responses:
+        '200':
+          description: Successful operation
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PortInOrderGroup'
+components:
+  schemas:
+    PortInOrderGroup:
+      type: object
+      description: The collection of port-in orders.
+      properties:
+        phoneNumberGroups:
+          type: array
+          description: A group of phone numbers to be ported in.
+          items:
+            type: object
+            properties:
+              phoneNumberGroup:
+                type: string
+              status:
+                type: string
+    VoiceConfiguration:
+      description: Configuration for voice
+      discriminator:
+        propertyName: type
+        mapping:
+          RTC: '#/components/schemas/RTCConfiguration'
+          EST: '#/components/schemas/ESTConfiguration'
+          FAX: '#/components/schemas/FAXConfiguration'
+      oneOf:
+      - $ref: '#/components/schemas/RTCConfiguration'
+      - $ref: '#/components/schemas/ESTConfiguration'
+      - $ref: '#/components/schemas/FAXConfiguration'
+    FAXConfiguration:
+      type: object
+      title: FAX
+      description: When you want to use the number for fax
+      properties:
+        type:
+          type: string
+          enum:
+          - FAX
+          x-enumDescriptions:
+            FAX: Indicates Fax capability.
+          default: FAX
+        serviceId:
+          type: string
+          example: 01G65Z755GHWAKHE12NY0CQO0T
+    ESTConfiguration:
+      type: object
+      title: EST
+      description: When you want to use the number for elastic sip trunking
+      properties:
+        type:
+          type: string
+          enum:
+          - EST
+          x-enumDescriptions:
+            EST: Indicates Elastic SIP Trunking capability.
+          default: EST
+        trunkId:
+          type: string
+          example: 01G65Z755AFWAKHE12NY0CQ9FH
+    RTCConfiguration:
+      type: object
+      title: RTC
+      description: If you want to use the number with programmable voice
+      properties:
+        type:
+          type: string
+          enum:
+          - RTC
+          x-enumDescriptions:
+            RTC: Indicates programmable voice capability.
+          default: RTC
+        appId:
+          type: string
+          description: The app id from the dashboard where you want to use the number
+          example: 6afd2da3-1692-4443-834c-8a2f386ec284
+    SmsConfiguration:
+      type: object
+      description: Configuration for what sms service id to use, and other sms related configurations
+      properties:
+        smsAppId:
+          type: string
+  requestBodies:
+    ActivatePortInRequest:
+      required: false
+      description: If you want to only activate certain numbers in the order, include this request body with the phone numbers you want to activate.
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              phoneNumberGroups:
+                type: array
+                items:
+                  type: string
+                  description: The phone number in the order you want to port-in.
+                  example: '+17775559999'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Your key ID and Key secret serve as the username and password, respectively. Both can be found in the [Sinch Build Dashboard](https://dashboard.sinch.com/settings/access-keys). For more information about basic authentication in the Numbers API, click [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/basic).
+    bearerAuth:
+      type: oauth2
+      description: The username and password are your Key ID and Key Secret from the [Sinch Build Dashboard](https://dashboard.sinch.com/settings/access-keys). Exchange these for a bearer token (access token). Learn how [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

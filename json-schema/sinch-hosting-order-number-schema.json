@@ -1,0 +1,154 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-hosting-order-number-schema.json",
+  "title": "HostingOrderNumber",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-imported-numbers-hosting-orders-api-openapi.yml#/components/schemas/HostingOrderNumber",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string",
+      "description": "The project ID to which the number belongs."
+    },
+    "hostingOrderId": {
+      "type": "string",
+      "description": "The ID of the hosting order to which the number belongs."
+    },
+    "phoneNumber": {
+      "type": "string",
+      "description": "The phone number in e.164 format with leading +."
+    },
+    "osrUpdate": {
+      "$ref": "#/$defs/HostingOrderNumber_OsrUpdate"
+    },
+    "campaignProvisioning": {
+      "$ref": "#/$defs/HostingOrderNumber_CampaignProvisioning"
+    },
+    "platformProvisioning": {
+      "$ref": "#/$defs/HostingOrderNumber_PlatformProvisioning"
+    },
+    "smsAtt": {
+      "description": "Contains information about hosted SMS AT&T numbers.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/CarrierState"
+        }
+      ]
+    },
+    "smsTmo": {
+      "description": "Contains information about hosted SMS T-Mobile numbers.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/CarrierState"
+        }
+      ]
+    },
+    "mmsAtt": {
+      "description": "Contains information about hosted MMS AT&T numbers.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/CarrierState"
+        }
+      ]
+    },
+    "mmsTmo": {
+      "description": "Contains information about hosted MMS T-Mobile numbers.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/CarrierState"
+        }
+      ]
+    }
+  },
+  "$defs": {
+    "CarrierState": {
+      "type": "object",
+      "description": "Contains information about the state of the carrier.",
+      "properties": {
+        "state": {
+          "$ref": "#/$defs/State"
+        },
+        "errorCode": {
+          "$ref": "#/$defs/ErrorCode"
+        },
+        "errorMessage": {
+          "$ref": "#/$defs/ErrorMessage"
+        },
+        "updateTime": {
+          "$ref": "#/$defs/UpdateTime"
+        }
+      }
+    },
+    "ErrorCode": {
+      "type": "string",
+      "description": "An optional string field that contains an error code if the operation failed. This field is empty (\"\") when there is no error."
+    },
+    "ErrorMessage": {
+      "type": "string",
+      "description": "An optional string field that provides a human-readable message describing the error. This field is empty (\"\") when no error has occurred."
+    },
+    "HostingOrderNumber_CampaignProvisioning": {
+      "description": "An object containing information about campaign provisioning.",
+      "type": "object",
+      "properties": {
+        "campaignId": {
+          "type": "string",
+          "description": "The campaign ID to which the hosting order is associated."
+        },
+        "state": {
+          "$ref": "#/$defs/State"
+        }
+      }
+    },
+    "HostingOrderNumber_OsrUpdate": {
+      "description": "An object containing information about the OSR update.",
+      "type": "object",
+      "properties": {
+        "nnid": {
+          "type": "string",
+          "description": "The Net Number ID identifying the phone number."
+        },
+        "state": {
+          "$ref": "#/$defs/State"
+        }
+      }
+    },
+    "HostingOrderNumber_PlatformProvisioning": {
+      "description": "An object containing information related to the provisioning on the platform.",
+      "type": "object",
+      "properties": {
+        "servicePlanId": {
+          "type": "string",
+          "description": "The service plan ID to which the hosting order number is associated."
+        },
+        "state": {
+          "$ref": "#/$defs/State"
+        }
+      }
+    },
+    "State": {
+      "type": "string",
+      "description": "Indicates the current state of the operation.",
+      "enum": [
+        "DONE",
+        "FAILED",
+        "IN_PROGRESS",
+        "WAITING",
+        "STATE_UNSPECIFIED"
+      ],
+      "x-enumDescriptions": {
+        "DONE": "The operation was completed successfully.",
+        "FAILED": "The operation has failed.",
+        "IN_PROGRESS": "The operation is currently in progress.",
+        "WAITING": "The operation is pending and has not yet started.",
+        "STATE_UNSPECIFIED": "The state is unspecified."
+      }
+    },
+    "UpdateTime": {
+      "type": "string",
+      "description": "A timestamp in ISO 8601 format indicating the last time the status was updated."
+    }
+  }
+}

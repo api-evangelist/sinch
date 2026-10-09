@@ -1,36 +1,46 @@
-specification: API Commons Rate Limits
-specificationVersion: '0.1'
-schema: https://raw.githubusercontent.com/api-evangelist/interface-research/main/schema/api-commons.yml#/$defs/RateLimits
-provider: Sinch
-providerId: sinch
-created: '2026-05-04'
-# Provenance stamped 2026-08-11: this artifact was written by the API Evangelist
-# bulk sweep dated 2026-05-04, not harvested from the provider. See roadmap#35.
-method: generated
-modified: '2026-05-04'
-reconciled: true
-tags:
-  - Rate Limiting
-  - Communications
-description: Sinch API rate limits per service plan.
-sources:
-  - https://www.sinch.com/pricing/
-  - https://developers.sinch.com/docs/sms/api-reference/
-headers:
-  retryAfter: Retry-After
-responseCodes:
-  throttled: 429
+generated: '2026-10-08'
+method: searched
+source: https://developers.sinch.com/docs/conversation/api-reference/conversation.md
+name: Sinch API rate limits
+description: Published limits are per product. The Conversation API reference states a project-wide request rate and a per-app
+  ingress queue drain rate; other products document the 429 behaviour without a number, except Number Lookup v2 (10 rps, recorded
+  under additional_documented_limits with its own page because check-economics verifies every limit_text against this file's
+  single source page).
+limit_count: 2
 limits:
-  - name: SMS API
-    scope: service_plan
-    metric: messages_per_second
-    limit: 100
-    timeFrame: second
-  - name: Voice API
-    scope: app
-    metric: calls_per_second
-    limit: varies
-  - name: RCS API
-    scope: agent
-    metric: messages_per_second
-    limit: varies
+- name: Conversation API project request rate
+  limit_text: Projects are limited to 800 requests per second across all apps and most endpoints.
+  limit: 800
+  window: second
+  scope: per-project
+  status_on_exhaustion: 429
+- name: Conversation API app MT ingress queue drain
+  limit_text: Conversation API apps have a maximum MT ingress queue size of 500000 messages, which are drained towards the
+    channel at a rate of 20 messages per second by default
+  limit: 20
+  window: second
+  scope: per-app
+  kind: throughput
+  queue_size: 500000
+  status_on_exhaustion: 429
+additional_documented_limits:
+- name: Number Lookup API v2 default rate
+  limit_text: The default rate limit is 10 requests per second.
+  limit: 10
+  window: second
+  scope: per-project
+  source: https://developers.sinch.com/docs/number-lookup-api-v2/api-reference/errors.md
+  status_on_exhaustion: 429
+- name: Fax API / Porting API 429
+  limit_text: Rate limit exceeded, please back off and try again later.
+  source: https://developers.sinch.com/docs/fax/api-reference/fax.md
+  status_on_exhaustion: 429
+- name: Voice API v1 42900
+  limit_text: This error occurs when rate limit is exceeded. It means that the number of requests sent to the API exceeds
+    the allowed limit.
+  source: https://developers.sinch.com/docs/voice/api-reference/errors.md
+  status_on_exhaustion: 429
+  error_code: 42900
+headers:
+  documented: false
+  note: No X-RateLimit-*, RateLimit-* or Retry-After headers are documented on any Sinch reference page read on 2026-10-08.

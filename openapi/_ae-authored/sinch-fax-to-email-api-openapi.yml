@@ -1,0 +1,156 @@
+openapi: 3.2.0
+info:
+  title: Sinch Fax Fax to Email API
+  description: The Sinch Fax API allows developers to send and receive faxes programmatically at scale. It supports sending faxes to single or multiple recipients, downloading received faxes, and managing fax numbers. The API is HIPAA, SOC 2 Type 1, and GDPR compliant, making it suitable for healthcare and other regulated industries that require secure document transmission. It integrates with the Sinch Numbers API for provisioning fax-capable phone numbers.
+  version: '3.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://fax.api.sinch.com
+  description: Global Production Server
+security:
+- oAuth2: []
+- basicAuth: []
+tags:
+- name: Fax to Email
+  description: Configure fax-to-email forwarding for incoming faxes on a service.
+paths:
+  /v3/projects/{project_id}/services/{service_id}/emails:
+    post:
+      operationId: createFaxToEmail
+      summary: Create a Fax-to-email Configuration
+      description: Configures an email address to receive incoming faxes for a specific fax service.
+      tags:
+      - Fax to Email
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ServiceId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/FaxToEmailRequest'
+      responses:
+        '200':
+          description: Fax-to-email configured
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaxToEmail'
+        '400':
+          description: Invalid request
+        '401':
+          description: Unauthorized
+    get:
+      operationId: listFaxToEmails
+      summary: List Fax-to-email Configurations
+      description: Returns the list of email addresses configured for fax-to-email on a service.
+      tags:
+      - Fax to Email
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ServiceId'
+      responses:
+        '200':
+          description: List of fax-to-email configurations
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/FaxToEmailList'
+        '401':
+          description: Unauthorized
+  /v3/projects/{project_id}/services/{service_id}/emails/{email}:
+    delete:
+      operationId: deleteFaxToEmail
+      summary: Delete a Fax-to-email Configuration
+      description: Removes an email address from the fax-to-email configuration.
+      tags:
+      - Fax to Email
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - $ref: '#/components/parameters/ServiceId'
+      - name: email
+        in: path
+        required: true
+        description: The email address to remove
+        schema:
+          type: string
+          format: email
+      responses:
+        '200':
+          description: Fax-to-email configuration removed
+        '401':
+          description: Unauthorized
+        '404':
+          description: Configuration not found
+components:
+  schemas:
+    FaxToEmailRequest:
+      type: object
+      required:
+      - email
+      properties:
+        email:
+          type: string
+          format: email
+          description: The email address for fax-to-email
+        phoneNumber:
+          type: string
+          description: Specific phone number to associate
+    FaxToEmail:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          description: The configured email address
+        phoneNumber:
+          type: string
+          description: The associated phone number
+        serviceId:
+          type: string
+          description: The service ID
+        projectId:
+          type: string
+          description: The project ID
+    FaxToEmailList:
+      type: object
+      properties:
+        emails:
+          type: array
+          description: List of fax-to-email configurations
+          items:
+            $ref: '#/components/schemas/FaxToEmail'
+  parameters:
+    ServiceId:
+      name: service_id
+      in: path
+      required: true
+      description: The unique service identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Application key and secret for basic authentication.
+externalDocs:
+  description: Sinch Fax API Documentation
+  url: https://developers.sinch.com/docs/fax

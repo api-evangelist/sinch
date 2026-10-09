@@ -1,0 +1,454 @@
+openapi: 3.2.0
+info:
+  title: Numbers | Sinch Numbers Callbacks API
+  description: '# Overview
+
+
+    The Numbers API enables you to search for, buy, view, and manage numbers.'
+  version: 1.0.3
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- url: https://numbers.api.sinch.com
+  description: Global API
+security:
+- Basic: []
+- OAuth2.0: []
+tags:
+- name: Numbers Callbacks
+  description: You can set up callback URLs to receive event notifications when your numbers are updated.
+paths:
+  /v1/projects/{projectId}/callbackConfiguration:
+    get:
+      summary: Get callbacks configuration
+      description: Returns the callbacks configuration for the specified project
+      operationId: GetCallbackConfiguration
+      responses:
+        '200':
+          description: Callbacks configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfiguration'
+        '400':
+          description: 400 Invalid Argument error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidArgument'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      tags:
+      - Numbers Callbacks
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage numbers.eventdestinations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.numbers.api.v1.EventDestinationsService;\nimport com.sinch.sdk.domains.numbers.models.v1.eventdestinations.response.EventDestinationResponse;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Get {\n\n  private static final Logger LOGGER = Logger.getLogger(Get.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    EventDestinationsService eventDestinationsService = client.numbers().v1().eventDestinations();\n\n    LOGGER.info(\"Get\");\n\n    EventDestinationResponse value = eventDestinationsService.get();\n\n    LOGGER.info(\"Response :\" + value);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try{\n    const response = await sinch.numbers.callbacks.get({});\n    console.log('✅ Successfully retrieved the callback configuration.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error('❌ Failed to retrieve the callback configuration:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\nfrom dotenv import load_dotenv\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\"\n)\n\nresponse = sinch_client.numbers.event_destinations.get()\n\nprint(\"Event Destination Configuration:\\n\", response)\n"
+    patch:
+      summary: Update callback configuration
+      description: Updates the callbacks configuration for the specified project
+      operationId: UpdateCallbackConfiguration
+      requestBody:
+        description: The callback configuration details to be updated.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackConfigurationUpdate'
+      responses:
+        '200':
+          description: Callback configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfiguration'
+        '400':
+          description: 400 Invalid Argument error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidArgument'
+        '403':
+          $ref: '#/components/responses/PermissionDenied'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      tags:
+      - Numbers Callbacks
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage numbers.eventdestinations;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.numbers.api.v1.EventDestinationsService;\nimport com.sinch.sdk.domains.numbers.models.v1.eventdestinations.request.EventDestinationUpdateRequest;\nimport com.sinch.sdk.domains.numbers.models.v1.eventdestinations.response.EventDestinationResponse;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Update {\n\n  private static final Logger LOGGER = Logger.getLogger(Update.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n\n    String hmac = \"NEW_HMAC_SECRET\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    EventDestinationsService eventDestinationsService = client.numbers().v1().eventDestinations();\n\n    LOGGER.info(\"Update callback HMAC secret\");\n\n    EventDestinationUpdateRequest parameters =\n        EventDestinationUpdateRequest.builder().setHmacSecret(hmac).build();\n\n    EventDestinationResponse value = eventDestinationsService.update(parameters);\n\n    LOGGER.info(\"Response :\" + value);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The new HMAC secret to configure for the callback\n  const hmacSecret = 'NEW_HMAC_SECRET';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try{\n    const response = await sinch.numbers.callbacks.update({\n      updateCallbackConfigurationRequestBody: {\n        hmacSecret,\n      },\n    });\n    console.log('✅ Successfully updated the callback configuration.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error('❌ Failed to update the callback configuration:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\nfrom dotenv import load_dotenv\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\"\n)\n\n# The HMAC secret for signing webhook requests to your event destination\nhmac_secret = \"NEW_HMAC_SECRET\"\n\nresponse = sinch_client.numbers.event_destinations.update(\n    hmac_secret=hmac_secret\n)\n\nprint(\"Updated event destination configuration:\\n\", response)\n"
+webhooks:
+  EventsCallback:
+    post:
+      tags:
+      - Numbers Callbacks
+      summary: Event notification
+      description: A notification of an event sent to your configured callback URL.
+      operationId: NumberService_EventsCallback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackPayload'
+      responses:
+        default:
+          description: 200 OK
+components:
+  schemas:
+    FieldViolation:
+      type: object
+      properties:
+        field:
+          type: string
+        description:
+          type: string
+    ResourceType:
+      type: string
+      description: The type of the resource.
+      x-enumDescriptions:
+        ACTIVE_NUMBER: Numbers which are already active and updated with new campaign IDs or service plan IDs.
+        NUMBER_ORDER: Number orders created for buying one or more phone numbers.
+      example: ACTIVE_NUMBER
+      enum:
+      - ACTIVE_NUMBER
+      - NUMBER_ORDER
+    CallbackPayloadActiveNumber:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/CallbackPayloadCommon'
+      properties:
+        eventType:
+          type: string
+          description: The type of the event.
+          enum:
+          - PROVISIONING_TO_SMS_PLATFORM
+          - DEPROVISIONING_FROM_SMS_PLATFORM
+          - PROVISIONING_TO_CAMPAIGN
+          - DEPROVISIONING_FROM_CAMPAIGN
+          - PROVISIONING_TO_VOICE_PLATFORM
+          - DEPROVISIONING_FROM_VOICE_PLATFORM
+          x-enumDescriptions:
+            PROVISIONING_TO_SMS_PLATFORM: An event that occurs when a number is linked to a Service Plan ID.
+            DEPROVISIONING_FROM_SMS_PLATFORM: An event that occurs when a number is unlinked from a Service Plan ID.
+            PROVISIONING_TO_CAMPAIGN: An event that occurs when a number is linked to a Campaign.
+            DEPROVISIONING_FROM_CAMPAIGN: An event that occurs when a number is unlinked from a Campaign.
+            PROVISIONING_TO_VOICE_PLATFORM: An event that occurs when a number is enabled for Voice operations.
+            DEPROVISIONING_FROM_VOICE_PLATFORM: An event that occurs when a number is disabled for Voice operations.
+          example: PROVISIONING_TO_CAMPAIGN
+        status:
+          type: string
+          description: The status of the event or the state transition it represents.
+          x-enumDescriptions:
+            SUCCEEDED: The event has succeeded.
+            FAILED: The event has failed.
+          enum:
+          - SUCCEEDED
+          - FAILED
+          example: FAILED
+        failureCode:
+          type: string
+          description: If the status is FAILED, a failure code will be provided. For numbers provisioning to SMS platform, there won't be any extra `failureCode`, as the result is binary. For campaign provisioning-related failures, refer to the list for the possible values.
+          example: CAMPAIGN_NOT_AVAILABLE
+          enum:
+          - CAMPAIGN_NOT_AVAILABLE
+          - EXCEEDED_10DLC_LIMIT
+          - NUMBER_PROVISIONING_FAILED
+          - PARTNER_SERVICE_UNAVAILABLE
+          - CAMPAIGN_PENDING_ACCEPTANCE
+          - MNO_SHARING_ERROR
+          - CAMPAIGN_PROVISIONING_FAILED
+          - CAMPAIGN_EXPIRED
+          - CAMPAIGN_MNO_REJECTED
+          - CAMPAIGN_MNO_SUSPENDED
+          - CAMPAIGN_MNO_REVIEW
+          - INSUFFICIENT_BALANCE
+          - MOCK_CAMPAIGN_NOT_ALLOWED
+          - TFN_NOT_ALLOWED
+          - INVALID_NNID
+          x-enumDescriptions:
+            CAMPAIGN_NOT_AVAILABLE: The specified campaign is not available.
+            EXCEEDED_10DLC_LIMIT: Exceeded the limit for 10DLC.
+            NUMBER_PROVISIONING_FAILED: Provisioning the number failed.
+            PARTNER_SERVICE_UNAVAILABLE: The third party service is unavailable.
+            CAMPAIGN_PENDING_ACCEPTANCE: The campaign is not yet accepted.
+            MNO_SHARING_ERROR: Error with MNO.
+            CAMPAIGN_PROVISIONING_FAILED: The campaign failed to provision.
+            CAMPAIGN_EXPIRED: The campaign expired.
+            CAMPAIGN_MNO_REJECTED: The campaign MNO was rejected.
+            CAMPAIGN_MNO_SUSPENDED: The campaign MNO was suspended.
+            CAMPAIGN_MNO_REVIEW: The campaign MNO is under review.
+            INSUFFICIENT_BALANCE: Not enough credit in the account.
+            MOCK_CAMPAIGN_NOT_ALLOWED: Provisioning not allowed for mock campaigns.
+            TFN_NOT_ALLOWED: Toll free numbers not allowed.
+            INVALID_NNID: Invalid NNID.
+        internalFailureCode:
+          type: string
+          description: If the status is FAILED, certain processes (eg. number to campaign provisioning) will have an internalFailureCode in the payload. The details of these codes can be found in our dedicated [Provisioning errors](https://developers.sinch.com/docs/numbers/api-reference/error-codes/provisioning-errors) documentation.
+          example: CRS0018
+        resourceId:
+          type: string
+          description: The unique identifier of the resource, depending on the resource type. For example, a phone number.
+          example: '+12345612345'
+    InvalidArgument:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+              - 400
+              x-enumDescriptions:
+                '400': The HTTP status code for invalid arguments.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+              - INVALID_ARGUMENT
+              x-enumDescriptions:
+                INVALID_ARGUMENT: The request contained invalid arguments.
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/BadRequest'
+    CallbackPayloadNumberOrder:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/CallbackPayloadCommon'
+      properties:
+        eventType:
+          type: string
+          description: The type of the event.
+          enum:
+          - NUMBER_ORDER_PROCESSING
+          x-enumDescriptions:
+            NUMBER_ORDER_PROCESSING: An event that occurs when a Number Order transitions to a new state.
+          example: NUMBER_ORDER_PROCESSING
+        status:
+          type: string
+          description: The status of the event or the state transition it represents.
+          x-enumDescriptions:
+            IN_REVIEW: The Number Order transitioned to the IN_REVIEW state.
+            BLOCKED: The Number Order transitioned to the BLOCKED state. The number order was blocked. To view any reasons associated with the BLOCKED status, use the [get number order registration operation](https://developers.sinch.com/docs/numbers/api-reference/numbers/number-order/getnumberorderregistration).
+            COMPLETED: The Number Order transitioned to the COMPLETED state. This is a final state and indicates the number order was successful.
+            REJECTED: The Number Order transitioned to the REJECTED state. This is a final state and indicates the number order was rejected.
+            EXPIRED: The Number Order transitioned to the EXPIRED state. This is a final state and indicates the number order expired.
+          enum:
+          - IN_REVIEW
+          - BLOCKED
+          - COMPLETED
+          - REJECTED
+          - EXPIRED
+          example: IN_REVIEW
+        resourceId:
+          type: string
+          description: The unique identifier of the resource, depending on the resource type. For example, a number order ID.
+          example: 01jgkbb8xywmz3hhahd76menqf
+    CallbackPayload:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/CallbackPayloadActiveNumber'
+      - $ref: '#/components/schemas/CallbackPayloadNumberOrder'
+      discriminator:
+        propertyName: resourceType
+        mapping:
+          ACTIVE_NUMBER: '#/components/schemas/CallbackPayloadActiveNumber'
+          NUMBER_ORDER: '#/components/schemas/CallbackPayloadNumberOrder'
+    CallbackConfigurationUpdate:
+      title: CallbackConfigurationUpdate
+      type: object
+      properties:
+        hmacSecret:
+          type: string
+          description: 'The HMAC secret to be updated for the specified project. It must be between 32 and 64 characters, alphanumeric (A-Z, a-z, 0-9) and hyphens (-) only. Regex pattern: ^[a-zA-Z0-9-]{32,64}$'
+      description: The request to update the callbacks configuration for the current project.
+    InternalError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+              - 500
+              x-enumDescriptions:
+                '500': The HTTP status code for an internal server error.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+              - INTERNAL
+              - UNKNOWN
+              x-enumDescriptions:
+                INTERNAL: An internal server error.
+                UNKNOWN: Some unknown error.
+            details:
+              type: array
+              items:
+                type: object
+    BadRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - BadRequest
+          x-enumDescriptions:
+            BadRequest: The request was malformed in some way.
+        fieldViolations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldViolation'
+    CallbackPayloadCommon:
+      type: object
+      required:
+      - resourceType
+      properties:
+        eventId:
+          type: string
+          description: The ID of the event.
+          example: abcd1234efghijklmnop567890
+        timestamp:
+          type: string
+          description: The date and time when the callback was created and added to the callbacks queue.
+          example: '2023-06-06T07:45:27.785357'
+        projectId:
+          type: string
+          description: The ID of the project to which the event belongs.
+          example: abcd12ef-ab12-ab12-bc34-abcdef123456
+        resourceType:
+          $ref: '#/components/schemas/ResourceType'
+    NotFound:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+              - 404
+              x-enumDescriptions:
+                '404': The HTTP status code for a resource not found.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+              - NOT_FOUND
+              x-enumDescriptions:
+                NOT_FOUND: The request resource could not be found.
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/NotFoundErrorDetails'
+    CallbackConfiguration:
+      description: Response message containing the callbacks configuration for a specific project.
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: ID of the project the configuration belongs to.
+          example: a99aa9aa-b888-777c-dd6d-ee55e5555555
+        hmacSecret:
+          type: string
+          description: The HMAC secret used for hashing the callback body using the HMAC-SHA1 algorithm - and for creating the `X-Sinch-Signature` header.
+          example: YOUR_hmac_secret
+    NotFoundErrorDetails:
+      type: object
+      properties:
+        type:
+          type: string
+        resourceType:
+          type: string
+          description: The type of the resource that was not found.
+        resourceName:
+          type: string
+          description: The name of the resource that was not found.
+        owner:
+          type: string
+          description: The owner of the resource that was not found.
+        description:
+          type: string
+          description: A description of the error.
+  responses:
+    PermissionDenied:
+      description: 'PERMISSION_DENIED: improper credentials. Be sure your projectId, username and password are correct.'
+      content:
+        application/json:
+          schema: {}
+          example:
+            error:
+              code: 403
+              message: ''
+              status: PERMISSION_DENIED
+              details: []
+  parameters:
+    projectId:
+      name: projectId
+      description: Found on your [Sinch Customer Dashboard](https://dashboard.sinch.com/settings/project-management). Settings > Projects.
+      in: path
+      required: true
+      schema:
+        type: string
+        example: YOUR_projectId
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: Your key ID and Key secret serve as the username and password, respectively. Both can be found in the [Sinch Customer Dashboard](https://dashboard.sinch.com/settings/access-keys). For more information about basic authentication in the Numbers API, click [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/basic).
+    OAuth2.0:
+      type: oauth2
+      description: The username and password are your Key ID and Key Secret from the [Access keys section](https://dashboard.sinch.com/settings/access-keys) in the Sinch Customer Dashboard. Exchange these for a bearer token (access token). Learn how [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php

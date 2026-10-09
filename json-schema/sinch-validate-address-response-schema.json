@@ -1,0 +1,98 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-validate-address-response-schema.json",
+  "title": "Validate Emergency Address Response",
+  "description": "Response object containing details of the emergency address.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-numbers-api-openapi.yml#/components/schemas/ValidateAddressResponse",
+  "type": "object",
+  "properties": {
+    "phoneNumber": {
+      "$ref": "#/$defs/PhoneNumber"
+    },
+    "displayName": {
+      "type": "string",
+      "description": "User supplied name for the phone number."
+    },
+    "validatedAddress": {
+      "$ref": "#/$defs/EmergencyAddress"
+    },
+    "validationResult": {
+      "$ref": "#/$defs/AddressValidationResultCode"
+    },
+    "validationMessage": {
+      "type": "string",
+      "description": "Validation result message"
+    },
+    "correctedAddress": {
+      "$ref": "#/$defs/EmergencyAddress"
+    },
+    "candidateAddresses": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/EmergencyAddress"
+      },
+      "description": "List of candidate addresses (only available if validationResult == NO_MATCH)"
+    }
+  },
+  "$defs": {
+    "AddressValidationResultCode": {
+      "type": "string",
+      "enum": [
+        "ADDRESS_VALIDATION_RESULT_CODE_UNSPECIFIED",
+        "EXACT_MATCH",
+        "NEAR_MATCH",
+        "NO_MATCH"
+      ],
+      "description": "Enum representing the result of address validation.",
+      "x-enumDescriptions": {
+        "ADDRESS_VALIDATION_RESULT_CODE_UNSPECIFIED": "Undetermined Result",
+        "EXACT_MATCH": "The address is perfect as sent",
+        "NEAR_MATCH": "The result was a close enough match and has been corrected",
+        "NO_MATCH": "The result is not close enough"
+      }
+    },
+    "EmergencyAddress": {
+      "type": "object",
+      "description": "Details of the emergency address.",
+      "title": "Emergency Address",
+      "properties": {
+        "streetNumber": {
+          "type": "string",
+          "description": "The street number for the emergency address."
+        },
+        "streetInfo": {
+          "type": "string",
+          "description": "The street name of the emergency location."
+        },
+        "location": {
+          "type": "string",
+          "description": "The location for address."
+        },
+        "city": {
+          "type": "string",
+          "description": "The city of the emergency location."
+        },
+        "state": {
+          "type": "string",
+          "description": "The state or province of the emergency location."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "The postal code of the emergency location."
+        },
+        "postalCodePlusFour": {
+          "type": "string",
+          "description": "The postal code of the emergency location."
+        }
+      }
+    },
+    "PhoneNumber": {
+      "type": "string",
+      "description": "The phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format with leading `+`. Example `+12025550134`.",
+      "title": "Phone Number"
+    }
+  }
+}

@@ -1,26 +1,88 @@
 openapi: 3.2.0
 info:
-  title: Sinch Conversation Apps API
-  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
+  title: Sinch Apps API
   version: '1.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  description: 'Operations tagged Apps across 2 of this provider''s published API definitions: sinch-chatlayer-analytics-api-openapi.yaml, original-sinch-conversation-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
+- url: https://analytics.api.chatlayer.ai
+  description: Europe
+- url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+  description: US
+- url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+  description: APAC
+- url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+  description: South America
 - url: https://us.conversation.api.sinch.com
   description: US Production Server
 - url: https://eu.conversation.api.sinch.com
   description: EU Production Server
 - url: https://br.conversation.api.sinch.com
   description: Brazil Production Server
-security:
-- oAuth2: []
-- basicAuth: []
 tags:
 - name: Apps
-  description: Manage Conversation API applications including channel credentials and webhook configurations.
 paths:
+  /v1/apps/{app_id}/logs/stream:
+    get:
+      tags:
+      - Apps
+      operationId: Analytics_ListAppIntegrationsLogs
+      parameters:
+      - name: app_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: query
+        in: query
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        description: 'The maximum number of logs to return.
+
+          The service may return fewer than this value.
+
+          The maximum value allowed is 100; value above 100 will be coerced to 100.'
+        schema:
+          type: integer
+          format: int32
+      - name: page_token
+        in: query
+        description: 'A page token, received from a previous ListAppIntegrationsLogsRequest call.
+
+          Provide this to retrieve a subsequent page.'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListAppIntegrationsLogsResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics list app integrations logs
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
   /v1/projects/{project_id}/apps:
     get:
       operationId: listApps
@@ -39,6 +101,9 @@ paths:
                 $ref: '#/components/schemas/AppList'
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
     post:
       operationId: createApp
       summary: Create an App
@@ -64,6 +129,16 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://us.conversation.api.sinch.com
+      description: US Production Server
+    - url: https://eu.conversation.api.sinch.com
+      description: EU Production Server
+    - url: https://br.conversation.api.sinch.com
+      description: Brazil Production Server
   /v1/projects/{project_id}/apps/{app_id}:
     get:
       operationId: getApp
@@ -85,6 +160,9 @@ paths:
           description: Unauthorized
         '404':
           description: App not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
     patch:
       operationId: updateApp
       summary: Update an App
@@ -111,6 +189,9 @@ paths:
           description: Unauthorized
         '404':
           description: App not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
     delete:
       operationId: deleteApp
       summary: Delete an App
@@ -127,42 +208,73 @@ paths:
           description: Unauthorized
         '404':
           description: App not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://us.conversation.api.sinch.com
+      description: US Production Server
+    - url: https://eu.conversation.api.sinch.com
+      description: EU Production Server
+    - url: https://br.conversation.api.sinch.com
+      description: Brazil Production Server
 components:
-  parameters:
-    AppId:
-      name: app_id
-      in: path
-      required: true
-      description: The unique app identifier
-      schema:
-        type: string
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
   schemas:
-    UpdateAppRequest:
+    ListAppIntegrationsLog:
       type: object
+      properties:
+        id:
+          type: string
+        app_id:
+          type: string
+        app_version:
+          type: string
+        platform_version:
+          type: string
+        log_message:
+          type: string
+        log_type:
+          type: string
+        severity_level:
+          type: integer
+          format: int32
+        timestamp:
+          type: string
+          format: date-time
+        log_attributes:
+          type: object
+          additionalProperties:
+            type: string
+        resource_attributes:
+          type: object
+          additionalProperties:
+            type: string
+        event_method:
+          type: string
+        event_command:
+          type: string
+    ListAppIntegrationsLogsResponse:
+      type: object
+      properties:
+        logs:
+          type: array
+          items:
+            $ref: '#/components/schemas/ListAppIntegrationsLog'
+        next_page_token:
+          type: string
+    CreateAppRequest:
+      type: object
+      required:
+      - display_name
       properties:
         display_name:
           type: string
-          description: Updated display name
+          description: The app display name
         channel_credentials:
           type: array
-          description: Updated channel credentials
+          description: Channel credential configurations
           items:
             $ref: '#/components/schemas/ChannelCredential'
-    AppList:
-      type: object
-      properties:
-        apps:
-          type: array
-          description: List of apps
-          items:
-            $ref: '#/components/schemas/App'
     ChannelCredential:
       type: object
       properties:
@@ -189,6 +301,25 @@ components:
         callback_secret:
           type: string
           description: Secret for validating callbacks from the channel
+    UpdateAppRequest:
+      type: object
+      properties:
+        display_name:
+          type: string
+          description: Updated display name
+        channel_credentials:
+          type: array
+          description: Updated channel credentials
+          items:
+            $ref: '#/components/schemas/ChannelCredential'
+    AppList:
+      type: object
+      properties:
+        apps:
+          type: array
+          description: List of apps
+          items:
+            $ref: '#/components/schemas/App'
     App:
       type: object
       properties:
@@ -206,20 +337,26 @@ components:
         conversation_metadata_report_view:
           type: string
           description: Metadata report configuration
-    CreateAppRequest:
-      type: object
-      required:
-      - display_name
-      properties:
-        display_name:
-          type: string
-          description: The app display name
-        channel_credentials:
-          type: array
-          description: Channel credential configurations
-          items:
-            $ref: '#/components/schemas/ChannelCredential'
+  parameters:
+    AppId:
+      name: app_id
+      in: path
+      required: true
+      description: The unique app identifier
+      schema:
+        type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Generate your access token on the [Chatlayer platform](https://app.chatlayer.ai/settings/api-access/tokens).
     oAuth2:
       type: oauth2
       description: OAuth 2.0 client credentials flow using project key ID and secret.
@@ -227,10 +364,14 @@ components:
         clientCredentials:
           tokenUrl: https://auth.sinch.com/oauth2/token
           scopes: {}
-    basicAuth:
-      type: http
-      scheme: basic
-      description: Key ID as username and key secret as password.
-externalDocs:
-  description: Sinch Conversation API Documentation
-  url: https://developers.sinch.com/docs/conversation
+x-refined-from:
+- sinch-chatlayer-analytics-api-openapi.yaml
+- original-sinch-conversation-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

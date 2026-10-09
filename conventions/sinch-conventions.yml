@@ -1,0 +1,103 @@
+generated: '2026-10-08'
+method: searched
+source: https://developers.sinch.com/docs/conversation/api-reference/conversation.md (auth, 429 rate limits, pagination params);
+  https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth.md; https://developers.sinch.com/docs/conversation/callbacks.md
+  (retries); https://developers.sinch.com/docs/voice-2.0/api-reference/webhook-signature.md; https://developers.sinch.com/docs/voice-2.0/api-reference/voice.md
+  (webhook idempotency note); the published contracts in openapi/
+name: Sinch API conventions
+api_style: REST over HTTPS, JSON; one base host per product (<product>.api.sinch.com) with regional hosts for Conversation
+  (us/eu/br), SMS (us/eu/au) and Voice v2 (us1/br1); resources scoped under /v1/projects/{projectId}
+authentication:
+  scheme: 'HTTP Basic (access key id : secret) or OAuth 2.0 client_credentials bearer token from https://auth.sinch.com/oauth2/token
+    on most products; Verification and Voice v1 also accept application-key signed requests; MMS (Mblox platform) uses an
+    API key'
+  token_lifetime_text: Access tokens are short lived. Typically, they will only last one hour.
+  docs: https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth
+  detail: authentication/sinch-authentication.yml
+idempotency:
+  coverage: partial
+  mechanism: request header / body token declared in the OpenAPI
+  description: 'No Idempotency-Key or equivalent request header is documented on any write operation in the 21 published contracts
+    or the reference pages. The only idempotency guidance is on the consumer side of Voice API v2 webhooks: "A failed request
+    is re-sent to the fallback URL, so the same event can arrive more than once. Make the handler idempotent and deduplicate
+    on the ce-id and ce-source headers".'
+  docs: https://developers.sinch.com/docs/voice-2.0/api-reference/voice
+  header: Idempotency-Key
+  evidence: Idempotency-Key on 5 of 244 mutating operations
+  verified: derived
+  scope:
+  - 'none: no write operation documents a replay-protection mechanism (Idempotency-Key or equivalent) in the 21 published
+    contracts'
+dry_run_mode:
+  supported: false
+  note: No dry-run or validate-only flag is documented on the message, call, number or porting write operations.
+reversibility:
+  grade: verified
+  description: Most writes have a documented reversal path; a stated window exists for sender removal and porting cancellation.
+  surfaces:
+  - write: Rent / order a phone number (NumberService_RentNumber, CreateNumberOrder)
+    reversal: NumberService_ReleaseNumber
+    window: not stated; the release endpoint "can cancel your subscription for a specific phone number"
+    docs: https://developers.sinch.com/docs/numbers/api-reference/numbers
+  - write: Create a port-in order (porting)
+    reversal: deleteOrder
+    window: while the order is in Pending status ("This operation allows you to cancel an order in Pending status.")
+    docs: https://developers.sinch.com/docs/numbers/api-reference/porting
+  - write: Provision a WhatsApp sender (Provisioning API)
+    reversal: WhatsappSendersController_delete_v1
+    window: '"Once requested the sender will be active for 30 days to send final messages. After 30 days it will be removed."'
+    docs: https://developers.sinch.com/docs/provisioning-api/api-reference/provisioning-api-1
+  - write: Provision a KakaoTalk sender
+    reversal: KakaotalkSendersController_deleteSender_v1
+    window: '"Once requested the sender will be active for 60 days to deliver final messages. After 60 days it will be removed."'
+    docs: https://developers.sinch.com/docs/provisioning-api/api-reference/provisioning-api-1
+  - write: Start a Voice v2 batch of calls
+    reversal: stopBatchProcessing
+    window: 'queued calls only: "Calls that are already in progress" continue'
+    docs: https://developers.sinch.com/docs/voice-2.0/api-reference/voice
+  - write: Send a Conversation message (Messages_SendMessage)
+    reversal: none — Messages_DeleteMessage removes the record from Conversation API storage and "does not affect" the delivered
+      message
+    window: na
+    docs: https://developers.sinch.com/docs/conversation/api-reference/conversation
+  - write: Start a conversation
+    reversal: Conversation_StopActiveConversation
+    window: while the conversation is still active
+    docs: https://developers.sinch.com/docs/conversation/api-reference/conversation
+  - write: Join participants to a conference (Callouts)
+    reversal: Calling_KickConferenceParticipant / Calling_KickConferenceAll
+    window: while the conference is live
+    docs: https://developers.sinch.com/docs/voice/api-reference/voice
+pagination:
+  style: mixed per product
+  params:
+    Conversation API: page_size + page_token (cursor), page_number on one list
+    Provisioning API: pageSize + pageToken (cursor)
+    Fax API: page + pageSize
+    Elastic SIP Trunking: page + size
+    Numbers API: pageSize + pageToken on list endpoints
+  docs: https://developers.sinch.com/docs/conversation/api-reference/conversation
+errors:
+  envelope: per product; Conversation and Numbers return a JSON error object with code, message, status and details; Fax and
+    Porting return {code, message}; Voice and Verification return {errorCode, message} with five-digit numeric codes (e.g.
+    42900 Request capacity exceeded)
+  detail: errors/sinch-error-codes.yml
+rate_limiting:
+  status_code: 429
+  signal: 429 Too Many Requests; no RateLimit-* or Retry-After response headers are documented
+  guidance: Something went wrong on our end, try again with exponential back-off (500/501/503); Rate limit exceeded, please
+    back off and try again later (Fax/Porting 429)
+  detail: rate-limits/sinch-rate-limits.yml
+webhooks:
+  signature: 'Conversation: HMAC signature on callbacks configured per webhook secret; Voice API v2: Authorization header
+    "service <serviceKey>:<Base64(HMAC-SHA256(secret, StringToSign))>" with a required x-timestamp header; CloudEvents 1.0
+    request format'
+  retries_text: The Conversation API uses an exponential backoff retry mechanism to ensure reliable callback delivery.
+  success: A callback is considered successfully delivered when your server responds with an HTTP status code in the 200-299
+    range.
+  docs: https://developers.sinch.com/docs/conversation/callbacks
+request_tracing:
+  header: traceId in Number Lookup error bodies ("Please provide the traceId from the response"); no documented request-id
+    header elsewhere
+versioning:
+  detail: lifecycle/sinch-lifecycle.yml

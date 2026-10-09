@@ -1,46 +1,354 @@
-generated: '2026-07-11'
+generated: '2026-10-08'
 method: derived
-docs: https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth
-note: Sinch OAuth 2.0 uses the client_credentials flow with project access keys (key
-  ID and secret) and does not publish or use OAuth scopes (https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
-source: openapi/sinch-conversation-openapi.yml, openapi/sinch-elastic-sip-trunking-openapi.yml,
-  openapi/sinch-fax-openapi.yml, openapi/sinch-numbers-openapi.yml, openapi/sinch-provisioning-openapi.yml,
-  openapi/sinch-registration-openapi.yml
+source: openapi/original-sinch-conversation-openapi.yml, openapi/original-sinch-elastic-sip-trunking-openapi.yml,
+  openapi/original-sinch-fax-openapi.yml, openapi/original-sinch-numbers-openapi.yml, openapi/original-sinch-provisioning-openapi.yml,
+  openapi/original-sinch-registration-openapi.yml, openapi/sinch-10dlc-registration-api-openapi.yml,
+  openapi/sinch-access-control-lists-api-openapi.yml, openapi/sinch-access-keys-api-openapi.yml,
+  openapi/sinch-access-keys-legacy-api-openapi.yml, openapi/sinch-active-numbers-api-openapi.yml,
+  openapi/sinch-apps-api-openapi.yml, openapi/sinch-available-numbers-api-openapi.yml, openapi/sinch-available-regions-api-openapi.yml,
+  openapi/sinch-brands-api-openapi.yml, openapi/sinch-capability-api-openapi.yml, openapi/sinch-compliance-brands-api-openapi.yml,
+  openapi/sinch-contacts-api-openapi.yml, openapi/sinch-conversation-api-openapi.yml, openapi/sinch-conversations-api-openapi.yml,
+  openapi/sinch-elastic-sip-trunking-api-openapi.yml, openapi/sinch-events-api-openapi.yml,
+  openapi/sinch-fax-api-openapi.yml, openapi/sinch-fax-to-email-api-openapi.yml, openapi/sinch-faxes-api-openapi.yml,
+  openapi/sinch-imported-numbers-hosting-orders-api-openapi.yml, openapi/sinch-kakaotalk-senders-api-openapi.yml,
+  openapi/sinch-line-senders-api-openapi.yml, openapi/sinch-market-requirements-api-openapi.yml,
+  openapi/sinch-messages-api-openapi.yml, openapi/sinch-number-lookup-api-openapi.yml, openapi/sinch-numbers-api-openapi.yml,
+  openapi/sinch-phone-numbers-api-openapi.yml, openapi/sinch-porting-api-openapi.yml, openapi/sinch-projects-api-openapi.yml,
+  openapi/sinch-provisioning-api-openapi.yml, openapi/sinch-rcs-senders-api-openapi.yml, openapi/sinch-registrations-api-openapi.yml,
+  openapi/sinch-sip-endpoints-api-openapi.yml, openapi/sinch-sip-trunks-api-openapi.yml, openapi/sinch-subprojects-api-openapi.yml,
+  openapi/sinch-telegram-senders-api-openapi.yml, openapi/sinch-template-management-api-openapi.yml,
+  openapi/sinch-transcoding-api-openapi.yml, openapi/sinch-us-shortcode-campaigns-api-openapi.yml,
+  openapi/sinch-voice-api-v2-openapi.yml, openapi/sinch-webhooks-api-openapi.yml
 schemes:
+- name: OAuth2
+  source: openapi/sinch-10dlc-registration-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: This is the recommended way to access our APIs in production.
+- name: OAuth2
+  source: openapi/sinch-access-keys-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The user name and password are your client_id and key_secret from the [Access
+    Keys sections](https://dashboard.sinch.com/settings/access-keys)
+- name: OAuth2
+  source: openapi/sinch-access-keys-legacy-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The user name and password are your client_id and key_secret from the [Access
+    Keys sections](https://dashboard.sinch.com/settings/access-keys)
+- name: OAuth2
+  source: openapi/sinch-brands-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The username and password are your Key ID and Key Secret from the Access keys
+    section in the Sinch Customer Dashboard. Exchange these for a bearer token (access token).
+- name: OAuth2
+  source: openapi/sinch-compliance-brands-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The username and password are your Key ID and Key Secret from the Access keys
+    section in the Sinch Customer Dashboard. Exchange these for a bearer token (access token).
 - name: oAuth2
-  source: openapi/sinch-conversation-openapi.yml
+  source: openapi/sinch-conversation-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The user name and password are your client_id and key_secret from the [Access
+    keys sections](https://dashboard.sinch.com/settings/access-keys)
+- name: OAuth2.0
+  source: openapi/sinch-elastic-sip-trunking-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: To use OAuth 2.0 authentication, use your Access Key ID and Access Key Secret
+    to obtain your bearer token. For detailed instructions on how to do this, see the [OAuth
+    Authentication](https://developers.sinch.com/docs/est/api-reference/est#oauth) section.
+- name: OAuth2
+  source: openapi/sinch-fax-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The user name and password is your key id and key secret from the [Access keys
+    sections](https://dashboard.sinch.com/settings/access-keys)
+- name: OAuth2.0
+  source: openapi/sinch-imported-numbers-hosting-orders-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The username and password are your Key ID and Key Secret from the [Access keys
+    section](https://dashboard.sinch.com/settings/access-keys) in the Sinch Customer Dashboard.
+    Exchange these for a bearer token (access token). Learn how [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+- name: OAuth2
+  source: openapi/sinch-number-lookup-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+- name: OAuth2.0
+  source: openapi/sinch-numbers-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The username and password are your Key ID and Key Secret from the [Access keys
+    section](https://dashboard.sinch.com/settings/access-keys) in the Sinch Customer Dashboard.
+    Exchange these for a bearer token (access token). Learn how [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+- name: bearerAuth
+  source: openapi/sinch-porting-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The username and password are your Key ID and Key Secret from the [Sinch Build
+    Dashboard](https://dashboard.sinch.com/settings/access-keys). Exchange these for a bearer
+    token (access token). Learn how [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+- name: OAuth2Production
+  source: openapi/sinch-provisioning-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth2 authorization for production
+- name: OAuth2.0
+  source: openapi/sinch-subprojects-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The username and password are your Key ID and Key Secret from the [Access keys
+    section](https://dashboard.sinch.com/settings/access-keys) in the Sinch Customer Dashboard.
+    Exchange these for a bearer token (access token).
+- name: oAuth2
+  source: openapi/sinch-template-management-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The user name and password are your client_id and key_secret from the [Access
+    keys sections](https://dashboard.sinch.com/settings/access-keys)
+- name: OAuth2
+  source: openapi/sinch-us-shortcode-campaigns-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: The username and password are your Key ID and Key Secret from the Access keys
+    section in the Sinch Customer Dashboard. Exchange these for a bearer token (access token).
+- name: SinchOAuth2
+  source: openapi/sinch-voice-api-v2-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: |-
+    OAuth 2.0 **Client Credentials** grant (recommended for production).
+
+    Exchange the **Access Key ID** (`client_id`) and **Access Key Secret**
+    (`client_secret`) for a short-lived Bearer token.
+
+    Tokens typically expire after **3600 seconds**. When the token expires,
+    request a new one using the same `tokenUrl`. There is no separate
+    refresh token in the client credentials flow — simply re-authenticate.
+
+    Access keys are managed in the Dashboard: https://dashboard.sinch.com/settings/access-keys
+- name: oAuth2
+  source: openapi/original-sinch-conversation-openapi.yml
   flows:
   - flow: clientCredentials
     tokenUrl: https://auth.sinch.com/oauth2/token
   description: OAuth 2.0 client credentials flow using project key ID and secret.
 - name: oAuth2
-  source: openapi/sinch-elastic-sip-trunking-openapi.yml
+  source: openapi/original-sinch-elastic-sip-trunking-openapi.yml
   flows:
   - flow: clientCredentials
     tokenUrl: https://auth.sinch.com/oauth2/token
   description: OAuth 2.0 client credentials flow.
 - name: oAuth2
-  source: openapi/sinch-fax-openapi.yml
+  source: openapi/original-sinch-fax-openapi.yml
   flows:
   - flow: clientCredentials
     tokenUrl: https://auth.sinch.com/oauth2/token
   description: OAuth 2.0 client credentials flow.
 - name: oAuth2
-  source: openapi/sinch-numbers-openapi.yml
+  source: openapi/original-sinch-numbers-openapi.yml
   flows:
   - flow: clientCredentials
     tokenUrl: https://auth.sinch.com/oauth2/token
   description: OAuth 2.0 client credentials flow.
 - name: oAuth2
-  source: openapi/sinch-provisioning-openapi.yml
+  source: openapi/original-sinch-provisioning-openapi.yml
   flows:
   - flow: clientCredentials
     tokenUrl: https://auth.sinch.com/oauth2/token
   description: OAuth 2.0 client credentials flow.
 - name: oAuth2
-  source: openapi/sinch-registration-openapi.yml
+  source: openapi/original-sinch-registration-openapi.yml
   flows:
   - flow: clientCredentials
     tokenUrl: https://auth.sinch.com/oauth2/token
   description: OAuth 2.0 client credentials flow.
-scopes: []
+- name: oAuth2
+  source: openapi/sinch-access-control-lists-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-active-numbers-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-apps-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow using project key ID and secret.
+- name: oAuth2
+  source: openapi/sinch-available-numbers-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-available-regions-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-capability-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow using project key ID and secret.
+- name: oAuth2
+  source: openapi/sinch-contacts-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow using project key ID and secret.
+- name: oAuth2
+  source: openapi/sinch-conversations-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow using project key ID and secret.
+- name: oAuth2
+  source: openapi/sinch-events-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow using project key ID and secret.
+- name: oAuth2
+  source: openapi/sinch-fax-to-email-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-faxes-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-kakaotalk-senders-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-line-senders-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-market-requirements-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-messages-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow using project key ID and secret.
+- name: oAuth2
+  source: openapi/sinch-phone-numbers-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-projects-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-rcs-senders-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-registrations-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-sip-endpoints-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-sip-trunks-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-telegram-senders-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow.
+- name: oAuth2
+  source: openapi/sinch-transcoding-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow using project key ID and secret.
+- name: oAuth2
+  source: openapi/sinch-webhooks-api-openapi.yml
+  flows:
+  - flow: clientCredentials
+    tokenUrl: https://auth.sinch.com/oauth2/token
+  description: OAuth 2.0 client credentials flow using project key ID and secret.
+scopes:
+- scope: '-'
+  description: '-'
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/sinch-provisioning-api-openapi.yml
+- scope: read
+  description: read
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/sinch-brands-api-openapi.yml
+  - openapi/sinch-compliance-brands-api-openapi.yml
+  - openapi/sinch-us-shortcode-campaigns-api-openapi.yml
+- scope: write
+  description: write
+  flows:
+  - clientCredentials
+  sources:
+  - openapi/sinch-brands-api-openapi.yml
+  - openapi/sinch-compliance-brands-api-openapi.yml
+  - openapi/sinch-us-shortcode-campaigns-api-openapi.yml

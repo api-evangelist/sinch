@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-sip-endpoint-schema.json",
+  "title": "SipEndpoint",
+  "description": "A SIP endpoint which is the address of your SIP infrastructure. SIP endpoints can be one of two types: static endpoints or registered endpoints.\n\n| Endpoint | Description |\n| -------- | ----------- |\n| Static endpoints | Static endpoints are defined by a static value which can either be an IP address or a domain name. |\n| Registered endpoints | Registered endpoints use a credential list to determine the endpoint. |\n\n---",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-elastic-sip-trunking-api-openapi.yml#/components/schemas/SipEndpoint",
+  "required": [
+    "name",
+    "priority"
+  ],
+  "type": "object",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/StaticEndpoint"
+    },
+    {
+      "$ref": "#/$defs/RegisteredEndpoint"
+    }
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "description": "The ID of the SIP endpoint.",
+      "readOnly": true
+    },
+    "sipTrunkId": {
+      "type": "string",
+      "description": "The ID of the SIP trunk to which the endpoint is assigned.",
+      "readOnly": true
+    },
+    "name": {
+      "type": "string",
+      "description": "The friendly name of the SIP endpoint."
+    },
+    "transport": {
+      "type": "string",
+      "description": "The transport protocol of the SIP endpoint.",
+      "x-enumDescriptions": {
+        "TCP": "[Transmission Control Protocol](https://community.sinch.com/t5/Glossary/TCP/ta-p/7741)",
+        "UDP": "[User Datagram Protocol](https://community.sinch.com/t5/Glossary/UDP/ta-p/7778)",
+        "TLS": "[Transport Layer Security](https://community.sinch.com/t5/Glossary/TLS/ta-p/7757)"
+      },
+      "enum": [
+        "TCP",
+        "UDP",
+        "TLS"
+      ],
+      "default": "UDP"
+    },
+    "priority": {
+      "minimum": 1,
+      "type": "integer",
+      "description": "Inbound call routing priority. If two or more endpoints have the same priority, calls will be routed to them using a round-robin strategy.\n\nLower priority endpoints will be routed to first. Equal priority endpoints will round-robin calls between them.",
+      "format": "int32"
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Sets whether the SIP endpoint is enabled or not.",
+      "default": true
+    },
+    "createTime": {
+      "readOnly": true,
+      "type": "string",
+      "description": "The date and time that the SIP endpoint was created.",
+      "format": "date-time"
+    },
+    "updateTime": {
+      "readOnly": true,
+      "type": "string",
+      "description": "The date and time that the SIP endpoint was last modified.",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "RegisteredEndpoint": {
+      "required": [
+        "isRegistered",
+        "credentialUsername"
+      ],
+      "properties": {
+        "isRegistered": {
+          "type": "boolean",
+          "description": "This property determines whether the endpoint is static or registered. If registered, this must be set to `true`."
+        },
+        "credentialUsername": {
+          "type": "string",
+          "description": "The username for the credential list you want to use to register the endpoint."
+        }
+      }
+    },
+    "StaticEndpoint": {
+      "required": [
+        "address"
+      ],
+      "properties": {
+        "address": {
+          "type": "string",
+          "description": "The address of the SIP endpoint can be an IP address or a domain name. EST uses IP authentication and will only accept calls from the specified address or domain."
+        },
+        "port": {
+          "maximum": 65535,
+          "minimum": 1,
+          "type": "integer",
+          "description": "The port of the SIP endpoint.",
+          "format": "int32",
+          "default": 5060
+        }
+      }
+    }
+  }
+}

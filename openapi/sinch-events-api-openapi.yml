@@ -1,55 +1,1291 @@
 openapi: 3.2.0
 info:
-  title: Sinch Conversation Events API
-  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
+  title: Sinch Events API
   version: '1.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  description: 'Operations tagged Events across 3 of this provider''s published API definitions: sinch-chatlayer-analytics-api-openapi.yaml, sinch-conversation-api-openapi.yaml, original-sinch-conversation-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
+- url: https://analytics.api.chatlayer.ai
+  description: Europe
+- url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+  description: US
+- url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+  description: APAC
+- url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+  description: South America
+- url: https://{region}.conversation.api.sinch.com
+  variables:
+    region:
+      default: us
+      enum:
+      - us
+      - eu
+      - br
+  description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
 - url: https://us.conversation.api.sinch.com
   description: US Production Server
 - url: https://eu.conversation.api.sinch.com
   description: EU Production Server
 - url: https://br.conversation.api.sinch.com
   description: Brazil Production Server
-security:
-- oAuth2: []
-- basicAuth: []
 tags:
 - name: Events
-  description: Send and receive events such as composing indicators across supported channels.
 paths:
-  /v1/projects/{project_id}/events:send:
+  /v1/bots/{bot_id}/events/attributes/{attribute_key}/values:
     post:
-      operationId: sendEvent
-      summary: Send an Event
-      description: Sends an event such as a composing indicator to a contact on a specific channel.
       tags:
       - Events
+      operationId: Analytics_GetEventAttributeValues
       parameters:
-      - $ref: '#/components/parameters/ProjectId'
-      requestBody:
+      - name: bot_id
+        in: path
         required: true
+        schema:
+          type: string
+      - name: attribute_key
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                query:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetEventAttributeValuesResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics get event attribute values
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
+  /v1/bots/{bot_id}/events/definitions:
+    get:
+      tags:
+      - Events
+      operationId: Analytics_ListEventDefinitions
+      parameters:
+      - name: bot_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page_token
+        in: query
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: team_id
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEventDefinitionsResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics list event definitions
+      x-summary-source: derived
+    post:
+      tags:
+      - Events
+      operationId: Analytics_CreateEventDefinition
+      parameters:
+      - name: bot_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  type: string
+                description:
+                  type: string
+                team_id:
+                  type: string
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateEventDefinitionResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics create event definition
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
+  /v1/bots/{bot_id}/events/funnel:
+    post:
+      tags:
+      - Events
+      operationId: Analytics_ComputeEventsFunnel
+      parameters:
+      - name: bot_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - end_time
+              - start_time
+              - steps
+              - version
+              type: object
+              properties:
+                version:
+                  type: string
+                start_time:
+                  type: string
+                end_time:
+                  type: string
+                steps:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FunnelStep'
+                breakdown_property:
+                  type: string
+                order_type:
+                  title: one of 'strict' or  'sequential'
+                  type: string
+                  default: sequential
+                properties:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FunnelStepFilter'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ComputeFunnelResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics compute events funnel
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
+  /v1/bots/{bot_id}/events/stream:
+    get:
+      tags:
+      - Events
+      operationId: Analytics_ListEvents
+      parameters:
+      - name: bot_id
+        in: path
+        description: The ID of the bot
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: The version of the bot (either DRAFT or LIVE)
+        required: true
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        description: 'The maximum number of events to return.
+
+          The service may return fewer than this value.
+
+          The maximum value allowed is 100; value above 100 will be coerced to 100.'
+        schema:
+          type: integer
+          format: int32
+      - name: page_token
+        in: query
+        description: 'A page token, received from a previous ListEvent call.
+
+          Provide this to retrieve a subsequent page.'
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the events, inclusive.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the events, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: event
+        in: query
+        description: The event name to filter on. When provided, only occurences of that given event will be returned
+        schema:
+          type: string
+      - name: conversation_id
+        in: query
+        description: The conversation to filter on. When provided, only events for the given conversation will be returned
+        schema:
+          type: string
+      - name: user_id
+        in: query
+        description: The user to filter on. When provided, only events for the given user will be returned
+        schema:
+          type: string
+      - name: campaign_id
+        in: query
+        description: The campaign to filter on. When provided, only events for the given campaign will be returned
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEventsResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics list events
+      x-summary-source: derived
+    post:
+      tags:
+      - Events
+      operationId: Analytics_ListEventsWithFilters
+      parameters:
+      - name: bot_id
+        in: path
+        description: The ID of the bot
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              required:
+              - end_time
+              - start_time
+              - version
+              type: object
+              properties:
+                version:
+                  title: The version of the bot (either DRAFT or LIVE)
+                  type: string
+                page_size:
+                  type: integer
+                  description: 'The maximum number of events to return.
+
+                    The service may return fewer than this value.
+
+                    The maximum value allowed is 100; value above 100 will be coerced to 100.'
+                  format: int32
+                page_token:
+                  type: string
+                  description: 'A page token, received from a previous ListEvent call.
+
+                    Provide this to retrieve a subsequent page.'
+                start_time:
+                  type: string
+                  description: The starting date for the time range of the events, inclusive.
+                end_time:
+                  type: string
+                  description: The ending date for the time range of the events, exclusive.
+                event:
+                  title: The event name to filter on. When provided, only occurences of that given event will be returned
+                  type: string
+                conversation_id:
+                  title: The conversation to filter on. When provided, only events for the given conversation will be returned
+                  type: string
+                user_id:
+                  title: The user to filter on. When provided, only events for the given user will be returned
+                  type: string
+                campaign_id:
+                  title: The campaign to filter on. When provided, only events for the given campaign will be returned
+                  type: string
+                filters:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/AttributeFilter'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEventsResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics list events with filters
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
+  /v1/bots/{bot_id}/events/track:
+    post:
+      tags:
+      - Events
+      operationId: Analytics_TrackEvent
+      parameters:
+      - name: bot_id
+        in: path
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                id:
+                  type: string
+                version:
+                  type: string
+                user_id:
+                  type: string
+                event:
+                  type: string
+                attributes:
+                  type: object
+                  additionalProperties:
+                    type: string
+                context:
+                  $ref: '#/components/schemas/TrackEventRequestContext'
+                timestamp:
+                  type: string
+                  format: date-time
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TrackEventResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics track event
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
+  /v1/teams/{team_id}/events:
+    get:
+      tags:
+      - Events
+      operationId: Analytics_GetTeamEvents
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: user_id
+        in: query
+        description: The id of the customer
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        description: 'The maximum number of events to return.
+
+          The service may return fewer than this value.
+
+          The maximum value allowed is 100; value above 100 will be coerced to 100.'
+        schema:
+          type: integer
+          format: int32
+      - name: page_token
+        in: query
+        description: 'A page token, received from a previous ListEvent call.
+
+          Provide this to retrieve a subsequent page.'
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the events, inclusive.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the events, exclusive.
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTeamEventsResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics get team events
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
+  /v1/teams/{team_id}/events/definitions:
+    get:
+      tags:
+      - Events
+      operationId: Analytics_ListTeamEventDefinitions
+      parameters:
+      - name: team_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: bot_id
+        in: query
+        schema:
+          type: string
+      - name: page_token
+        in: query
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListEventDefinitionsResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics list team event definitions
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
+  /v1/projects/{project_id}/events:send:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    post:
+      description: 'Sends an event to the referenced contact from the referenced app.
+
+        Note that this operation enqueues the event in a queue so a successful
+
+        response only indicates that the event has been queued.'
+      tags:
+      - Events
+      summary: Send an event
+      operationId: Events_SendEvent
+      requestBody:
+        description: The event to be sent.
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/SendEventRequest'
+        required: true
       responses:
         '200':
-          description: Event sent
+          description: A successful response.
           content:
             application/json:
               schema:
                 $ref: '#/components/schemas/SendEventResponse'
         '400':
-          description: Invalid request
+          $ref: '#/components/responses/400Error'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.events;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.EventsService;\nimport com.sinch.sdk.domains.conversation.models.v1.ChannelRecipientIdentities;\nimport com.sinch.sdk.domains.conversation.models.v1.ChannelRecipientIdentity;\nimport com.sinch.sdk.domains.conversation.models.v1.ConversationChannel;\nimport com.sinch.sdk.domains.conversation.models.v1.events.AppEvent;\nimport com.sinch.sdk.domains.conversation.models.v1.events.request.SendEventRequest;\nimport com.sinch.sdk.domains.conversation.models.v1.events.response.SendEventResponse;\nimport com.sinch.sdk.domains.conversation.models.v1.events.types.ComposingEndEvent;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Send {\n\n  private static final Logger LOGGER = Logger.getLogger(Send.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the Conversation Application to send the event from\n    String conversationApplicationId = \"APPLICATION_ID\";\n    // The channel to use for the recipient\n    ConversationChannel recipientChannel = ConversationChannel.SMS;\n    // The identity of the recipient (e.g. phone number for SMS)\n    String recipientPhoneNumber = \"RECIPIENT_PHONE_NUMBER\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    EventsService eventsService = client.conversation().v1().events();\n\n    AppEvent event = ComposingEndEvent.COMPOSING_END_EVENT;\n\n    SendEventRequest request =\n        SendEventRequest.builder()\n            .setAppId(conversationApplicationId)\n            .setEvent(event)\n            .setRecipient(\n                ChannelRecipientIdentities.of(\n                    ChannelRecipientIdentity.builder()\n                        .setChannel(recipientChannel)\n                        .setIdentity(recipientPhoneNumber)\n                        .build()))\n            .build();\n\n    LOGGER.info(String.format(\"Send event to application with ID '%s'\", conversationApplicationId));\n\n    SendEventResponse response = eventsService.send(request);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation Application to send the Event from\n  const applicationId = 'CONVERSATION_APP_ID';\n  // The phone number to send the Event to, in E.164 format\n  const recipientPhoneNumber = 'RECIPIENT_PHONE_NUMBER';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.events.send({\n      sendEventRequestBody: {\n        app_id: applicationId,\n        event: {\n          composing_event: {},\n        },\n        recipient: {\n          identified_by: {\n            channel_identities: [\n              {\n                channel: 'RCS',\n                identity: recipientPhoneNumber,\n              },\n            ],\n          },\n        },\n      },\n    });\n    console.log('✅ Successfully sent Event.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to send Event to the recipient ${recipientPhoneNumber}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+  /v1/projects/{project_id}/events/{event_id}:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    - $ref: '#/components/parameters/event_id'
+    get:
+      description: Get event from ID
+      tags:
+      - Events
+      summary: Get an event
+      operationId: Events_GetEvent
+      responses:
+        '200':
+          $ref: '#/components/responses/getEventResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.events;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.EventsService;\nimport com.sinch.sdk.domains.conversation.models.v1.events.ConversationEvent;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Get {\n\n  private static final Logger LOGGER = Logger.getLogger(Get.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the event to retrieve\n    String eventId = \"EVENT_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    EventsService eventsService = client.conversation().v1().events();\n\n    LOGGER.info(String.format(\"Get information for event with ID '%s'\", eventId));\n\n    ConversationEvent response = eventsService.get(eventId);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Contact to retrieve\n  const eventId = 'EVENT_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.events.get({\n      event_id: eventId,\n    });\n    console.log('✅ Successfully retrieved the Event.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the Event with ID ${eventId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    delete:
+      description: Delete a specific event by its ID.
+      tags:
+      - Events
+      summary: Delete an event
+      operationId: Events_DeleteEvents
+      responses:
+        '200':
+          description: A successful response.
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.events;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.EventsService;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Delete {\n\n  private static final Logger LOGGER = Logger.getLogger(Delete.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the event to delete\n    String eventId = \"EVENT_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    EventsService eventsService = client.conversation().v1().events();\n\n    LOGGER.info(String.format(\"Delete event with ID '%s' \", eventId));\n\n    eventsService.delete(eventId);\n\n    LOGGER.info(\"Done\");\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Event to delete\n  const eventId = 'EVENT_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    await sinch.conversation.events.delete({\n      event_id: eventId,\n    });\n    console.log(`✅ Successfully deleted the Event with ID ${eventId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete the Event with ID ${eventId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+  /v1/projects/{project_id}/events:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    get:
+      summary: List events
+      description: List all events in a project
+      tags:
+      - Events
+      operationId: Events_ListEvents
+      parameters:
+      - name: conversation_id
+        description: Resource name (id) of the conversation. One of conversation_id or contact_id needs to be present.
+        in: query
+        schema:
+          type: string
+      - name: contact_id
+        description: Resource name (id) of the contact. One of conversation_id or contact_id needs to be present.
+        in: query
+        schema:
+          type: string
+      - name: page_size
+        description: 'Maximum number of events to fetch. Defaults to 10
+
+          and the maximum is 20.'
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: page_token
+        description: 'Next page token previously returned if any. When specifying this token, make sure to use the same values
+
+          for the other parameters from the request that originated the token, otherwise the paged results may be inconsistent.'
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/listEventsResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.events;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.EventsService;\nimport com.sinch.sdk.domains.conversation.models.v1.events.request.EventsListQueryParameters;\nimport com.sinch.sdk.domains.conversation.models.v1.events.response.EventsListResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class List {\n\n  private static final Logger LOGGER = Logger.getLogger(List.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the conversation to list events for\n    String conversationId = \"CONVERSATION_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    EventsService eventsService = client.conversation().v1().events();\n\n    LOGGER.info(String.format(\"List events for conversation with ID '%s'\", conversationId));\n\n    EventsListQueryParameters request =\n        EventsListQueryParameters.builder().setConversationId(conversationId).build();\n\n    EventsListResponse response = eventsService.list(request);\n\n    LOGGER.info(\"Response:\");\n\n    response.iterator().forEachRemaining(f -> LOGGER.info(f.toString()));\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation to list Events for\n  const conversationId = 'CONVERSATION_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.events.list({\n      conversation_id: conversationId,\n    });\n    if (response.data.length === 0) {\n      console.log('No Events found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Events.`);\n    response.data.forEach((event) => {\n      console.log(event);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list the Events:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
 components:
   schemas:
+    CampaignInfo:
+      type: object
+      properties:
+        id:
+          type: string
+        source:
+          type: string
+        medium:
+          type: string
+        name:
+          type: string
+        content:
+          type: string
+        term:
+          type: string
+    TrackingEventAttribute:
+      type: object
+      properties:
+        key:
+          type: string
+        value:
+          type: string
+    AttributeFilter:
+      type: object
+      properties:
+        key:
+          type: string
+        operator:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
+    TrackingEvent:
+      type: object
+      properties:
+        id:
+          type: string
+        event:
+          type: string
+        bot_id:
+          type: string
+        version:
+          type: string
+        user_id:
+          type: string
+        channel_id:
+          type: string
+        channel_type:
+          type: string
+        conversation_id:
+          type: string
+        attributes:
+          type: object
+          additionalProperties:
+            type: string
+        timestamp:
+          type: string
+          format: date-time
+    FunnelStepResultByCohort:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStepResult'
+    FunnelStepResult:
+      type: object
+      properties:
+        event_id:
+          type: string
+        count:
+          type: integer
+          format: int32
+        order:
+          type: integer
+          format: int64
+        breakdown_value:
+          type: string
+    GetEventAttributeValuesResponse:
+      type: object
+      properties:
+        attributes:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingEventAttribute'
+    EventDefinition:
+      type: object
+      properties:
+        id:
+          type: string
+        team_id:
+          type: string
+        bot_id:
+          type: string
+        event:
+          type: string
+        description:
+          type: string
+        created_at:
+          type: string
+          format: date-time
+        last_seen_at:
+          type: string
+          format: date-time
+        volume_30_day:
+          type: integer
+          format: int32
+    TrackEventRequestContext:
+      type: object
+      properties:
+        conversation_id:
+          type: string
+        campaign:
+          $ref: '#/components/schemas/CampaignInfo'
+    ComputeFunnelResponse:
+      type: object
+      properties:
+        result:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStepResultByCohort'
+    FunnelStep:
+      type: object
+      properties:
+        order:
+          type: integer
+          format: int32
+        event_id:
+          type: string
+        properties:
+          type: array
+          items:
+            $ref: '#/components/schemas/FunnelStepFilter'
+    CreateEventDefinitionResponse:
+      type: object
+      properties:
+        event_definition:
+          $ref: '#/components/schemas/EventDefinition'
+    TrackEventResponse:
+      type: object
+      properties:
+        event_id:
+          type: string
+    ListEventDefinitionsResponse:
+      type: object
+      properties:
+        event_definitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/EventDefinition'
+        next_page_token:
+          type: string
+    FunnelStepFilter:
+      type: object
+      properties:
+        key:
+          type: string
+        operator:
+          type: string
+        type:
+          type: string
+        value:
+          type: array
+          items:
+            type: string
+    GetTeamEventsResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingEvent'
+        next_page_token:
+          type: string
+    ListEventsResponse:
+      type: object
+      properties:
+        events:
+          type: array
+          items:
+            $ref: '#/components/schemas/TrackingEvent'
+        next_page_token:
+          type: string
+    AppEventField:
+      type: object
+      title: App Event Type
+      properties:
+        app_event:
+          description: Event originating from an app
+          type: object
+          title: App Event
+          oneOf:
+          - $ref: '#/components/schemas/ComposingEventField'
+          - $ref: '#/components/schemas/ComposingEndEventField'
+          - $ref: '#/components/schemas/ReadMessageEventField'
+          - $ref: '#/components/schemas/CommentReplyEventField'
+          - $ref: '#/components/schemas/AgentJoinedEventField'
+          - $ref: '#/components/schemas/AgentLeftEventField'
+          - $ref: '#/components/schemas/GenericEventField'
+    AgentJoinedEventField:
+      type: object
+      title: Agent Joined Event Type
+      properties:
+        agent_joined_event:
+          title: Agent Joined Event
+          type: object
+          properties:
+            agent:
+              $ref: '#/components/schemas/Agent'
+          required:
+          - agent
+    CommentReplyEventField:
+      type: object
+      title: Comment Reply Event Type
+      properties:
+        comment_reply_event:
+          title: Comment Reply Event
+          description: Represents a response to a comment event.
+          type: object
+          required:
+          - text
+          properties:
+            text:
+              description: The text of the comment reply.
+              type: string
+    ReadMessageEventField:
+      type: object
+      title: Read Message Event Type
+      properties:
+        read_message_event:
+          title: Read Message Event
+          type: object
+          description: Marks an inbound (contact) message as read on the channel, producing a read receipt for the contact. Supported on WhatsApp and RCS.
+    ChannelIdentities:
+      required:
+      - channel_identities
+      type: object
+      properties:
+        channel_identities:
+          description: 'A list of specific channel identities.
+
+            The API will use these identities when sending to specific channels.'
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelRecipientIdentity'
+    GenericEventField:
+      type: object
+      title: Generic Type
+      properties:
+        generic_event:
+          title: Generic Event
+          type: object
+          properties:
+            payload:
+              description: Arbitrary data set to the event. A valid JSON object.
+              type: object
+          description: Event that contains only a flexible payload field.
+          required:
+          - payload
+    ContactIDField:
+      type: object
+      title: Contact ID
+      properties:
+        contact_id:
+          title: Contact ID string
+          description: The ID of the contact.
+          type: string
+          example: '{CONTACT_ID}'
+    AgentType:
+      description: Agent's classification. It can be UNKNOWN_AGENT_TYPE, HUMAN or BOT.
+      enum:
+      - UNKNOWN_AGENT_TYPE
+      - HUMAN
+      - BOT
+      x-enumDescriptions:
+        UNKNOWN_AGENT_TYPE: The default AgentType. When the agent type is unknown.
+        HUMAN: Human agent.
+        BOT: Bot agent.
+      type: string
+      default: UNKNOWN_AGENT_TYPE
+    ConversationEventBase:
+      type: object
+      title: Conversation Event
+      description: Common properties to ConversationEvent management
+      allOf:
+      - $ref: '#/components/schemas/AppEventField'
+      - type: object
+        properties:
+          conversation_id:
+            type: string
+            description: Optional. The ID of the event's conversation. Will not be present for apps in Dispatch Mode.
+          contact_id:
+            type: string
+            description: Optional. The ID of the contact. Will not be present for apps in Dispatch Mode.
+          channel_identity:
+            $ref: '#/components/schemas/ChannelIdentity'
+          accept_time:
+            type: string
+            format: date-time
+            description: The processed time of the message in UTC timezone. Must be less than current_time and greater than (current_time - 30 days).
+          processing_mode:
+            $ref: '#/components/schemas/ProcessingMode'
+    ListEventsResponse_2:
+      type: object
+      properties:
+        events:
+          description: List of ConversationsEvents.
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationEvent'
+          readOnly: true
+        next_page_token:
+          type: string
+          description: Token that should be included in the next request to fetch the next page.
+    RecipientRequest:
+      description: Identifies the recipient. If [Dispatch Mode](https://developers.sinch.com/docs/conversation/processing-modes/) is used, you must use the `identified_by` field.
+      allOf:
+      - $ref: '#/components/schemas/RecipientBase'
+    ConversationEvent:
+      type: object
+      title: Conversation Event
+      description: An event on a particular channel.
+      required:
+      - id
+      - channel_identity
+      - processing_mode
+      allOf:
+      - $ref: '#/components/schemas/ConversationEventBase'
+      - type: object
+        properties:
+          direction:
+            $ref: '#/components/schemas/ConversationDirection'
+          id:
+            type: string
+            description: The ID of the event.
+    RecipientBase:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/IdentifiedByField'
+      - $ref: '#/components/schemas/ContactIDField'
+    ConversationChannel:
+      type: string
+      title: Channel Identifier
+      description: The identifier of the channel you want to include. Must be one of the enum values.
+      example: WHATSAPP
+      x-enumDescriptions:
+        SMS: The SMS channel.
+        RCS: The RCS channel.
+        WHATSAPP: The WhatsApp channel.
+        MMS: The MMS channel.
+        KAKAOTALK: The KakaoTalk channel.
+        KAKAOTALKCHAT: The KakaoTalk chat channel (used primarily in ConsultationTalk).
+        VIBERBM: The Viber Business Messages channel.
+        LINE: The LINE channel.
+        INSTAGRAM: The Instagram channel.
+        MESSENGER: The Facebook Messenger channel.
+        WECHAT: The WeChat channel.
+        TELEGRAM: The Telegram channel.
+        APPLEBC: The Apple Messages for Business channel.
+      enum:
+      - SMS
+      - RCS
+      - WHATSAPP
+      - MMS
+      - KAKAOTALK
+      - KAKAOTALKCHAT
+      - VIBERBM
+      - LINE
+      - INSTAGRAM
+      - MESSENGER
+      - WECHAT
+      - TELEGRAM
+      - APPLEBC
+    ChannelIdentity:
+      description: 'A unique identity of message recipient on a particular channel.
+
+        For example, the channel identity on SMS, WHATSAPP or VIBERBM is a MSISDN phone number.'
+      type: object
+      title: Channel Identity
+      required:
+      - identity
+      - channel
+      properties:
+        app_id:
+          description: Required if using a channel that uses app-scoped channel identities. Currently, FB Messenger, Instagram, LINE, and WeChat use app-scoped channel identities, which means contacts will have different channel identities on different Conversation API apps. These can be thought of as virtual identities that are app-specific and, therefore, the app_id must be included in the API call.
+          type: string
+        channel:
+          $ref: '#/components/schemas/ConversationChannel'
+        identity:
+          description: The channel identity. This will differ from channel to channel. For example, a phone number for SMS, WhatsApp, and Viber Business.
+          type: string
+    IdentifiedByField:
+      type: object
+      title: Channel Identities
+      properties:
+        identified_by:
+          title: Channel Identity List
+          type: object
+          description: The identity as specified by the channel.
+          allOf:
+          - $ref: '#/components/schemas/ChannelIdentities'
+    SendEventResponse:
+      type: object
+      properties:
+        accepted_time:
+          description: Accepted timestamp.
+          type: string
+          format: date-time
+          readOnly: true
+        event_id:
+          description: Event id.
+          type: string
+          readOnly: true
+    Agent:
+      description: Represents an agent that is involved in a conversation.
+      type: object
+      title: Agent
+      properties:
+        display_name:
+          description: Agent's display name
+          type: string
+        type:
+          $ref: '#/components/schemas/AgentType'
+        picture_url:
+          description: The Agent's picture url.
+          type: string
+    ProcessingMode:
+      description: Whether or not Conversation API should store contacts and conversations for the app. For more information, see [Processing Modes](https://developers.sinch.com/docs/conversation/processing-modes/).
+      enum:
+      - CONVERSATION
+      - DISPATCH
+      x-enumDescriptions:
+        CONVERSATION: Creates contacts and conversations automatically when a message is sent or received and there's no existing contact or active conversation.
+        DISPATCH: The default Processing Mode. Does not associate messages with contacts and conversations. This processing mode is mostly intended for unidirectional high volume SMS use cases. The lack of contacts and conversations limits some API features as related data won't be queryable in the [Contact](https://developers.sinch.com/docs/conversation/api-reference/conversation/tag/Contact/) and [Conversation](https://developers.sinch.com/docs/conversation/api-reference/conversation/tag/Conversation/) APIs.
+      type: string
+      default: DISPATCH
+    ChannelRecipientIdentity:
+      type: object
+      required:
+      - identity
+      - channel
+      properties:
+        channel:
+          $ref: '#/components/schemas/ConversationChannel'
+        identity:
+          description: The channel recipient identity.
+          type: string
+    AgentLeftEventField:
+      type: object
+      title: Agent Left Event Type
+      properties:
+        agent_left_event:
+          title: Agent Left Event
+          type: object
+          properties:
+            agent:
+              $ref: '#/components/schemas/Agent'
+          required:
+          - agent
+    MessageQueue:
+      type: string
+      description: Select the priority type for the message
+      default: NORMAL_PRIORITY
+      example: NORMAL_PRIORITY
+      x-enumDescriptions:
+        NORMAL_PRIORITY: The normal priority queue.
+        HIGH_PRIORITY: The high priority queue.
+      enum:
+      - NORMAL_PRIORITY
+      - HIGH_PRIORITY
     SendEventRequest:
+      type: object
+      required:
+      - app_id
+      - recipient
+      - event
+      properties:
+        app_id:
+          description: The ID of the app sending the event.
+          type: string
+        callback_url:
+          description: 'Overwrites the default callback url for delivery receipts for this message
+
+            The REST URL should be of the form: `http://host[:port]/path`'
+          type: string
+        channel_priority_order:
+          description: 'Optional. A single element array that dictates on what channel should
+
+            the Conversation API try to send the event.
+
+            It overrides any default set on the contact. Providing more than one
+
+            option has no effect.'
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationChannel'
+        event:
+          $ref: '#/components/schemas/AppEventField'
+        event_metadata:
+          description: Optional. Eventual metadata that should be associated to the event.
+          type: string
+        queue:
+          $ref: '#/components/schemas/MessageQueue'
+        recipient:
+          $ref: '#/components/schemas/RecipientRequest'
+    runtimeError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/protobufAny'
+            message:
+              type: string
+            status:
+              type: string
+    ConversationDirection:
+      type: string
+      description: The direction of the message flow, indicating whether the message was sent to or from the Conversation API app.
+      x-enumDescriptions:
+        TO_APP: Sent to the Conversation API app.
+        TO_CONTACT: Sent to a recipient/contact from the Conversation API app.
+      enum:
+      - TO_APP
+      - TO_CONTACT
+    ComposingEventField:
+      type: object
+      title: Composing
+      properties:
+        composing_event:
+          title: Composing Event Type
+          type: object
+          description: Represents a typing indicator shown to the contact.
+    ComposingEndEventField:
+      type: object
+      title: Composing End Event Type
+      properties:
+        composing_end_event:
+          title: Composing End Event
+          type: object
+          description: Represents a typing-end indicator. Stops a typing indicator previously shown to the contact.
+    protobufAny:
+      type: object
+      properties:
+        type_url:
+          type: string
+        value:
+          type: string
+          format: byte
+    SendEventRequest_2:
       type: object
       required:
       - app_id
@@ -73,7 +1309,7 @@ components:
             composing_event:
               type: object
               description: Composing indicator event
-    SendEventResponse:
+    SendEventResponse_2:
       type: object
       properties:
         event_id:
@@ -83,7 +1319,84 @@ components:
           type: string
           format: date-time
           description: When the event was accepted
+  responses:
+    listEventsResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListEventsResponse_2'
+    403Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 403
+            message: You do not have access to the requested resource.
+            status: UNAUTHORIZED
+            details: []
+    501Error:
+      description: Something went wrong on our end, try again with exponential back-off. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 501
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    500Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 500
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    400Error:
+      description: Malformed request. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 400
+            message: Malformed request
+            status: INVALID_REQUEST
+            details: []
+    getEventResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ConversationEvent'
+    401Error:
+      description: Incorrect credentials. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            type: object
   parameters:
+    event_id:
+      description: The unique ID of the event.
+      name: event_id
+      required: true
+      in: path
+      schema:
+        type: string
+    project_id:
+      name: project_id
+      description: The unique ID of the project. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+      in: path
+      required: true
+      schema:
+        type: string
     ProjectId:
       name: project_id
       in: path
@@ -92,17 +1405,30 @@ components:
       schema:
         type: string
   securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Generate your access token on the [Chatlayer platform](https://app.chatlayer.ai/settings/api-access/tokens).
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/conversation/api-reference/#authentication).
     oAuth2:
       type: oauth2
-      description: OAuth 2.0 client credentials flow using project key ID and secret.
+      description: The user name and password are your client_id and key_secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
       flows:
         clientCredentials:
           tokenUrl: https://auth.sinch.com/oauth2/token
           scopes: {}
-    basicAuth:
-      type: http
-      scheme: basic
-      description: Key ID as username and key secret as password.
-externalDocs:
-  description: Sinch Conversation API Documentation
-  url: https://developers.sinch.com/docs/conversation
+x-refined-from:
+- sinch-chatlayer-analytics-api-openapi.yaml
+- sinch-conversation-api-openapi.yaml
+- original-sinch-conversation-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

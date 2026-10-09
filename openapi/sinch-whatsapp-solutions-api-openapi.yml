@@ -1,0 +1,678 @@
+openapi: 3.2.0
+info:
+  title: Provisioning WhatsApp Solutions API
+  description: The WhatsApp solutions endpoint offers a way for you to manage your WhatsApp solutions.
+  version: 1.2.117
+servers:
+- url: https://provisioning.api.sinch.com
+  description: Production server
+security:
+- BasicAuth: []
+  BearerAuth: []
+  OAuth2Production: []
+tags:
+- name: WhatsApp Solutions
+  description: The WhatsApp solutions endpoint offers a way for you to manage your WhatsApp solutions.
+paths:
+  /v1/projects/{projectId}/whatsapp/solutions:
+    get:
+      description: Returns a list of solutions for the specified project.
+      operationId: WhatsappSolutionsController_listSolutions_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of solutions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappSolutionListDto'
+              examples:
+                response:
+                  summary: List response
+                  description: "\n    Response with solutions.\n    "
+                  value:
+                    solutions:
+                    - id: '123'
+                      details:
+                        name: Test name
+                      ownerApp:
+                        id: 456
+                        name: Test owner app name
+                      partnerApp:
+                        id: 789
+                        name: Test partner app name
+                      assigned: false
+                    - id: '123'
+                      details:
+                        name: Test name
+                      ownerApp:
+                        id: 456
+                        name: Test owner app name
+                      partnerApp:
+                        id: 789
+                        name: Test partner app name
+                      assigned: true
+                    - id: '123'
+                      details:
+                        name: Test name
+                      ownerApp:
+                        id: 456
+                        name: Test owner app name
+                      partnerApp:
+                        id: 789
+                        name: Test partner app name
+                      assigned: false
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_found-0:
+                  summary: ProjectNotFoundError
+                  value:
+                    errorCode: project_not_found
+                    message: Project not found.
+                    resolution: Verify that the projectId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: List all solutions in project
+      tags:
+      - WhatsApp Solutions
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+    post:
+      description: Returns all solutions for a project.
+      operationId: WhatsappSolutionsController_createSolution_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Solution data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/WhatsappSolutionInputDto'
+            examples:
+              input:
+                summary: Body request for solution
+                description: "\n    Example body request to create a solution.\n    "
+                value:
+                  accessToken: 3cca3b57-e388-4aaa-abe3-ecb1c0c8265f
+                  businessManager: SINCH_UK
+                  details:
+                    name: Test name
+      responses:
+        '201':
+          description: Solutions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappCreateSolutionListDto'
+              examples:
+                response:
+                  summary: Create response
+                  description: "\n    Response when successfully creating a solution.\n    "
+                  value:
+                    solutions:
+                    - id: '123'
+                      details:
+                        name: Test name
+                      ownerApp:
+                        id: 456
+                        name: Test owner app name
+                      partnerApp:
+                        id: 789
+                        name: Test partner app name
+                      assigned: false
+                    - id: '123'
+                      details:
+                        name: Test name
+                      ownerApp:
+                        id: 456
+                        name: Test owner app name
+                      partnerApp:
+                        id: 789
+                        name: Test partner app name
+                      assigned: false
+                    - id: '123'
+                      details:
+                        name: Test name
+                      ownerApp:
+                        id: 456
+                        name: Test owner app name
+                      partnerApp:
+                        id: 789
+                        name: Test partner app name
+                      assigned: false
+                    failedSolutions: []
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_found-0:
+                  summary: ProjectNotFoundError
+                  value:
+                    errorCode: project_not_found
+                    message: Project not found.
+                    resolution: Verify that the projectId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Create solution for project
+      tags:
+      - WhatsApp Solutions
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/whatsapp/solutions/{solutionId}:
+    get:
+      description: Returns a solution for a project.
+      operationId: WhatsappSolutionsController_getSolution_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: solutionId
+        required: true
+        in: path
+        description: The unique ID of the solution.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Solution
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappSolutionDto'
+              examples:
+                assignedResponse:
+                  summary: Get assigned solution response
+                  description: "\n    Response with assigned solution.\n    "
+                  value:
+                    id: '123'
+                    details:
+                      name: Test name
+                    ownerApp:
+                      id: 456
+                      name: Test owner app name
+                    partnerApp:
+                      id: 789
+                      name: Test partner app name
+                    assigned: true
+                notAssignedResponse:
+                  summary: Get unassigned solution response
+                  description: "\n    Response with unassigned solution.\n    "
+                  value:
+                    id: '123'
+                    details:
+                      name: Test name
+                    ownerApp:
+                      id: 456
+                      name: Test owner app name
+                    partnerApp:
+                      id: 789
+                      name: Test partner app name
+                    assigned: false
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_found-0:
+                  summary: ProjectNotFoundError
+                  value:
+                    errorCode: project_not_found
+                    message: Project not found.
+                    resolution: Verify that the projectId is correct.
+                solution_not_found-1:
+                  summary: SolutionNotFoundError
+                  value:
+                    errorCode: solution_not_found
+                    message: Solution not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get solution for project
+      tags:
+      - WhatsApp Solutions
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/whatsapp/solutions/{solutionId}/assign:
+    post:
+      description: Assign solution to project, to enable Embedded Signup onboarding.
+      operationId: WhatsappSolutionsController_assignSolution_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: solutionId
+        required: true
+        in: path
+        description: The unique ID of the solution.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Solution assigned
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_found-0:
+                  summary: ProjectNotFoundError
+                  value:
+                    errorCode: project_not_found
+                    message: Project not found.
+                    resolution: Verify that the projectId is correct.
+                solution_not_found-1:
+                  summary: SolutionNotFoundError
+                  value:
+                    errorCode: solution_not_found
+                    message: Solution not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                solution_cannot_be_reassigned-0:
+                  summary: SolutionCannotBeReassignedError
+                  value:
+                    errorCode: solution_cannot_be_reassigned
+                    message: Project is already onboarded, can't reassign solution
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Assign solution to project
+      tags:
+      - WhatsApp Solutions
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+components:
+  schemas:
+    WhatsappInputBusinessManagersPublicDocumentationEnum:
+      type: string
+      enum:
+      - SINCH_BR
+      - SINCH_MX
+      - SINCH_UK
+      description: Business manager.
+    WhatsappFailedSolutionDto:
+      type: object
+      properties:
+        partnerAppId:
+          type: string
+          readOnly: true
+          description: The unique ID of the Tech Provider Meta App.
+          uniqueItems: false
+        errorCode:
+          x-enumDescriptions:
+            ACTIVATION_FAILED: The background execution layout failed during the software solution initialization phase.
+            CREATION_FAILED: The infrastructure provisioning engine failed during the primary solution instantiation loop.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          readOnly: true
+          description: Error code allows to programmatically handle errors.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappFailedSolutionErrorsEnum'
+        errorMessage:
+          type: string
+          readOnly: true
+          description: Human readable message.
+          uniqueItems: false
+      required:
+      - partnerAppId
+      - errorCode
+    WhatsappSolutionInputDto:
+      type: object
+      properties:
+        details:
+          description: Solution details and information.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSolutionDetailsInputDto'
+        accessToken:
+          type: string
+          description: The accessToken received from the authResponse, returned when completing the embedded solution flow.
+          uniqueItems: false
+        businessManager:
+          x-enumDescriptions:
+            SINCH_BR: Instructs the interface layer to reference public onboarding documentation for the Brazil Meta Business Manager asset.
+            SINCH_MX: Instructs the interface layer to reference public onboarding documentation for the Mexico Meta Business Manager asset.
+            SINCH_UK: Instructs the interface layer to reference public onboarding documentation for the United Kingdom Meta Business Manager asset.
+          description: Business manager.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappInputBusinessManagersPublicDocumentationEnum'
+      required:
+      - details
+      - accessToken
+      - businessManager
+    WhatsappPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+    WhatsappSolutionDto:
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: The unique ID of the solution
+          uniqueItems: false
+        details:
+          description: Solution details and information.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSolutionDetailsDto'
+        partnerApp:
+          readOnly: true
+          description: The Meta App of the Tech Provider.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSolutionMetaAppDto'
+        ownerApp:
+          readOnly: true
+          description: The Meta App of the Solution Partner (e.g. Sinch).
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappSolutionMetaAppDto'
+        assigned:
+          type: boolean
+          readOnly: true
+          description: If project has been assigned to this solution.
+          uniqueItems: false
+      required:
+      - id
+      - details
+      - assigned
+    WhatsappSolutionDetailsDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the solution.
+          uniqueItems: false
+      required:
+      - name
+    WhatsappSolutionDetailsInputDto:
+      type: object
+      properties:
+        name:
+          type: string
+          description: The name of the solution.
+          uniqueItems: false
+      required:
+      - name
+    WhatsappSolutionMetaAppDto:
+      type: object
+      properties:
+        id:
+          type: number
+          readOnly: true
+          description: The unique ID of the Meta App.
+          uniqueItems: false
+        name:
+          type: string
+          readOnly: true
+          description: The name of the Meta App.
+          uniqueItems: false
+      required:
+      - id
+      - name
+    WhatsappSolutionListDto:
+      type: object
+      properties:
+        solutions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WhatsappSolutionDto'
+          description: List of solutions.
+          uniqueItems: false
+      required:
+      - solutions
+    WhatsappCreateSolutionListDto:
+      type: object
+      properties:
+        solutions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WhatsappSolutionDto'
+          description: List of solutions.
+          uniqueItems: false
+        failedSolutions:
+          type: array
+          items:
+            $ref: '#/components/schemas/WhatsappFailedSolutionDto'
+          description: List of failed solutions.
+          uniqueItems: false
+      required:
+      - solutions
+      - failedSolutions
+    WhatsappFailedSolutionErrorsEnum:
+      type: string
+      enum:
+      - ACTIVATION_FAILED
+      - CREATION_FAILED
+      - UNRECOGNIZED
+      description: Error code allows to programmatically handle errors.
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
+x-tagGroup-upscale:
+  name: Upscale
+  tags:
+  - Upscale Admin Feature Flag
+  - Upscale Admin Log Operation
+  - Upscale Admin Migrations
+  - Upscale Admin Sms
+  - Upscale Admin Upscales
+  - Internal
+  - Upscale Sms
+  - Upscale Upscales
+x-tagGroup-notification:
+  name: Notification
+  tags:
+  - Notification Admin Feature Flag
+  - Notification Admin Log Operation
+  - Internal
+x-tagGroups:
+- name: Webhook
+  tags:
+  - Webhooks
+- name: WhatsApp
+  tags:
+  - WhatsApp Accounts
+  - WhatsApp
+  - WhatsApp Flows
+  - WhatsApp Senders
+  - WhatsApp Solutions
+  - WhatsApp Templates
+- name: Bundles
+  tags:
+  - Bundles
+- name: KakaoTalk
+  tags:
+  - KakaoTalk Categories
+  - KakaoTalk Senders
+  - KakaoTalk Templates
+- name: Conversation
+  tags:
+  - Conversation
+- name: RCS
+  tags:
+  - RCS Accounts
+  - RCS Questionnaire
+  - RCS Senders
+- name: SMS
+  tags:
+  - SMS Apps

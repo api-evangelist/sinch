@@ -1,0 +1,71 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-inbound-message-list-schema.json",
+  "title": "InboundMessageList",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-inbounds-api-openapi.yml#/components/schemas/InboundMessageList",
+  "type": "object",
+  "properties": {
+    "count": {
+      "type": "integer",
+      "description": "Total number of inbound messages"
+    },
+    "page": {
+      "type": "integer",
+      "description": "Current page number"
+    },
+    "page_size": {
+      "type": "integer",
+      "description": "Number of messages per page"
+    },
+    "inbounds": {
+      "type": "array",
+      "description": "List of inbound message objects",
+      "items": {
+        "$ref": "#/$defs/InboundMessage"
+      }
+    }
+  },
+  "$defs": {
+    "InboundMessage": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique inbound message identifier"
+        },
+        "from": {
+          "type": "string",
+          "description": "The sender phone number"
+        },
+        "to": {
+          "type": "string",
+          "description": "The destination number"
+        },
+        "body": {
+          "type": "string",
+          "description": "The message body"
+        },
+        "type": {
+          "type": "string",
+          "description": "The message type"
+        },
+        "received_at": {
+          "type": "string",
+          "format": "date-time",
+          "description": "When the message was received"
+        },
+        "operator_id": {
+          "type": "string",
+          "description": "The mobile operator identifier"
+        },
+        "client_reference": {
+          "type": "string",
+          "description": "Client reference from the original batch"
+        }
+      }
+    }
+  }
+}

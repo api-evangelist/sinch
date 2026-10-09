@@ -1,0 +1,1160 @@
+openapi: 3.2.0
+info:
+  title: Numbers | Sinch Number Order API
+  description: '# Overview
+
+
+    The Numbers API enables you to search for, buy, view, and manage numbers.'
+  version: 1.0.3
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- url: https://numbers.api.sinch.com
+  description: Global API
+security:
+- Basic: []
+- OAuth2.0: []
+tags:
+- name: Number Order
+  description: You can use the Number Order API to buy numbers.
+  x-displayName: Number Order
+paths:
+  /v1/projects/{projectId}/numberOrders:lookupNumberRequirements:
+    post:
+      operationId: LookupNumberRequirements
+      summary: Lookup number requirements
+      description: 'Returns required KYC fields info based on number type & country legislation.
+
+
+        You can follow a detailed tutorial outlining the entire ordering process here.'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LookupNumberRequirementsRequest'
+            examples:
+              LookupAustralianKycRequirementsRequest:
+                $ref: '#/components/examples/lookupAuKycRequirementsReq'
+              GettingStartedExample:
+                $ref: '#/components/examples/gettingStartedLookupExample'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NumberRequirements'
+              examples:
+                LookupAustralianKycRequirementsResponse:
+                  $ref: '#/components/examples/lookupAuKycRequirementsRes'
+        '400':
+          description: 400 Invalid Argument error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidArgument'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      tags:
+      - Number Order
+  /v1/projects/{projectId}/numberOrders:createNumberOrder:
+    post:
+      operationId: CreateNumberOrder
+      summary: Create a number order
+      description: 'Create a number order for a specific number or for a quantity of numbers matching a set of criteria (pattern, capabilities etc.) - reserves the phone numbers for a period between 30 minutes and 48 hours (check the expireTime field) and creates entities for collecting KYC info.
+
+
+        Set exactly one of these options:
+
+        - `numberOrderOption`: order specific phone numbers. `phoneNumbers` must contain exactly one phone number; ordering more than one number per order isn''t currently supported.
+
+        - `quantityOrderOption`: order between 1 and 100 numbers (`requestedQuantity`) that match the given criteria.
+
+
+        You can follow a detailed tutorial outlining the entire ordering process here.'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateNumberOrderRequest'
+            examples:
+              CreateAustralianNumberOrderRequest:
+                $ref: '#/components/examples/createAustralianNumberOrderRequest'
+              CreateUsQuantityOrderRequest:
+                $ref: '#/components/examples/createUsQuantityOrderRequest'
+              GettingStartedExample:
+                $ref: '#/components/examples/gettingStartedExample'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NumberOrder'
+              examples:
+                AustralianNumberOrder:
+                  $ref: '#/components/examples/australianNumberOrder'
+        '400':
+          description: 400 Invalid Argument error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidArgument'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      tags:
+      - Number Order
+  /v1/projects/{projectId}/numberOrders/{numberOrderId}:
+    get:
+      operationId: GetNumberOrder
+      summary: Get a number order
+      description: 'Returns the number order alongside all reserved numbers.
+
+
+        You can follow a detailed tutorial outlining the entire ordering process here.'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/numberOrderId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NumberOrder'
+              examples:
+                AustralianNumberOrder:
+                  $ref: '#/components/examples/australianNumberOrder'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      tags:
+      - Number Order
+  /v1/projects/{projectId}/numberOrders/{numberOrderId}/registration:
+    put:
+      operationId: UpdateNumberOrderRegistration
+      summary: Update number order registration
+      description: 'Updates the registration (vehicle for KYC info) for a specific number order. Validated against the country requirements revealed by the "Lookup number requirements" endpoints.
+
+
+        You can follow a detailed tutorial outlining the entire ordering process here.'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/numberOrderId'
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateNumberOrderRegistrationRequest'
+            examples:
+              updateAustralianRegistration:
+                $ref: '#/components/examples/australianRegistration'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+              examples:
+                australianRegistration:
+                  $ref: '#/components/examples/australianRegistration'
+        '400':
+          description: 400 Invalid Argument error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidArgument'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      tags:
+      - Number Order
+    get:
+      operationId: GetNumberOrderRegistration
+      summary: Get number order registration
+      description: 'Retrieves the Registration submitted for a number order via the "Update number order registration" endpoint.
+
+
+        You can follow a detailed tutorial outlining the entire ordering process here.'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/numberOrderId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Registration'
+              examples:
+                australianRegistration:
+                  $ref: '#/components/examples/australianRegistration'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      tags:
+      - Number Order
+  /v1/projects/{projectId}/numberOrders/{numberOrderId}/attachments/{attachmentId}:
+    post:
+      operationId: UploadNumberOrderAttachment
+      summary: Upload an attachment for a number order
+      description: 'Upload file attachments to a number order registration. Mandatory only if revealed in the requirements returned by the "Lookup number requirements" endpoint.
+
+
+        The "attachmentId" URL parameter is the one returned by the "Lookup number requirements" endpoint.
+
+
+        You can follow a detailed tutorial outlining the entire ordering process here.'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/numberOrderId'
+      - name: attachmentId
+        description: attachment IDs are returned by the "Lookup number requirements" endpoint
+        in: path
+        required: true
+        schema:
+          type: string
+          example: d1c7ccbf-919d-462f-8587-dec95a1b11zz
+      requestBody:
+        required: true
+        description: File attachment upload request body with Content-Type = multipart/form-data
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+              - file
+              properties:
+                file:
+                  type: string
+                  format: binary
+                  description: File attachment to upload
+                documentType:
+                  type: string
+                  description: Optional document type associated with the uploaded attachment
+      responses:
+        '200':
+          description: Document uploaded successfully
+        '400':
+          description: 400 Invalid Argument error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidArgument'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '413':
+          description: Document is too large to upload
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RequestEntityTooLarge'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      tags:
+      - Number Order
+  /v1/projects/{projectId}/numberOrders/{numberOrderId}/submit:
+    post:
+      operationId: SubmitNumberOrder
+      summary: Submit number order
+      description: 'Submits the order for review, assuming the KYC info and attachments were submitted using their dedicated endpoints.
+
+
+        You can follow a detailed tutorial outlining the entire ordering process here.'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/numberOrderId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NumberOrder'
+              examples:
+                AustralianNumberOrder:
+                  $ref: '#/components/examples/australianNumberOrder'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      tags:
+      - Number Order
+components:
+  schemas:
+    FieldViolation:
+      type: object
+      properties:
+        field:
+          type: string
+        description:
+          type: string
+    NumberType:
+      type: string
+      enum:
+      - MOBILE
+      - LOCAL
+      - TOLL_FREE
+      x-enumDescriptions:
+        MOBILE: Numbers that belong to a specific range.
+        LOCAL: Numbers that are assigned to a specific geographic region.
+        TOLL_FREE: Numbers that are free of charge for the calling party but billed for all arriving calls.
+      description: The number type.
+      title: Type
+    OrderVoiceConfigurationFAX:
+      title: OrderVoiceConfigurationFAX
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/OrderVoiceConfigurationBase'
+      - $ref: '#/components/schemas/VoiceConfigurationFAX'
+    NumberPrice:
+      type: object
+      properties:
+        setupPrice:
+          $ref: '#/components/schemas/money'
+        monthlyPrice:
+          $ref: '#/components/schemas/money'
+        paymentIntervalMonths:
+          type: integer
+          format: int32
+    BadRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - BadRequest
+          x-enumDescriptions:
+            BadRequest: The request was malformed in some way.
+        fieldViolations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldViolation'
+    OrderVoiceConfiguration:
+      title: OrderVoiceConfiguration
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/OrderVoiceConfigurationRTC'
+      - $ref: '#/components/schemas/OrderVoiceConfigurationEST'
+      - $ref: '#/components/schemas/OrderVoiceConfigurationFAX'
+      discriminator:
+        propertyName: type
+        mapping:
+          RTC: '#/components/schemas/OrderVoiceConfigurationRTC'
+          EST: '#/components/schemas/OrderVoiceConfigurationEST'
+          FAX: '#/components/schemas/OrderVoiceConfigurationFAX'
+    UploadStatus:
+      default: WAITING
+      description: The attachment upload status. It will be either `COMPLETED`, `WAITING` or `FAILED`.
+      enum:
+      - COMPLETED
+      - WAITING
+      - FAILED
+      x-enumDescriptions:
+        WAITING: Waiting for upload
+        COMPLETED: Upload completed
+        FAILED: Upload failed
+      title: Upload Status
+    RegionCode:
+      type: string
+      example: US
+      description: 'ISO 3166-1 alpha-2 country code of the phone number. Example: US, GB or SE.'
+      title: Region Code
+    LookupNumberRequirementsRequest:
+      type: object
+      properties:
+        regionCode:
+          $ref: '#/components/schemas/RegionCode'
+        numberType:
+          $ref: '#/components/schemas/NumberType'
+      required:
+      - regionCode
+      - numberType
+    NumberPattern:
+      type: object
+      properties:
+        pattern:
+          type: string
+          description: Sequence of digits to search for.
+        searchPattern:
+          $ref: '#/components/schemas/NumberPatternSearchPattern'
+      title: Search Pattern
+    Registration:
+      type: object
+      properties:
+        requestDetails:
+          type: object
+          additionalProperties: true
+          description: Free-form JSON object representing registration data.
+        attachments:
+          type: array
+          description: The attachments submitted for this registration, via the dedicated endpoint
+          items:
+            $ref: '#/components/schemas/Attachment'
+        logs:
+          type: array
+          description: A list of timestamped messages from our team with feedback regarding your submitted registration details, in ascending timestamp order
+          items:
+            $ref: '#/components/schemas/RegistrationLog'
+    OrderVoiceConfigurationEST:
+      title: OrderVoiceConfigurationEST
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/OrderVoiceConfigurationBase'
+      - $ref: '#/components/schemas/VoiceConfigurationEST'
+    ScheduledVoiceProvisioning:
+      type: object
+      readOnly: true
+      description: Represents the ongoing or failed scheduled voice provisioning job. This field will be empty if the number was successfully provisioned provisioned for voice.
+      required:
+      - type
+      oneOf:
+      - $ref: '#/components/schemas/ScheduledVoiceProvisioningEST'
+      - $ref: '#/components/schemas/ScheduledVoiceProvisioningFAX'
+      - $ref: '#/components/schemas/ScheduledVoiceProvisioningRTC'
+      discriminator:
+        propertyName: type
+        mapping:
+          EST: '#/components/schemas/ScheduledVoiceProvisioningEST'
+          FAX: '#/components/schemas/ScheduledVoiceProvisioningFAX'
+          RTC: '#/components/schemas/ScheduledVoiceProvisioningRTC'
+      title: Scheduled Voice Provisioning
+    money:
+      type: object
+      description: An object giving details on currency code and the amount charged.
+      properties:
+        currencyCode:
+          type: string
+          example: USD
+          description: The 3-letter currency code defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html).
+        amount:
+          type: string
+          example: '2.00'
+          description: 'The amount in decimal form.
+
+            For example `2.00`.
+
+            There are no guarantees on the precision unless documented by the message origin. The amount cannot be updated and is read-only.'
+      title: Money
+    NumberPatternSearchPattern:
+      type: string
+      enum:
+      - START
+      - CONTAINS
+      - END
+      x-enumDescriptions:
+        START: Numbers that start with the provided sequence of digits.
+        CONTAINS: Numbers that contain the sequence of digits entered.
+        END: Numbers that end with the sequence of digits entered.
+      description: The pattern to apply to searches.
+      title: Search Pattern
+    NumberCapability:
+      type: string
+      enum:
+      - SMS
+      - VOICE
+      x-enumDescriptions:
+        SMS: The SMS product can use the number.
+        VOICE: The Voice product can use the number.
+      default: SMS
+      description: 'The capabilities the phone number supports: SMS, Voice, or both'
+      title: Capability
+    ScheduledVoiceProvisioningEST:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ScheduledVoiceProvisioningCommon'
+      - $ref: '#/components/schemas/VoiceTrunkId'
+    UpdateNumberOrderRegistrationRequest:
+      type: object
+      properties:
+        requestDetails:
+          type: object
+          additionalProperties: true
+          description: Free-form JSON object representing registration data.
+    ProvisioningStatus:
+      default: WAITING
+      description: The provisioning status. It will be either `WAITING`, `IN_PROGRESS` or `FAILED`. If the provisioning fails, a reason for the failure will be provided. [See a full list of provisioning error descriptions]<(https://developers.sinch.com/docs/numbers/api-reference/error-codes/provisioning-errors) and troubleshooting recommendations.
+      enum:
+      - PROVISIONING_STATUS_UNSPECIFIED
+      - WAITING
+      - IN_PROGRESS
+      - FAILED
+      x-enumDescriptions:
+        PROVISIONING_STATUS_UNSPECIFIED: The status is currently unknown.
+        WAITING: Waiting for provisioning
+        IN_PROGRESS: Provisioning in progress
+        FAILED: Provisioning failed. See [provisioning error descriptions](https://developers.sinch.com/docs/numbers/api-reference/error-codes/provisioning-errors)
+      title: Provisioning Status
+    VoiceConfigurationCommon:
+      title: Common VoiceConfiguration fields
+      type: object
+      properties:
+        type:
+          $ref: '#/components/schemas/VoiceApplicationType'
+        lastUpdatedTime:
+          type: string
+          description: Timestamp when the status was last updated.
+          format: date-time
+          readOnly: true
+        scheduledVoiceProvisioning:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/ScheduledVoiceProvisioning'
+    VoiceAppId:
+      type: object
+      properties:
+        appId:
+          type: string
+          description: Your app ID for the Voice API. The `appId` can be found in your [Sinch Customer Dashboard](https://dashboard.sinch.com/voice/apps).
+    AttachmentTemplate:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Attachment template file name
+        url:
+          type: string
+          description: URL where the template can be downloaded from
+    NumberOrder:
+      type: object
+      properties:
+        projectId:
+          type: string
+        idNumberOrder:
+          type: string
+        regionCode:
+          $ref: '#/components/schemas/RegionCode'
+        state:
+          $ref: '#/components/schemas/NumberOrderState'
+        numberType:
+          $ref: '#/components/schemas/NumberType'
+        orderNumbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/OrderNumber'
+        smsConfiguration:
+          $ref: '#/components/schemas/OrderSmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/OrderVoiceConfiguration'
+        expireTime:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          example: '2025-11-23T08:54:58.115Z'
+        createTime:
+          type: string
+          format: date-time
+        updateTime:
+          type: string
+          format: date-time
+    OrderSmsConfiguration:
+      type: object
+      title: KYC SMS Configuration
+      description: SMS Configuration for KYC numbers, containing the `servicePlanId` and `campaignId`.
+      allOf:
+      - $ref: '#/components/schemas/smsConfigurationBase'
+    CreateNumberOrderRequestBase:
+      type: object
+      description: Create a number order
+      properties:
+        regionCode:
+          $ref: '#/components/schemas/RegionCode'
+        numberType:
+          $ref: '#/components/schemas/NumberType'
+        smsConfiguration:
+          $ref: '#/components/schemas/OrderSmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/OrderVoiceConfiguration'
+        callbackUrl:
+          type: string
+          format: uri
+      required:
+      - regionCode
+      - numberType
+    VoiceConfigurationEST:
+      title: EST VoiceConfiguration
+      type: object
+      required:
+      - type
+      allOf:
+      - $ref: '#/components/schemas/VoiceConfigurationCommon'
+      - $ref: '#/components/schemas/VoiceTrunkId'
+    NumberRequirements:
+      type: object
+      properties:
+        fields:
+          description: Free-form JSON object of requirements.
+          type: object
+          additionalProperties: true
+        attachments:
+          description: List of attachments necessary to be uploaded as part of the KYC process
+          type: array
+          items:
+            $ref: '#/components/schemas/RequiredAttachment'
+    ScheduledVoiceProvisioningFAX:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ScheduledVoiceProvisioningCommon'
+      - $ref: '#/components/schemas/VoiceServiceId'
+    NotFound:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+              - 404
+              x-enumDescriptions:
+                '404': The HTTP status code for a resource not found.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+              - NOT_FOUND
+              x-enumDescriptions:
+                NOT_FOUND: The request resource could not be found.
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/NotFoundErrorDetails'
+    OrderVoiceConfigurationRTC:
+      title: OrderVoiceConfigurationRTC
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/OrderVoiceConfigurationBase'
+      - $ref: '#/components/schemas/VoiceAppId'
+    NumberOrderState:
+      type: string
+      x-enumDescriptions:
+        NUMBER_ORDER_STATE_UNSPECIFIED: State not specified.
+        CREATED: Created state.
+        EXPIRED: Expired state.
+        IN_REVIEW: Order in review.
+        BLOCKED: Order blocked.
+        REJECTED: Order rejected.
+        COMPLETED: Order completed.
+      enum:
+      - NUMBER_ORDER_STATE_UNSPECIFIED
+      - CREATED
+      - EXPIRED
+      - IN_REVIEW
+      - BLOCKED
+      - REJECTED
+      - COMPLETED
+      description: The state of the number order
+      title: Number Order State
+    OrderNumber:
+      type: object
+      properties:
+        phoneNumber:
+          $ref: '#/components/schemas/PhoneNumber'
+        numberPrice:
+          $ref: '#/components/schemas/NumberPrice'
+        capabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/NumberCapability'
+    RequiredAttachment:
+      type: object
+      properties:
+        id:
+          type: string
+          description: ID  to be used when uploading the attachment for the registration via the "Upload an attachment for a number order" endpoint
+        description:
+          type: string
+          description: Details about the attachment to be provided
+        mandatory:
+          type: boolean
+          description: Indicates if this attachment's upload is mandatory when purchasing the phone number
+        template:
+          type: array
+          description: Template to be used for the file attachment
+          items:
+            $ref: '#/components/schemas/AttachmentTemplate'
+        title:
+          type: string
+          description: Title of the attachment to be provided
+        allowedMimeTypes:
+          description: Array of allowed mime types. If empty, no restrictions are applied.
+          example:
+          - application/pdf
+          - application/pdf
+          type: array
+          items:
+            type: string
+        allowedDocumentTypes:
+          description: Document types allowed for this attachment. If specified, the documentType field in the attachment must be one of the allowed types.
+          example:
+          - Passport
+          - Driver's License
+          type: array
+          items:
+            type: string
+    Attachment:
+      type: object
+      properties:
+        attachmentId:
+          type: string
+        fileName:
+          type: string
+        mimeType:
+          type: string
+        createTime:
+          type: string
+          description: Timestamp string (RFC3339).
+          format: date-time
+        updateTime:
+          type: string
+          description: Timestamp string (RFC3339).
+          format: date-time
+        uploadStatus:
+          $ref: '#/components/schemas/UploadStatus'
+        documentType:
+          type: string
+    VoiceTrunkId:
+      type: object
+      properties:
+        trunkId:
+          type: string
+          description: The trunk ID if the type is EST. The `trunkId` can be found in your [Sinch Customer Dashboard](https://dashboard.sinch.com/trunks/your-trunks).
+    VoiceApplicationType:
+      type: string
+      description: The voice application type. Examples are RTC, EST, FAX
+      x-enumDescriptions:
+        RTC: Voice [see documentation](https://developers.sinch.com/docs/voice)
+        EST: Elastic SIP Trunking [see documentation](https://developers.sinch.com/docs/est)
+        FAX: FAX application [see documentation](https://developers.sinch.com/docs/fax/overview)
+      enum:
+      - RTC
+      - EST
+      - FAX
+      default: RTC
+    InternalError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+              - 500
+              x-enumDescriptions:
+                '500': The HTTP status code for an internal server error.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+              - INTERNAL
+              - UNKNOWN
+              x-enumDescriptions:
+                INTERNAL: An internal server error.
+                UNKNOWN: Some unknown error.
+            details:
+              type: array
+              items:
+                type: object
+    RegistrationLog:
+      type: object
+      properties:
+        message:
+          type: string
+          description: The feedback / message from our team
+        createTime:
+          type: string
+          description: Timestamp string (RFC3339). Indicates the date & time when the message was created.
+          format: date-time
+    VoiceServiceId:
+      type: object
+      properties:
+        serviceId:
+          type: string
+          description: The service ID if the type is FAX. The `serviceId` can be found in your [Sinch Customer Dashboard](https://dashboard.sinch.com/fax/services).
+    OrderVoiceConfigurationBase:
+      title: OrderVoiceConfigurationBase
+      type: object
+      required:
+      - type
+      properties:
+        type:
+          $ref: '#/components/schemas/VoiceApplicationType'
+    RequestEntityTooLarge:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+              - 413
+              x-enumDescriptions:
+                '413': The HTTP status code for entity too large.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+              - CONTENT_TOO_LARGE
+              x-enumDescriptions:
+                CONTENT_TOO_LARGE: The request content is too large.
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/RequestEntityTooLargeErrorDetails'
+    RequestEntityTooLargeErrorDetails:
+      type: object
+      properties:
+        type:
+          type: string
+        resourceName:
+          type: string
+          description: The name of the resource that exceeded the expected size limit.
+        description:
+          type: string
+          description: A description of the error.
+    smsConfigurationBase:
+      title: Base SMS Configuration
+      type: object
+      required:
+      - servicePlanId
+      properties:
+        servicePlanId:
+          type: string
+          description: The `servicePlanId` can be found in the [Sinch Customer Dashboard](https://dashboard.sinch.com/sms/api/rest). The service plan ID is what ties this number to the configured SMS service.
+        campaignId:
+          type: string
+          description: Only for US phone numbers. This `campaignId` is required to send SMS traffic to US; click [here](https://community.sinch.com/t5/10DLC/What-is-10DLC/ta-p/7845) to read more about 10DLC A2P messaging. So, it is the current campaign ID for this number. The `campaignId` is found on your TCR platform.
+    NotFoundErrorDetails:
+      type: object
+      properties:
+        type:
+          type: string
+        resourceType:
+          type: string
+          description: The type of the resource that was not found.
+        resourceName:
+          type: string
+          description: The name of the resource that was not found.
+        owner:
+          type: string
+          description: The owner of the resource that was not found.
+        description:
+          type: string
+          description: A description of the error.
+    InvalidArgument:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+              - 400
+              x-enumDescriptions:
+                '400': The HTTP status code for invalid arguments.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+              - INVALID_ARGUMENT
+              x-enumDescriptions:
+                INVALID_ARGUMENT: The request contained invalid arguments.
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/BadRequest'
+    ScheduledVoiceProvisioningCommon:
+      type: object
+      required:
+      - type
+      allOf:
+      - type: object
+        properties:
+          type:
+            $ref: '#/components/schemas/VoiceApplicationType'
+          lastUpdatedTime:
+            type: string
+            description: Timestamp when the status was last updated.
+            format: date-time
+            readOnly: true
+          status:
+            $ref: '#/components/schemas/ProvisioningStatus'
+    PhoneNumber:
+      type: string
+      example: '+12025550134'
+      description: The phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format with leading `+`. Example `+12025550134`.
+      title: Phone Number
+    CreateNumberOrderRequest:
+      allOf:
+      - $ref: '#/components/schemas/CreateNumberOrderRequestBase'
+      - oneOf:
+        - title: Order specific phone numbers
+          type: object
+          description: Order specific phone numbers using `numberOrderOption`. Only one phone number per order is currently supported.
+          properties:
+            numberOrderOption:
+              $ref: '#/components/schemas/CreateNumberOrderOption'
+          required:
+          - numberOrderOption
+        - title: Order by quantity
+          type: object
+          description: Order between 1 and 100 numbers that match the given criteria using `quantityOrderOption`.
+          properties:
+            quantityOrderOption:
+              $ref: '#/components/schemas/CreateQuantityOrderOption'
+          required:
+          - quantityOrderOption
+    VoiceConfigurationFAX:
+      title: FAX VoiceConfiguration
+      type: object
+      required:
+      - type
+      allOf:
+      - $ref: '#/components/schemas/VoiceConfigurationCommon'
+      - $ref: '#/components/schemas/VoiceServiceId'
+    ScheduledVoiceProvisioningRTC:
+      type: object
+      allOf:
+      - $ref: '#/components/schemas/ScheduledVoiceProvisioningCommon'
+      - $ref: '#/components/schemas/VoiceAppId'
+    CreateNumberOrderOption:
+      type: object
+      properties:
+        phoneNumbers:
+          type: array
+          description: The phone numbers to order, in E.164 format. Although this is an array, only one phone number per order is currently supported.
+          minItems: 1
+          maxItems: 1
+          items:
+            type: string
+            description: phone numbers in E.164 format
+            example: '+12311234567'
+    CreateQuantityOrderOption:
+      type: object
+      properties:
+        numberPattern:
+          $ref: '#/components/schemas/NumberPattern'
+        requestedQuantity:
+          type: integer
+          format: int32
+          description: The number of phone numbers to order, between 1 and 100.
+          minimum: 1
+          maximum: 100
+          example: 3
+        sequential:
+          type: boolean
+        capabilities:
+          type: array
+          items:
+            $ref: '#/components/schemas/NumberCapability'
+      required:
+      - requestedQuantity
+  examples:
+    gettingStartedExample:
+      value:
+        regionCode: YOUR_region_code
+        numberType: YOUR_number_type
+        numberOrderOption:
+          phoneNumbers:
+          - YOUR_available_phone_number_to_buy
+    gettingStartedLookupExample:
+      value:
+        regionCode: YOUR_region_code
+        numberType: YOUR_number_type
+    lookupAuKycRequirementsRes:
+      value:
+        fields:
+          schema: /schema/policySchema-v1.json
+          rules:
+          - template: {}
+          - template: {}
+          attachments: []
+    australianNumberOrder:
+      summary: Australian Number Order response
+      value:
+        projectId: 10d64985-0bfb-43d3-a2b9-bc5fa6a4752c
+        idNumberOrder: 03kjzencnckxrn216rr1zzzzzz
+        regionCode: AU
+        state: CREATED
+        numberType: MOBILE
+        orderNumbers:
+        - phoneNumber: '+61411111112'
+          numberPrice:
+            setupPrice:
+              currencyCode: USD
+              amount: '1.00'
+            monthlyPrice:
+              currencyCode: USD
+              amount: '1.00'
+            paymentIntervalMonths: 1
+          capabilities:
+          - SMS
+        smsConfiguration:
+          servicePlanId: 1dez6a8300774283a4256aa756a11111
+        expireTime: '2026-03-07T16:53:00.204187Z'
+        createTime: '2026-03-05T16:53:00Z'
+        updateTime: '2026-03-05T16:53:00Z'
+    lookupAuKycRequirementsReq:
+      value:
+        regionCode: AU
+        numberType: MOBILE
+    australianRegistration:
+      summary: Australian registration
+      value:
+        requestDetails:
+          data:
+          - - senderId: +61XXXXXXXXX
+              purposeOfTheTraffic: One Time Password
+              intendedUseOfMobileNumbers: Transactional
+              iConfirmThatMyBusinessHasAValidUseCaseForThisLn: true
+          - endBusinessName: ExampleExample
+            endBusinessAddress: ExampleExample
+            endBusinessAddress2: ExampleExample
+            city: Victoria
+            state: VIC
+            country: AU
+            postalCode: '3000'
+          - firstName: Example
+            lastName: Example
+            phoneNumber: +61XXXXXXXXX
+        attachments:
+        - attachmentId: 01jxn2251d0shhamtbykft2xzx
+          fileName: template.rtf
+          mimeType: application/rtf
+          uploadStatus: WAITING
+          createTime: '2026-02-24T06:39:55.902553Z'
+          updateTime: '2026-02-24T06:39:55.902553Z'
+        logs:
+        - message: Dear Customer, Please provide a local Australia contact number from 'John Doe'. Thank you. Regards, Sinch Service Implementation Team
+          createTime: '2026-02-24T06:39:55.902553Z'
+        - message: Dear Customer, We're unable to proceed further with this request as we did not receive any new updates from you. Thank you. Regards, Sinch Service Implementation Team
+          createTime: '2026-02-25T06:39:55.902553Z'
+    createUsQuantityOrderRequest:
+      summary: Create US LOCAL Quantity Order request
+      value:
+        regionCode: US
+        numberType: LOCAL
+        smsConfiguration:
+          servicePlanId: 1dez6a8300774283a4256aa756a11111
+        callbackUrl: https://www.your-callback-server.com/callback
+        quantityOrderOption:
+          requestedQuantity: 3
+          sequential: false
+    createAustralianNumberOrderRequest:
+      summary: Create Australian Number Order request
+      value:
+        regionCode: AU
+        numberType: MOBILE
+        smsConfiguration:
+          servicePlanId: 1dez6a8300774283a4256aa756a11111
+        callbackUrl: https://www.your-callback-server.com/callback
+        numberOrderOption:
+          phoneNumbers:
+          - '+61411111112'
+  parameters:
+    numberOrderId:
+      name: numberOrderId
+      description: The ID of the number order created by the REST API user.
+      in: path
+      required: true
+      schema:
+        type: string
+    projectId:
+      name: projectId
+      description: Found on your [Sinch Customer Dashboard](https://dashboard.sinch.com/settings/project-management). Settings > Projects.
+      in: path
+      required: true
+      schema:
+        type: string
+        example: YOUR_projectId
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: Your key ID and Key secret serve as the username and password, respectively. Both can be found in the [Sinch Customer Dashboard](https://dashboard.sinch.com/settings/access-keys). For more information about basic authentication in the Numbers API, click [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/basic).
+    OAuth2.0:
+      type: oauth2
+      description: The username and password are your Key ID and Key Secret from the [Access keys section](https://dashboard.sinch.com/settings/access-keys) in the Sinch Customer Dashboard. Exchange these for a bearer token (access token). Learn how [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php

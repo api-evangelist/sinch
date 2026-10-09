@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-list-brand-response-schema.json",
+  "title": "ListBrandResponse",
+  "description": "List of brands object",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-brands-api-openapi.yml#/components/schemas/ListBrandResponse",
+  "properties": {
+    "brands": {
+      "description": "List of brands",
+      "items": {
+        "$ref": "#/$defs/BasicBrand"
+      },
+      "type": "array"
+    },
+    "nextPageToken": {
+      "description": "Token to request the next page of results.",
+      "type": "string"
+    },
+    "totalSize": {
+      "description": "Total count of brands matching provided search criteria",
+      "format": "int32",
+      "type": "integer"
+    }
+  },
+  "type": "object",
+  "$defs": {
+    "BasicBrand": {
+      "description": "Basic brand content used for listing brands matching the search criteria.",
+      "properties": {
+        "brandId": {
+          "description": "The unique identifier for the brand.",
+          "type": "string",
+          "readOnly": true
+        },
+        "brandName": {
+          "description": "The name of the brand.",
+          "type": "string"
+        },
+        "brandMetadataId": {
+          "description": "The unique identifier for the brand metadata.",
+          "type": "string"
+        },
+        "status": {
+          "type": "object",
+          "readOnly": true,
+          "allOf": [
+            {
+              "$ref": "#/$defs/BrandStatus"
+            }
+          ]
+        },
+        "callbackUrl": {
+          "description": "The URL to receive the brand status update callback. The URL must be a valid URL and must be reachable from Sinch.",
+          "type": "string"
+        },
+        "createTime": {
+          "description": "The date and time when the brand was created.",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "updateTime": {
+          "description": "The date and time when the brand was updated.",
+          "type": "string",
+          "format": "date-time",
+          "readOnly": true
+        }
+      },
+      "type": "object"
+    },
+    "BrandStatus": {
+      "enum": [
+        "DRAFT",
+        "NEW",
+        "PENDING",
+        "PENDING_REVIEW",
+        "REJECTED",
+        "INCOMPLETE",
+        "COMPLETED",
+        "ARCHIVED"
+      ],
+      "x-enumDescriptions": {
+        "DRAFT": "The brand is in draft status. It can be updated and submitted for validation.",
+        "NEW": "A new brand created, not processed yet.",
+        "PENDING": "The brand info is under review.",
+        "PENDING_REVIEW": "When a brand is in incomplete status, customer can update the brand. Updating the brand moves the brand to PENDING_REVIEW state, what means that is waiting for another review after the customer changes.",
+        "REJECTED": "The brand has been rejected.",
+        "INCOMPLETE": "The brand is incomplete. The customer can update the brand to complete it.",
+        "COMPLETED": "The brand validation has been completed and the brand is approved for integration against the brand type specification.",
+        "ARCHIVED": "The brand is archived after a cancellation. It can not be updated or submitted for validation."
+      },
+      "type": "string",
+      "format": "enum"
+    }
+  }
+}

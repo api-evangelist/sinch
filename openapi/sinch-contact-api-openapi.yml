@@ -1,0 +1,1045 @@
+openapi: 3.2.0
+info:
+  description: '# Overview
+
+
+    Send and receive messages globally over SMS, RCS, WhatsApp, Viber Business, Facebook messenger and other popular channels using the Sinch Conversation API.'
+  title: Conversation API | Sinch Contact API
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    email: support@sinch.com
+    name: support at sinch
+servers:
+- url: https://{region}.conversation.api.sinch.com
+  variables:
+    region:
+      default: us
+      enum:
+      - us
+      - eu
+      - br
+  description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+security:
+- Basic: []
+- oAuth2: []
+tags:
+- description: A contact is a collection that groups together underlying connected **channel recipient identities**.
+  name: Contact
+  x-displayName: Contacts
+paths:
+  /v1/projects/{project_id}/contacts:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    get:
+      description: List all contacts in the project. Note that, if a WhatsApp contact is returned, the `display_name` field of that contact may be populated with the WhatsApp display name (if the name is already stored on the server and the `display_name` field has not been overwritten by the user).
+      tags:
+      - Contact
+      summary: List Contacts
+      operationId: Contact_ListContacts
+      parameters:
+      - description: 'Optional. The maximum number of contacts to fetch. The default is 10
+
+          and the maximum is 20.'
+        name: page_size
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - description: Optional. Next page token previously returned if any.
+        name: page_token
+        in: query
+        schema:
+          type: string
+      - description: Optional. Contact identifier in an external system. If used, `channel` and `identity` query parameters can't be used.
+        name: external_id
+        in: query
+        schema:
+          type: string
+      - description: Optional. Specifies a channel, and must be set to one of the enum values. If set, the `identity` parameter must be set and `external_id` can't be used. Used in conjunction with `identity` to uniquely identify the specified channel identity.
+        name: channel
+        in: query
+        schema:
+          $ref: '#/components/schemas/ConversationChannel'
+      - description: Optional. If set, the `channel` parameter must be set and `external_id` can't be used. Used in conjunction with `channel` to uniquely identify the specified channel identity. This will differ from channel to channel. For example, a phone number for SMS, WhatsApp, and Viber Business.
+        name: identity
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/listContactsResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.contacts;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ContactsService;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.response.ContactsListResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class List {\n\n  private static final Logger LOGGER = Logger.getLogger(List.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ContactsService contactService = client.conversation().v1().contacts();\n\n    LOGGER.info(\"List contacts\");\n\n    ContactsListResponse response = contactService.list();\n\n    LOGGER.info(\"Response: \");\n\n    response.iterator().forEachRemaining(f -> LOGGER.info(f.toString()));\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.contact.list({});\n    if (response.data.length === 0) {\n      console.log('No Contacts found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Contacts.`);\n    response.data.forEach((contact) => {\n      console.log(contact);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list the Contacts:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\nfrom dotenv import load_dotenv\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\ncontacts = sinch_client.conversation.contacts.list()\n\nprint(\"List of contacts:\\n\")\nfor contact in contacts.iterator():\n    print(contact)\n"
+    post:
+      tags:
+      - Contact
+      summary: Create a Contact
+      description: Most Conversation API contacts are created automatically when a message is sent to a new recipient. You can also create a new contact manually using this API call.
+      operationId: Contact_CreateContact
+      requestBody:
+        $ref: '#/components/requestBodies/CreateContactRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/createContactResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.contacts;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ContactsService;\nimport com.sinch.sdk.domains.conversation.models.v1.ChannelIdentity;\nimport com.sinch.sdk.domains.conversation.models.v1.ConversationChannel;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.Contact;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.ContactLanguage;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.request.ContactCreateRequest;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.Arrays;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Create {\n\n  private static final Logger LOGGER = Logger.getLogger(Create.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The channel to use for the contact\n    ConversationChannel recipientChannel = ConversationChannel.SMS;\n    // The phone number of the contact to create\n    String recipientPhoneNumber = \"RECIPIENT_PHONE_NUMBER\";\n    // The display name of the contact to create\n    String contactDisplayName = \"Created from Java SDK snippet\";\n    // The language of the contact to create\n    ContactLanguage contactLanguage = ContactLanguage.FR;\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ContactsService contactService = client.conversation().v1().contacts();\n\n    LOGGER.info(\"Create contact\");\n\n    ContactCreateRequest contact =\n        ContactCreateRequest.builder()\n            .setChannelIdentities(\n                Arrays.asList(\n                    ChannelIdentity.builder()\n                        .setChannel(recipientChannel)\n                        .setIdentity(recipientPhoneNumber)\n                        .build()))\n            .setDisplayName(contactDisplayName)\n            .setLanguage(contactLanguage)\n            .build();\n\n    Contact result = contactService.create(contact);\n\n    LOGGER.info(\"Response: \" + result);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // Parameters to create a contact\n  const recipientPhoneNumber = 'RECIPIENT_PHONE_NUMBER';\n  const contactDisplayName = 'Created from Node.js SDK snippet';\n  const contactLanguage = 'FR';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.contact.create({\n      contactCreateRequestBody: {\n        channel_identities: [\n          {\n            channel: 'RCS',\n            identity: recipientPhoneNumber,\n          },\n        ],\n        display_name: contactDisplayName,\n        language: contactLanguage,\n      },\n    });\n    console.log('✅ Successfully created the Contact.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to create the Contact for phone number ${recipientPhoneNumber}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\n\nfrom dotenv import load_dotenv\n\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\n# The channel to use for the contact\nrecipient_channel = \"SMS\"\n# The phone number of the contact to create\nrecipient_phone_number = \"RECIPIENT_PHONE_NUMBER\"\n# The display name of the contact to create\ncontact_display_name = \"Created from Python SDK snippet\"\n# The language of the contact\nlanguage = \"FR\"\n# The channel identities the contact is reachable on\nchannel_identities = [\n    {\"channel\": recipient_channel, \"identity\": recipient_phone_number}\n]\n\nresponse = sinch_client.conversation.contacts.create(\n    channel_identities=channel_identities,\n    display_name=contact_display_name,\n    language=language,\n)\n\nprint(f\"Successfully created contact.\\n{response}\")\n"
+  /v1/projects/{project_id}/contacts/{contact_id}:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    - $ref: '#/components/parameters/contact_id'
+    get:
+      description: 'Returns a specific contact as specified by the contact ID. Note the following:
+
+
+        - If a WhatsApp contact is returned, the `display_name` field of that contact may be populated with the WhatsApp display name (if the name is already stored on the server and the `display_name` field has not been overwritten by the user).
+
+
+        - If you receive an Inbound Message callback for an MO message on the Instagram channel, the corresponding payload will not include the Instagram username. You may use the `contact_id` and `channel_identity` values included in the callback to retreive the username (detailed in the `display_name` field) with this Conversation API operation.'
+      tags:
+      - Contact
+      summary: Get a Contact
+      operationId: Contact_GetContact
+      responses:
+        '200':
+          $ref: '#/components/responses/getContactResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.contacts;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ContactsService;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.Contact;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Get {\n\n  private static final Logger LOGGER = Logger.getLogger(Get.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the contact to retrieve\n    String conversationContactId = \"CONTACT_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ContactsService contactService = client.conversation().v1().contacts();\n\n    LOGGER.info(String.format(\"Get details for contact with ID '%s'\", conversationContactId));\n\n    Contact result = contactService.get(conversationContactId);\n\n    LOGGER.info(\"Response: \" + result);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Contact to retrieve\n  const contactId = 'CONTACT_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.contact.get({\n      contact_id: contactId,\n    });\n    console.log('✅ Successfully retrieved the Contact.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the Contact with ID ${contactId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\nfrom dotenv import load_dotenv\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\n# The ID of the contact to retrieve\ncontact_id = \"CONVERSATION_CONTACT_ID\"\n\nresponse = sinch_client.conversation.contacts.get(contact_id=contact_id)\n\nprint(f\"Contact details:\\n{response}\")\n"
+    delete:
+      description: Delete a contact as specified by the contact ID.
+      tags:
+      - Contact
+      summary: Delete a Contact
+      operationId: Contact_DeleteContact
+      responses:
+        '200':
+          description: A successful response.
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.contacts;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ContactsService;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Delete {\n\n  private static final Logger LOGGER = Logger.getLogger(Delete.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the contact to delete\n    String conversationContactId = \"CONTACT_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ContactsService contactService = client.conversation().v1().contacts();\n\n    LOGGER.info(String.format(\"Delete conversation contact with ID '%s'\", conversationContactId));\n\n    contactService.delete(conversationContactId);\n\n    LOGGER.info(\"Done\");\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Contact to delete\n  const contactId = 'CONTACT_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    await sinch.conversation.contact.delete({\n      contact_id: contactId,\n    });\n    console.log(`✅ Successfully deleted the Contact with ID ${contactId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete the Contact with ID ${contactId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\nfrom dotenv import load_dotenv\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\n# The ID of the contact to delete\ncontact_id = \"CONVERSATION_CONTACT_ID\"\n\nsinch_client.conversation.contacts.delete(contact_id=contact_id)\n\nprint(f\"Successfully deleted contact {contact_id}.\")\n"
+    patch:
+      description: Updates a contact as specified by the contact ID.
+      tags:
+      - Contact
+      summary: Update a Contact
+      operationId: Contact_UpdateContact
+      parameters:
+      - $ref: '#/components/parameters/update_mask'
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateContactRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/updateContactResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.contacts;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ContactsService;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.Contact;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Update {\n\n  private static final Logger LOGGER = Logger.getLogger(Update.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the contact to update\n    String conversationContactId = \"CONTACT_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ContactsService contactService = client.conversation().v1().contacts();\n\n    LOGGER.info(String.format(\"Update contact with ID '%s'\", conversationContactId));\n\n    Contact contact = Contact.builder().setDisplayName(\"updated from Java SDK snippet\").build();\n\n    Contact result = contactService.update(conversationContactId, contact);\n\n    LOGGER.info(\"Response: \" + result);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The contact ID to update\n  const contactId = 'CONTACT_ID';\n  // The new name for the contact\n  const updatedContactName = 'Updated from Node.js SDK snippet';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.contact.update({\n      contact_id: contactId,\n      updateContactRequestBody: {\n        display_name: updatedContactName,\n      },\n    });\n    console.log('✅ Successfully updated the Contact.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to update the Contact with ID ${contactId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\n\nfrom dotenv import load_dotenv\n\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\n# The ID of the contact to update\ncontact_id = \"CONVERSATION_CONTACT_ID\"\n\n# The display name of the contact to update\ncontact_display_name = \"Updated from Python SDK snippet\"\n\nresponse = sinch_client.conversation.contacts.update(\n    contact_id=contact_id,\n    display_name=contact_display_name,\n)\n\nprint(f\"Successfully updated contact.\\n{response}\")\n"
+  /v1/projects/{project_id}/contacts/{destination_id}:merge:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    - $ref: '#/components/parameters/destination_id'
+    post:
+      description: 'The remaining contact will contain all conversations that the removed
+
+        contact did. If both contacts had conversations within the same App,
+
+        messages from the removed contact will be merged into corresponding active
+
+        conversations in the destination contact. Channel
+
+        identities will be moved from the source contact to the destination contact
+
+        only for channels that weren''t present there before. Moved channel
+
+        identities will be placed at the bottom of the channel priority list.
+
+        Optional fields from the source contact will be copied only if
+
+        corresponding fields in the destination contact are empty. The contact being
+
+        removed cannot be referenced after this call.'
+      tags:
+      - Contact
+      summary: Merge two Contacts
+      operationId: Contact_MergeContact
+      requestBody:
+        $ref: '#/components/requestBodies/MergeContactRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/mergeContactResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.contacts;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ContactsService;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.Contact;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.request.MergeContactRequest;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Merge {\n\n  private static final Logger LOGGER = Logger.getLogger(Merge.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    //  The ID of the contact to merge from (the source contact)\n    String sourceContactId = \"SOURCE_CONTACT_ID\";\n    // The ID of the contact to merge into (the destination contact)\n    String destinationContactId = \"DESTINATION_CONTACT_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ContactsService contactService = client.conversation().v1().contacts();\n\n    LOGGER.info(\n        String.format(\n            \"Merge contact with ID '%s' onto contact with ID '%s'\",\n            sourceContactId, destinationContactId));\n\n    MergeContactRequest request =\n        MergeContactRequest.builder().setSourceId(sourceContactId).build();\n    Contact result = contactService.mergeContact(destinationContactId, request);\n\n    LOGGER.info(\"Response: \" + result);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Contact to merge into\n  const destinationContactId = 'DESTINATION_CONTACT_ID';\n  // The source Contact will be merged into the destination Contact and then deleted\n  const sourceContactId = 'SOURCE_CONTACT_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.contact.mergeContact({\n      destination_id: destinationContactId,\n      mergeContactRequestBody: {\n        source_id: sourceContactId,\n      },\n    });\n    console.log('✅ Successfully merged the Contacts.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to merge the Contact with ID ${sourceContactId} into the Contact with ID ${destinationContactId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\n\nfrom dotenv import load_dotenv\n\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\n# The ID of the contact to merge into (the destination contact)\ndestination_id = \"DESTINATION_CONTACT_ID\"\n\n# The ID of the contact to merge from (the source contact)\nsource_id = \"SOURCE_CONTACT_ID\"\n\nresponse = sinch_client.conversation.contacts.merge_contact(\n    destination_id=destination_id,\n    source_id=source_id\n)\n\nprint(f\"Successfully merged contacts.\\n{response}\")\n"
+  /v1/projects/{project_id}/contacts:getChannelProfile:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    post:
+      description: 'Get user profile from a specific channel.
+
+        Only supported on `MESSENGER`, `INSTAGRAM`, `VIBER` and `LINE` channels. Note that, in order to retrieve a WhatsApp display name, you can use the Get a Contact or List Contacts operations, which will populate the `display_name` field of each returned contact with the WhatsApp display name (if the name is already stored on the server and the `display_name` field has not been overwritten by the user).'
+      tags:
+      - Contact
+      summary: Get Channel Profile
+      operationId: Contact_GetChannelProfile
+      requestBody:
+        $ref: '#/components/requestBodies/GetChannelProfileRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/getChannelProfileResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.contacts;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ContactsService;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.request.ContactGetChannelProfileByContactIdRequest;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.request.GetChannelProfileConversationChannel;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.response.GetChannelProfileResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class GetChannelProfile {\n\n  private static final Logger LOGGER = Logger.getLogger(GetChannelProfile.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the Conversation application the contact belongs to\n    String conversationApplicationId = \"APPLICATION_ID\";\n    // The ID of the contact to retrieve the channel profile for\n    String conversationContactId = \"CONTACT_ID\";\n    // The channel associated with the contact\n    GetChannelProfileConversationChannel conversationChannel =\n        GetChannelProfileConversationChannel.MESSENGER;\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ContactsService contactService = client.conversation().v1().contacts();\n\n    ContactGetChannelProfileByContactIdRequest parametersByContactId =\n        ContactGetChannelProfileByContactIdRequest.builder()\n            .setAppId(conversationApplicationId)\n            .setChannel(conversationChannel)\n            .setContactId(conversationContactId)\n            .build();\n\n    LOGGER.info(\n        String.format(\n            \"Get MESSENGER channel profile for contact with ID '%s'\", conversationContactId));\n\n    GetChannelProfileResponse result =\n        contactService.getChannelProfileByContactId(parametersByContactId);\n\n    LOGGER.info(\"Response: \" + result);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation App where the channel is configured\n  const appId = 'CONVERSATION_APP_ID';\n  // The ID of the contact to fetch the channel profile for\n  const contactId = 'CONTACT_ID';\n  // Supported channels: 'MESSENGER', 'INSTAGRAM', 'LINE'\n  const channel = 'MESSENGER';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.contact.getChannelProfile({\n      getChannelProfileRequestBody: {\n        app_id: appId,\n        channel,\n        recipient: {\n          contact_id: contactId,\n        },\n      },\n    });\n    console.log('✅ Successfully retrieved the channel profile for the Contact.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the channel profile (on ${channel}) for the Contact with ID ${contactId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\n\nfrom dotenv import load_dotenv\n\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\n# The ID of the Conversation application the contact belongs to\nconversation_application_id = \"APPLICATION_ID\"\n\n# The ID of the contact to retrieve the channel profile for\nconversation_contact_id = \"CONTACT_ID\"\n\n# The channel associated with the contact\nconversation_channel = \"MESSENGER\"\n\nresponse = sinch_client.conversation.contacts.get_channel_profile(\n    app_id=conversation_application_id,\n    channel=conversation_channel,\n    recipient={\n        \"contact_id\": conversation_contact_id\n    }\n)\n\nprint(f\"Successfully retrieved channel profile.\\n{response}\")\n"
+  /v1/projects/{project_id}/contacts:identityConflicts:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    get:
+      description: 'Lists contact identity conflicts across supported SIM-based channels (SMS, MMS, RCS).
+
+        Use this to identify contact records sharing the same identity (e.g., phone number), which must be resolved before enabling the Unified Contact ID feature.'
+      tags:
+      - Contact
+      summary: Lists Contact Identity Conflicts
+      operationId: Contact_ListIdentityConflicts
+      parameters:
+      - description: Maximum number of conflicts to return (max 20).
+        name: page_size
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - description: Pagination token for retrieving next page.
+        name: page_token
+        in: query
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  conflicts:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        identity:
+                          type: string
+                          description: The identity value (e.g., phone number) that is duplicated across contacts.
+                        channels:
+                          type: array
+                          items:
+                            type: string
+                          description: List of channels where this identity is present.
+                        contact_ids:
+                          type: array
+                          items:
+                            type: string
+                          description: List of contact IDs that share this identity.
+                  next_page_token:
+                    type: string
+                    description: Token for retrieving the next page of results.
+              examples:
+                conflictExample:
+                  summary: Example response with channels
+                  value:
+                    conflicts:
+                    - identity: '{PHONE_NUMBER}'
+                      channels:
+                      - MMS
+                      - RCS
+                      - SMS
+                      contact_ids:
+                      - 01JYGNEVNG48XM1RFZKD0B2S7K
+                      - 01JZMH3ZZYP6V84EJ5FSHFH3P8
+                    next_page_token: ''
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.contacts;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ContactsService;\nimport com.sinch.sdk.domains.conversation.models.v1.contacts.response.IdentityConflictsListResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class ListIdentityConflicts {\n\n  private static final Logger LOGGER = Logger.getLogger(ListIdentityConflicts.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ContactsService contactService = client.conversation().v1().contacts();\n\n    LOGGER.info(\"List identity conflicts\");\n\n    IdentityConflictsListResponse response = contactService.listIdentityConflicts();\n\n    LOGGER.info(\"Response: \");\n\n    response.iterator().forEachRemaining(f -> LOGGER.info(f.toString()));\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.contact.listIdentityConflicts({});\n    if (response.data.length === 0) {\n      console.log('No Identity Conflicts found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Identity Conflicts.`);\n    response.data.forEach((identityConflict) => {\n      console.log(identityConflict);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list the Identity Conflicts:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\n\nfrom dotenv import load_dotenv\n\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\nresponse = sinch_client.conversation.contacts.list_identity_conflicts()\n\nfor conflict in response.iterator():\n    print(f\"Identity conflict: {conflict}\")\n"
+components:
+  responses:
+    403Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 403
+            message: You do not have access to the requested resource.
+            status: UNAUTHORIZED
+            details: []
+    501Error:
+      description: Something went wrong on our end, try again with exponential back-off. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 501
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    getContactResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Contact'
+    500Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 500
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    createContactResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Contact'
+    400Error:
+      description: Malformed request. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 400
+            message: Malformed request
+            status: INVALID_REQUEST
+            details: []
+    getChannelProfileResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetChannelProfileResponse'
+    updateContactResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Contact'
+          examples:
+            updatedContact:
+              $ref: '#/components/examples/updateContactResponse'
+    401Error:
+      description: Incorrect credentials. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            type: object
+    listContactsResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListContactsResponse'
+    mergeContactResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Contact'
+          examples:
+            mergedContact:
+              $ref: '#/components/examples/mergeContactResponse'
+  examples:
+    createContactWithOneChannel:
+      summary: Create new contact with only one channel
+      value:
+        channel_identities:
+        - channel: WHATSAPP
+          identity: '{{WHATSAPP_PHONE_NUMBER}}'
+        language: EN_US
+        display_name: New Contact
+        email: new.contact@email.com
+    mergeContactResponse:
+      summary: Merged contact
+      value:
+        id: ID_of_target_contact
+        channel_identities:
+        - channel: TELEGRAM
+          identity: '{TELEGRAM_ID}'
+          app_id: ''
+        - channel: WHATSAPP
+          identity: '{WHATSAPP_ID}'
+          app_id: ''
+        channel_priority:
+        - TELEGRAM
+        - WHATSAPP
+        display_name: '{CONTACT_DISPLAY_NAME}'
+        email: ''
+        external_id: ''
+        metadata: ''
+        language: ZU
+    updateContactRequest:
+      summary: Update contact
+      value:
+        channel_identities:
+        - channel: MESSENGER
+          identity: '{{FACEBOOK_USER_NAME}}'
+          app_id: '{{APP_ID}}'
+        - channel: VIBER
+          identity: '{{PHONE_NUMBER}}'
+          app_id: '{{APP_ID}}'
+        channel_priority:
+        - MESSENGER
+        - VIBER
+        email: string
+        language: FR
+        metadata: string
+    updateContactResponse:
+      summary: Updated contact
+      value:
+        channel_identities:
+        - channel: MESSENGER
+          identity: '{{FACEBOOK_USER_NAME}}'
+          app_id: '{{APP_ID}}'
+        - channel: VIBER
+          identity: '{{PHONE_NUMBER}}'
+          app_id: '{{APP_ID}}'
+        channel_priority:
+        - MESSENGER
+        - VIBER
+        display_name: string
+        external_id: string
+        email: string
+        language: EN_US
+        metadata: string
+    createContactWithManyChannels:
+      summary: Create new contact with multiple channels
+      value:
+        channel_identities:
+        - channel: MESSENGER
+          identity: '{{FACEBOOK_USER_NAME}}'
+          app_id: '{{APP_ID}}'
+        - channel: SMS
+          identity: '{{PHONE_NUMBER}}'
+        - channel: VIBER
+          identity: '{{PHONE_NUMBER}}'
+          app_id: '{{APP_ID}}'
+        channel_priority:
+        - MESSENGER
+        - VIBER
+        - SMS
+        language: EN_US
+        display_name: New Contact
+        email: new.contact@email.com
+  schemas:
+    GetChannelProfileConversationChannel:
+      type: string
+      title: Channel Identifier
+      description: The channel. Must be one of the supported channels for this operation.
+      example: MESSENGER
+      x-enumDescriptions:
+        MESSENGER: The Facebook Messenger channel.
+        INSTAGRAM: The Instagram channel.
+        VIBER: The Viber Bot channel.
+        LINE: The LINE channel.
+      enum:
+      - MESSENGER
+      - INSTAGRAM
+      - VIBER
+      - LINE
+    ChannelIdentities:
+      required:
+      - channel_identities
+      type: object
+      properties:
+        channel_identities:
+          description: 'A list of specific channel identities.
+
+            The API will use these identities when sending to specific channels.'
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelRecipientIdentity'
+    ConversationMergeStrategy:
+      type: string
+      default: MERGE
+      x-enumDescriptions:
+        MERGE: Merge the contents of the two subjects.
+      enum:
+      - MERGE
+    GetChannelProfileRequest:
+      type: object
+      required:
+      - app_id
+      - recipient
+      - channel
+      properties:
+        app_id:
+          type: string
+          description: The ID of the app.
+          example: '{APP_ID}'
+        recipient:
+          $ref: '#/components/schemas/Recipient'
+        channel:
+          $ref: '#/components/schemas/GetChannelProfileConversationChannel'
+    Contact:
+      description: A participant in a conversation typically representing a person. It is associated with a collection of channel identities.
+      type: object
+      title: Contact
+      properties:
+        channel_identities:
+          description: List of channel identities.
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
+        channel_priority:
+          description: List of channels defining the channel priority.
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationChannel'
+        display_name:
+          type: string
+          description: The display name. A default 'Unknown' will be assigned if left empty.
+        email:
+          description: Email of the contact.
+          type: string
+        external_id:
+          description: Contact identifier in an external system.
+          type: string
+        id:
+          description: The ID of the contact.
+          type: string
+          example: '{CONTACT_ID}'
+        language:
+          $ref: '#/components/schemas/ContactLanguage'
+        metadata:
+          description: Metadata associated with the contact. Up to 1024 characters long.
+          type: string
+    ContactIDField:
+      type: object
+      title: Contact ID
+      properties:
+        contact_id:
+          title: Contact ID string
+          description: The ID of the contact.
+          type: string
+          example: '{CONTACT_ID}'
+    ContactCreateRequest:
+      description: A participant in a conversation typically representing a person. It is associated with a collection of channel identities.
+      type: object
+      title: Contact creation request
+      required:
+      - channel_identities
+      - language
+      properties:
+        channel_identities:
+          description: List of channel identities. Array must contain at least one item.
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelIdentity'
+        channel_priority:
+          description: List of channels defining the channel priority. The channel at the top of the list is tried first.
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationChannel'
+        display_name:
+          type: string
+          description: The display name. A default 'Unknown' will be assigned if left empty.
+        email:
+          description: Email of the contact.
+          type: string
+        external_id:
+          description: Contact identifier in an external system.
+          type: string
+        language:
+          $ref: '#/components/schemas/ContactLanguage'
+        metadata:
+          description: Metadata associated with the contact. Up to 1024 characters long.
+          type: string
+    GetChannelProfileResponse:
+      type: object
+      properties:
+        profile_name:
+          type: string
+          description: The profile name.
+          example: John Doe
+    RecipientBase:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/IdentifiedByField'
+      - $ref: '#/components/schemas/ContactIDField'
+    ConversationChannel:
+      type: string
+      title: Channel Identifier
+      description: The identifier of the channel you want to include. Must be one of the enum values.
+      example: WHATSAPP
+      x-enumDescriptions:
+        SMS: The SMS channel.
+        RCS: The RCS channel.
+        WHATSAPP: The WhatsApp channel.
+        MMS: The MMS channel.
+        KAKAOTALK: The KakaoTalk channel.
+        KAKAOTALKCHAT: The KakaoTalk chat channel (used primarily in ConsultationTalk).
+        VIBERBM: The Viber Business Messages channel.
+        LINE: The LINE channel.
+        INSTAGRAM: The Instagram channel.
+        MESSENGER: The Facebook Messenger channel.
+        WECHAT: The WeChat channel.
+        TELEGRAM: The Telegram channel.
+        APPLEBC: The Apple Messages for Business channel.
+      enum:
+      - SMS
+      - RCS
+      - WHATSAPP
+      - MMS
+      - KAKAOTALK
+      - KAKAOTALKCHAT
+      - VIBERBM
+      - LINE
+      - INSTAGRAM
+      - MESSENGER
+      - WECHAT
+      - TELEGRAM
+      - APPLEBC
+    ChannelIdentity:
+      description: 'A unique identity of message recipient on a particular channel.
+
+        For example, the channel identity on SMS, WHATSAPP or VIBERBM is a MSISDN phone number.'
+      type: object
+      title: Channel Identity
+      required:
+      - identity
+      - channel
+      properties:
+        app_id:
+          description: Required if using a channel that uses app-scoped channel identities. Currently, FB Messenger, Instagram, LINE, and WeChat use app-scoped channel identities, which means contacts will have different channel identities on different Conversation API apps. These can be thought of as virtual identities that are app-specific and, therefore, the app_id must be included in the API call.
+          type: string
+        channel:
+          $ref: '#/components/schemas/ConversationChannel'
+        identity:
+          description: The channel identity. This will differ from channel to channel. For example, a phone number for SMS, WhatsApp, and Viber Business.
+          type: string
+    MergeContactRequest:
+      type: object
+      required:
+      - source_id
+      properties:
+        source_id:
+          description: Required. The ID of the contact that should be removed.
+          type: string
+        strategy:
+          $ref: '#/components/schemas/ConversationMergeStrategy'
+    IdentifiedByField:
+      type: object
+      title: Channel Identities
+      properties:
+        identified_by:
+          title: Channel Identity List
+          type: object
+          description: The identity as specified by the channel.
+          allOf:
+          - $ref: '#/components/schemas/ChannelIdentities'
+    ChannelRecipientIdentity:
+      type: object
+      required:
+      - identity
+      - channel
+      properties:
+        channel:
+          $ref: '#/components/schemas/ConversationChannel'
+        identity:
+          description: The channel recipient identity.
+          type: string
+    ListContactsResponse:
+      type: object
+      properties:
+        contacts:
+          description: List of contacts belonging to the specified project.
+          type: array
+          items:
+            $ref: '#/components/schemas/Contact'
+        next_page_token:
+          description: 'Token that should be included in the next list contacts request to
+
+            fetch the next page.'
+          type: string
+    ContactLanguage:
+      type: string
+      enum:
+      - AF
+      - SQ
+      - AR
+      - AZ
+      - BN
+      - BG
+      - CA
+      - ZH
+      - ZH_CN
+      - ZH_HK
+      - ZH_TW
+      - HR
+      - CS
+      - DA
+      - NL
+      - EN
+      - EN_GB
+      - EN_US
+      - ET
+      - FIL
+      - FI
+      - FR
+      - DE
+      - EL
+      - GU
+      - HA
+      - HE
+      - HI
+      - HU
+      - ID
+      - GA
+      - IT
+      - JA
+      - KN
+      - KK
+      - KO
+      - LO
+      - LV
+      - LT
+      - MK
+      - MS
+      - ML
+      - MR
+      - NB
+      - FA
+      - PL
+      - PT
+      - PT_BR
+      - PT_PT
+      - PA
+      - RO
+      - RU
+      - SR
+      - SK
+      - SL
+      - ES
+      - ES_AR
+      - ES_ES
+      - ES_MX
+      - SW
+      - SV
+      - TA
+      - TE
+      - TH
+      - TR
+      - UK
+      - UR
+      - UZ
+      - VI
+      - ZU
+      x-enumDescriptions:
+        AF: Afrikaans
+        SQ: Albanian
+        AR: Arabic
+        AZ: Azerbaijani
+        BN: Bengali
+        BG: Bulgarian
+        CA: Catalan
+        ZH: Chinese
+        ZH_CN: Chinese (CHN)
+        ZH_HK: Chinese (HKG)
+        ZH_TW: Chinese (TAI)
+        HR: Croatian
+        CS: Czech
+        DA: Danish
+        NL: Dutch
+        EN: English
+        EN_GB: English (UK)
+        EN_US: English (US)
+        ET: Estonian
+        FIL: Filipino
+        FI: Finnish
+        FR: French
+        DE: German
+        EL: Greek
+        GU: Gujarati
+        HA: Hausa
+        HE: Hebrew
+        HI: Hindi
+        HU: Hungarian
+        ID: Indonesian
+        GA: Irish
+        IT: Italian
+        JA: Japanese
+        KN: Kannada
+        KK: Kazakh
+        KO: Korean
+        LO: Lao
+        LV: Latvian
+        LT: Lithuanian
+        MK: Macedonian
+        MS: Malay
+        ML: Malayalam
+        MR: Marathi
+        NB: Norwegian
+        FA: Persian
+        PL: Polish
+        PT: Portuguese
+        PT_BR: Portuguese (BR)
+        PT_PT: Portuguese (PT)
+        PA: Punjabi
+        RO: Romanian
+        RU: Russian
+        SR: Serbian
+        SK: Slovak
+        SL: Slovenian
+        ES: Spanish
+        ES_AR: Spanish (ARG)
+        ES_ES: Spanish (SPA)
+        ES_MX: Spanish (MEX)
+        SW: Swahili
+        SV: Swedish
+        TA: Tamil
+        TE: Telugu
+        TH: Thai
+        TR: Turkish
+        UK: Ukrainian
+        UR: Urdu
+        UZ: Uzbek
+        VI: Vietnamese
+        ZU: Zulu
+    runtimeError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/protobufAny'
+            message:
+              type: string
+            status:
+              type: string
+    Recipient:
+      description: Identifies the recipient.
+      allOf:
+      - $ref: '#/components/schemas/RecipientBase'
+    protobufAny:
+      type: object
+      properties:
+        type_url:
+          type: string
+        value:
+          type: string
+          format: byte
+  parameters:
+    project_id:
+      name: project_id
+      description: The unique ID of the project. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+      in: path
+      required: true
+      schema:
+        type: string
+    update_mask:
+      description: The set of field mask paths.
+      name: update_mask
+      in: query
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+    contact_id:
+      name: contact_id
+      description: The unique ID of the contact.
+      in: path
+      required: true
+      schema:
+        type: string
+    destination_id:
+      name: destination_id
+      description: The unique ID of the contact that should be kept when merging two contacts.
+      in: path
+      required: true
+      schema:
+        type: string
+  requestBodies:
+    GetChannelProfileRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetChannelProfileRequest'
+      required: true
+    CreateContactRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ContactCreateRequest'
+          examples:
+            createContactOneChannel:
+              $ref: '#/components/examples/createContactWithOneChannel'
+            createContactMultipleChannels:
+              $ref: '#/components/examples/createContactWithManyChannels'
+      description: The contact to create.
+      required: true
+    UpdateContactRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Contact'
+          examples:
+            updateContact:
+              $ref: '#/components/examples/updateContactRequest'
+      description: The contact to be updated
+      required: true
+    MergeContactRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/MergeContactRequest'
+      description: The contact to be removed.
+      required: true
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/conversation/api-reference/#authentication).
+    oAuth2:
+      type: oauth2
+      description: The user name and password are your client_id and key_secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-readme:
+  proxy-enabled: true
+  samples-enabled: true

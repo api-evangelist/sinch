@@ -1,0 +1,2774 @@
+openapi: 3.2.0
+info:
+  title: Provisioning KakaoTalk Templates API
+  description: The KakaoTalk template endpoint offers a way for you to manage your KakaoTalk templates that can be used with the Conversation API.
+  version: 1.2.117
+servers:
+- url: https://provisioning.api.sinch.com
+  description: Production server
+security:
+- BasicAuth: []
+  BearerAuth: []
+  OAuth2Production: []
+tags:
+- name: KakaoTalk Templates
+  description: The KakaoTalk template endpoint offers a way for you to manage your KakaoTalk templates that can be used with the Conversation API.
+paths:
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}/templates:
+    get:
+      description: Returns a paginated list of templates for the specified project. If no page token is supplied then the first `50` templates are returned in alphabetical order.
+      operationId: KakaotalkTemplatesController_listTemplates_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      - name: filterStates
+        required: false
+        in: query
+        description: Optionally query for template by states.
+        x-enumDescriptions:
+          APPROVED: The template is approved and available for use.
+          REJECTED: The template was rejected and cannot be used.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkTemplateStatesEnum'
+      - name: filterStatuses
+        required: false
+        in: query
+        description: Optionally query for template by statuses.
+        x-enumDescriptions:
+          DRAFT: The template changes are saved as a draft only.
+          IN_PROGRESS: The template changes have been submitted and are still processing.
+          REJECTED: The template changes have been reviewed and rejected.
+        schema:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkTemplateStatusesEnum'
+      - name: pageSize
+        required: false
+        in: query
+        schema:
+          type: number
+          minimum: 1
+          maximum: 1000
+        description: The page size requested.
+      - name: pageToken
+        required: false
+        in: query
+        schema:
+          type: string
+        description: The page token if retrieving the next page from a previous query.
+      - name: templateName
+        required: false
+        in: query
+        description: Optionally query for template by name. Will return all templates with names that begin with the query string.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: List of templates
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkTemplateListDto'
+              examples:
+                response:
+                  summary: List response
+                  description: "\n    Response with templates.\n    "
+                  value:
+                    totalSize: 2
+                    pageSize: 50
+                    templates:
+                    - id: 1a76b24e-bead-4c72-b468-6c3bdfff0ee6
+                      code: S7yFqaKqJ8tsnBZH2CEd
+                      state: APPROVED
+                      details:
+                        language: EN
+                        messageType: BASIC
+                        emphasizeType: EMPHASIZE_TYPE_NONE
+                        categoryCode: '001001'
+                        securityFlag: false
+                        name: Example name
+                        content: Example content
+                        extra: Example extra
+                        ad: Example ad
+                        title: Example title
+                        subtitle: Example subtitle
+                        imageName: Example image name
+                        imageUrl: https://example-image-url.com
+                        buttons:
+                        - ordering: 1
+                          type: APP_LINK
+                          name: Example Name
+                          linkMo: https://example-link-mo.com
+                          linkPc: https://example-link-pc.com
+                          schemeIos: https://example-scheme-ios.com
+                          schemeAndroid: https://example-scheme-android.com
+                      created: '2023-02-24T10:19:31.372Z'
+                      modified: '2023-02-24T10:19:31.372Z'
+                    - id: 1a76b24e-bead-4c72-b468-6c3bdfff0ee6
+                      code: S7yFqaKqJ8tsnBZH2CEd
+                      state: APPROVED
+                      details:
+                        language: EN
+                        messageType: BASIC
+                        emphasizeType: EMPHASIZE_TYPE_NONE
+                        categoryCode: '001001'
+                        securityFlag: false
+                        name: Example name
+                        content: Example content
+                        extra: Example extra
+                        ad: Example ad
+                        title: Example title
+                        subtitle: Example subtitle
+                        imageName: Example image name
+                        imageUrl: https://example-image-url.com
+                        buttons:
+                        - ordering: 1
+                          type: APP_LINK
+                          name: Example Name
+                          linkMo: https://example-link-mo.com
+                          linkPc: https://example-link-pc.com
+                          schemeIos: https://example-scheme-ios.com
+                          schemeAndroid: https://example-scheme-android.com
+                      changes:
+                        status: IN_PROGRESS
+                        details:
+                          language: EN
+                          messageType: BASIC
+                          emphasizeType: EMPHASIZE_TYPE_NONE
+                          categoryCode: '001001'
+                          securityFlag: false
+                          name: Example name
+                          content: Example content
+                          extra: Example extra
+                          ad: Example ad
+                          title: Example title
+                          subtitle: Example subtitle
+                          imageName: Example image name
+                          imageUrl: https://example-image-url.com
+                          buttons:
+                          - ordering: 1
+                            type: APP_LINK
+                            name: Example Name
+                            linkMo: https://example-link-mo.com
+                            linkPc: https://example-link-pc.com
+                            schemeIos: https://example-scheme-ios.com
+                            schemeAndroid: https://example-scheme-android.com
+                      created: '2023-02-24T10:19:31.372Z'
+                      modified: '2023-02-24T10:19:31.372Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                invalid_page_size-1:
+                  summary: InvalidPageSizeError
+                  value:
+                    errorCode: invalid_page_size
+                    message: Page size must be numeric.
+                    resolution: Use a integer value for pageSize parameter.
+                invalid_page_token-2:
+                  summary: InvalidPageTokenError
+                  value:
+                    errorCode: invalid_page_token
+                    message: Invalid page token.
+                    resolution: The page token to use is provided in the previous query response, for new queries simply leave this field undefined.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+                template_not_found-1:
+                  summary: TemplateNotFoundError
+                  value:
+                    errorCode: template_not_found
+                    message: Template not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: List all templates in project
+      tags:
+      - KakaoTalk Templates
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+    post:
+      callbacks:
+        Comment:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: KakaoTalk Template received a comment
+              description: "\n        Callback sent when a comment is placed on a template.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event, in this case `KAKAOTALK_TEMPLATE_COMMENT_ADDED`.
+                          type: string
+                        payload:
+                          description: Template at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/KakaotalkTemplateDto'
+                        comment:
+                          description: Comment for template.
+                          type: string
+                      required:
+                      - type
+                      - payload
+                      - comment
+                    example:
+                      type: KAKAOTALK_TEMPLATE_COMMENT_ADDED
+                      payload:
+                        id: 1a76b24e-bead-4c72-b468-6c3bdfff0ee6
+                        code: S7yFqaKqJ8tsnBZH2CEd
+                        changes:
+                          status: DRAFT
+                          details:
+                            language: EN
+                            messageType: BASIC
+                            emphasizeType: EMPHASIZE_TYPE_NONE
+                            categoryCode: '001001'
+                            securityFlag: false
+                            name: Example name
+                            content: Example content
+                            extra: Example extra
+                            ad: Example ad
+                            title: Example title
+                            subtitle: Example subtitle
+                            imageName: Example image name
+                            imageUrl: https://example-image-url.com
+                            buttons:
+                            - ordering: 1
+                              type: APP_LINK
+                              name: Example Name
+                              linkMo: https://example-link-mo.com
+                              linkPc: https://example-link-pc.com
+                              schemeIos: https://example-scheme-ios.com
+                              schemeAndroid: https://example-scheme-android.com
+                        created: '2023-02-24T10:19:31.372Z'
+                        modified: '2023-02-24T10:19:31.372Z'
+                      comment: new template comment
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+        Approved:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: KakaoTalk Template approved
+              description: "\n        Callback sent when a template is approved.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event, in this case `KAKAOTALK_TEMPLATE_APPROVED`.
+                          type: string
+                        payload:
+                          description: Template at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/KakaotalkTemplateDto'
+                      required:
+                      - type
+                      - payload
+                    example:
+                      type: KAKAOTALK_TEMPLATE_APPROVED
+                      payload:
+                        id: 1a76b24e-bead-4c72-b468-6c3bdfff0ee6
+                        code: S7yFqaKqJ8tsnBZH2CEd
+                        state: APPROVED
+                        details:
+                          language: EN
+                          messageType: BASIC
+                          emphasizeType: EMPHASIZE_TYPE_NONE
+                          categoryCode: '001001'
+                          securityFlag: false
+                          name: Example name
+                          content: Example content
+                          extra: Example extra
+                          ad: Example ad
+                          title: Example title
+                          subtitle: Example subtitle
+                          imageName: Example image name
+                          imageUrl: https://example-image-url.com
+                          buttons:
+                          - ordering: 1
+                            type: APP_LINK
+                            name: Example Name
+                            linkMo: https://example-link-mo.com
+                            linkPc: https://example-link-pc.com
+                            schemeIos: https://example-scheme-ios.com
+                            schemeAndroid: https://example-scheme-android.com
+                        created: '2023-02-24T10:19:31.372Z'
+                        modified: '2023-02-24T10:19:31.372Z'
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+        Rejected:
+          '{$request.body#webhooks.target}':
+            post:
+              summary: KakaoTalk Template rejected
+              description: "\n        Callback sent when a template is rejected.\n        "
+              parameters:
+              - in: header
+                name: x-sinch-webhook-signature
+                schema:
+                  type: string
+                  format: SHA256-hash
+                example: Jc88RMjzkxPoy/fCPiL+iy7osojuUgawpjl1g6H38O8=
+              - in: header
+                name: x-sinch-webhook-signature-algorithm
+                schema:
+                  type: string
+                  const: HmacSHA256
+                  x-enumDescriptions:
+                    HmacSHA256: The HMAC SHA-256 signature algorithm used to validate webhook authenticity.
+                  uniqueItems: false
+                example: HmacSHA256
+              - in: header
+                name: x-sinch-webhook-signature-nonce
+                schema:
+                  type: string
+                example: 01EAW2BNWCG9DC13RS582V0ZQ3
+              - in: header
+                name: x-sinch-webhook-signature-timestamp
+                schema:
+                  type: string
+                  format: timestamp
+                example: '1592227387'
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      type: object
+                      properties:
+                        type:
+                          description: Type of event, in this case `KAKAOTALK_TEMPLATE_REJECTED`.
+                          type: string
+                        payload:
+                          description: Template at time of callback.
+                          allOf:
+                          - $ref: '#/components/schemas/KakaotalkTemplateDto'
+                      required:
+                      - type
+                      - payload
+                    example:
+                      type: KAKAOTALK_TEMPLATE_REJECTED
+                      payload:
+                        id: 1a76b24e-bead-4c72-b468-6c3bdfff0ee6
+                        code: S7yFqaKqJ8tsnBZH2CEd
+                        state: REJECTED
+                        details:
+                          language: EN
+                          messageType: BASIC
+                          emphasizeType: EMPHASIZE_TYPE_NONE
+                          categoryCode: '001001'
+                          securityFlag: false
+                          name: Example name
+                          content: Example content
+                          extra: Example extra
+                          ad: Example ad
+                          title: Example title
+                          subtitle: Example subtitle
+                          imageName: Example image name
+                          imageUrl: https://example-image-url.com
+                          buttons:
+                          - ordering: 1
+                            type: APP_LINK
+                            name: Example Name
+                            linkMo: https://example-link-mo.com
+                            linkPc: https://example-link-pc.com
+                            schemeIos: https://example-scheme-ios.com
+                            schemeAndroid: https://example-scheme-android.com
+                        created: '2023-02-24T10:19:31.372Z'
+                        modified: '2023-02-24T10:19:31.372Z'
+              responses:
+                '200':
+                  description: Response to callback will be ignored. The call will retry if unsuccessful.
+      description: Creates a new template with the request data.
+      operationId: KakaotalkTemplatesController_createTemplate_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Template data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KakaotalkInputTemplateDto'
+            examples:
+              minimal:
+                summary: Minimum example
+                description: "\n    Minimum body to create a template.\n    "
+                value:
+                  details:
+                    name: Example name
+                    content: Example content
+                    language: EN
+              full:
+                summary: Full example
+                description: "\n    Full body to create a template.\n    "
+                value:
+                  status: SUBMIT
+                  details:
+                    language: EN
+                    messageType: BASIC
+                    emphasizeType: EMPHASIZE_TYPE_NONE
+                    categoryCode: '001001'
+                    securityFlag: false
+                    name: Example name
+                    content: Example content
+                    extra: Example extra
+                    title: Example title
+                    subtitle: Example subtitle
+                    imageName: Example image name
+                    imageUrl: https://example-image-url.com
+                    buttons:
+                    - ordering: 1
+                      type: APP_LINK
+                      name: Example Name
+                      linkMo: https://example-link-mo.com
+                      linkPc: https://example-link-pc.com
+                      schemeIos: https://example-scheme-ios.com
+                      schemeAndroid: https://example-scheme-android.com
+      responses:
+        '201':
+          description: Created template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkTemplateDto'
+              examples:
+                response:
+                  summary: Create response
+                  description: "\n    Response when successfully creating a template.\n    "
+                  value:
+                    id: 1a76b24e-bead-4c72-b468-6c3bdfff0ee6
+                    code: S7yFqaKqJ8tsnBZH2CEd
+                    changes:
+                      status: IN_PROGRESS
+                      details:
+                        language: EN
+                        messageType: BASIC
+                        emphasizeType: EMPHASIZE_TYPE_NONE
+                        categoryCode: '001001'
+                        securityFlag: false
+                        name: Example name
+                        content: Example content
+                        extra: Example extra
+                        ad: Example ad
+                        title: Example title
+                        subtitle: Example subtitle
+                        imageName: Example image name
+                        imageUrl: https://example-image-url.com
+                        buttons:
+                        - ordering: 1
+                          type: APP_LINK
+                          name: Example Name
+                          linkMo: https://example-link-mo.com
+                          linkPc: https://example-link-pc.com
+                          schemeIos: https://example-scheme-ios.com
+                          schemeAndroid: https://example-scheme-android.com
+                    created: '2023-02-24T10:19:31.372Z'
+                    modified: '2023-02-24T10:19:31.372Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                template_invalid_category_code-1:
+                  summary: TemplateInvalidCategoryCodeError
+                  value:
+                    errorCode: template_invalid_category_code
+                    message: Invalid template category code.
+                    resolution: Verify that the template category code used is supported for the provided project.
+                invalid_payload-2:
+                  summary: InvalidPayloadError
+                  value:
+                    errorCode: invalid_payload
+                    message: Invalid payload.
+                    resolution: Correct payload and submit again.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                template_exists-0:
+                  summary: TemplateExistsError
+                  value:
+                    errorCode: template_exists
+                    message: Template already exists.
+                    resolution: Templates must have unique name. Change name and submit again.
+        '424':
+          description: FailedDependency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                template_kakaotalk_validation_error-0:
+                  summary: TemplateKakaotalkValidationErrorError
+                  value:
+                    errorCode: template_kakaotalk_validation_error
+                    message: 'Template kakaoTalk validation error: Some details from provider'
+                    resolution: Please try again later. If template is saved as draft, try to submit the template again. If option "saveDraftOnFailure" is specified as "false", try the request again.
+                    additionalInformation: {}
+                template_kakaotalk_validation_error-1:
+                  summary: TemplateKakaotalkValidationErrorError
+                  value:
+                    errorCode: template_kakaotalk_validation_error
+                    message: 'Template kakaoTalk validation error: Some details from provider'
+                    resolution: Please try again later. If template is saved as draft, try to submit the template again. If option "saveDraftOnFailure" is specified as "false", try the request again.
+                    additionalInformation:
+                      templateCode: AX5NnkwWABRXG7LjDBGa
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support. If template is saved as draft, try to submit the template again. If option "saveDraftOnFailure" is specified as "false", try the request again.
+                    additionalInformation: {}
+                internal_error-1:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support. If template is saved as draft, try to submit the template again. If option "saveDraftOnFailure" is specified as "false", try the request again.
+                    additionalInformation:
+                      templateCode: templateCode
+                internal_error-2:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Create a template in project
+      tags:
+      - KakaoTalk Templates
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}/templates/{templateCode}:
+    get:
+      description: Returns a template for a project, with the specified name and language.
+      operationId: KakaotalkTemplatesController_get_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      - name: templateCode
+        required: true
+        in: path
+        description: The unique name of the template.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkTemplateDto'
+              examples:
+                response:
+                  summary: Get response
+                  description: "\n    Response when successfully creating a template.\n    "
+                  value:
+                    id: 1a76b24e-bead-4c72-b468-6c3bdfff0ee6
+                    code: S7yFqaKqJ8tsnBZH2CEd
+                    state: APPROVED
+                    details:
+                      language: EN
+                      messageType: BASIC
+                      emphasizeType: EMPHASIZE_TYPE_NONE
+                      categoryCode: '001001'
+                      securityFlag: false
+                      name: Example name
+                      content: Example content
+                      extra: Example extra
+                      ad: Example ad
+                      title: Example title
+                      subtitle: Example subtitle
+                      imageName: Example image name
+                      imageUrl: https://example-image-url.com
+                      buttons:
+                      - ordering: 1
+                        type: APP_LINK
+                        name: Example Name
+                        linkMo: https://example-link-mo.com
+                        linkPc: https://example-link-pc.com
+                        schemeIos: https://example-scheme-ios.com
+                        schemeAndroid: https://example-scheme-android.com
+                    created: '2023-02-24T10:19:31.372Z'
+                    modified: '2023-02-24T10:19:31.372Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+                template_not_found-1:
+                  summary: TemplateNotFoundError
+                  value:
+                    errorCode: template_not_found
+                    message: Template not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get template in project
+      tags:
+      - KakaoTalk Templates
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+    delete:
+      description: Delete template that matches the template code.
+      operationId: KakaotalkTemplatesController_deleteTemplate_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      - name: templateCode
+        required: true
+        in: path
+        description: The unique name of the template.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Template deleted
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                template_not_found-0:
+                  summary: TemplateNotFoundError
+                  value:
+                    errorCode: template_not_found
+                    message: Template not found.
+                    resolution: Verify that the parameters are correct.
+                sender_not_found-1:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Delete template for project
+      tags:
+      - KakaoTalk Templates
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+    patch:
+      description: Updates an existing template with the request data.
+      operationId: KakaotalkTemplatesController_updateTemplate_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      - name: templateCode
+        required: true
+        in: path
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Updating data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KakaotalkInputUpdateTemplateDto'
+            examples:
+              minimal:
+                summary: Minimum example
+                description: "\n    Minimum body to update a template.\n    "
+                value: {}
+              full:
+                summary: Full example
+                description: "\n    Full body to update a template.\n    "
+                value:
+                  status: DRAFT
+                  details:
+                    messageType: BASIC
+                    emphasizeType: EMPHASIZE_TYPE_NONE
+                    categoryCode: '001001'
+                    securityFlag: false
+                    name: Example name
+                    content: Example content
+                    extra: Example extra
+                    title: Example title
+                    subtitle: Example subtitle
+                    imageName: Example image name
+                    imageUrl: https://example-image-url.com
+                    buttons:
+                    - ordering: 1
+                      type: APP_LINK
+                      name: Example Name
+                      linkMo: https://example-link-mo.com
+                      linkPc: https://example-link-pc.com
+                      schemeIos: https://example-scheme-ios.com
+                      schemeAndroid: https://example-scheme-android.com
+      responses:
+        '200':
+          description: Updated template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkTemplateDto'
+              examples:
+                response:
+                  summary: Update response
+                  description: "\n    Response when successfully updating a template.\n    "
+                  value:
+                    id: 1a76b24e-bead-4c72-b468-6c3bdfff0ee6
+                    code: S7yFqaKqJ8tsnBZH2CEd
+                    changes:
+                      status: IN_PROGRESS
+                      details:
+                        language: EN
+                        messageType: BASIC
+                        emphasizeType: EMPHASIZE_TYPE_NONE
+                        categoryCode: '001001'
+                        securityFlag: false
+                        name: Example name
+                        content: Example content
+                        extra: Example extra
+                        ad: Example ad
+                        title: Example title
+                        subtitle: Example subtitle
+                        imageName: Example image name
+                        imageUrl: https://example-image-url.com
+                        buttons:
+                        - ordering: 1
+                          type: APP_LINK
+                          name: Example Name
+                          linkMo: https://example-link-mo.com
+                          linkPc: https://example-link-pc.com
+                          schemeIos: https://example-scheme-ios.com
+                          schemeAndroid: https://example-scheme-android.com
+                    created: '2023-02-24T10:19:31.372Z'
+                    modified: '2023-02-24T10:19:31.372Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                template_invalid_category_code-1:
+                  summary: TemplateInvalidCategoryCodeError
+                  value:
+                    errorCode: template_invalid_category_code
+                    message: Invalid template category code.
+                    resolution: Verify that the template category code used is supported for the provided project.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+                template_not_found-1:
+                  summary: TemplateNotFoundError
+                  value:
+                    errorCode: template_not_found
+                    message: Template not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                template_exists-0:
+                  summary: TemplateExistsError
+                  value:
+                    errorCode: template_exists
+                    message: Template already exists.
+                    resolution: Templates must have unique name. Change name and submit again.
+                template_not_updatable-1:
+                  summary: TemplateNotUpdatableError
+                  value:
+                    errorCode: template_not_updatable
+                    message: Template is not updatable.
+                    resolution: 'Updates are only supported by templates with state: APPROVED, REJECTED.'
+                template_changes_not_updatable-2:
+                  summary: TemplateChangesNotUpdatableError
+                  value:
+                    errorCode: template_changes_not_updatable
+                    message: Template is not updatable.
+                    resolution: 'Updates are only supported by template changes with status: DRAFT, REJECTED.'
+        '424':
+          description: FailedDependency
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                template_kakaotalk_validation_error-0:
+                  summary: TemplateKakaotalkValidationErrorError
+                  value:
+                    errorCode: template_kakaotalk_validation_error
+                    message: 'Template kakaoTalk validation error: Some details from provider'
+                    resolution: Please try again later. If template is saved as draft, try to submit the template again. If option "saveDraftOnFailure" is specified as "false", try the request again.
+                    additionalInformation: {}
+                template_kakaotalk_validation_error-1:
+                  summary: TemplateKakaotalkValidationErrorError
+                  value:
+                    errorCode: template_kakaotalk_validation_error
+                    message: 'Template kakaoTalk validation error: Some details from provider'
+                    resolution: Please try again later. If template is saved as draft, try to submit the template again. If option "saveDraftOnFailure" is specified as "false", try the request again.
+                    additionalInformation:
+                      templateCode: AX5NnkwWABRXG7LjDBGa
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Update a template in project
+      tags:
+      - KakaoTalk Templates
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}/templates/{templateCode}/activities:
+    get:
+      description: Paginated list of activities for a template. Ordered from the most recent one to the oldest one.
+      operationId: KakaotalkTemplatesController_listActivities_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      - name: templateCode
+        required: true
+        in: path
+        description: The unique name of the template.
+        schema:
+          type: string
+      - name: pageSize
+        required: false
+        in: query
+        schema:
+          type: number
+          minimum: 1
+          maximum: 100
+        description: The page size requested.
+      - name: pageToken
+        required: false
+        in: query
+        schema:
+          type: string
+        description: The page token if retrieving the next page from a previous query.
+      responses:
+        '200':
+          description: Recent activities on template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkTemplateNotificationListDto'
+              examples:
+                response:
+                  summary: List template activities response
+                  description: "\n    Response for all template activities.\n    "
+                  value:
+                    totalSize: 2
+                    pageSize: 50
+                    notifications:
+                    - type: CREATED
+                      created: '2023-01-19T13:11:08.204Z'
+                      author: Provisioning API user
+                    - type: COMMENT_ADDED
+                      created: '2023-01-19T13:11:08.204Z'
+                      comment: Example comment
+                      author: Provisioning API user
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                invalid_page_token-1:
+                  summary: InvalidPageTokenError
+                  value:
+                    errorCode: invalid_page_token
+                    message: Invalid page token.
+                    resolution: The page token to use is provided in the previous query response, for new queries simply leave this field undefined.
+                invalid_page_size-2:
+                  summary: InvalidPageSizeError
+                  value:
+                    errorCode: invalid_page_size
+                    message: Page size must be numeric.
+                    resolution: Use a integer value for pageSize parameter.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                sender_not_found-0:
+                  summary: SenderNotFoundError
+                  value:
+                    errorCode: sender_not_found
+                    message: Sender not found.
+                    resolution: Verify that the parameters are correct.
+                template_not_found-1:
+                  summary: TemplateNotFoundError
+                  value:
+                    errorCode: template_not_found
+                    message: Template not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Lists activities on project template
+      tags:
+      - KakaoTalk Templates
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}/templates/{templateCode}/changes:
+    delete:
+      description: 'Delete a template draft.
+
+
+        Please note that it is only possible to delete templates that have not yet been submitted to KakaoTalk.'
+      operationId: KakaotalkTemplatesController_deleteTemplateDraft_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      - name: templateCode
+        required: true
+        in: path
+        description: The unique name of the template.
+        schema:
+          type: string
+      responses:
+        '204':
+          description: Template draft deleted
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                template_not_found-0:
+                  summary: TemplateNotFoundError
+                  value:
+                    errorCode: template_not_found
+                    message: Template not found.
+                    resolution: Verify that the parameters are correct.
+        '409':
+          description: Conflict
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                template_not_deletable-0:
+                  summary: TemplateNotDeletableError
+                  value:
+                    errorCode: template_not_deletable
+                    message: Template is not deletable.
+                    resolution: Only templates that has not yet been submitted to KakaoTalk is eligible for deletion.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Delete template draft for project
+      tags:
+      - KakaoTalk Templates
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/kakaotalk/senders/{plusFriendId}/templates/{templateCode}/comments:
+    post:
+      description: Creates a comment for a template.
+      operationId: KakaotalkTemplatesController_createComment_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: plusFriendId
+        required: true
+        in: path
+        description: The unique ID of the sender.
+        schema:
+          type: string
+      - name: templateCode
+        required: true
+        in: path
+        description: The unique name of the template.
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: Comment data
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/KakaotalkCommentInputDto'
+            examples:
+              input:
+                summary: Body request
+                description: "\n      Example body request to create a comment.\n      "
+                value:
+                  comment: Example comment.
+      responses:
+        '201':
+          description: Created comment for a template
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkCommentDto'
+              examples:
+                created:
+                  summary: Create response
+                  description: "\n    Response when successfully creating a comment.\n    "
+                  value:
+                    type: CREATED
+                    comment: Example comment
+                    created: '2023-01-19T13:11:08.204Z'
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                invalid_input-0:
+                  summary: InvalidInputError
+                  value:
+                    errorCode: invalid_input
+                    message: Invalid input.
+                    resolution: Correct the validation errors and submit again.
+                    additionalInformation:
+                      validationErrors:
+                      - details.buttons.0.name must be a string
+                project_not_initialized-1:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for KakaoTalk.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for KakaoTalk.
+                template_invalid_language_code-2:
+                  summary: TemplateInvalidLanguageCodeError
+                  value:
+                    errorCode: template_invalid_language_code
+                    message: Invalid language code.
+                    resolution: Verify that the language code used is supported by the Provisioning API and KakaoTalk.
+                    additionalInformation:
+                      supportedCodes: AF, AR, AZ, BG, BN, CA, CS, DA, DE, EL, EN, EN_GB, EN_US, ES, ES_AR, ES_ES, ES_MX, ET, FA, FI, FIL, FR, GA, GU, HA, HE, HI, HR, HU, ID, IT, JA, KA, KK, KN, KO, KY_KG, LO, LT, LV, MK, ML, MR, MS, NB, NL, PA, PL, PT_BR, PT_PT, RO, RU, RW_RW, SK, SL, SQ, SR, SV, SW, TA, TE, TH, TR, UK, UR, UZ, VI, ZH_CN, ZH_HK, ZH_TW, ZU
+                invalid_payload-3:
+                  summary: InvalidPayloadError
+                  value:
+                    errorCode: invalid_payload
+                    message: Invalid payload.
+                    resolution: Correct payload and submit again.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                template_not_found-0:
+                  summary: TemplateNotFoundError
+                  value:
+                    errorCode: template_not_found
+                    message: Template not found.
+                    resolution: Verify that the parameters are correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/KakaotalkPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Creates a comment for a template
+      tags:
+      - KakaoTalk Templates
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+components:
+  schemas:
+    KakaotalkButtonDto:
+      type: object
+      properties:
+        ordering:
+          type: number
+          description: Button sequence
+          uniqueItems: false
+        type:
+          x-enumDescriptions:
+            APP_LINK: Launches a deep link to open a specific target within a mobile application.
+            BOT_FOR_CONSULTATION: Initializes an interactive support or automated consultation flow with a chat bot.
+            BOT_KEYWORD: Submits a predefined automated keyword response block back to the chat bot.
+            BOT_TRANSFER: Transfers the current communication context directly into a bot interaction sequence.
+            BUSINESS_FORM: Launches an embedded native Kakao business questionnaire or lead collection form.
+            BUTTON_TYPE_UNSPECIFIED: The configuration properties for the button type are unspecified.
+            CHANNEL_ID_ADDED: Triggers a native prompt encouraging the end-user to subscribe to or add the Kakao channel.
+            DELIVERY_SEARCH: Redirects the user to external delivery tracking metrics or shipping cargo lookups.
+            IMAGE_SECURE_TRANSMISSION_PLUGIN_ID: Launches a secure verification plugin context dedicated to image file transmission.
+            MESSAGE_DELIVERY: Advances the template execution loop to continue the underlying message delivery flow.
+            ONE_CLICK_PAYMENT_PLUGIN: Launches an integrated native plug-in interface to complete a one-click payment checkout.
+            PERSONAL_INFORMATION_USE_PLUGIN_ID: Launches a secure personal data governance plugin to gather explicit user privacy consent.
+            WEB_LINK: Launches a target external URL routing path inside a web browser environment.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Button type
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkKakaoTalkButtonTypeEnum'
+        name:
+          type: string
+          description: Button name
+          uniqueItems: false
+        linkMo:
+          type: string
+          format: url
+          description: Mobile web link
+          uniqueItems: false
+        linkPc:
+          type: string
+          format: url
+          description: PC web link
+          uniqueItems: false
+        schemeIos:
+          type: string
+          description: iOS app link
+          uniqueItems: false
+        schemeAndroid:
+          type: string
+          description: Android app link
+          uniqueItems: false
+    KakaotalkTemplateLanguagesEnum:
+      type: string
+      enum:
+      - AF
+      - AR
+      - AZ
+      - BG
+      - BN
+      - CA
+      - CS
+      - DA
+      - DE
+      - EL
+      - EN
+      - EN_GB
+      - EN_US
+      - ES
+      - ES_AR
+      - ES_ES
+      - ES_MX
+      - ET
+      - FA
+      - FI
+      - FIL
+      - FR
+      - GA
+      - GU
+      - HA
+      - HE
+      - HI
+      - HR
+      - HU
+      - ID
+      - IT
+      - JA
+      - KA
+      - KK
+      - KN
+      - KO
+      - KY_KG
+      - LO
+      - LT
+      - LV
+      - MK
+      - ML
+      - MR
+      - MS
+      - NB
+      - NL
+      - PA
+      - PL
+      - PT_BR
+      - PT_PT
+      - RO
+      - RU
+      - RW_RW
+      - SK
+      - SL
+      - SQ
+      - SR
+      - SV
+      - SW
+      - TA
+      - TE
+      - TH
+      - TR
+      - UK
+      - UR
+      - UZ
+      - VI
+      - ZH_CN
+      - ZH_HK
+      - ZH_TW
+      - ZU
+      - UNRECOGNIZED
+      description: Template language
+    KakaotalkActionsEnum:
+      type: string
+      enum:
+      - DRAFT
+      - SUBMIT
+      description: Create as draft or submit. Defaults to submit.
+    KakaotalkInputKakaoTalkButtonTypeEnum:
+      type: string
+      enum:
+      - APP_LINK
+      - BOT_FOR_CONSULTATION
+      - BOT_KEYWORD
+      - BOT_TRANSFER
+      - BUSINESS_FORM
+      - CHANNEL_ID_ADDED
+      - DELIVERY_SEARCH
+      - IMAGE_SECURE_TRANSMISSION_PLUGIN_ID
+      - MESSAGE_DELIVERY
+      - ONE_CLICK_PAYMENT_PLUGIN
+      - PERSONAL_INFORMATION_USE_PLUGIN_ID
+      - WEB_LINK
+      description: Button type
+    KakaotalkTemplateChangesDetailsDto:
+      type: object
+      properties:
+        language:
+          x-enumDescriptions:
+            AF: The language configuration is set to Afrikaans.
+            AR: The language configuration is set to Arabic.
+            AZ: The language configuration is set to Azerbaijani.
+            BG: The language configuration is set to Bulgarian.
+            BN: The language configuration is set to Bengali.
+            CA: The language configuration is set to Catalan.
+            CS: The language configuration is set to Czech.
+            DA: The language configuration is set to Danish.
+            DE: The language configuration is set to German.
+            EL: The language configuration is set to Greek.
+            EN: The language configuration is set to English.
+            EN_GB: The language configuration is set to British English.
+            EN_US: The language configuration is set to American English.
+            ES: The language configuration is set to Spanish.
+            ES_AR: The language configuration is set to Argentinian Spanish.
+            ES_ES: The language configuration is set to European Spanish.
+            ES_MX: The language configuration is set to Mexican Spanish.
+            ET: The language configuration is set to Estonian.
+            FA: The language configuration is set to Persian.
+            FI: The language configuration is set to Finnish.
+            FIL: The language configuration is set to Filipino.
+            FR: The language configuration is set to French.
+            GA: The language configuration is set to Irish.
+            GU: The language configuration is set to Gujarati.
+            HA: The language configuration is set to Hausa.
+            HE: The language configuration is set to Hebrew.
+            HI: The language configuration is set to Hindi.
+            HR: The language configuration is set to Croatian.
+            HU: The language configuration is set to Hungarian.
+            ID: The language configuration is set to Indonesian.
+            IT: The language configuration is set to Italian.
+            JA: The language configuration is set to Japanese.
+            KA: The language configuration is set to Georgian.
+            KK: The language configuration is set to Kazakh.
+            KN: The language configuration is set to Kannada.
+            KO: The language configuration is set to Korean.
+            KY_KG: The language configuration is set to Kyrgyz.
+            LO: The language configuration is set to Lao.
+            LT: The language configuration is set to Lithuanian.
+            LV: The language configuration is set to Latvian.
+            MK: The language configuration is set to Macedonian.
+            ML: The language configuration is set to Malayalam.
+            MR: The language configuration is set to Marathi.
+            MS: The language configuration is set to Malay.
+            NB: The language configuration is set to Norwegian.
+            NL: The language configuration is set to Dutch.
+            PA: The language configuration is set to Punjabi.
+            PL: The language configuration is set to Polish.
+            PT_BR: The language configuration is set to Brazilian Portuguese.
+            PT_PT: The language configuration is set to European Portuguese.
+            RO: The language configuration is set to Romanian.
+            RU: The language configuration is set to Russian.
+            RW_RW: The language configuration is set to Kinyarwanda.
+            SK: The language configuration is set to Slovak.
+            SL: The language configuration is set to Slovenian.
+            SQ: The language configuration is set to Albanian.
+            SR: The language configuration is set to Serbian.
+            SV: The language configuration is set to Swedish.
+            SW: The language configuration is set to Swahili.
+            TA: The language configuration is set to Tamil.
+            TE: The language configuration is set to Telugu.
+            TH: The language configuration is set to Thai.
+            TR: The language configuration is set to Turkish.
+            UK: The language configuration is set to Ukrainian.
+            UR: The language configuration is set to Urdu.
+            UZ: The language configuration is set to Uzbek.
+            VI: The language configuration is set to Vietnamese.
+            ZH_CN: The language configuration is set to Simplified Chinese.
+            ZH_HK: The language configuration is set to Traditional Chinese (Hong Kong).
+            ZH_TW: The language configuration is set to Traditional Chinese (Taiwan).
+            ZU: The language configuration is set to Zulu.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Template language
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateLanguagesEnum'
+        messageType:
+          x-enumDescriptions:
+            AD_INCLUDED: The layout includes explicit promotional or advertising blocks.
+            BASIC: The standard layout without supplementary structural elements.
+            EXTRA_INFORMATION: The layout features an appended metadata or supplementary info block.
+            MIXED: The layout consolidates multiple structural interaction fields.
+            TEMPLATE_MESSAGE_TYPE_UNSPECIFIED: The layout structure is unspecified.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Types of template message
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkKakaoTalkTemplateMessageTypeEnum'
+        emphasizeType:
+          x-enumDescriptions:
+            EMPHASIZE_TYPE_IMAGE: Applies structural highlighting focused primarily on an image element.
+            EMPHASIZE_TYPE_NONE: No additional structural or visual highlighting is applied.
+            EMPHASIZE_TYPE_TEXT: Applies structural highlighting focused on high-visibility text copy.
+            EMPHASIZE_TYPE_UNSPECIFIED: The layout highlighting type is unspecified.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Types of emphasized template
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkKakaoTalkTemplateEmphasizeTypeEnum'
+        categoryCode:
+          type: string
+          description: Template category code
+          uniqueItems: false
+        securityFlag:
+          type: boolean
+          description: Security template
+          uniqueItems: false
+        name:
+          type: string
+          description: Button name
+          uniqueItems: false
+        content:
+          type: string
+          description: Template body
+          uniqueItems: false
+        extra:
+          type: string
+          description: Additional template information
+          uniqueItems: false
+        ad:
+          type: string
+          description: Request for consent of receiving within template or simple ad phrases
+          uniqueItems: false
+        title:
+          type: string
+          description: Template title
+          uniqueItems: false
+        subtitle:
+          type: string
+          description: Auxiliary template phrase
+          uniqueItems: false
+        imageName:
+          type: string
+          description: Image name (name of uploaded file)
+          uniqueItems: false
+        imageUrl:
+          type: string
+          format: url
+          description: Image URL
+          uniqueItems: false
+        buttons:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkButtonDto'
+          description: List of buttons
+          uniqueItems: false
+    KakaotalkTemplateDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique ID of the template.
+          uniqueItems: false
+        code:
+          type: string
+          description: Registered delivery template code
+          uniqueItems: false
+        state:
+          x-enumDescriptions:
+            APPROVED: The template is approved and available for use.
+            REJECTED: The template was rejected and cannot be used.
+          description: The current state of the template.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateStatesEnum'
+        changes:
+          description: Any pending changes to the template.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateChangesDto'
+        details:
+          description: Template details and information.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateDetailsDto'
+        created:
+          type: string
+          description: The UTC Date Time in ISO 8601 for when the template was created.
+          uniqueItems: false
+        modified:
+          type: string
+          description: The UTC Date Time in ISO 8601 for when the template was last modified.
+          uniqueItems: false
+      required:
+      - code
+    KakaotalkTemplateStatusesEnum:
+      type: string
+      enum:
+      - DRAFT
+      - IN_PROGRESS
+      - REJECTED
+      description: Current status of the pending changes
+    KakaotalkCommentTypeEnum:
+      type: string
+      const: CREATED
+    KakaotalkInputTemplateLanguagesEnum:
+      type: string
+      enum:
+      - AF
+      - AR
+      - AZ
+      - BG
+      - BN
+      - CA
+      - CS
+      - DA
+      - DE
+      - EL
+      - EN
+      - EN_GB
+      - EN_US
+      - ES
+      - ES_AR
+      - ES_ES
+      - ES_MX
+      - ET
+      - FA
+      - FI
+      - FIL
+      - FR
+      - GA
+      - GU
+      - HA
+      - HE
+      - HI
+      - HR
+      - HU
+      - ID
+      - IT
+      - JA
+      - KA
+      - KK
+      - KN
+      - KO
+      - KY_KG
+      - LO
+      - LT
+      - LV
+      - MK
+      - ML
+      - MR
+      - MS
+      - NB
+      - NL
+      - PA
+      - PL
+      - PT_BR
+      - PT_PT
+      - RO
+      - RU
+      - RW_RW
+      - SK
+      - SL
+      - SQ
+      - SR
+      - SV
+      - SW
+      - TA
+      - TE
+      - TH
+      - TR
+      - UK
+      - UR
+      - UZ
+      - VI
+      - ZH_CN
+      - ZH_HK
+      - ZH_TW
+      - ZU
+      description: Template language
+    KakaotalkInputKakaoTalkTemplateEmphasizeTypeEnum:
+      type: string
+      enum:
+      - EMPHASIZE_TYPE_IMAGE
+      - EMPHASIZE_TYPE_NONE
+      - EMPHASIZE_TYPE_TEXT
+      description: Types of emphasized template
+    KakaotalkTemplateStatesEnum:
+      type: string
+      enum:
+      - APPROVED
+      - REJECTED
+      description: The current state of the template.
+    KakaotalkTemplateNotificationListDto:
+      type: object
+      properties:
+        totalSize:
+          type: number
+          description: Total size of the entries matching the search query.
+          uniqueItems: false
+        pageSize:
+          type: number
+          description: Requested size of the page.
+          uniqueItems: false
+        previousPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch previous batch of entries.
+          uniqueItems: false
+        nextPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch next batch of entries.
+          uniqueItems: false
+        notifications:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkTemplateNotificationDto'
+          uniqueItems: false
+      required:
+      - totalSize
+      - pageSize
+      - notifications
+    KakaotalkInputKakaoTalkTemplateMessageTypeEnum:
+      type: string
+      enum:
+      - AD_INCLUDED
+      - BASIC
+      - EXTRA_INFORMATION
+      - MIXED
+      description: Types of template message
+    KakaotalkInputButtonDto:
+      type: object
+      properties:
+        ordering:
+          type: number
+          minimum: 1
+          maximum: 5
+          description: Button sequence
+          uniqueItems: false
+        type:
+          x-enumDescriptions:
+            APP_LINK: Launches a deep link to open a specific target within a mobile application.
+            BOT_FOR_CONSULTATION: Initializes an interactive support or automated consultation flow with a chat bot.
+            BOT_KEYWORD: Submits a predefined automated keyword response block back to the chat bot.
+            BOT_TRANSFER: Transfers the current communication context directly into a bot interaction sequence.
+            BUSINESS_FORM: Launches an embedded native Kakao business questionnaire or lead collection form.
+            CHANNEL_ID_ADDED: Triggers a native prompt encouraging the end-user to subscribe to or add the Kakao channel.
+            DELIVERY_SEARCH: Redirects the user to external delivery tracking metrics or shipping cargo lookups.
+            IMAGE_SECURE_TRANSMISSION_PLUGIN_ID: Launches a secure verification plugin context dedicated to image file transmission.
+            MESSAGE_DELIVERY: Advances the template execution loop to continue the underlying message delivery flow.
+            ONE_CLICK_PAYMENT_PLUGIN: Launches an integrated native plug-in interface to complete a one-click payment checkout.
+            PERSONAL_INFORMATION_USE_PLUGIN_ID: Launches a secure personal data governance plugin to gather explicit user privacy consent.
+            WEB_LINK: Launches a target external URL routing path inside a web browser environment.
+          description: Button type
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkInputKakaoTalkButtonTypeEnum'
+        name:
+          type: string
+          minLength: 1
+          maxLength: 14
+          description: Button name Not required for draft.
+          uniqueItems: false
+        linkMo:
+          type: string
+          format: url
+          minLength: 1
+          maxLength: 500
+          description: Mobile web link
+          uniqueItems: false
+        linkPc:
+          type: string
+          format: url
+          minLength: 1
+          maxLength: 500
+          description: PC web link
+          uniqueItems: false
+        schemeIos:
+          type: string
+          format: url
+          minLength: 1
+          maxLength: 500
+          description: iOS app link
+          uniqueItems: false
+        schemeAndroid:
+          type: string
+          format: url
+          minLength: 1
+          maxLength: 500
+          description: Android app link
+          uniqueItems: false
+      required:
+      - ordering
+      - type
+      - name
+    KakaotalkPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+    KakaotalkKakaoTalkButtonTypeEnum:
+      type: string
+      enum:
+      - APP_LINK
+      - BOT_FOR_CONSULTATION
+      - BOT_KEYWORD
+      - BOT_TRANSFER
+      - BUSINESS_FORM
+      - BUTTON_TYPE_UNSPECIFIED
+      - CHANNEL_ID_ADDED
+      - DELIVERY_SEARCH
+      - IMAGE_SECURE_TRANSMISSION_PLUGIN_ID
+      - MESSAGE_DELIVERY
+      - ONE_CLICK_PAYMENT_PLUGIN
+      - PERSONAL_INFORMATION_USE_PLUGIN_ID
+      - WEB_LINK
+      - UNRECOGNIZED
+      description: Button type
+    KakaotalkCommentInputDto:
+      type: object
+      properties:
+        comment:
+          type: string
+          minLength: 1
+          maxLength: 65535
+          uniqueItems: false
+      required:
+      - comment
+    KakaotalkInputTemplateDetailsDto:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+          description: Button name
+          uniqueItems: false
+        language:
+          x-enumDescriptions:
+            AF: The language configuration is set to Afrikaans.
+            AR: The language configuration is set to Arabic.
+            AZ: The language configuration is set to Azerbaijani.
+            BG: The language configuration is set to Bulgarian.
+            BN: The language configuration is set to Bengali.
+            CA: The language configuration is set to Catalan.
+            CS: The language configuration is set to Czech.
+            DA: The language configuration is set to Danish.
+            DE: The language configuration is set to German.
+            EL: The language configuration is set to Greek.
+            EN: The language configuration is set to English.
+            EN_GB: The language configuration is set to British English.
+            EN_US: The language configuration is set to American English.
+            ES: The language configuration is set to Spanish.
+            ES_AR: The language configuration is set to Argentinian Spanish.
+            ES_ES: The language configuration is set to European Spanish.
+            ES_MX: The language configuration is set to Mexican Spanish.
+            ET: The language configuration is set to Estonian.
+            FA: The language configuration is set to Persian.
+            FI: The language configuration is set to Finnish.
+            FIL: The language configuration is set to Filipino.
+            FR: The language configuration is set to French.
+            GA: The language configuration is set to Irish.
+            GU: The language configuration is set to Gujarati.
+            HA: The language configuration is set to Hausa.
+            HE: The language configuration is set to Hebrew.
+            HI: The language configuration is set to Hindi.
+            HR: The language configuration is set to Croatian.
+            HU: The language configuration is set to Hungarian.
+            ID: The language configuration is set to Indonesian.
+            IT: The language configuration is set to Italian.
+            JA: The language configuration is set to Japanese.
+            KA: The language configuration is set to Georgian.
+            KK: The language configuration is set to Kazakh.
+            KN: The language configuration is set to Kannada.
+            KO: The language configuration is set to Korean.
+            KY_KG: The language configuration is set to Kyrgyz.
+            LO: The language configuration is set to Lao.
+            LT: The language configuration is set to Lithuanian.
+            LV: The language configuration is set to Latvian.
+            MK: The language configuration is set to Macedonian.
+            ML: The language configuration is set to Malayalam.
+            MR: The language configuration is set to Marathi.
+            MS: The language configuration is set to Malay.
+            NB: The language configuration is set to Norwegian.
+            NL: The language configuration is set to Dutch.
+            PA: The language configuration is set to Punjabi.
+            PL: The language configuration is set to Polish.
+            PT_BR: The language configuration is set to Brazilian Portuguese.
+            PT_PT: The language configuration is set to European Portuguese.
+            RO: The language configuration is set to Romanian.
+            RU: The language configuration is set to Russian.
+            RW_RW: The language configuration is set to Kinyarwanda.
+            SK: The language configuration is set to Slovak.
+            SL: The language configuration is set to Slovenian.
+            SQ: The language configuration is set to Albanian.
+            SR: The language configuration is set to Serbian.
+            SV: The language configuration is set to Swedish.
+            SW: The language configuration is set to Swahili.
+            TA: The language configuration is set to Tamil.
+            TE: The language configuration is set to Telugu.
+            TH: The language configuration is set to Thai.
+            TR: The language configuration is set to Turkish.
+            UK: The language configuration is set to Ukrainian.
+            UR: The language configuration is set to Urdu.
+            UZ: The language configuration is set to Uzbek.
+            VI: The language configuration is set to Vietnamese.
+            ZH_CN: The language configuration is set to Simplified Chinese.
+            ZH_HK: The language configuration is set to Traditional Chinese (Hong Kong).
+            ZH_TW: The language configuration is set to Traditional Chinese (Taiwan).
+            ZU: The language configuration is set to Zulu.
+          description: Template language
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkInputTemplateLanguagesEnum'
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Template body Not required for draft.
+          uniqueItems: false
+        messageType:
+          x-enumDescriptions:
+            AD_INCLUDED: The layout includes explicit promotional or advertising blocks.
+            BASIC: The standard layout without supplementary structural elements.
+            EXTRA_INFORMATION: The layout features an appended metadata or supplementary info block.
+            MIXED: The layout consolidates multiple structural interaction fields.
+          default: BASIC
+          description: Types of template message
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkInputKakaoTalkTemplateMessageTypeEnum'
+        emphasizeType:
+          x-enumDescriptions:
+            EMPHASIZE_TYPE_IMAGE: Applies structural highlighting focused primarily on an image element.
+            EMPHASIZE_TYPE_NONE: No additional structural or visual highlighting is applied.
+            EMPHASIZE_TYPE_TEXT: Applies structural highlighting focused on high-visibility text copy.
+          default: EMPHASIZE_TYPE_NONE
+          description: Types of emphasized template
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkInputKakaoTalkTemplateEmphasizeTypeEnum'
+        categoryCode:
+          type: string
+          minLength: 1
+          maxLength: 6
+          default: '999999'
+          description: Template category code
+          uniqueItems: false
+        securityFlag:
+          type: boolean
+          default: false
+          description: "Security template\n  Set for security messages such as OTP\n  If set, message text is unexposed to all devices except for the main device at the time of sending"
+          uniqueItems: false
+        extra:
+          type: string
+          minLength: 1
+          maxLength: 500
+          description: Additional template information
+          uniqueItems: false
+        title:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: "Template Title (No more than 50 characters,\n    Android: To be abbreviated if it exceeds 2 lines with more than 23 characters,\n    iOS: To be abbreviated if it exceeds 2 lines with more than 27 characters)"
+          uniqueItems: false
+        subtitle:
+          type: string
+          minLength: 1
+          maxLength: 50
+          description: "Auxiliary Template Phrase (No more than 50 characters,\n    Android: To be abbreviated if it exceeds 18 characters,\n    iOS: To be abbreviated if it exceeds 21 characters)"
+          uniqueItems: false
+        imageName:
+          type: string
+          minLength: 1
+          maxLength: 250
+          description: Image name (name of uploaded file)
+          uniqueItems: false
+        imageUrl:
+          type: string
+          format: url
+          description: 'Image URL
+
+            - Supported mime types: `image/jpeg` or `image/png`.
+
+            - Maximum file size: 500KB.
+
+            - Minimum image dimensions: 500 x 250 px.
+
+            - Aspect ratio: 2 x 1.'
+          uniqueItems: false
+        buttons:
+          uniqueItems: true
+          minItems: 0
+          maxItems: 5
+          description: List of buttons Field 'type' must have unique values across items.
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkInputButtonDto'
+      required:
+      - name
+      - language
+      - content
+    KakaotalkKakaoTalkTemplateMessageTypeEnum:
+      type: string
+      enum:
+      - AD_INCLUDED
+      - BASIC
+      - EXTRA_INFORMATION
+      - MIXED
+      - TEMPLATE_MESSAGE_TYPE_UNSPECIFIED
+      - UNRECOGNIZED
+      description: Types of template message
+    KakaotalkTemplateListDto:
+      type: object
+      properties:
+        totalSize:
+          type: number
+          description: Total size of the entries matching the search query.
+          uniqueItems: false
+        pageSize:
+          type: number
+          description: Requested size of the page.
+          uniqueItems: false
+        previousPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch previous batch of entries.
+          uniqueItems: false
+        nextPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch next batch of entries.
+          uniqueItems: false
+        templates:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkTemplateDto'
+          description: List of templates
+          uniqueItems: false
+      required:
+      - totalSize
+      - pageSize
+      - templates
+    KakaotalkInputTemplateDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            DRAFT: Saves the pending changes as a draft without submitting them to the system.
+            SUBMIT: Submits the pending changes directly for processing.
+          default: SUBMIT
+          description: Create as draft or submit. Defaults to submit.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkActionsEnum'
+        details:
+          description: Template details and information.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkInputTemplateDetailsDto'
+        saveDraftOnFailure:
+          type: boolean
+          default: false
+          description: Flag to save template as draft if submission fails. Defaults to false.
+          uniqueItems: false
+      required:
+      - details
+    KakaotalkTemplateChangesDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            DRAFT: The template changes are saved as a draft only.
+            IN_PROGRESS: The template changes have been submitted and are still processing.
+            REJECTED: The template changes have been reviewed and rejected.
+          description: Current status of the pending changes
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateStatusesEnum'
+        details:
+          oneOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateDetailsDto'
+            description: For newly created template
+          - $ref: '#/components/schemas/KakaotalkTemplateChangesDetailsDto'
+            description: For update template
+          description: Template details and information.
+          uniqueItems: false
+      required:
+      - status
+      - details
+    KakaotalkTemplateNotificationDto:
+      type: object
+      properties:
+        type:
+          x-enumDescriptions:
+            COMMENT_ADDED: A new comment has been added to the notification trail.
+            CREATED: The notification configuration has been successfully created.
+            DRAFT: The notification configuration is currently in a draft state.
+            EDITED: The notification configuration has been edited or updated.
+            IN_PROGRESS: The notification process is currently executing.
+            REJECTED: The notification configuration has been rejected.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateNotificationTypeEnum'
+        created:
+          type: string
+          uniqueItems: false
+        author:
+          type: string
+          uniqueItems: false
+        comment:
+          type: string
+          uniqueItems: false
+      required:
+      - type
+    KakaotalkInputUpdateTemplateDetailsDto:
+      type: object
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 150
+          description: Button name
+          uniqueItems: false
+        content:
+          type: string
+          minLength: 1
+          maxLength: 1000
+          description: Template body
+          uniqueItems: false
+        messageType:
+          x-enumDescriptions:
+            AD_INCLUDED: The layout includes explicit promotional or advertising blocks.
+            BASIC: The standard layout without supplementary structural elements.
+            EXTRA_INFORMATION: The layout features an appended metadata or supplementary info block.
+            MIXED: The layout consolidates multiple structural interaction fields.
+          description: Types of template message
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkInputKakaoTalkTemplateMessageTypeEnum'
+        emphasizeType:
+          x-enumDescriptions:
+            EMPHASIZE_TYPE_IMAGE: Applies structural highlighting focused primarily on an image element.
+            EMPHASIZE_TYPE_NONE: No additional structural or visual highlighting is applied.
+            EMPHASIZE_TYPE_TEXT: Applies structural highlighting focused on high-visibility text copy.
+          description: Types of emphasized template
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkInputKakaoTalkTemplateEmphasizeTypeEnum'
+        categoryCode:
+          type: string
+          minLength: 1
+          maxLength: 6
+          description: Template category code
+          uniqueItems: false
+        securityFlag:
+          type: boolean
+          description: "Security template\n  Set for security messages such as OTP\n  If set, message text is unexposed to all devices except for the main device at the time of sending"
+          uniqueItems: false
+        extra:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 500
+          description: Additional template information
+          uniqueItems: false
+        title:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 50
+          description: "Template Title (No more than 50 characters,\n    Android: To be abbreviated if it exceeds 2 lines with more than 23 characters,\n    iOS: To be abbreviated if it exceeds 2 lines with more than 27 characters)"
+          uniqueItems: false
+        subtitle:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 50
+          description: "Auxiliary Template Phrase (No more than 50 characters,\n    Android: To be abbreviated if it exceeds 18 characters,\n    iOS: To be abbreviated if it exceeds 21 characters)"
+          uniqueItems: false
+        imageName:
+          type:
+          - string
+          - 'null'
+          minLength: 1
+          maxLength: 250
+          description: Image name (name of uploaded file)
+          uniqueItems: false
+        imageUrl:
+          type:
+          - string
+          - 'null'
+          format: url
+          description: 'Image URL
+
+            - Supported mime types: `image/jpeg` or `image/png`.
+
+            - Maximum file size: 500KB.
+
+            - Minimum image dimensions: 500 x 250 px.
+
+            - Aspect ratio: 2 x 1.'
+          uniqueItems: false
+        buttons:
+          uniqueItems: true
+          minItems: 0
+          maxItems: 5
+          description: List of buttons Field 'type' must have unique values across items.
+          type:
+          - array
+          - 'null'
+          items:
+            $ref: '#/components/schemas/KakaotalkInputButtonDto'
+    KakaotalkKakaoTalkTemplateEmphasizeTypeEnum:
+      type: string
+      enum:
+      - EMPHASIZE_TYPE_IMAGE
+      - EMPHASIZE_TYPE_NONE
+      - EMPHASIZE_TYPE_TEXT
+      - EMPHASIZE_TYPE_UNSPECIFIED
+      - UNRECOGNIZED
+      description: Types of emphasized template
+    KakaotalkInputUpdateTemplateDto:
+      type: object
+      properties:
+        status:
+          x-enumDescriptions:
+            DRAFT: Saves the pending changes as a draft without submitting them to the system.
+            SUBMIT: Submits the pending changes directly for processing.
+          default: DRAFT
+          description: Create as draft or submit. Defaults to draft.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkActionsEnum'
+        details:
+          description: Template details and information.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkInputUpdateTemplateDetailsDto'
+    KakaotalkTemplateDetailsDto:
+      type: object
+      properties:
+        language:
+          x-enumDescriptions:
+            AF: The language configuration is set to Afrikaans.
+            AR: The language configuration is set to Arabic.
+            AZ: The language configuration is set to Azerbaijani.
+            BG: The language configuration is set to Bulgarian.
+            BN: The language configuration is set to Bengali.
+            CA: The language configuration is set to Catalan.
+            CS: The language configuration is set to Czech.
+            DA: The language configuration is set to Danish.
+            DE: The language configuration is set to German.
+            EL: The language configuration is set to Greek.
+            EN: The language configuration is set to English.
+            EN_GB: The language configuration is set to British English.
+            EN_US: The language configuration is set to American English.
+            ES: The language configuration is set to Spanish.
+            ES_AR: The language configuration is set to Argentinian Spanish.
+            ES_ES: The language configuration is set to European Spanish.
+            ES_MX: The language configuration is set to Mexican Spanish.
+            ET: The language configuration is set to Estonian.
+            FA: The language configuration is set to Persian.
+            FI: The language configuration is set to Finnish.
+            FIL: The language configuration is set to Filipino.
+            FR: The language configuration is set to French.
+            GA: The language configuration is set to Irish.
+            GU: The language configuration is set to Gujarati.
+            HA: The language configuration is set to Hausa.
+            HE: The language configuration is set to Hebrew.
+            HI: The language configuration is set to Hindi.
+            HR: The language configuration is set to Croatian.
+            HU: The language configuration is set to Hungarian.
+            ID: The language configuration is set to Indonesian.
+            IT: The language configuration is set to Italian.
+            JA: The language configuration is set to Japanese.
+            KA: The language configuration is set to Georgian.
+            KK: The language configuration is set to Kazakh.
+            KN: The language configuration is set to Kannada.
+            KO: The language configuration is set to Korean.
+            KY_KG: The language configuration is set to Kyrgyz.
+            LO: The language configuration is set to Lao.
+            LT: The language configuration is set to Lithuanian.
+            LV: The language configuration is set to Latvian.
+            MK: The language configuration is set to Macedonian.
+            ML: The language configuration is set to Malayalam.
+            MR: The language configuration is set to Marathi.
+            MS: The language configuration is set to Malay.
+            NB: The language configuration is set to Norwegian.
+            NL: The language configuration is set to Dutch.
+            PA: The language configuration is set to Punjabi.
+            PL: The language configuration is set to Polish.
+            PT_BR: The language configuration is set to Brazilian Portuguese.
+            PT_PT: The language configuration is set to European Portuguese.
+            RO: The language configuration is set to Romanian.
+            RU: The language configuration is set to Russian.
+            RW_RW: The language configuration is set to Kinyarwanda.
+            SK: The language configuration is set to Slovak.
+            SL: The language configuration is set to Slovenian.
+            SQ: The language configuration is set to Albanian.
+            SR: The language configuration is set to Serbian.
+            SV: The language configuration is set to Swedish.
+            SW: The language configuration is set to Swahili.
+            TA: The language configuration is set to Tamil.
+            TE: The language configuration is set to Telugu.
+            TH: The language configuration is set to Thai.
+            TR: The language configuration is set to Turkish.
+            UK: The language configuration is set to Ukrainian.
+            UR: The language configuration is set to Urdu.
+            UZ: The language configuration is set to Uzbek.
+            VI: The language configuration is set to Vietnamese.
+            ZH_CN: The language configuration is set to Simplified Chinese.
+            ZH_HK: The language configuration is set to Traditional Chinese (Hong Kong).
+            ZH_TW: The language configuration is set to Traditional Chinese (Taiwan).
+            ZU: The language configuration is set to Zulu.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Template language
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkTemplateLanguagesEnum'
+        messageType:
+          x-enumDescriptions:
+            AD_INCLUDED: The layout includes explicit promotional or advertising blocks.
+            BASIC: The standard layout without supplementary structural elements.
+            EXTRA_INFORMATION: The layout features an appended metadata or supplementary info block.
+            MIXED: The layout consolidates multiple structural interaction fields.
+            TEMPLATE_MESSAGE_TYPE_UNSPECIFIED: The layout structure is unspecified.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Types of template message
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkKakaoTalkTemplateMessageTypeEnum'
+        emphasizeType:
+          x-enumDescriptions:
+            EMPHASIZE_TYPE_IMAGE: Applies structural highlighting focused primarily on an image element.
+            EMPHASIZE_TYPE_NONE: No additional structural or visual highlighting is applied.
+            EMPHASIZE_TYPE_TEXT: Applies structural highlighting focused on high-visibility text copy.
+            EMPHASIZE_TYPE_UNSPECIFIED: The layout highlighting type is unspecified.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Types of emphasized template
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkKakaoTalkTemplateEmphasizeTypeEnum'
+        categoryCode:
+          type: string
+          description: Template category code
+          uniqueItems: false
+        securityFlag:
+          type: boolean
+          description: Security template
+          uniqueItems: false
+        name:
+          type: string
+          description: Button name
+          uniqueItems: false
+        content:
+          type: string
+          description: Template body
+          uniqueItems: false
+        extra:
+          type: string
+          description: Additional template information
+          uniqueItems: false
+        ad:
+          type: string
+          description: Request for consent of receiving within template or simple ad phrases
+          uniqueItems: false
+        title:
+          type: string
+          description: Template title
+          uniqueItems: false
+        subtitle:
+          type: string
+          description: Auxiliary template phrase
+          uniqueItems: false
+        imageName:
+          type: string
+          description: Image name (name of uploaded file)
+          uniqueItems: false
+        imageUrl:
+          type: string
+          format: url
+          description: Image URL
+          uniqueItems: false
+        buttons:
+          type: array
+          items:
+            $ref: '#/components/schemas/KakaotalkButtonDto'
+          description: List of buttons
+          uniqueItems: false
+      required:
+      - language
+      - messageType
+      - emphasizeType
+      - categoryCode
+      - securityFlag
+      - name
+      - buttons
+    KakaotalkCommentDto:
+      type: object
+      properties:
+        type:
+          x-enumDescriptions:
+            CREATED: Indicates the comment has been successfully created and published.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/KakaotalkCommentTypeEnum'
+        comment:
+          type: string
+          uniqueItems: false
+        created:
+          type: string
+          uniqueItems: false
+      required:
+      - type
+      - comment
+    KakaotalkTemplateNotificationTypeEnum:
+      type: string
+      enum:
+      - COMMENT_ADDED
+      - CREATED
+      - DRAFT
+      - EDITED
+      - IN_PROGRESS
+      - REJECTED
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
+x-tagGroup-upscale:
+  name: Upscale
+  tags:
+  - Upscale Admin Feature Flag
+  - Upscale Admin Log Operation
+  - Upscale Admin Migrations
+  - Upscale Admin Sms
+  - Upscale Admin Upscales
+  - Internal
+  - Upscale Sms
+  - Upscale Upscales
+x-tagGroup-notification:
+  name: Notification
+  tags:
+  - Notification Admin Feature Flag
+  - Notification Admin Log Operation
+  - Internal
+x-tagGroups:
+- name: Webhook
+  tags:
+  - Webhooks
+- name: WhatsApp
+  tags:
+  - WhatsApp Accounts
+  - WhatsApp
+  - WhatsApp Flows
+  - WhatsApp Senders
+  - WhatsApp Solutions
+  - WhatsApp Templates
+- name: Bundles
+  tags:
+  - Bundles
+- name: KakaoTalk
+  tags:
+  - KakaoTalk Categories
+  - KakaoTalk Senders
+  - KakaoTalk Templates
+- name: Conversation
+  tags:
+  - Conversation
+- name: RCS
+  tags:
+  - RCS Accounts
+  - RCS Questionnaire
+  - RCS Senders
+- name: SMS
+  tags:
+  - SMS Apps

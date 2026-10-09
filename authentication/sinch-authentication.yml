@@ -1,46 +1,115 @@
-generated: '2026-07-11'
+generated: '2026-10-08'
 method: derived
-source: openapi/sinch-brands-openapi.yml, openapi/sinch-conversation-openapi.yml, openapi/sinch-elastic-sip-trunking-openapi.yml,
-  openapi/sinch-fax-openapi.yml, openapi/sinch-numbers-openapi.yml, openapi/sinch-provisioning-openapi.yml,
-  openapi/sinch-registration-openapi.yml, openapi/sinch-sms-openapi.yml, openapi/sinch-verification-openapi.yml,
-  openapi/sinch-voice-openapi.yml
+source: openapi/sinch-10dlc-registration-api-openapi.yml, openapi/sinch-access-keys-api-openapi.yml,
+  openapi/sinch-access-keys-legacy-api-openapi.yml, openapi/sinch-batches-api-openapi.yml, openapi/sinch-brands-api-openapi.yml,
+  openapi/sinch-chatlayer-analytics-api-openapi.yml, openapi/sinch-compliance-brands-api-openapi.yml,
+  openapi/sinch-conversation-api-openapi.yml, openapi/sinch-delivery-reports-api-openapi.yml,
+  openapi/sinch-elastic-sip-trunking-api-openapi.yml, openapi/sinch-fax-api-openapi.yml, openapi/sinch-groups-api-openapi.yml
+  ...
 summary:
   types:
+  - apiKey
   - http
   - oauth2
+  api_key_in:
+  - header
   oauth2_flows:
   - clientCredentials
 schemes:
-- name: bearerAuth
+- name: BasicAuth
   type: http
-  scheme: bearer
-  description: Bearer token authentication.
+  scheme: basic
+  description: Our basic security works with any project. Simply use the client_id and client_secret
+    that were displayed when you created your access key through the dashboard in the [Access
+    keys section](https://dashboard.sinch.com/settings/access-keys).
   sources:
-  - openapi/sinch-brands-openapi.yml
-  - openapi/sinch-sms-openapi.yml
-- name: oAuth2
+  - openapi/sinch-10dlc-registration-api-openapi.yml
+  - openapi/sinch-access-keys-api-openapi.yml
+  - openapi/sinch-access-keys-legacy-api-openapi.yml
+  - openapi/sinch-chatlayer-analytics-api-openapi.yml
+  - openapi/sinch-conversation-api-openapi.yml
+  - openapi/sinch-elastic-sip-trunking-api-openapi.yml
+  - openapi/sinch-fax-api-openapi.yml
+  - openapi/sinch-imported-numbers-hosting-orders-api-openapi.yml
+  - openapi/sinch-number-lookup-api-openapi.yml
+  - openapi/sinch-numbers-api-openapi.yml
+  - openapi/sinch-porting-api-openapi.yml
+  - openapi/sinch-provisioning-api-openapi.yml
+  - openapi/sinch-subprojects-api-openapi.yml
+  - openapi/sinch-template-management-api-openapi.yml
+  - openapi/sinch-verification-api-openapi.yml
+  - openapi/sinch-voice-api-openapi.yml
+  - openapi/sinch-voice-api-v2-openapi.yml
+- name: OAuth2
   type: oauth2
   flows:
   - flow: clientCredentials
     tokenUrl: https://auth.sinch.com/oauth2/token
     scopes: 0
-  description: OAuth 2.0 client credentials flow using project key ID and secret.
+  description: This is the recommended way to access our APIs in production.
   sources:
-  - openapi/sinch-conversation-openapi.yml
-  - openapi/sinch-elastic-sip-trunking-openapi.yml
-  - openapi/sinch-fax-openapi.yml
-  - openapi/sinch-numbers-openapi.yml
-  - openapi/sinch-provisioning-openapi.yml
-  - openapi/sinch-registration-openapi.yml
-- name: basicAuth
+  - openapi/sinch-10dlc-registration-api-openapi.yml
+  - openapi/sinch-access-keys-api-openapi.yml
+  - openapi/sinch-access-keys-legacy-api-openapi.yml
+  - openapi/sinch-brands-api-openapi.yml
+  - openapi/sinch-compliance-brands-api-openapi.yml
+  - openapi/sinch-conversation-api-openapi.yml
+  - openapi/sinch-elastic-sip-trunking-api-openapi.yml
+  - openapi/sinch-fax-api-openapi.yml
+  - openapi/sinch-imported-numbers-hosting-orders-api-openapi.yml
+  - openapi/sinch-number-lookup-api-openapi.yml
+  - openapi/sinch-numbers-api-openapi.yml
+  - openapi/sinch-porting-api-openapi.yml
+  - openapi/sinch-provisioning-api-openapi.yml
+  - openapi/sinch-subprojects-api-openapi.yml
+  - openapi/sinch-template-management-api-openapi.yml
+  - openapi/sinch-us-shortcode-campaigns-api-openapi.yml
+  - openapi/sinch-voice-api-v2-openapi.yml
+- name: bearerAuth
   type: http
-  scheme: basic
-  description: Key ID as username and key secret as password.
+  scheme: bearer
+  description: API token sent in the Authorization header preceded by Bearer.
   sources:
-  - openapi/sinch-conversation-openapi.yml
-  - openapi/sinch-elastic-sip-trunking-openapi.yml
-  - openapi/sinch-fax-openapi.yml
-  - openapi/sinch-numbers-openapi.yml
-  - openapi/sinch-provisioning-openapi.yml
-  - openapi/sinch-verification-openapi.yml
-  - openapi/sinch-voice-openapi.yml
+  - openapi/sinch-batches-api-openapi.yml
+  - openapi/sinch-delivery-reports-api-openapi.yml
+  - openapi/sinch-groups-api-openapi.yml
+  - openapi/sinch-inbounds-api-openapi.yml
+  - openapi/sinch-provisioning-api-openapi.yml
+- name: hmacAuth
+  type: http
+  scheme: hmac
+  description: Used for hashing callbacks. Please refer to the callback-configuration endpoints
+    for more information.
+  sources:
+  - openapi/sinch-brands-api-openapi.yml
+  - openapi/sinch-us-shortcode-campaigns-api-openapi.yml
+- name: hmacAuth
+  type: apiKey
+  in: header
+  parameter: X-Sinch-Signature
+  description: HMAC-SHA256 signature used to authenticate webhook deliveries. The signature
+    is computed over the request body using the project's HMAC secret and sent in the X-Sinch-Signature
+    header. Please refer to the Brand Callback endpoints for more information.
+  sources:
+  - openapi/sinch-compliance-brands-api-openapi.yml
+- name: ApiKey
+  type: apiKey
+  in: header
+  parameter: x-api-key
+  sources:
+  - openapi/sinch-mms-api-openapi.yml
+- name: Application
+  type: apiKey
+  in: header
+  parameter: Authentication
+  description: For more information about application request signing authentication, see [Request
+    Signing](https://developers.sinch.com/docs/verification/api-reference/authentication/application-signed-request).
+  sources:
+  - openapi/sinch-verification-api-openapi.yml
+- name: Signed
+  type: apiKey
+  in: header
+  parameter: Authorization
+  description: For more information about signed request authentication, see [Request Signing](https://developers.sinch.com/docs/voice/api-reference/authentication/signed-request).
+  sources:
+  - openapi/sinch-voice-api-openapi.yml

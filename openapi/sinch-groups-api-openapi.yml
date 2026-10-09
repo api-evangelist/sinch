@@ -185,6 +185,31 @@ components:
           description: List of group objects
           items:
             $ref: '#/components/schemas/Group'
+    Group:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The unique group identifier
+        name:
+          type: string
+          description: The group name
+        size:
+          type: integer
+          description: The number of members in the group
+        created_at:
+          type: string
+          format: date-time
+          description: When the group was created
+        modified_at:
+          type: string
+          format: date-time
+          description: When the group was last modified
+        child_groups:
+          type: array
+          description: List of child group IDs
+          items:
+            type: string
     CreateGroupRequest:
       type: object
       properties:
@@ -223,44 +248,19 @@ components:
         remove_from_group:
           type: string
           description: Remove all members that are in another group
-    Group:
-      type: object
-      properties:
-        id:
-          type: string
-          description: The unique group identifier
-        name:
-          type: string
-          description: The group name
-        size:
-          type: integer
-          description: The number of members in the group
-        created_at:
-          type: string
-          format: date-time
-          description: When the group was created
-        modified_at:
-          type: string
-          format: date-time
-          description: When the group was last modified
-        child_groups:
-          type: array
-          description: List of child group IDs
-          items:
-            type: string
   parameters:
-    ServicePlanId:
-      name: service_plan_id
-      in: path
-      required: true
-      description: The unique identifier for the service plan
-      schema:
-        type: string
     GroupId:
       name: group_id
       in: path
       required: true
       description: The unique identifier for the group
+      schema:
+        type: string
+    ServicePlanId:
+      name: service_plan_id
+      in: path
+      required: true
+      description: The unique identifier for the service plan
       schema:
         type: string
   securitySchemes:
@@ -271,3 +271,4 @@ components:
 externalDocs:
   description: Sinch SMS API Documentation
   url: https://developers.sinch.com/docs/sms
+x-ae-provenance: origin unrecorded (catalog pass before 2026-09); NOT a provider-published document. Kept on 2026-10-08 because its /xms/v1/{service_plan_id}/... paths match the SMS REST API reference nav at https://developers.sinch.com/docs/sms/api-reference (Batches, Delivery reports, Groups, Inbounds), which publishes no downloadable OpenAPI bundle (searched 2026-10-08). Moved out of _original/ because _original asserts provider publication.

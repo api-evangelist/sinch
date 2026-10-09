@@ -1,0 +1,275 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-create-tcr-campaign-request-schema.json",
+  "title": "Campaign Request",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-10dlc-registration-api-openapi.yml#/components/schemas/CreateTcrCampaignRequest",
+  "type": "object",
+  "required": [
+    "brandId",
+    "useCase",
+    "campaignName",
+    "description",
+    "sample1",
+    "sample2",
+    "sample3",
+    "stopMessage",
+    "optInMessage",
+    "helpMessage",
+    "autoRenewal",
+    "embeddedLink",
+    "embeddedPhone",
+    "affiliateMarketing",
+    "numberPool",
+    "ageGated",
+    "directLending",
+    "subscriberOptIn",
+    "subscriberOptOut",
+    "subscriberHelp",
+    "optinKeywords",
+    "optoutKeywords",
+    "helpKeywords",
+    "messageFlow"
+  ],
+  "properties": {
+    "brandId": {
+      "maxLength": 8,
+      "type": "string",
+      "description": "The brand is the company or entity represented in the campaign. The brand ID is an alphanumeric identifier that always begins with a \"B\". When registering a brand in The Campaign Registry (TCR), TCR returns a brand ID value, example: BESINCH. For more info, see [Brand Registrations](https://developers.sinch.com/docs/10dlc-registration/api-reference/10dlc-registration/tag/Brand-Registration/)."
+    },
+    "useCase": {
+      "$ref": "#/$defs/CampaignUseCaseType"
+    },
+    "campaignName": {
+      "maxLength": 128,
+      "type": "string",
+      "description": "This is an optional name to help track and view your campaign within Sinch's platform. Use a name that is easily recognizable, this will help you identify your campaign later within the Sinch customer dashboard. This name is not part of the campaign registration in TCR."
+    },
+    "vertical": {
+      "$ref": "#/$defs/CampaignVerticalType"
+    },
+    "description": {
+      "maxLength": 4096,
+      "type": "string",
+      "description": "Describe in detail the service the message program is providing to the end user and the purpose of the brand's messages (i.e. appointment reminders, OTP alerts, etc.). The description should match the selected use case and identify who is sending the messages, who is receiving the messages, and why messages are being sent.",
+      "minLength": 40
+    },
+    "sample1": {
+      "minLength": 20,
+      "maxLength": 1024,
+      "type": "string",
+      "description": "Provide sample production message content. Include the Brand name and opt out instructions (e.g. Reply STOP to stop) in every message. If you have selected Mixed use case, please provide examples of each sub use case selected."
+    },
+    "sample2": {
+      "maxLength": 1024,
+      "type": "string",
+      "description": "Message sample. Some campaign tiers require 2 or more message samples, depending on sub-usecases."
+    },
+    "sample3": {
+      "maxLength": 1024,
+      "type": "string",
+      "description": "Message sample. Some campaign tiers require 3 or more message samples, depending on sub-usecases."
+    },
+    "sample4": {
+      "maxLength": 1024,
+      "type": "string",
+      "description": "Message sample. Some campaign tiers require 4 or more message samples, depending on sub-usecases."
+    },
+    "stopMessage": {
+      "minLength": 20,
+      "maxLength": 255,
+      "type": "string",
+      "description": "Message sent in response to a STOP keyword. It must confirm that the end user has unsubscribed from the message program and will not receive any further messages. Include the brand name. You can also include customer care contact information (e.g. support email or phone number)."
+    },
+    "optInMessage": {
+      "minLength": 20,
+      "maxLength": 255,
+      "type": "string",
+      "description": "Initial message that is sent confirming the end user's subscription. Include the brand name, opt-out instructions (reply STOP to stop), customer care instructions (reply HELP for help), message frequency (#msgs/mo, msg frequency varies, recurring messages, etc.) and the \"message and data rates may apply\" disclosure (Msg & Data rates may apply)."
+    },
+    "helpMessage": {
+      "minLength": 20,
+      "maxLength": 255,
+      "type": "string",
+      "description": "Message sent in response to HELP. Include the brand name and additional customer care contact information (e.g. support email or phone number)."
+    },
+    "subUseCases": {
+      "type": "array",
+      "description": "If you have selected a mixed use case, select all sub use cases that apply to your message program. Choose between 2 and 5 sub use cases for this campaign.  The input(s) should be one of the accepted enum values.",
+      "items": {
+        "$ref": "#/$defs/CampaignSubUseCaseType"
+      }
+    },
+    "autoRenewal": {
+      "type": "boolean",
+      "description": "Will your campaign automatically renew? If \"Yes\", a monthly recurring fee will be charged to the account. If \"No\", only the initial setup fee will be charged, and the campaign will expire after three months unless it is reviewed manually.",
+      "default": true
+    },
+    "embeddedLink": {
+      "type": "boolean",
+      "description": "Will your message content include a URL? Note that public URL shorteners are not allowed.",
+      "default": false
+    },
+    "embeddedPhone": {
+      "type": "boolean",
+      "description": "Will your message content include embedded phone numbers?",
+      "default": false
+    },
+    "numberPool": {
+      "type": "boolean",
+      "description": "Will your campaign support a number pool (more than 50 numbers)? If yes, your use case should clearly support the need for a number pool. For more info, see [When should I use a number pool for my 10DLC campaign](https://community.sinch.com/t5/10DLC/When-should-I-use-a-number-pool-for-my-10DLC-campaign/ta-p/12432).",
+      "default": false
+    },
+    "ageGated": {
+      "type": "boolean",
+      "description": "Will your traffic include any content related to age-restricted goods or services? If yes, you must implement an age gate verification process.",
+      "default": false
+    },
+    "directLending": {
+      "type": "boolean",
+      "description": "Are you a financial institution engaged in direct, first-party lending to your customers? If yes, note that your campaign description should clearly indicate direct lending, even if your use case is not related to your lending services (e.g. OTP).",
+      "default": false
+    },
+    "subscriberOptIn": {
+      "type": "boolean",
+      "description": "Will your campaign collect and process end user opt-ins? This is mandatory for all use cases, except for Machine-to-Machine.",
+      "default": true
+    },
+    "subscriberOptOut": {
+      "type": "boolean",
+      "description": "Message sent in response to a STOP keyword. It must confirm that the end user has unsubscribed from the message program and will not receive any further messages. Include the brand name. You can also include customer care contact information (e.g. support email or phone number).",
+      "default": true
+    },
+    "subscriberHelp": {
+      "type": "boolean",
+      "description": "Message sent in response to HELP. Include the brand name and additional customer care contact information (e.g. support email or phone number).",
+      "default": true
+    },
+    "optinKeywords": {
+      "maxLength": 255,
+      "type": "string",
+      "description": "If subscribers can opt-in via a keyword, enter keyword(s) here (alphanumeric comma separated values, no blank spaces)."
+    },
+    "optoutKeywords": {
+      "maxLength": 255,
+      "type": "string",
+      "description": "Subscriber opt-out keywords. Default values are STOP, QUIT, END, CANCEL and UNSUBSCRIBE. If you accept additional opt-out keywords, you can enter them here (alphanumeric comma separated values, no blank spaces)."
+    },
+    "helpKeywords": {
+      "maxLength": 255,
+      "type": "string",
+      "description": "Subscriber help keywords. Default value is HELP.  If you accept additional help keywords, you can enter them here. (alphanumeric comma separated values, no blank spaces)."
+    },
+    "messageFlow": {
+      "minLength": 40,
+      "maxLength": 2048,
+      "type": "string",
+      "description": "Provide instructions for how end users opt-in to receive messages. A compliant opt-in is critical to the approval of your campaign. Include all opt-in mechanisms (e.g. keyword/text-to-join, online form, point-of-sale (POS) system, verbal consent, interactive voice response (IVR) system, paper form) and a clear program description. The Call-to-Action should include opt-out instructions (reply STOP to stop), customer care instructions (reply HELP for help), message frequency (#msgs/mo, msg frequency varies, recurring messages, etc.) and message and data rates disclosure (Msg & Data rates may apply)."
+    },
+    "terms_and_conditions_link": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "A URL to a page containing the terms and conditions."
+    },
+    "privacy_policy_link": {
+      "type": "string",
+      "maxLength": 255,
+      "description": "A URL to a page containing the privacy policy."
+    },
+    "attachments": {
+      "type": "boolean",
+      "description": "If this property is set to `true`, this will delay the submission of the campaign until all necessary documentation is uploaded using the [Upload Campaign Files](https://developers.sinch.com/docs/10dlc-registration/api-reference/10dlc-registration/tag/10DLC-Campaign-Registration/#tag/10DLC-Campaign-Registration/operation/CampaignRegistrationExternalService_UploadCampaignFile) operation.",
+      "default": false
+    }
+  },
+  "$defs": {
+    "CampaignSubUseCaseType": {
+      "type": "string",
+      "enum": [
+        "2FA",
+        "ACCOUNT_NOTIFICATION",
+        "CUSTOMER_CARE",
+        "DELIVERY_NOTIFICATION",
+        "FRAUD_ALERT",
+        "HIGHER_EDUCATION",
+        "MARKETING",
+        "POLLING_VOTING",
+        "PUBLIC_SERVICE_ANNOUNCEMENT",
+        "SECURITY_ALERT"
+      ],
+      "x-enumDescriptions": {
+        "2FA": "Any authentication, verification, or one-time passcode.",
+        "ACCOUNT_NOTIFICATION": "Standard notifications for account holders, relating to and being about an account.",
+        "CUSTOMER_CARE": "All customer care interaction, including but not limited to account management and customer support.",
+        "DELIVERY_NOTIFICATION": "Notification about the status of the delivery of a product or service.",
+        "FRAUD_ALERT": "Notifications regarding potential fraudulent activity on a user's account.",
+        "HIGHER_EDUCATION": "Messaging created on behalf of Colleges or Universities, including School Districts and education institutions. This use case is NOT for the \"free to the consumer\" messaging model.",
+        "MARKETING": "Any communication that includes marketing and/or promotional content.",
+        "POLLING_VOTING": "The sending of surveys and polling/voting campaigns for non political arenas.",
+        "PUBLIC_SERVICE_ANNOUNCEMENT": "Informational messaging to raise an audience's awareness about important issues.",
+        "SECURITY_ALERT": "A notification that the security of a system, either software or hardware, has been compromised in some way and there is an action you need to take."
+      }
+    },
+    "CampaignUseCaseType": {
+      "title": "Campaign Usecase Type",
+      "type": "string",
+      "description": "Select a use case that is the primary use case that is most applicable to the service that messages are providing to subscribers. Standard use cases are immediately available for all qualified registered brands, whereas special use cases require vetting or pre/post approval by mobile network operators (MNOs).\n\nSpecial use cases are sensitive or critical in nature and may require vetting or pre/post registration approval by mobile network operators (MNOs). Requirements may vary according to each MNO.\n\nFor more information on standard use case versus special use case campaigns, see [10DLC Use Cases - Standard Use Cases vs Special Use Cases](https://community.sinch.com/t5/10DLC/10DLC-Use-Cases-Standard-Use-Cases-vs-Special-Use-Cases/ta-p/7028/). ",
+      "enum": [
+        "2FA",
+        "ACCOUNT_NOTIFICATION",
+        "CUSTOMER_CARE",
+        "DELIVERY_NOTIFICATION",
+        "FRAUD_ALERT",
+        "HIGHER_EDUCATION",
+        "LOW_VOLUME",
+        "MARKETING",
+        "MIXED",
+        "POLLING_VOTING",
+        "PUBLIC_SERVICE_ANNOUNCEMENT",
+        "SECURITY_ALERT",
+        "AGENTS_FRANCHISES",
+        "CARRIER_EXEMPT",
+        "CHARITY",
+        "EMERGENCY",
+        "K12_EDUCATION",
+        "POLITICAL",
+        "PROXY",
+        "SOCIAL",
+        "SWEEPSTAKE",
+        "SOLE_PROPRIETOR"
+      ],
+      "x-enumDescriptions": {
+        "2FA": "Any authentication, verification, or one-time passcode.",
+        "ACCOUNT_NOTIFICATION": "Standard notifications for account holders, relating to and being about an account.",
+        "CUSTOMER_CARE": "All customer care interaction, including but not limited to account management and customer support.",
+        "DELIVERY_NOTIFICATION": "Notification about the status of the delivery of a product or service.",
+        "FRAUD_ALERT": "Notifications regarding potential fraudulent activity on a user's account.",
+        "HIGHER_EDUCATION": "Messaging created on behalf of Colleges or Universities, including School Districts and education institutions. This use case is NOT for the \"free to the consumer\" messaging model.",
+        "LOW_VOLUME": "For Brands that have multiple use cases and only need very low messaging throughput. Examples include: test or demo accounts, small businesses (single Doctor's office, single Pizza shop etc.).",
+        "MARKETING": "Any communication that includes marketing and/or promotional content.",
+        "MIXED": "Any messaging campaign containing 2 to 5 standard uses cases.",
+        "POLLING_VOTING": "The sending of surveys and polling/voting campaigns for non political arenas.",
+        "PUBLIC_SERVICE_ANNOUNCEMENT": "Informational messaging to raise an audience's awareness about important issues.",
+        "SECURITY_ALERT": "A notification that the security of a system, either software or hardware, has been compromised in some way and there is an action you need to take.",
+        "AGENTS_FRANCHISES": "Agents; franchises; local branches.",
+        "CARRIER_EXEMPT": "Carrier exempt.",
+        "CHARITY": "Communications from a registered charity aimed at providing help and raising money for those in need.",
+        "EMERGENCY": "Notification services designed to support public safety/health during natural disasters, armed conflicts, pandemics, and other national or regional emergencies.",
+        "K12_EDUCATION": "Campaigns created for messaging platforms that support schools from grades K - 12, and distance learning centers.",
+        "POLITICAL": "Part of organized effort to influence decision making of specific groups. Available only to Non-Profit entities with a Campaign Verify token or Aegis Political Vet, or Non Profit entities with a verified 501(c)(3/4/5/6) tax exempt status.",
+        "PROXY": "Peer-to-peer, app-based group messaging with proxy/pooled numbers. Supporting personalized services and non-exposure of personal numbers for enterprise or A2P communications.",
+        "SOCIAL": "Communication between public figures/influencers and their communities.",
+        "SWEEPSTAKE": "All sweepstakes messaging.",
+        "SOLE_PROPRIETOR": "A business that is owned and operated by a single individual/business entity. This use case is intended for sole proprietors who do not fit the low volume use case but still have relatively low messaging needs."
+      }
+    },
+    "CampaignVerticalType": {
+      "deprecated": true,
+      "title": "Campaign Vertical Type",
+      "type": "string",
+      "description": "This field has been deprecated and is no longer being captured."
+    }
+  }
+}

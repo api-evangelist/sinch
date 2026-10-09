@@ -1,0 +1,191 @@
+openapi: 3.2.0
+info:
+  title: Chatlayer Analytics Subscriptions API
+  version: 1.0.0
+  contact:
+    name: Support
+    url: www.sinch.com
+    email: support@sinch.com
+servers:
+- url: https://analytics.api.chatlayer.ai
+  description: Europe
+- url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+  description: US
+- url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+  description: APAC
+- url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+  description: South America
+security:
+- basicAuth: []
+tags:
+- name: Subscriptions
+paths:
+  /v1/bots/{bot_id}/subscriptions:
+    get:
+      tags:
+      - Subscriptions
+      operationId: Analytics_ListSubscriptions
+      parameters:
+      - name: bot_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: page_token
+        in: query
+        schema:
+          type: string
+      - name: page_size
+        in: query
+        schema:
+          type: integer
+          format: int32
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListSubscriptionsResponse'
+      summary: Analytics list subscriptions
+      x-summary-source: derived
+    post:
+      tags:
+      - Subscriptions
+      operationId: Analytics_CreateSubscription
+      parameters:
+      - name: bot_id
+        in: path
+        description: the id of the bot
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                bot_version:
+                  title: the version of the bot
+                  type: string
+                  example: LIVE
+                target:
+                  title: the target url to which the request will be sent
+                  type: string
+                  example: https://httpbin.org/post
+                secret:
+                  title: the secret with which the request will be signed
+                  type: string
+                event_type:
+                  type: string
+                  description: The event type you want to be notified about. One of TRACKING_EVENT, FLOW_EVENT or MESSAGE_EVENT
+                  example: TRACKING_EVENT
+                event_names:
+                  title: 'when specified only the events with the given name will be sent
+
+                    only valid for TRACKING_EVENTS for now'
+                  type: array
+                  items:
+                    type: string
+                version:
+                  title: 'identifies the definition of the subscription type to use.
+
+                    currently only the value "v1" is allowed'
+                  type: string
+                  example: v1
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateSubscriptionResponse'
+      summary: Analytics create subscription
+      x-summary-source: derived
+  /v1/bots/{bot_id}/subscriptions/{subscription_id}:
+    delete:
+      tags:
+      - Subscriptions
+      operationId: Analytics_DeleteSubscription
+      parameters:
+      - name: bot_id
+        in: path
+        required: true
+        schema:
+          type: string
+      - name: subscription_id
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                type: object
+      summary: Analytics delete subscription
+      x-summary-source: derived
+components:
+  schemas:
+    ListSubscriptionsResponse:
+      type: object
+      properties:
+        subscriptions:
+          type: array
+          items:
+            $ref: '#/components/schemas/Subscription'
+        next_page_token:
+          type: string
+    CreateSubscriptionResponse:
+      type: object
+      properties:
+        subscription:
+          $ref: '#/components/schemas/Subscription'
+    Subscription:
+      type: object
+      properties:
+        id:
+          title: identifies the subscription
+          type: string
+        bot_id:
+          title: identifies the bot
+          type: string
+        bot_version:
+          type: string
+        target:
+          title: the destination url where the events will be sent to
+          type: string
+        event_type:
+          title: the event type you want to be notified about
+          type: string
+        event_names:
+          title: 'when specified only the events with the given name will be sent
+
+            only valid for TRACKING_EVENTS for now'
+          type: array
+          items:
+            type: string
+        created_at:
+          title: the time when the subscription was created
+          type: string
+          format: date-time
+        version:
+          title: 'identifies the definition of the subscription payload to use
+
+            currently only the value "v1" is allowed'
+          type: string
+        status:
+          type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Generate your access token on the [Chatlayer platform](https://app.chatlayer.ai/settings/api-access/tokens).
+externalDocs:
+  description: Learn more
+  url: https://developers.sinch.com/docs/chatlayer-analytics/
+x-original-swagger-version: '2.0'

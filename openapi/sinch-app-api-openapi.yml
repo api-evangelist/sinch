@@ -1,0 +1,1037 @@
+openapi: 3.2.0
+info:
+  description: '# Overview
+
+
+    Send and receive messages globally over SMS, RCS, WhatsApp, Viber Business, Facebook messenger and other popular channels using the Sinch Conversation API.'
+  title: Conversation API | Sinch App API
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    email: support@sinch.com
+    name: support at sinch
+servers:
+- url: https://{region}.conversation.api.sinch.com
+  variables:
+    region:
+      default: us
+      enum:
+      - us
+      - eu
+      - br
+  description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+security:
+- Basic: []
+- oAuth2: []
+tags:
+- description: Apps are created and configured through the Sinch Dashboard, are tied to the API user and come with a set of **channel credentials** for each underlying connected channel.
+  name: App
+  x-displayName: Apps
+paths:
+  /v1/projects/{project_id}/apps:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    get:
+      description: Get a list of all apps in the specified project.
+      tags:
+      - App
+      summary: List all apps for a given project
+      operationId: App_ListApps
+      responses:
+        '200':
+          $ref: '#/components/responses/listAppsResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.applications;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.AppsService;\nimport com.sinch.sdk.domains.conversation.models.v1.apps.response.AppsListResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class List {\n\n  private static final Logger LOGGER = Logger.getLogger(List.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    AppsService appService = client.conversation().v1().apps();\n\n    LOGGER.info(\"List conversations\");\n\n    AppsListResponse result = appService.list();\n\n    LOGGER.info(\"Response: \");\n\n    result\n        .iterator()\n        .forEachRemaining(\n            f -> LOGGER.info(String.format(\"- %s (%s) : %s\", f.getDisplayName(), f.getId(), f)));\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.app.list({});\n    if (!response.apps?.length) {\n      console.log('No Conversation Apps found.');\n      return;\n    }\n    console.log(`✅ Found ${response.apps.length} Conversation Apps.`);\n    response.apps.forEach((app) => {\n      console.log(app);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list Conversation Apps:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\nfrom dotenv import load_dotenv\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\napps = sinch_client.conversation.apps.list()\n\nprint(\"List of apps:\\n\")\nfor app in apps.iterator():\n    print(app)\n"
+    post:
+      tags:
+      - App
+      summary: Create an app
+      description: You can create a new Conversation API app using the API. You can create an app for one or more channels at once. The ID of the app is generated at creation and will be returned in the response.
+      operationId: App_CreateApp
+      requestBody:
+        $ref: '#/components/requestBodies/CreateAppRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/createAppResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.applications;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.AppsService;\nimport com.sinch.sdk.domains.conversation.models.v1.apps.request.AppCreateRequest;\nimport com.sinch.sdk.domains.conversation.models.v1.apps.response.AppResponse;\nimport com.sinch.sdk.domains.conversation.models.v1.credentials.ConversationChannelCredentials;\nimport com.sinch.sdk.domains.conversation.models.v1.credentials.ConversationChannelCredentialsBuilderFactory;\nimport com.sinch.sdk.domains.conversation.models.v1.credentials.StaticBearerCredentials;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.Arrays;\nimport java.util.List;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Create {\n\n  private static final Logger LOGGER = Logger.getLogger(Create.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The service plan ID and API token for the SMS channel\n    String smsServicePlanId = Settings.getServicePlanId().orElse(\"SMS_SERVICE_PLAN_ID\");\n    String smsApiToken = (\"SMS_API_TOKEN\");\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    AppsService appService = client.conversation().v1().apps();\n\n    LOGGER.info(\n        String.format(\n            \"Create conversation application with SMS channel for service plan ID '%s'\",\n            smsServicePlanId));\n\n    ConversationChannelCredentials smsChannel =\n        ConversationChannelCredentialsBuilderFactory.sms(\n                StaticBearerCredentials.builder()\n                    .setClaimedIdentity(smsServicePlanId)\n                    .setToken(smsApiToken)\n                    .build())\n            .build();\n\n    List<ConversationChannelCredentials> channelCredentials = Arrays.asList(smsChannel);\n\n    AppCreateRequest request =\n        AppCreateRequest.builder()\n            .setChannelCredentials(channelCredentials)\n            .setDisplayName(\"Created from Java SDK snippet\")\n            .build();\n\n    AppResponse response = appService.create(request);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // RCS credentials - replace with your own\n  const rcsAgentId = 'RCS_SENDER_AGENT_ID';\n  const rcsAgentAccessToken = 'RCS_BEARER_TOKEN';\n  // Name of the Conversation App to create\n  const appName = 'Created from Node.js SDK snippet';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.app.create({\n      appCreateRequestBody: {\n        display_name: appName,\n        channel_credentials: [\n          {\n            channel: 'RCS',\n            static_bearer: {\n              claimed_identity: rcsAgentId,\n              token: rcsAgentAccessToken,\n            },\n          },\n        ],\n      },\n    });\n    console.log('✅ Successfully created the Conversation App.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to create the Conversation App with name ${appName}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\nfrom dotenv import load_dotenv\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\n# The display name for the app\ndisplay_name = \"[Python SDK: Conversation App] Sample app\"\n\n# The service plan ID for the SMS channel\nsms_service_plan_id = os.environ.get(\"SINCH_SERVICE_PLAN_ID\") or \"SMS_SERVICE_PLAN_ID\"\n\n# The API token for the SMS channel\nsms_api_token = \"SMS_API_TOKEN\"\n\n# The channel credentials for the app\nchannel_credentials = {\n    \"SMS\": {\n        \"claimed_identity\": sms_service_plan_id,\n        \"token\": sms_api_token\n    }\n}\n\nresponse = sinch_client.conversation.apps.create(\n    display_name=display_name,\n    channel_credentials=channel_credentials,\n)\n\nprint(f\"Successfully created app.\\n{response}\")\n\n\n"
+  /v1/projects/{project_id}/apps/{app_id}:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    - $ref: '#/components/parameters/app_id'
+    get:
+      tags:
+      - App
+      summary: Get an app
+      description: Returns a particular app as specified by the App ID.
+      operationId: App_GetApp
+      responses:
+        '200':
+          $ref: '#/components/responses/getAppResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.applications;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.AppsService;\nimport com.sinch.sdk.domains.conversation.models.v1.apps.response.AppResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Get {\n\n  private static final Logger LOGGER = Logger.getLogger(Get.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the Conversation App to retrieve\n    String conversationApplicationId = \"CONVERSATION_APP_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    AppsService appService = client.conversation().v1().apps();\n\n    LOGGER.info(\n        String.format(\"Get details for application with ID '%s'\", conversationApplicationId));\n\n    AppResponse response = appService.get(conversationApplicationId);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation App to retrieve\n  const appId = 'CONVERSATION_APP_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.app.get({\n      app_id: appId,\n    });\n    console.log('✅ Successfully retrieved the Conversation App.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the Conversation App with ID ${appId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\nfrom dotenv import load_dotenv\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\n# The ID of the app to retrieve\napp_id = \"CONVERSATION_APP_ID\"\n\nresponse = sinch_client.conversation.apps.get(app_id=app_id)\n\nprint(f\"App details:\\n{response}\")\n"
+    delete:
+      tags:
+      - App
+      summary: Delete an app
+      description: Deletes the app specified by the App ID. Note that this operation will not delete contacts (which are stored at the project level) nor any channel-specific resources (for example, WhatsApp Sender Identities will not be deleted).
+      operationId: App_DeleteApp
+      responses:
+        '200':
+          description: A successful response.
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.applications;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.AppsService;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Delete {\n\n  private static final Logger LOGGER = Logger.getLogger(Delete.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the Conversation App to delete\n    String conversationApplicationId = \"CONVERSATION_APP_ID\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    AppsService appService = client.conversation().v1().apps();\n\n    LOGGER.info(\n        String.format(\"Delete conversation application with ID '%s'\", conversationApplicationId));\n\n    appService.delete(conversationApplicationId);\n\n    LOGGER.info(\"Done\");\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation App to delete\n  const appId = 'CONVERSATION_APP_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    await sinch.conversation.app.delete({\n      app_id: appId,\n    });\n    console.log(`✅ Successfully deleted the Conversation App with ID ${appId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete the Conversation App with ID ${appId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\nfrom dotenv import load_dotenv\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\n# The ID of the app to delete\napp_id = \"CONVERSATION_APP_ID\"\n\nsinch_client.conversation.apps.delete(app_id=app_id)\n\nprint(\"App deleted successfully\")\n"
+    patch:
+      tags:
+      - App
+      summary: Update an app
+      description: Updates a particular app as specified by the App ID. Note that this is a `PATCH` operation, so any specified field values will replace existing values. Therefore, **if you'd like to add additional configurations to an existing Conversation API app, ensure that you include existing values AND new values in the call**. For example, if you'd like to add new `channel_credentials`, you can get your existing Conversation API app, extract the existing `channel_credentials` list, append your new configuration to that list, and include the updated `channel_credentials` list in this update call.
+      operationId: App_UpdateApp
+      parameters:
+      - $ref: '#/components/parameters/update_mask'
+      requestBody:
+        $ref: '#/components/requestBodies/UpdateAppRequest'
+      responses:
+        '200':
+          $ref: '#/components/responses/updateAppResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.applications;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.AppsService;\nimport com.sinch.sdk.domains.conversation.models.v1.apps.request.AppUpdateRequest;\nimport com.sinch.sdk.domains.conversation.models.v1.apps.response.AppResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Update {\n\n  private static final Logger LOGGER = Logger.getLogger(Update.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the Conversation App to update\n    String conversationApplicationId = \"CONVERSATION_APP_ID\";\n    // New name for the Conversation App\n    String updatedAppName = \"Updated from Java SDK snippet\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    AppsService appService = client.conversation().v1().apps();\n\n    LOGGER.info(String.format(\"Update application with ID '%s'\", conversationApplicationId));\n\n    AppUpdateRequest parameters = AppUpdateRequest.builder().setDisplayName(updatedAppName).build();\n\n    AppResponse result = appService.update(conversationApplicationId, parameters);\n\n    LOGGER.info(\"Response: \" + result);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation App to update\n  const appId = 'CONVERSATION_APP_ID';\n  // New name for the Conversation App\n  const updatedAppName = 'Updated from Node.js SDK snippet';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.app.update({\n      app_id: appId,\n      appUpdateRequestBody: {\n        display_name: updatedAppName,\n      },\n    });\n    console.log('✅ Successfully updated the Conversation App.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to update the Conversation App with ID ${appId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      - lang: Python
+        source: "\"\"\"\nSinch Python Snippet\n\nThis snippet is available at https://github.com/sinch/sinch-sdk-python/tree/main/examples/snippets\n\"\"\"\n\nimport os\nfrom dotenv import load_dotenv\nfrom sinch import SinchClient\n\nload_dotenv()\n\nsinch_client = SinchClient(\n    project_id=os.environ.get(\"SINCH_PROJECT_ID\") or \"MY_PROJECT_ID\",\n    key_id=os.environ.get(\"SINCH_KEY_ID\") or \"MY_KEY_ID\",\n    key_secret=os.environ.get(\"SINCH_KEY_SECRET\") or \"MY_KEY_SECRET\",\n    conversation_region=os.environ.get(\"SINCH_CONVERSATION_REGION\") or \"MY_CONVERSATION_REGION\"\n)\n\n# The ID of the app to update\napp_id = \"CONVERSATION_APP_ID\"\n\n# The new display name for the app\ndisplay_name = \"Updated from Python SDK snippet\"\n\nresponse = sinch_client.conversation.apps.update(\n    app_id=app_id,\n    display_name=display_name\n)\n\nprint(f\"Updated app:\\n{response}\")\n"
+components:
+  schemas:
+    SmartConversation:
+      description: This object is required for apps that subscribe to Smart Conversations features.
+      type: object
+      properties:
+        enabled:
+          description: Set to true to allow messages processed by this app to be analyzed by Smart Conversations.
+          type: boolean
+          default: false
+    ConversationMetadataReportView:
+      type: string
+      default: NONE
+      description: 'NONE - Omit metadata.
+
+        FULL - Include all metadata assigned to the conversation.'
+      x-enumDescriptions:
+        NONE: Omit metadata.
+        FULL: Include all metadata assigned to the conversation.
+      enum:
+      - NONE
+      - FULL
+    LineEnterpriseCredentials:
+      type: object
+      title: LINE Credentials
+      required:
+      - token
+      - secret
+      properties:
+        token:
+          type: string
+          description: The token for the LINE channel to which you are connecting.
+          example: '{{LINE_TOKEN}}'
+        secret:
+          type: string
+          description: The secret for the LINE channel to which you are connecting.
+          format: password
+          example: '{{LINE_SECRET}}'
+    BasicAuthCredentials:
+      description: It consists of a username and a password.
+      type: object
+      required:
+      - password
+      - username
+      title: Basic Auth Credential
+      properties:
+        password:
+          description: Basic auth password.
+          type: string
+          format: password
+        username:
+          description: Basic auth username.
+          type: string
+    RetentionPolicy:
+      type: object
+      description: The retention policy configured for the app. For more information about retention policies, see [Retention Policy](https://developers.sinch.com/docs/conversation/keyconcepts/#retention-policy).
+      title: Retention policy for messages and conversations
+      properties:
+        retention_type:
+          $ref: '#/components/schemas/RetentionPolicyType'
+        ttl_days:
+          description: 'Optional. The days before a message or conversation is eligible for deletion.
+
+            Default value is 180. The ttl_days value has no effect when retention_type
+
+            is `PERSIST_RETENTION_POLICY`. The valid values for this field are [1 - 3650].
+
+            Note that retention cleanup job runs once every twenty-four hours
+
+            which can lead to delay i.e., messages and conversations are not deleted on
+
+            the minute they become eligible for deletion.'
+          type: integer
+          default: 180
+          format: int64
+    TelegramCredentialsField:
+      type: object
+      title: Telegram
+      properties:
+        telegram_credentials:
+          type: object
+          title: Telegram Credentials
+          required:
+          - token
+          description: If you are including the Telegram Bot channel in the `channel_identifier` property, you must include this object.
+          properties:
+            token:
+              type: string
+              description: The token for the Telegram bot to which you are connecting.
+              example: '{{TELEGRAM_BOT_TOKEN}}'
+              format: password
+    DeliveryReportBasedFallback:
+      description: This object contains additional settings related to [delivery report based fallback](https://developers.sinch.com/docs/conversation/keyconcepts/#delivery-report-base-message-fallback). Note that this is **paid** functionality.
+      type: object
+      properties:
+        enabled:
+          description: Optional. A flag specifying whether this app has enabled fallback message delivery upon no positive delivery report. This feature is applicable only to messages which are sent to a recipient with more than one channel identity. Identities must be defined on channels which support at least the 'DELIVERED' message state. **Please note that this functionality requires payment.**
+          type: boolean
+          default: false
+        delivery_report_waiting_time:
+          description: Optional. The time, in seconds, after which a message without a positive delivery report will fallback to the next channel.
+          type: integer
+          format: int32
+          minimum: 10
+          maximum: 259200
+    MessageRetrySettings:
+      description: This object contains settings related to message retry mechanism.
+      type: object
+      properties:
+        retry_duration:
+          description: The maximum duration, in seconds, during which the system will retry sending a message in the event of a temporary processing failure. Time is counted after the first message processing failure. At least one retry is guaranteed. Subsequent retry instances are randomized with exponential backoff. If the next retry timestamp exceeds the configured time, one final retry will be performed on the cut-off time. The valid values for this field are [30 - 3600].
+          type: integer
+          format: int32
+          default: 3600
+    KakaoTalkChatCredentialsField:
+      type: object
+      title: KakaoTalkChat
+      properties:
+        kakaotalkchat_credentials:
+          type: object
+          title: KakaoTalkChat Credentials
+          required:
+          - kakaotalk_plus_friend_id
+          description: If you are including the KakaoTalkChat channel in the `channel_identifier` property, you must include this object.
+          properties:
+            kakaotalk_plus_friend_id:
+              type: string
+              description: Kakaotalk Plus friend ID.
+            api_key:
+              type: string
+              description: InfoBank API KEY.
+    ChannelCredentialsTypes:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/StaticBearerCredentialsField'
+      - $ref: '#/components/schemas/StaticTokenCredentialsField'
+      - $ref: '#/components/schemas/MMSCredentialsField'
+      - $ref: '#/components/schemas/KakaoTalkCredentialsField'
+      - $ref: '#/components/schemas/TelegramCredentialsField'
+      - $ref: '#/components/schemas/LineCredentialsField'
+      - $ref: '#/components/schemas/LineEnterpriseCredentialsField'
+      - $ref: '#/components/schemas/WeChatCredentialsField'
+      - $ref: '#/components/schemas/InstagramCredentialsField'
+      - $ref: '#/components/schemas/AppleBcCredentialsField'
+      - $ref: '#/components/schemas/KakaoTalkChatCredentialsField'
+    ListAppsResponse:
+      type: object
+      properties:
+        apps:
+          description: List of apps belonging to a specific project ID.
+          type: array
+          items:
+            $ref: '#/components/schemas/AppResponse'
+    QueueStats:
+      type: object
+      properties:
+        outbound_size:
+          description: The current size of the App's MT queue.
+          type: integer
+          format: int64
+          readOnly: true
+        outbound_limit:
+          description: The limit of the App's MT queue. The default limit is 500000 messages.
+          type: integer
+          format: int64
+          readOnly: true
+    InstagramCredentialsField:
+      type: object
+      title: Instagram
+      properties:
+        instagram_credentials:
+          type: object
+          title: Instagram Credentials
+          required:
+          - token
+          description: If you are including the INSTAGRAM channel in the `channel_identifier` property, you must include this object.
+          properties:
+            token:
+              type: string
+              description: The static token.
+              format: password
+            business_account_id:
+              type: string
+              description: Required if using the Sinch Facebook App.
+    ChannelCredentialsCommonTypes:
+      type: object
+      properties:
+        callback_secret:
+          description: 'The secret used to verify the channel callbacks
+
+            for channels which support callback verification.
+
+            The callback verification is not needed for Sinch-managed
+
+            channels because the callbacks are not leaving
+
+            Sinch internal networks.
+
+            Max length is 256 characters.
+
+            Note: leaving channel_callback_secret empty for channels with
+
+            callback verification will disable the verification.'
+          type: string
+          format: password
+        channel:
+          $ref: '#/components/schemas/ConversationChannel'
+        state:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/ChannelIntegrationState'
+        channel_known_id:
+          description: Additional identifier set by the channel that represents an specific id used by the channel.
+          type: string
+          readOnly: true
+        credential_ordinal_number:
+          allOf:
+          - $ref: '#/components/schemas/CredentialOrdinalNumber'
+    CredentialOrdinalNumber:
+      type: integer
+      description: The ordinal number of the credential. This field is used when the application supports multiple credential integrations per channel. Currently, this is only applicable to the `LINE` channel. For other channels, this value will always be set to `0`. In the case in which there are multiple credential integrations per channel on a single app, this field must have a unique value for each multi-credential channel entry.
+      default: 0
+      minimum: 0
+      maximum: 255
+    CallbackSettings:
+      description: This object contains additional settings related to callback processing.
+      type: object
+      properties:
+        secret_for_overridden_callback_urls:
+          description: Optional. Secret can be used to sign contents of delivery receipts for a message that was sent with the default callback URL overridden (using the [`callback_url` field](https://developers.sinch.com/docs/conversation/api-reference/conversation/tag/Messages/#tag/Messages/operation/Messages_SendMessage!path=callback_url&t=request)). You can then use the secret to verify the signature.
+          type: string
+          format: password
+    ConversationChannelCredentials:
+      type: object
+      description: Enables access to the underlying messaging channel.
+      allOf:
+      - $ref: '#/components/schemas/ChannelCredentialsTypes'
+      - $ref: '#/components/schemas/ChannelCredentialsCommonTypes'
+    LineEnterpriseCredentialsField:
+      type: object
+      title: LINE Enterprise
+      properties:
+        line_enterprise_credentials:
+          type: object
+          title: LINE Enterprise Credentials
+          description: If the `channel` property is set to `LINE` for this entry of the `channel_credentials` array, you must include either the `line_credentials` object or the `line_enterprise_credentials` object in the entry as well.
+          allOf:
+          - oneOf:
+            - $ref: '#/components/schemas/LineCredentialsJapanField'
+            - $ref: '#/components/schemas/LineCredentialsThailandField'
+          - type: object
+            properties:
+              is_default:
+                type: boolean
+                description: When an app contains multiple LINE or LINE Enterprise credentials, one of the credentials needs to be defined as the default. Setting this property to `true` marks the corresponding credentials as the default credentials.
+                default: false
+    LineCredentialsThailandField:
+      type: object
+      title: LINE Credentials Thailand
+      properties:
+        line_thailand:
+          $ref: '#/components/schemas/LineEnterpriseCredentials'
+    ChannelIntegrationStatus:
+      description: Status of the channel credentials integration
+      x-enumDescriptions:
+        PENDING: Initial status when the channel has been activated in the front-end.
+        ACTIVE: Credentials have been successfully validated and exchanged for a long-lived token. This status is used by default for channels in which the credential can't be validated.
+        FAILING: Failed to validate credentials and acquire a long-lived token.
+      default: PENDING
+      type: string
+      enum:
+      - PENDING
+      - ACTIVE
+      - FAILING
+    KakaoTalkCredentialsField:
+      type: object
+      title: KakaoTalk
+      properties:
+        kakaotalk_credentials:
+          type: object
+          title: KakaoTalk Credentials
+          required:
+          - kakaotalk_plus_friend_id
+          - kakaotalk_sender_key
+          description: If you are including the KakaoTalk channel in the `channel_identifier` property, you must include this object.
+          properties:
+            kakaotalk_plus_friend_id:
+              description: KakaoTalk Business Channel ID.
+              type: string
+            kakaotalk_sender_key:
+              description: KakaoTalk Sender Key.
+              type: string
+    MMSCredentialsField:
+      type: object
+      title: MMS
+      properties:
+        mms_credentials:
+          type: object
+          title: MMS Credentials
+          required:
+          - account_id
+          - api_key
+          description: If you are including the MMS channel in the `channel_identifier` property, you must include this object.
+          properties:
+            account_id:
+              description: MMS Account ID.
+              type: string
+            api_key:
+              description: MMS API Key.
+              type: string
+            basic_auth:
+              $ref: '#/components/schemas/BasicAuthCredentials'
+    AppleBcCredentialsField:
+      type: object
+      title: Apple Business Chat
+      properties:
+        applebc_credentials:
+          type: object
+          title: Apple Business Chat Credentials
+          required:
+          - business_chat_account_id
+          description: If you are including the AppleBC channel in the `channel_identifier` property, you must include this object.
+          properties:
+            business_chat_account_id:
+              type: string
+              description: The ID that identifies a Business Chat Account (BCA).
+            merchant_id:
+              type: string
+              description: Merchant ID, required if our client wants to use Apple Pay.
+            apple_pay_certificate_reference:
+              type: string
+              description: Certificate reference, required if our client wants to use Apple Pay.
+            apple_pay_certificate_password:
+              type: string
+              format: password
+              description: Certificate password, required if our client wants to use Apple Pay.
+    AppCreateRequest:
+      description: The request sent to the API endpoint to create a new app.
+      type: object
+      title: Conversation API app
+      required:
+      - display_name
+      - channel_credentials
+      properties:
+        channel_credentials:
+          description: An array of channel credentials. The order of the credentials defines the app channel priority.
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationChannelCredentials'
+        conversation_metadata_report_view:
+          $ref: '#/components/schemas/ConversationMetadataReportView'
+        display_name:
+          description: The display name for the app.
+          type: string
+          example: Sinch Conversation API Demo App 001
+        retention_policy:
+          $ref: '#/components/schemas/RetentionPolicy'
+        dispatch_retention_policy:
+          $ref: '#/components/schemas/DispatchRetentionPolicy'
+        processing_mode:
+          $ref: '#/components/schemas/ProcessingMode'
+        smart_conversation:
+          $ref: '#/components/schemas/SmartConversation'
+        callback_settings:
+          $ref: '#/components/schemas/CallbackSettings'
+        message_retry_settings:
+          $ref: '#/components/schemas/MessageRetrySettings'
+        delivery_report_based_fallback:
+          $ref: '#/components/schemas/DeliveryReportBasedFallback'
+    StaticBearerCredentialsField:
+      type: object
+      title: Static Bearer Authentication
+      properties:
+        static_bearer:
+          description: This object is required for channels which use a bearer-type of credential for authentication.
+          type: object
+          required:
+          - claimed_identity
+          - token
+          title: Static Bearer Credentials
+          properties:
+            claimed_identity:
+              description: The claimed identity for the channel.
+              type: string
+            token:
+              description: The static bearer token for the channel.
+              type: string
+              format: password
+    ConversationChannel:
+      type: string
+      title: Channel Identifier
+      description: The identifier of the channel you want to include. Must be one of the enum values.
+      example: WHATSAPP
+      x-enumDescriptions:
+        SMS: The SMS channel.
+        RCS: The RCS channel.
+        WHATSAPP: The WhatsApp channel.
+        MMS: The MMS channel.
+        KAKAOTALK: The KakaoTalk channel.
+        KAKAOTALKCHAT: The KakaoTalk chat channel (used primarily in ConsultationTalk).
+        VIBERBM: The Viber Business Messages channel.
+        LINE: The LINE channel.
+        INSTAGRAM: The Instagram channel.
+        MESSENGER: The Facebook Messenger channel.
+        WECHAT: The WeChat channel.
+        TELEGRAM: The Telegram channel.
+        APPLEBC: The Apple Messages for Business channel.
+      enum:
+      - SMS
+      - RCS
+      - WHATSAPP
+      - MMS
+      - KAKAOTALK
+      - KAKAOTALKCHAT
+      - VIBERBM
+      - LINE
+      - INSTAGRAM
+      - MESSENGER
+      - WECHAT
+      - TELEGRAM
+      - APPLEBC
+    AppUpdateRequest:
+      description: The request sent to the API endpoint to update the configuration of an app.
+      type: object
+      title: Conversation API app
+      properties:
+        channel_credentials:
+          description: An array of channel credentials. The order of the credentials defines the app channel priority.
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationChannelCredentials'
+        conversation_metadata_report_view:
+          $ref: '#/components/schemas/ConversationMetadataReportView'
+        display_name:
+          description: The display name for the app.
+          type: string
+          example: Sinch Conversation API Demo App 001
+        retention_policy:
+          $ref: '#/components/schemas/RetentionPolicy'
+        dispatch_retention_policy:
+          $ref: '#/components/schemas/DispatchRetentionPolicy'
+        processing_mode:
+          $ref: '#/components/schemas/ProcessingMode'
+        smart_conversation:
+          $ref: '#/components/schemas/SmartConversation'
+        callback_settings:
+          $ref: '#/components/schemas/CallbackSettings'
+        message_retry_settings:
+          $ref: '#/components/schemas/MessageRetrySettings'
+        delivery_report_based_fallback:
+          $ref: '#/components/schemas/DeliveryReportBasedFallback'
+    ProcessingMode:
+      description: Whether or not Conversation API should store contacts and conversations for the app. For more information, see [Processing Modes](https://developers.sinch.com/docs/conversation/processing-modes/).
+      enum:
+      - CONVERSATION
+      - DISPATCH
+      x-enumDescriptions:
+        CONVERSATION: Creates contacts and conversations automatically when a message is sent or received and there's no existing contact or active conversation.
+        DISPATCH: The default Processing Mode. Does not associate messages with contacts and conversations. This processing mode is mostly intended for unidirectional high volume SMS use cases. The lack of contacts and conversations limits some API features as related data won't be queryable in the [Contact](https://developers.sinch.com/docs/conversation/api-reference/conversation/tag/Contact/) and [Conversation](https://developers.sinch.com/docs/conversation/api-reference/conversation/tag/Conversation/) APIs.
+      type: string
+      default: DISPATCH
+    AppResponse:
+      description: The response showing information about the app.
+      type: object
+      title: Conversation API app
+      properties:
+        channel_credentials:
+          type: array
+          items:
+            $ref: '#/components/schemas/ConversationChannelCredentials'
+        conversation_metadata_report_view:
+          $ref: '#/components/schemas/ConversationMetadataReportView'
+        display_name:
+          description: The display name for the app.
+          type: string
+          example: Sinch Conversation API Demo App 001
+        id:
+          description: The ID of the app. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+          type: string
+          example: '{APP_ID}'
+        rate_limits:
+          $ref: '#/components/schemas/RateLimits'
+        retention_policy:
+          $ref: '#/components/schemas/RetentionPolicy'
+        dispatch_retention_policy:
+          $ref: '#/components/schemas/DispatchRetentionPolicy'
+        processing_mode:
+          $ref: '#/components/schemas/ProcessingMode'
+        smart_conversation:
+          $ref: '#/components/schemas/SmartConversation'
+        queue_stats:
+          $ref: '#/components/schemas/QueueStats'
+        callback_settings:
+          $ref: '#/components/schemas/CallbackSettings'
+        delivery_report_based_fallback:
+          $ref: '#/components/schemas/DeliveryReportBasedFallback'
+        message_retry_settings:
+          $ref: '#/components/schemas/MessageRetrySettings'
+    StaticTokenCredentialsField:
+      type: object
+      title: Static Token Authentication
+      properties:
+        static_token:
+          type: object
+          description: This object is required for channels which use a static token credential for authentication.
+          required:
+          - token
+          title: Static Token Credentials
+          properties:
+            token:
+              description: The static token for the channel.
+              type: string
+              format: password
+    ChannelIntegrationState:
+      type: object
+      title: Channel Integration State
+      description: State of the channel credentials integration.
+      required:
+      - status
+      properties:
+        status:
+          $ref: '#/components/schemas/ChannelIntegrationStatus'
+        description:
+          description: Description in case the integration fails
+          type: string
+    RateLimits:
+      type: object
+      properties:
+        inbound:
+          description: 'The number of inbound messages/events we process per second,
+
+            from underlying channels to the app.  The default rate limit is 25.'
+          type: integer
+          format: int64
+          readOnly: true
+        outbound:
+          description: 'The number of messages/events we process per second, from the
+
+            app to the underlying channels. Note that underlying channels may have other
+
+            rate limits.  The default rate limit is 25.'
+          type: integer
+          format: int64
+          readOnly: true
+        webhooks:
+          description: 'The rate limit of callbacks sent to the webhooks registered
+
+            for the app. Note that if you have multiple webhooks with shared triggers,
+
+            multiple callbacks will be sent out for each triggering event. The default rate limit is 25.'
+          type: integer
+          format: int64
+          readOnly: true
+    DispatchRetentionPolicy:
+      type: object
+      description: The retention policy configured for messages in [Dispatch Mode](https://developers.sinch.com/docs/conversation/processing-modes/). Currently only `MESSAGE_EXPIRE_POLICY` is available. For more information about retention policies, see [Retention Policy](https://developers.sinch.com/docs/conversation/keyconcepts/#retention-policy).
+      properties:
+        retention_type:
+          $ref: '#/components/schemas/DispatchRetentionPolicyType'
+        ttl_days:
+          description: 'Optional. The days before a message is eligible for deletion. The valid range is `[0 - 7]`. In the case of a `0` day TTL, messages aren''t stored at all.
+
+            Note the retention cleanup job runs once every twenty-four hours, so messages are not deleted on the minute they become eligible for deletion.'
+          type: integer
+          default: 0
+          format: int64
+    RetentionPolicyType:
+      enum:
+      - MESSAGE_EXPIRE_POLICY
+      - CONVERSATION_EXPIRE_POLICY
+      - PERSIST_RETENTION_POLICY
+      x-enumDescriptions:
+        MESSAGE_EXPIRE_POLICY: The default retention policy where messages older than ttl_days are automatically deleted from Conversation API database.
+        CONVERSATION_EXPIRE_POLICY: The conversation expire policy only considers the last message in a conversation. If the last message is older that ttl_days the entire conversation is deleted. The difference with MESSAGE_EXPIRE_POLICY is that messages with accept_time older than ttl_days are persisted as long as there is a newer message in the same conversation.
+        PERSIST_RETENTION_POLICY: Persist policy does not delete old messages or conversations. Please note that message storage might be subject to additional charges in the future.
+      type: string
+      default: MESSAGE_EXPIRE_POLICY
+    LineCredentialsJapanField:
+      type: object
+      title: LINE Credentials Japan
+      properties:
+        line_japan:
+          $ref: '#/components/schemas/LineEnterpriseCredentials'
+    WeChatCredentialsField:
+      type: object
+      title: WeChat
+      properties:
+        wechat_credentials:
+          type: object
+          title: WeChat Credentials
+          required:
+          - app_id
+          - app_secret
+          - token
+          - aes_key
+          description: If you are including the WeChat channel in the `channel_identifier` property, you must include this object.
+          properties:
+            app_id:
+              type: string
+              description: The AppID(Developer ID) for the WeChat channel to which you are connecting.
+              example: '{{WECHAT_APPID}}'
+            app_secret:
+              type: string
+              description: The AppSecret(Developer Password) for the WeChat channel to which you are connecting.
+              format: password
+              example: '{{WECHAT_APPSECRET}}'
+            token:
+              type: string
+              description: The Token for the WeChat channel to which you are connecting.
+              example: '{{WECHAT_TOKEN}}'
+            aes_key:
+              type: string
+              description: The Encoding AES Key for the WeChat channel to which you are connecting.
+              example: '{{WECHAT_AESKEY}}'
+    DispatchRetentionPolicyType:
+      x-enumDescriptions:
+        MESSAGE_EXPIRE_POLICY: Removes all messages, sent or received by the app, older than the TTL days specified in the policy.
+      enum:
+      - MESSAGE_EXPIRE_POLICY
+      type: string
+      default: MESSAGE_EXPIRE_POLICY
+    LineCredentialsField:
+      type: object
+      title: LINE
+      properties:
+        line_credentials:
+          type: object
+          title: LINE Credentials
+          required:
+          - token
+          - secret
+          description: If the `channel` property is set to `LINE` for this entry of the `channel_credentials` array, you must include either the `line_credentials` object or the `line_enterprise_credentials` object in the entry as well.
+          properties:
+            token:
+              type: string
+              description: The token for the LINE channel to which you are connecting.
+              example: '{{LINE_TOKEN}}'
+            secret:
+              type: string
+              description: The secret for the LINE channel to which you are connecting.
+              format: password
+              example: '{{LINE_SECRET}}'
+            is_default:
+              type: boolean
+              description: When an app contains multiple LINE or LINE Enterprise credentials, one of the credentials needs to be defined as the default. Setting this property to `true` marks the corresponding credentials as the default credentials.
+              default: false
+    runtimeError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/protobufAny'
+            message:
+              type: string
+            status:
+              type: string
+    protobufAny:
+      type: object
+      properties:
+        type_url:
+          type: string
+        value:
+          type: string
+          format: byte
+  responses:
+    403Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 403
+            message: You do not have access to the requested resource.
+            status: UNAUTHORIZED
+            details: []
+    501Error:
+      description: Something went wrong on our end, try again with exponential back-off. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 501
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    500Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 500
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    400Error:
+      description: Malformed request. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 400
+            message: Malformed request
+            status: INVALID_REQUEST
+            details: []
+    updateAppResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AppResponse'
+    listAppsResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/ListAppsResponse'
+    401Error:
+      description: Incorrect credentials. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            type: object
+    getAppResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AppResponse'
+    createAppResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AppResponse'
+  parameters:
+    app_id:
+      name: app_id
+      description: The unique ID of the app. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+      in: path
+      required: true
+      schema:
+        type: string
+    project_id:
+      name: project_id
+      description: The unique ID of the project. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+      in: path
+      required: true
+      schema:
+        type: string
+    update_mask:
+      description: The set of field mask paths.
+      name: update_mask
+      in: query
+      explode: false
+      schema:
+        type: array
+        items:
+          type: string
+  examples:
+    createSMSApp:
+      summary: Create SMS App
+      value:
+        channel_credentials:
+        - channel: SMS
+          static_bearer:
+            claimed_identity: '{Service_Plan_Id}'
+            token: '{API_Token}'
+        display_name: Demo SMS App
+    createWhatsAppApp:
+      summary: Create WhatsApp App
+      value:
+        channel_credentials:
+        - channel: WHATSAPP
+          static_bearer:
+            claimed_identity: '{WhatsApp_Sender_ID}'
+            token: '{WhatsApp_Bearer_Token}'
+        display_name: Demo WhatsApp App
+    createFacebookApp:
+      summary: Create Facebook App
+      value:
+        channel_credentials:
+        - channel: MESSENGER
+          static_token:
+            token: '{Facebook_Token}'
+        display_name: Demo Facebook App
+    updateApp:
+      summary: Update app
+      value:
+        channel_credentials:
+        - channel: WHATSAPP
+          static_bearer:
+            claimed_identity: '{{WhatsApp_Sender_Id}}'
+            token: '{{WhatsApp_Bearer_Token}}'
+          callback_secret: '{{Callback_Secret_1}}'
+        - channel: MESSENGER
+          static_token:
+            token: '{{Facebook_Token}}'
+          callback_secret: '{{Callback_Secret_2}}'
+        - channel: SMS
+          static_bearer:
+            claimed_identity: '{{Service_Plan_Id}}'
+            token: '{{API_Token}}'
+        display_name: New App Display Name
+  requestBodies:
+    CreateAppRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AppCreateRequest'
+          examples:
+            createFacebookApp:
+              $ref: '#/components/examples/createFacebookApp'
+            createWhatsAppApp:
+              $ref: '#/components/examples/createWhatsAppApp'
+            createSMSApp:
+              $ref: '#/components/examples/createSMSApp'
+      description: The app to create.
+      required: true
+    UpdateAppRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/AppUpdateRequest'
+          examples:
+            updateApp:
+              $ref: '#/components/examples/updateApp'
+      description: The updated app.
+      required: true
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/conversation/api-reference/#authentication).
+    oAuth2:
+      type: oauth2
+      description: The user name and password are your client_id and key_secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-readme:
+  proxy-enabled: true
+  samples-enabled: true

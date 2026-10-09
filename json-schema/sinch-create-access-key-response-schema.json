@@ -1,0 +1,55 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-create-access-key-response-schema.json",
+  "title": "CreateAccessKeyResponse",
+  "description": "Response message for the AccessKeyService.CreateAccessKey.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-access-keys-legacy-api-openapi.yml#/components/schemas/CreateAccessKeyResponse",
+  "type": "object",
+  "properties": {
+    "accessKey": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/AccessKey"
+        }
+      ],
+      "description": "The newly created Access Key."
+    },
+    "secret": {
+      "type": "string",
+      "description": "The Access Key secret. After an Access Key has been created it is impossible to\n retrieve its secret again."
+    }
+  },
+  "$defs": {
+    "AccessKey": {
+      "type": "object",
+      "properties": {
+        "accessKeyId": {
+          "type": "string",
+          "description": "Unique ID for this Access Key."
+        },
+        "displayName": {
+          "type": "string",
+          "description": "The display name for this Access Key. It must be unique for the resource tied to the key."
+        },
+        "projectId": {
+          "type": "string",
+          "description": "The project ID this key is tied to."
+        },
+        "createTime": {
+          "type": "string",
+          "description": "Timestamp when the Access Key was created.",
+          "format": "date-time"
+        },
+        "updateTime": {
+          "type": "string",
+          "description": "Timestamp when the Access Key was last modified.",
+          "format": "date-time"
+        }
+      },
+      "description": "A single Access Key."
+    }
+  }
+}

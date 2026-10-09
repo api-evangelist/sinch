@@ -1,0 +1,1389 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-whatsapp-template-dto-schema.json",
+  "title": "WhatsappTemplateDto",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-provisioning-api-openapi.yml#/components/schemas/WhatsappTemplateDto",
+  "type": "object",
+  "properties": {
+    "whatsappId": {
+      "type": "string",
+      "uniqueItems": false
+    },
+    "state": {
+      "x-enumDescriptions": {
+        "APPROVED": "The template is approved and available for use.",
+        "DISABLED": "The template has been disabled and is restricted from outbound messaging operations.",
+        "PAUSED": "The template is temporarily paused and cannot be utilized until explicitly resumed.",
+        "PENDING": "The template is queued and currently awaiting approval or processing milestones.",
+        "REJECTED": "The template was rejected and cannot be used."
+      },
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappTemplateStatesEnum"
+        }
+      ]
+    },
+    "name": {
+      "type": "string",
+      "uniqueItems": false
+    },
+    "language": {
+      "x-enumDescriptions": {
+        "AF": "The language configuration is set to Afrikaans.",
+        "AR": "The language configuration is set to Arabic.",
+        "AZ": "The language configuration is set to Azerbaijani.",
+        "BG": "The language configuration is set to Bulgarian.",
+        "BN": "The language configuration is set to Bengali.",
+        "CA": "The language configuration is set to Catalan.",
+        "CS": "The language configuration is set to Czech.",
+        "DA": "The language configuration is set to Danish.",
+        "DE": "The language configuration is set to German.",
+        "EL": "The language configuration is set to Greek.",
+        "EN": "The language configuration is set to English.",
+        "EN_GB": "The language configuration is set to British English.",
+        "EN_US": "The language configuration is set to American English.",
+        "ES": "The language configuration is set to Spanish.",
+        "ES_AR": "The language configuration is set to Argentinian Spanish.",
+        "ES_ES": "The language configuration is set to European Spanish.",
+        "ES_MX": "The language configuration is set to Mexican Spanish.",
+        "ES_UY": "The language configuration is set to Uruguayan Spanish.",
+        "ET": "The language configuration is set to Estonian.",
+        "FA": "The language configuration is set to Persian.",
+        "FI": "The language configuration is set to Finnish.",
+        "FIL": "The language configuration is set to Filipino.",
+        "FR": "The language configuration is set to French.",
+        "GA": "The language configuration is set to Irish.",
+        "GU": "The language configuration is set to Gujarati.",
+        "HA": "The language configuration is set to Hausa.",
+        "HE": "The language configuration is set to Hebrew.",
+        "HI": "The language configuration is set to Hindi.",
+        "HR": "The language configuration is set to Croatian.",
+        "HU": "The language configuration is set to Hungarian.",
+        "ID": "The language configuration is set to Indonesian.",
+        "IT": "The language configuration is set to Italian.",
+        "JA": "The language configuration is set to Japanese.",
+        "KA": "The language configuration is set to Georgian.",
+        "KK": "The language configuration is set to Kazakh.",
+        "KN": "The language configuration is set to Kannada.",
+        "KO": "The language configuration is set to Korean.",
+        "KY_KG": "The language configuration is set to Kyrgyz.",
+        "LO": "The language configuration is set to Lao.",
+        "LT": "The language configuration is set to Lithuanian.",
+        "LV": "The language configuration is set to Latvian.",
+        "MK": "The language configuration is set to Macedonian.",
+        "ML": "The language configuration is set to Malayalam.",
+        "MR": "The language configuration is set to Marathi.",
+        "MS": "The language configuration is set to Malay.",
+        "NB": "The language configuration is set to Norwegian.",
+        "NL": "The language configuration is set to Dutch.",
+        "PA": "The language configuration is set to Punjabi.",
+        "PL": "The language configuration is set to Polish.",
+        "PT_BR": "The language configuration is set to Brazilian Portuguese.",
+        "PT_PT": "The language configuration is set to European Portuguese.",
+        "RO": "The language configuration is set to Romanian.",
+        "RU": "The language configuration is set to Russian.",
+        "RW_RW": "The language configuration is set to Kinyarwanda.",
+        "SK": "The language configuration is set to Slovak.",
+        "SL": "The language configuration is set to Slovenian.",
+        "SQ": "The language configuration is set to Albanian.",
+        "SR": "The language configuration is set to Serbian.",
+        "SV": "The language configuration is set to Swedish.",
+        "SW": "The language configuration is set to Swahili.",
+        "TA": "The language configuration is set to Tamil.",
+        "TE": "The language configuration is set to Telugu.",
+        "TH": "The language configuration is set to Thai.",
+        "TR": "The language configuration is set to Turkish.",
+        "UK": "The language configuration is set to Ukrainian.",
+        "UR": "The language configuration is set to Urdu.",
+        "UZ": "The language configuration is set to Uzbek.",
+        "VI": "The language configuration is set to Vietnamese.",
+        "ZH_CN": "The language configuration is set to Simplified Chinese.",
+        "ZH_HK": "The language configuration is set to Traditional Chinese (Hong Kong).",
+        "ZH_TW": "The language configuration is set to Traditional Chinese (Taiwan).",
+        "ZU": "The language configuration is set to Zulu.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappTemplateLanguagesEnum"
+        }
+      ]
+    },
+    "category": {
+      "x-enumDescriptions": {
+        "AUTHENTICATION": "Billing or functional category for authentication and verification messages.",
+        "MARKETING": "Billing or functional category for promotional or marketing messages.",
+        "UTILITY": "Billing or functional category for utility and service-related messages.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappTemplateCategoryEnum"
+        }
+      ]
+    },
+    "rejectionCode": {
+      "x-enumDescriptions": {
+        "ABUSIVE_CONTENT": "The upstream gateway rejected the layout because the messaging copy violated safety, spam, or abuse criteria.",
+        "INCORRECT_CATEGORY": "The upstream gateway rejected the layout because the business vertical classification does not align with the actual content.",
+        "INVALID_FORMAT": "The upstream gateway rejected the layout because variable placeholders, syntax parameters, or media configurations are invalid.",
+        "NONE": "The template has not faced any restriction codes or rejection events.",
+        "SCAM": "The upstream gateway rejected the layout because the text patterns match fraudulent, deceptive, or financial scam signatures.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Rejection code if template is in status 'REJECTED'",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappTemplateRejectionCodeEnum"
+        }
+      ]
+    },
+    "qualityScore": {
+      "x-enumDescriptions": {
+        "QUALITY_SCORE_GREEN": "Indicates an optimal template delivery standing reflecting low user block counts.",
+        "QUALITY_SCORE_RED": "Indicates a severely degraded template standing, which may trigger suspension or delivery throttling.",
+        "QUALITY_SCORE_YELLOW": "Indicates a warning template standing reflecting a notable increase in recent opt-out actions.",
+        "QUALITY_SCORE_UNKNOWN": "The platform has not collected sufficient telemetry data to compute an active quality rating.",
+        "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+      },
+      "description": "Quality score of the HSM.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappTemplateQualityScoreEnum"
+        }
+      ]
+    },
+    "changes": {
+      "description": "Object containing changes on the template. If empty the changes has been approved and applied to the template.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappTemplateChangesDto"
+        }
+      ]
+    },
+    "details": {
+      "description": "Template details and information.",
+      "uniqueItems": false,
+      "allOf": [
+        {
+          "$ref": "#/$defs/WhatsappTemplateDetailsDto"
+        }
+      ]
+    },
+    "analytics": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/WhatsappTemplateAnalyticsDto"
+      },
+      "description": "Template analytics.",
+      "uniqueItems": false
+    },
+    "isMetaGenerated": {
+      "type": "boolean",
+      "description": "Indicates if the template was auto-generated by Meta.",
+      "uniqueItems": false
+    }
+  },
+  "required": [
+    "name",
+    "language",
+    "category",
+    "analytics",
+    "isMetaGenerated"
+  ],
+  "$defs": {
+    "WhatsappBidStrategiesEnum": {
+      "type": "string",
+      "enum": [
+        "BID_STRATEGY_LOWEST_COST_WITH_BID_CAP",
+        "BID_STRATEGY_UNSPECIFIED",
+        "UNRECOGNIZED"
+      ],
+      "description": "Bid strategy returned for the template optimization configuration."
+    },
+    "WhatsappBodyComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "BODY": "Defines the primary structural layout block containing the main text message and variables."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeBodyEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "uniqueItems": false
+        },
+        "addSecurityRecommendation": {
+          "type": "boolean",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "WhatsappButtonTypeCopyCodeEnum": {
+      "type": "string",
+      "const": "COPY_CODE"
+    },
+    "WhatsappButtonTypeEnum": {
+      "type": "string",
+      "const": "FLOW"
+    },
+    "WhatsappButtonTypeOrderDetailsEnum": {
+      "type": "string",
+      "const": "ORDER_DETAILS"
+    },
+    "WhatsappButtonTypeOtpEnum": {
+      "type": "string",
+      "const": "OTP"
+    },
+    "WhatsappButtonTypePhoneNumberEnum": {
+      "type": "string",
+      "const": "PHONE_NUMBER"
+    },
+    "WhatsappButtonTypeQuickReplyEnum": {
+      "type": "string",
+      "const": "QUICK_REPLY"
+    },
+    "WhatsappButtonTypeRequestContactInfoEnum": {
+      "type": "string",
+      "const": "REQUEST_CONTACT_INFO"
+    },
+    "WhatsappButtonTypeUrlEnum": {
+      "type": "string",
+      "const": "URL"
+    },
+    "WhatsappButtonsComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "BUTTONS": "Defines the interactive layout block hosting quick reply or call-to-action components."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeButtonsEnum"
+            }
+          ]
+        },
+        "buttons": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/WhatsappPhoneNumberButtonDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappUrlButtonDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappQuickReplyButtonDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappOtpButtonDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappFlowButtonDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappRequestContactInfoButtonDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappOrderDetailsButtonDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappCopyCodeButtonDto"
+              }
+            ]
+          },
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type",
+        "buttons"
+      ]
+    },
+    "WhatsappCardBodyComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "BODY": "Defines the primary structural layout block containing the main text message and variables."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeBodyEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "description": "Card body text.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "WhatsappCardButtonsComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "BUTTONS": "Defines the interactive layout block hosting quick reply or call-to-action components."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeButtonsEnum"
+            }
+          ]
+        },
+        "buttons": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/WhatsappUrlButtonDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappQuickReplyButtonDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappPhoneNumberButtonDto"
+              }
+            ]
+          },
+          "description": "Card buttons.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type",
+        "buttons"
+      ]
+    },
+    "WhatsappCardDto": {
+      "type": "object",
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/WhatsappCardHeaderComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappCardBodyComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappCardButtonsComponentDto"
+              }
+            ]
+          },
+          "description": "List of components in the cards.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "components"
+      ]
+    },
+    "WhatsappCardHeaderComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "HEADER": "Defines the high-visibility structural layout block used for introductory text or rich media assets."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeHeaderEnum"
+            }
+          ]
+        },
+        "format": {
+          "x-enumDescriptions": {
+            "IMAGE": "Configures the structural template header block to host static image media assets.",
+            "VIDEO": "Configures the structural template header block to host short video media assets."
+          },
+          "description": "Card header format.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappCardHeaderComponentFormatsEnum"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "format"
+      ]
+    },
+    "WhatsappCardHeaderComponentFormatsEnum": {
+      "type": "string",
+      "enum": [
+        "IMAGE",
+        "VIDEO"
+      ],
+      "description": "Card header format."
+    },
+    "WhatsappCarouselComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "CAROUSEL": "Defines a dynamic multimedia block configured with horizontal scrolling multi-card cards."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeCarouselEnum"
+            }
+          ]
+        },
+        "cards": {
+          "description": "Media cards.",
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WhatsappCardDto"
+          }
+        }
+      },
+      "required": [
+        "type",
+        "cards"
+      ]
+    },
+    "WhatsappComponentTypeBodyEnum": {
+      "type": "string",
+      "const": "BODY"
+    },
+    "WhatsappComponentTypeButtonsEnum": {
+      "type": "string",
+      "const": "BUTTONS"
+    },
+    "WhatsappComponentTypeCarouselEnum": {
+      "type": "string",
+      "const": "CAROUSEL"
+    },
+    "WhatsappComponentTypeFooterEnum": {
+      "type": "string",
+      "const": "FOOTER"
+    },
+    "WhatsappComponentTypeHeaderEnum": {
+      "type": "string",
+      "const": "HEADER"
+    },
+    "WhatsappComponentTypeLimitedTimeOfferEnum": {
+      "type": "string",
+      "const": "LIMITED_TIME_OFFER"
+    },
+    "WhatsappCopyCodeButtonDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "COPY_CODE": "Defines an interactive component that copies a code snippet."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappButtonTypeCopyCodeEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "WhatsappFlowActionEnum": {
+      "type": "string",
+      "enum": [
+        "DATA_EXCHANGE",
+        "NAVIGATE",
+        "UNKNOWN",
+        "UNRECOGNIZED"
+      ],
+      "description": "Flow action"
+    },
+    "WhatsappFlowButtonDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "FLOW": "Defines an interactive component that initializes an embedded native rich interaction flow."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappButtonTypeEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "description": "Text to display on the Flow button",
+          "uniqueItems": false
+        },
+        "flowId": {
+          "type": "string",
+          "description": "Flow ID to launch when button is pressed",
+          "uniqueItems": false
+        },
+        "flowAction": {
+          "x-enumDescriptions": {
+            "DATA_EXCHANGE": "Triggers an asynchronous data synchronization payload transfer with the configured webhook or API endpoint.",
+            "NAVIGATE": "Advances the interactive user workflow viewport context to the subsequent structural layout step.",
+            "UNKNOWN": "The targeted interaction action code type cannot be resolved.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Flow action",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappFlowActionEnum"
+            }
+          ]
+        },
+        "navigateScreen": {
+          "type": "string",
+          "description": "The unique ID of the first screen. Required for Navigate action.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "WhatsappFooterComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "FOOTER": "Defines the supplementary structural layout block used for faint text copy or legal disclaimers."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeFooterEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "uniqueItems": false
+        },
+        "codeExpirationMinutes": {
+          "type": "number",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "WhatsappLimitedTimeOfferComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "LIMITED_TIME_OFFER": "Defines a dynamic structural layout block for showcasing time-sensitive promotional offers and urgency-driven purchase incentives."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeLimitedTimeOfferEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "description": "Offer details text.",
+          "uniqueItems": false
+        },
+        "hasExpiration": {
+          "type": "boolean",
+          "description": "Indicates if the offer expiration details appear in the delivered message.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type",
+        "hasExpiration"
+      ]
+    },
+    "WhatsappLocationHeaderComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "HEADER": "Defines the high-visibility structural layout block used for introductory text or rich media assets."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeHeaderEnum"
+            }
+          ]
+        },
+        "format": {
+          "x-enumDescriptions": {
+            "LOCATION": "Configures the structural template header block to host coordinate and geolocational location arrays."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappLocationHeaderComponentFormatEnum"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "format"
+      ]
+    },
+    "WhatsappLocationHeaderComponentFormatEnum": {
+      "type": "string",
+      "const": "LOCATION"
+    },
+    "WhatsappMediaHeaderComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "HEADER": "Defines the high-visibility structural layout block used for introductory text or rich media assets."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeHeaderEnum"
+            }
+          ]
+        },
+        "format": {
+          "x-enumDescriptions": {
+            "IMAGE": "Configures the structural template header block to host static image media assets.",
+            "VIDEO": "Configures the structural template header block to host short video media assets.",
+            "DOCUMENT": "Configures the structural template header block to host file and document media assets."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappMediaHeaderComponentFormatEnum"
+            }
+          ]
+        }
+      },
+      "required": [
+        "type",
+        "format"
+      ]
+    },
+    "WhatsappMediaHeaderComponentFormatEnum": {
+      "type": "string",
+      "enum": [
+        "DOCUMENT",
+        "IMAGE",
+        "VIDEO"
+      ]
+    },
+    "WhatsappMediaHeaderExampleDto": {
+      "type": "object",
+      "properties": {
+        "url": {
+          "type": "string",
+          "format": "url",
+          "uniqueItems": false
+        }
+      }
+    },
+    "WhatsappOrderDetailsButtonDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "ORDER_DETAILS": "Defines an interactive component that directs the customer to systemic order tracking metadata views."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappButtonTypeOrderDetailsEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "WhatsappOtpButtonDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "OTP": "Defines an interactive component configured to transmit immediate high-volume verification tokens."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappButtonTypeOtpEnum"
+            }
+          ]
+        },
+        "otpType": {
+          "x-enumDescriptions": {
+            "COPY_CODE": "Configures the verification layout to present a plain-text code that the user can manually copy or transfer.",
+            "ONE_TAP": "Configures the verification layout to invoke a native device callback wrapper, requiring a single tap confirmation from the user.",
+            "ZERO_TAP": "Configures the verification layout to execute automated background authentication handshake layers without requiring manual user input.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappOtpTypeEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "uniqueItems": false
+        },
+        "autofillText": {
+          "type": "string",
+          "uniqueItems": false
+        },
+        "packageName": {
+          "type": "string",
+          "deprecated": true,
+          "uniqueItems": false
+        },
+        "signatureHash": {
+          "type": "string",
+          "deprecated": true,
+          "uniqueItems": false
+        },
+        "supportedApps": {
+          "uniqueItems": false,
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WhatsappSupportedAppDto"
+          }
+        },
+        "zeroTapTermsAccepted": {
+          "type": "boolean",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type",
+        "otpType"
+      ]
+    },
+    "WhatsappOtpTypeEnum": {
+      "type": "string",
+      "enum": [
+        "COPY_CODE",
+        "ONE_TAP",
+        "ZERO_TAP",
+        "UNRECOGNIZED"
+      ]
+    },
+    "WhatsappPhoneNumberButtonDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "PHONE_NUMBER": "Defines an interactive component that routes natively to the host hardware dialer array."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappButtonTypePhoneNumberEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "uniqueItems": false
+        },
+        "phoneNumber": {
+          "type": "string",
+          "format": "phone number",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "WhatsappQuickReplyButtonDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "QUICK_REPLY": "Defines an interactive component that routes immediate, automated textual response payloads back to the host gateway."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappButtonTypeQuickReplyEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "WhatsappRequestContactInfoButtonDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "REQUEST_CONTACT_INFO": "Defines an interactive component that prompts native interface sharing configurations to harvest user identity footprints."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappButtonTypeRequestContactInfoEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type"
+      ]
+    },
+    "WhatsappSupportedAppDto": {
+      "type": "object",
+      "properties": {
+        "packageName": {
+          "type": "string",
+          "uniqueItems": false
+        },
+        "signatureHash": {
+          "type": "string",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "packageName",
+        "signatureHash"
+      ]
+    },
+    "WhatsappTemplateAnalyticsButtonTypesEnum": {
+      "type": "string",
+      "enum": [
+        "QUICK_REPLY",
+        "UNIQUE_URL",
+        "URL",
+        "UNRECOGNIZED"
+      ],
+      "description": "Type of button."
+    },
+    "WhatsappTemplateAnalyticsButtonsDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "QUICK_REPLY": "Aggregates interaction metrics for static pre-configured response buttons.",
+            "UNIQUE_URL": "Aggregates interaction metrics for call-to-action buttons configured with dynamic tracking URLs.",
+            "URL": "Aggregates interaction metrics for call-to-action buttons redirecting to static web hyperlinks.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Type of button.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappTemplateAnalyticsButtonTypesEnum"
+            }
+          ]
+        },
+        "content": {
+          "type": "string",
+          "description": "Content of the button.",
+          "uniqueItems": false
+        },
+        "clicks": {
+          "type": "number",
+          "description": "Number of times the button has been clicked.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type",
+        "content",
+        "clicks"
+      ]
+    },
+    "WhatsappTemplateAnalyticsDto": {
+      "type": "object",
+      "properties": {
+        "sent": {
+          "type": "number",
+          "description": "Number of times template has been sent.",
+          "uniqueItems": false
+        },
+        "delivered": {
+          "type": "number",
+          "description": "Number of times template has been delivered.",
+          "uniqueItems": false
+        },
+        "read": {
+          "type": "number",
+          "description": "Number of times template has been read.",
+          "uniqueItems": false
+        },
+        "start": {
+          "type": "string",
+          "description": "The UTC Date Time in ISO 8601 for start of date range.",
+          "uniqueItems": false
+        },
+        "end": {
+          "type": "string",
+          "description": "The UTC Date Time in ISO 8601 for end of date range.",
+          "uniqueItems": false
+        },
+        "buttons": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/WhatsappTemplateAnalyticsButtonsDto"
+          },
+          "description": "Number of times buttons in the template has been clicked.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "sent",
+        "delivered",
+        "read",
+        "start",
+        "end",
+        "buttons"
+      ]
+    },
+    "WhatsappTemplateCategoryEnum": {
+      "type": "string",
+      "enum": [
+        "AUTHENTICATION",
+        "MARKETING",
+        "UTILITY",
+        "UNRECOGNIZED"
+      ]
+    },
+    "WhatsappTemplateChangesDetailsDto": {
+      "type": "object",
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/WhatsappTextHeaderComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappMediaHeaderComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappLocationHeaderComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappBodyComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappFooterComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappButtonsComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappCarouselComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappLimitedTimeOfferComponentDto"
+              }
+            ]
+          },
+          "description": "\n    The current status of the changes.\n    \n    `DRAFT`: The changes has not been submitted.\n    `IN_PROGRESS`: The changes has been submitted.\n",
+          "uniqueItems": false
+        },
+        "messageSendTtlSeconds": {
+          "type": "number",
+          "description": "\n  Template message delivery retry time-to-live (TTL) override value. If unable to deliver the template message, it will be periodically retry for this period of time. If it is unable to deliver the message for this period of time, the message will be dropped.\n\n|  | AUTHENTICATION | MARKETING | UTILITY |\n| -- | -- | -- | -- |\n| Default | 10 minutes | 30 days | 30 days |\n| Customizable range | 10 seconds to 15 minutes | 12 hours to 30 days | 30 seconds to 12 hours |\n| Valid values | 10 to 900 seconds | 43200 to 2592000 seconds | 30 to 43200 seconds |\n\n  Please note that authentication templates created before October 23, 2024, have a default TTL of 30 days.\n  ",
+          "uniqueItems": false
+        },
+        "optimization": {
+          "description": "Optimization settings for the template.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappTemplateDetailsOptimizationDto"
+            }
+          ]
+        }
+      }
+    },
+    "WhatsappTemplateChangesDto": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "x-enumDescriptions": {
+            "DRAFT": "The template changes are saved as a draft only.",
+            "IN_PROGRESS": "The template changes have been submitted and are still processing.",
+            "REJECTED": "The template changes have been reviewed and rejected."
+          },
+          "description": "\n    The current status of the changes.\n    \n    `DRAFT`: The changes has not been submitted.\n    `IN_PROGRESS`: The changes has been submitted.\n",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappTemplateStatusesEnum"
+            }
+          ]
+        },
+        "allowCategoryChange": {
+          "type": "boolean",
+          "description": "True if Meta should be allowed to change the category if they determine the category is wrong. If false, Meta might reject the template if they determine the category is wrong based on the template contents. Defaults to false.",
+          "uniqueItems": false
+        },
+        "details": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/WhatsappTemplateDetailsDto",
+              "description": "For newly created template"
+            },
+            {
+              "$ref": "#/$defs/WhatsappTemplateChangesDetailsDto",
+              "description": "For update template"
+            }
+          ],
+          "description": "Template details and information.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "status"
+      ]
+    },
+    "WhatsappTemplateDetailsDto": {
+      "type": "object",
+      "properties": {
+        "components": {
+          "type": "array",
+          "items": {
+            "anyOf": [
+              {
+                "$ref": "#/$defs/WhatsappTextHeaderComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappMediaHeaderComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappBodyComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappFooterComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappButtonsComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappLocationHeaderComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappCarouselComponentDto"
+              },
+              {
+                "$ref": "#/$defs/WhatsappLimitedTimeOfferComponentDto"
+              }
+            ]
+          },
+          "description": "List of components in the template. Must contain a BODY component and can only have one entry of each type.",
+          "uniqueItems": false
+        },
+        "messageSendTtlSeconds": {
+          "type": "number",
+          "description": "\n  Template message delivery retry time-to-live (TTL) override value. If unable to deliver the template message, it will be periodically retry for this period of time. If it is unable to deliver the message for this period of time, the message will be dropped.\n\n|  | AUTHENTICATION | MARKETING | UTILITY |\n| -- | -- | -- | -- |\n| Default | 10 minutes | 30 days | 30 days |\n| Customizable range | 10 seconds to 15 minutes | 12 hours to 30 days | 30 seconds to 12 hours |\n| Valid values | 10 to 900 seconds | 43200 to 2592000 seconds | 30 to 43200 seconds |\n\n  Please note that authentication templates created before October 23, 2024, have a default TTL of 30 days.\n  ",
+          "uniqueItems": false
+        },
+        "optimization": {
+          "description": "Optimization settings for the template.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappTemplateDetailsOptimizationDto"
+            }
+          ]
+        }
+      },
+      "required": [
+        "components"
+      ]
+    },
+    "WhatsappTemplateDetailsOptimizationDto": {
+      "type": "object",
+      "properties": {
+        "bidAmount": {
+          "type": "number",
+          "description": "Maximum price returned for 1,000 message deliveries, expressed in your WABA currency's smallest unit (for example, cents for USD). Example: a value of 5000 represents $0.05 USD per delivery (5 cents x 1,000 messages).",
+          "uniqueItems": false
+        },
+        "bidStrategy": {
+          "x-enumDescriptions": {
+            "BID_STRATEGY_UNSPECIFIED": "No bid strategy was specified for the template optimization configuration.",
+            "BID_STRATEGY_LOWEST_COST_WITH_BID_CAP": "The template optimization configuration uses the lowest-cost strategy with a bid cap.",
+            "UNRECOGNIZED": "The value returned by an upstream system is not recognized by this API version."
+          },
+          "description": "Bid strategy returned for the template optimization configuration.",
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappBidStrategiesEnum"
+            }
+          ]
+        },
+        "bidCountryMultiplierOverrides": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          },
+          "description": "Country-specific bid multipliers returned by the upstream system, keyed by ISO 3166-1 alpha-2 country code. Values are strings to preserve decimal precision. If not provided, the default bid multiplier of 1.0 is applied for all countries. Allowed range is 0.0 to 10.0. Example: { \"US\": \"1.2\", \"GB\": \"1.1\" }.",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "bidAmount",
+        "bidStrategy"
+      ]
+    },
+    "WhatsappTemplateLanguagesEnum": {
+      "type": "string",
+      "enum": [
+        "AF",
+        "AR",
+        "AZ",
+        "BG",
+        "BN",
+        "CA",
+        "CS",
+        "DA",
+        "DE",
+        "EL",
+        "EN",
+        "EN_GB",
+        "EN_US",
+        "ES",
+        "ES_AR",
+        "ES_ES",
+        "ES_MX",
+        "ES_UY",
+        "ET",
+        "FA",
+        "FI",
+        "FIL",
+        "FR",
+        "GA",
+        "GU",
+        "HA",
+        "HE",
+        "HI",
+        "HR",
+        "HU",
+        "ID",
+        "IT",
+        "JA",
+        "KA",
+        "KK",
+        "KN",
+        "KO",
+        "KY_KG",
+        "LO",
+        "LT",
+        "LV",
+        "MK",
+        "ML",
+        "MR",
+        "MS",
+        "NB",
+        "NL",
+        "PA",
+        "PL",
+        "PT_BR",
+        "PT_PT",
+        "RO",
+        "RU",
+        "RW_RW",
+        "SK",
+        "SL",
+        "SQ",
+        "SR",
+        "SV",
+        "SW",
+        "TA",
+        "TE",
+        "TH",
+        "TR",
+        "UK",
+        "UR",
+        "UZ",
+        "VI",
+        "ZH_CN",
+        "ZH_HK",
+        "ZH_TW",
+        "ZU",
+        "UNRECOGNIZED"
+      ]
+    },
+    "WhatsappTemplateQualityScoreEnum": {
+      "type": "string",
+      "enum": [
+        "QUALITY_SCORE_GREEN",
+        "QUALITY_SCORE_RED",
+        "QUALITY_SCORE_YELLOW",
+        "QUALITY_SCORE_UNKNOWN",
+        "UNRECOGNIZED"
+      ],
+      "description": "Quality score of the HSM."
+    },
+    "WhatsappTemplateRejectionCodeEnum": {
+      "type": "string",
+      "enum": [
+        "ABUSIVE_CONTENT",
+        "INCORRECT_CATEGORY",
+        "INVALID_FORMAT",
+        "NONE",
+        "SCAM",
+        "UNRECOGNIZED"
+      ],
+      "description": "Rejection code if template is in status 'REJECTED'"
+    },
+    "WhatsappTemplateStatesEnum": {
+      "type": "string",
+      "enum": [
+        "APPROVED",
+        "DISABLED",
+        "PAUSED",
+        "PENDING",
+        "REJECTED"
+      ]
+    },
+    "WhatsappTemplateStatusesEnum": {
+      "type": "string",
+      "enum": [
+        "DRAFT",
+        "IN_PROGRESS",
+        "REJECTED"
+      ],
+      "description": "\n    The current status of the changes.\n    \n    `DRAFT`: The changes has not been submitted.\n    `IN_PROGRESS`: The changes has been submitted.\n"
+    },
+    "WhatsappTextHeaderComponentDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "HEADER": "Defines the high-visibility structural layout block used for introductory text or rich media assets."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappComponentTypeHeaderEnum"
+            }
+          ]
+        },
+        "format": {
+          "x-enumDescriptions": {
+            "TEXT": "Configures the structural template header block to host alphanumeric text copy strings."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappTextHeaderComponentFormatEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "description": "Text to show in the header",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type",
+        "format"
+      ]
+    },
+    "WhatsappTextHeaderComponentFormatEnum": {
+      "type": "string",
+      "const": "TEXT"
+    },
+    "WhatsappUrlButtonDto": {
+      "type": "object",
+      "properties": {
+        "type": {
+          "x-enumDescriptions": {
+            "URL": "Defines an interactive component that switches viewports out of the client app into a dedicated browser environment."
+          },
+          "uniqueItems": false,
+          "allOf": [
+            {
+              "$ref": "#/$defs/WhatsappButtonTypeUrlEnum"
+            }
+          ]
+        },
+        "text": {
+          "type": "string",
+          "uniqueItems": false
+        },
+        "url": {
+          "type": "string",
+          "format": "url",
+          "uniqueItems": false
+        }
+      },
+      "required": [
+        "type"
+      ]
+    }
+  }
+}

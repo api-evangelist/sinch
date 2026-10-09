@@ -1,0 +1,438 @@
+openapi: 3.2.0
+info:
+  title: Number Lookup Api v2 Number Lookup V2 API
+  description: With quick and easy access to Number Lookup, you can enhance your communications and keep your database as clean as a whistle. Number Lookup checks against first-party numbering sources and provides real-time feedback. Improve communication by validating and verifying numbers, boosting delivery conversion rates, and saving money on marketing campaigns. Test numbers to ensure your recipients are ready and waiting to receive your messages!
+  contact:
+    name: Sinch
+    url: https://www.sinch.com/contact-us/
+    email: support@sinch.com
+  license:
+    url: https://www.sinch.com/toc
+    name: MIT
+  version: 0.1.0
+servers:
+- url: https://lookup.api.sinch.com
+security:
+- Basic: []
+- OAuth2: []
+tags:
+- name: NumberLookupV2
+paths:
+  /v2/projects/{projectId}/lookups:
+    post:
+      tags:
+      - NumberLookupV2
+      summary: Performs a number lookup
+      operationId: NumberLookupV2_Lookup
+      parameters:
+      - name: projectId
+        in: path
+        required: true
+        schema:
+          type: string
+        x-position: 1
+      requestBody:
+        x-name: numberLookupRequest
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/NumberLookupRequest'
+            examples:
+              minRequest:
+                summary: Minimum request
+                value:
+                  number: '+12312312312'
+              additionalOptions:
+                summary: Request with additional features
+                value:
+                  number: '+12312312312'
+                  features:
+                  - LineType
+                  - RND
+                  - SimSwap
+                  - VoIPDetection
+                  rndFeatureOptions:
+                    contactDate: '2025-01-01'
+        x-position: 2
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NumberLookupResponse'
+        '400':
+          description: Bad Request
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '401':
+          description: Invalid Authorization
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '402':
+          description: Account Locked
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '403':
+          description: API disabled
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '429':
+          description: Too Many Requests
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+        '500':
+          description: Internal Error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProblemDetails'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage numberlookup;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.numberlookup.api.v2.NumberLookupV2Service;\nimport com.sinch.sdk.domains.numberlookup.models.v2.request.LookupFeatureType;\nimport com.sinch.sdk.domains.numberlookup.models.v2.request.NumberLookupRequest;\nimport com.sinch.sdk.domains.numberlookup.models.v2.response.NumberLookupResponse;\nimport com.sinch.sdk.models.Configuration;\nimport java.util.Collections;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Lookup {\n\n  private static final Logger LOGGER = Logger.getLogger(Lookup.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n\n    // The phone number you want to lookup in E.164 format\n    String phoneNumber = \"PHONE_NUMBER\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    NumberLookupV2Service numberLookupService = client.lookup().v2();\n\n    NumberLookupRequest request =\n        NumberLookupRequest.builder()\n            .setNumber(phoneNumber)\n            .setFeatures(Collections.singletonList(LookupFeatureType.LINE_TYPE))\n            .build();\n\n    LOGGER.info(\"Lookup for: \" + phoneNumber);\n\n    NumberLookupResponse response = numberLookupService.lookup(request);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The phone number you want to lookup\n  const phoneNumber = 'PHONE_NUMBER';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try{\n    const response = await sinch.numberLookup.lookup({\n      numberLookupRequestBody: {\n        number: phoneNumber,\n        features: [ 'LineType' ],\n      },\n    });\n    console.log('✅ Successfully performed the number lookup.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to perform a lookup for the phone number ${phoneNumber}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        status:
+          type: integer
+          description: The error status code.
+          format: int32
+        title:
+          type: string
+          description: A short, human-readable summary of the error type.
+        detail:
+          type: string
+          description: A human-readable explanation specific to this occurrence of the error.
+        type:
+          type:
+          - string
+          - 'null'
+          description: A URI reference that identifies the error type.
+    ProblemDetails:
+      type: object
+      additionalProperties: false
+      properties:
+        type:
+          type:
+          - string
+          - 'null'
+          description: A URI reference that identifies the problem type.
+        title:
+          type: string
+          description: A short, human-readable summary of the problem type.
+        status:
+          type: integer
+          description: The HTTP status code.
+          format: int32
+        traceId:
+          type: string
+          description: The identifier for a trace.
+          example: 00-84c1fd4063c38d9f3900d06e56542d48-85d1d4-00
+    ApiSwapPeriod:
+      type: string
+      description: ''
+      x-enumNames:
+      - Undefined
+      - SP4H
+      - SP12H
+      - SP24H
+      - SP48H
+      - SP5D
+      - SP7D
+      - SP14D
+      - SP30D
+      - SPMAX
+      enum:
+      - Undefined
+      - SP4H
+      - SP12H
+      - SP24H
+      - SP48H
+      - SP5D
+      - SP7D
+      - SP14D
+      - SP30D
+      - SPMAX
+      x-enumDescriptions:
+        Undefined: Undefined
+        SP4H: 4 Hours
+        SP12H: 12 Hours
+        SP24H: 24 Hours
+        SP48H: 48 Hours
+        SP5D: 5 Days
+        SP7D: 7 Days
+        SP14D: 14 Days
+        SP30D: 30 Days
+        SPMAX: Maximum
+    VoIPDetectionResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        probability:
+          description: Probability of number being VoIP based on the AI analysis.
+          type:
+          - string
+          - 'null'
+          example: High
+          allOf:
+          - $ref: '#/components/schemas/ApiVoIPProbability'
+        error:
+          type:
+          - object
+          - 'null'
+          allOf:
+          - $ref: '#/components/schemas/ErrorResponse'
+    SimSwapResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        swapped:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates whether SIM was changed.
+          example: true
+        swapPeriod:
+          description: Threshold for sim swap check.
+          type:
+          - string
+          - 'null'
+          example: SP24H
+          allOf:
+          - $ref: '#/components/schemas/ApiSwapPeriod'
+        error:
+          type:
+          - object
+          - 'null'
+          allOf:
+          - $ref: '#/components/schemas/ErrorResponse'
+    LineResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        carrier:
+          type:
+          - string
+          - 'null'
+          description: Name of the carrier.
+          example: T-Mobile USA
+        type:
+          description: Number type e.g. wireless, mobile, fixed.
+          type:
+          - string
+          - 'null'
+          example: Mobile
+          allOf:
+          - $ref: '#/components/schemas/ApiLineType'
+        mobileCountryCode:
+          type:
+          - string
+          - 'null'
+          description: A numeric code (MCC) that uniquely identifies a country within the international telecommunications network.
+          example: '310'
+        mobileNetworkCode:
+          type:
+          - string
+          - 'null'
+          description: A distinct identifier assigned to a mobile network operator within a specific country, used in combination with MCC.
+          example: '260'
+        ported:
+          type:
+          - boolean
+          - 'null'
+          description: Indicates if a phone number has been transferred from its original network to a different provider.
+          example: true
+        portingDate:
+          type:
+          - string
+          - 'null'
+          format: date-time
+          description: Specifies the date, in ISO 8601 format, when a phone number was transferred from its original network to a new provider.
+          example: '2000-01-01 00:00:00+00:00'
+        error:
+          type:
+          - object
+          - 'null'
+          allOf:
+          - $ref: '#/components/schemas/ErrorResponse'
+    RndResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        disconnected:
+          type:
+          - boolean
+          - 'null'
+          description: Provides information whether the number was disconnected after provided last contact date.
+        error:
+          type:
+          - object
+          - 'null'
+          allOf:
+          - $ref: '#/components/schemas/ErrorResponse'
+    NumberLookupRequest:
+      type: object
+      additionalProperties: false
+      required:
+      - number
+      properties:
+        number:
+          type: string
+          description: MSISDN in E.164 format to query.
+          minLength: 1
+          example: '+12312312312'
+        features:
+          type: array
+          description: Contains requested features. Fallback to LineType if not provided.
+          items:
+            $ref: '#/components/schemas/ApiFeature'
+        rndFeatureOptions:
+          description: Required when RND feature is requested.
+          type:
+          - object
+          - 'null'
+          allOf:
+          - $ref: '#/components/schemas/RndFeatureOptions'
+    ApiFeature:
+      type: string
+      description: ''
+      x-enumNames:
+      - LineType
+      - SimSwap
+      - VoIPDetection
+      - RND
+      enum:
+      - LineType
+      - SimSwap
+      - VoIPDetection
+      - RND
+      x-enumDescriptions:
+        LineType: Use to return line type information for the phone number.
+        SimSwap: Use to determine whether the phone number is SIM swapped.
+        VoIPDetection: Use to determine if the carrier is associated with a VoIP provider (alpha).
+        RND: Use to determine whether the phone number has been disconnected (alpha).
+    ApiLineType:
+      type: string
+      description: Represents the type of a phone line.
+      x-enumNames:
+      - Landline
+      - Mobile
+      - VoIP
+      - Special
+      - Freephone
+      - Other
+      enum:
+      - Landline
+      - Mobile
+      - VoIP
+      - Special
+      - Freephone
+      - Other
+      x-enumDescriptions:
+        Landline: A landline phone number.
+        Mobile: A mobile network phone number.
+        VoIP: A Voice over IP phone number.
+        Special: A specialty type of number, such as a satellite phone or fax line.
+        Freephone: A freephone type phone number.
+        Other: Another type.
+    ApiVoIPProbability:
+      type: string
+      description: ''
+      x-enumNames:
+      - Unknown
+      - Low
+      - Likely
+      - High
+      enum:
+      - Unknown
+      - Low
+      - Likely
+      - High
+      x-enumDescriptions:
+        Unknown: Undefined
+        Low: Low
+        Likely: Likely
+        High: High
+    NumberLookupResponse:
+      type: object
+      additionalProperties: false
+      properties:
+        line:
+          description: An object containing information about the line type of the number.
+          type:
+          - object
+          - 'null'
+          allOf:
+          - $ref: '#/components/schemas/LineResponse'
+        simSwap:
+          description: An object containing information about the SimSwap verification performed on the number.
+          type:
+          - object
+          - 'null'
+          allOf:
+          - $ref: '#/components/schemas/SimSwapResponse'
+        voIPDetection:
+          description: An object containing information about the VoIP detection performed on the number.
+          type:
+          - object
+          - 'null'
+          allOf:
+          - $ref: '#/components/schemas/VoIPDetectionResponse'
+        rnd:
+          description: An object containing information whether number is disconnected.
+          type:
+          - object
+          - 'null'
+          allOf:
+          - $ref: '#/components/schemas/RndResponse'
+        countryCode:
+          type: string
+          description: ISO 3166-1 alpha-2 two-letter country identifier
+        traceId:
+          type: string
+          description: The identifier for a trace.
+          example: 84c1fd4063c38d9f3900d06e56542d48
+        number:
+          type: string
+          description: Requested MSISDN in E.164 format.
+          example: '+12312312312'
+    RndFeatureOptions:
+      type: object
+      additionalProperties: false
+      properties:
+        contactDate:
+          type: string
+          description: Last contact date in YYYY-MM-DD format.
+          format: date
+  securitySchemes:
+    Basic:
+      type: http
+      description: For more information about basic authentication, see [Basic Authentication](/docs/number-lookup-api/api-reference/authentication/).
+      scheme: basic
+    OAuth2:
+      type: oauth2
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

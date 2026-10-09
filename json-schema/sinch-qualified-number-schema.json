@@ -1,0 +1,143 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-qualified-number-schema.json",
+  "title": "QualifiedNumber",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-imported-numbers-hosting-orders-api-openapi.yml#/components/schemas/QualifiedNumber",
+  "type": "object",
+  "properties": {
+    "phoneNumber": {
+      "type": "string",
+      "description": "The phone number in e.164 format with leading +."
+    },
+    "projectId": {
+      "type": "string",
+      "description": "The ID of the project to which the number belongs."
+    },
+    "regionCode": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code of the phone number. Example US or CA."
+    },
+    "globalProcessState": {
+      "type": "string",
+      "format": "enum",
+      "enum": [
+        "GLOBAL_PROCESS_STATE_UNSPECIFIED",
+        "GLOBAL_PROCESS_STATE_ELIGIBLE_CHECK_PENDING",
+        "GLOBAL_PROCESS_STATE_ELIGIBLE",
+        "GLOBAL_PROCESS_STATE_NOT_ELIGIBLE",
+        "GLOBAL_PROCESS_STATE_VERIFICATION_PENDING",
+        "GLOBAL_PROCESS_STATE_VERIFICATION_FAILED",
+        "GLOBAL_PROCESS_STATE_VERIFICATION_BLOCKED",
+        "GLOBAL_PROCESS_STATE_VERIFIED",
+        "GLOBAL_PROCESS_STATE_HOSTING_IN_PROGRESS",
+        "GLOBAL_PROCESS_STATE_HOSTING_DONE",
+        "GLOBAL_PROCESS_STATE_HOSTING_FAILED"
+      ],
+      "x-enumDescriptions": {
+        "GLOBAL_PROCESS_STATE_UNSPECIFIED": "The state is unspecified.",
+        "GLOBAL_PROCESS_STATE_ELIGIBLE_CHECK_PENDING": "The check for eligibility is pending.",
+        "GLOBAL_PROCESS_STATE_ELIGIBLE": "The state is eligible.",
+        "GLOBAL_PROCESS_STATE_NOT_ELIGIBLE": "The state is not eligible.",
+        "GLOBAL_PROCESS_STATE_VERIFICATION_PENDING": "The state verification is pending.",
+        "GLOBAL_PROCESS_STATE_VERIFICATION_FAILED": "The state verification failed.",
+        "GLOBAL_PROCESS_STATE_VERIFICATION_BLOCKED": "The state verification is blocked.",
+        "GLOBAL_PROCESS_STATE_VERIFIED": "The state is verified.",
+        "GLOBAL_PROCESS_STATE_HOSTING_IN_PROGRESS": "Hosting process is in progress.",
+        "GLOBAL_PROCESS_STATE_HOSTING_DONE": "Hosting process is done.",
+        "GLOBAL_PROCESS_STATE_HOSTING_FAILED": "Hosting process failed."
+      },
+      "description": "The global processing state of the qualified number."
+    },
+    "osrEligibility": {
+      "$ref": "#/$defs/QualifiedNumber_OsrEligibilityDetails"
+    },
+    "ownershipVerification": {
+      "$ref": "#/$defs/QualifiedNumber_OwnershipVerificationDetails"
+    },
+    "hostedNumber": {
+      "$ref": "#/$defs/QualifiedNumber_HostedNumberDetails"
+    },
+    "createdTime": {
+      "description": "The date and time the hosting order was created.",
+      "type": "string",
+      "format": "date-time"
+    },
+    "updatedTime": {
+      "description": "The date and time the hosting order was last updated.",
+      "type": "string",
+      "format": "date-time"
+    }
+  },
+  "$defs": {
+    "QualifiedNumber_HostedNumberDetails": {
+      "description": "Details about the hosting status of a number, including any errors if available.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "type": "integer",
+          "description": "The status of the hosting details.",
+          "format": "enum",
+          "enum": [
+            0,
+            1,
+            2
+          ],
+          "x-enumDescriptions": {
+            "0": "HOSTING_STATUS_UNSPECIFIED",
+            "1": "HOSTING_STATUS_HOSTED",
+            "2": "HOSTING_STATUS_FAILED"
+          }
+        },
+        "error": {
+          "type": "string",
+          "description": "The description of the hosting status error."
+        }
+      }
+    },
+    "QualifiedNumber_OsrEligibilityDetails": {
+      "description": "Details about the OSR eligibility, including the status of the OSR update, and the error if available.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/State"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "QualifiedNumber_OwnershipVerificationDetails": {
+      "description": "Details about the ownership verification, including the status of the verification process and any error if available.",
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/State"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "State": {
+      "type": "string",
+      "description": "Indicates the current state of the operation.",
+      "enum": [
+        "DONE",
+        "FAILED",
+        "IN_PROGRESS",
+        "WAITING",
+        "STATE_UNSPECIFIED"
+      ],
+      "x-enumDescriptions": {
+        "DONE": "The operation was completed successfully.",
+        "FAILED": "The operation has failed.",
+        "IN_PROGRESS": "The operation is currently in progress.",
+        "WAITING": "The operation is pending and has not yet started.",
+        "STATE_UNSPECIFIED": "The state is unspecified."
+      }
+    }
+  }
+}

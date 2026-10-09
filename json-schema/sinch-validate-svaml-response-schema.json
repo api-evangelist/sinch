@@ -1,0 +1,29 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-validate-svaml-response-schema.json",
+  "title": "validateSvamlResponse",
+  "description": "Result of a SVAML validation request.\n\nThe HTTP `200` status indicates the validation was successfully performed — not that the payload is valid.\nInspect `isValid` to determine the outcome.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-voice-api-v2-openapi.yml#/components/schemas/validateSvamlResponse",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "isValid"
+  ],
+  "properties": {
+    "isValid": {
+      "type": "boolean",
+      "description": "`true` if the submitted SVAML payload passed validation; `false` if one or more errors were found."
+    },
+    "errors": {
+      "type": "array",
+      "description": "Validation error messages describing why the SVAML payload is invalid.\n\nPresent only when `isValid` is `false`. Each entry identifies a specific problem, including the affected field or command where applicable.",
+      "items": {
+        "type": "string",
+        "description": "A human-readable description of a single validation error."
+      }
+    }
+  }
+}

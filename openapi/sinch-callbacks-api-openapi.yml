@@ -1,0 +1,1576 @@
+openapi: 3.2.0
+info:
+  title: Voice API | Sinch Callbacks API
+  version: 1.0.1
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: support@sinch.com
+  description: This document provides a detailed user guide and reference documentation on the Sinch Voice REST API.
+servers:
+- url: https://calling.api.sinch.com
+  description: redirected by Sinch to an appropriate region
+- url: https://calling-use1.api.sinch.com
+  description: United States
+- url: https://calling-euc1.api.sinch.com
+  description: Europe
+- url: https://calling-sae1.api.sinch.com
+  description: South America
+- url: https://calling-apse1.api.sinch.com
+  description: Southeast Asia 1
+- url: https://calling-apse2.api.sinch.com
+  description: Southeast Asia 2
+security:
+- Basic: []
+- Signed: []
+tags:
+- name: Callbacks
+  description: 'Controlling a call from your application backend is done by responding to callbacks from the Sinch platform and/or by calling REST APIs in the Sinch platform from your application''s backend.
+
+
+    Read more about how callbacks work here.'
+paths: {}
+webhooks:
+  ice:
+    post:
+      operationId: ice
+      summary: Incoming Call Event
+      tags:
+      - Callbacks
+      description: 'When a call reaches the Sinch platform, the system makes a POST request to the specified calling callback URL.
+
+
+        This event, called the **ICE** event, can be triggered by either an incoming data call or an incoming PSTN call. Look here for allowed instructions and actions.
+
+
+        If there is no response to the callback within the timeout period, an error message is played, and the call is disconnected.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/iceRequest'
+            examples:
+              IceExample:
+                $ref: '#/components/examples/ICEexample'
+      responses:
+        '200':
+          description: The Incoming Call Event (ICE) requires a valid SVAML object in response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IceSVAMLRequestBody'
+              examples:
+                sayExample:
+                  $ref: '#/components/examples/IceSayResponse'
+  ace:
+    post:
+      operationId: ace
+      summary: Answered Call Event
+      tags:
+      - Callbacks
+      description: 'This callback is made when the call is picked up by the callee (person receiving the call). It''s a POST request to the specified calling callback URL. Look here for allowed instructions and actions.
+
+
+        If there is no response to the callback within the timeout period, the call is connected.
+
+
+        If you have Answering Machine Detection (AMD) enabled, the `amd` object will also be present on ACE callbacks.
+
+
+        Note: ACE Callbacks are not issued for InApp Calls (`destination:` `username`), only PSTN and SIP calls.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/aceRequest'
+      responses:
+        '200':
+          description: The Answered Call Event (ACE) requires a valid SVAML object in response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AceSVAMLRequestBody'
+              examples:
+                hangup:
+                  $ref: '#/components/examples/AceHangupResponse'
+                runMenu:
+                  $ref: '#/components/examples/AcePlayMenuResponse'
+  dice:
+    post:
+      operationId: dice
+      summary: Disconnected Call Event
+      tags:
+      - Callbacks
+      description: This callback is made when the call is disconnected. It's a POST request to the specified calling callback URL. This event doesn't support instructions and only supports the hangup action.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/diceRequest'
+            examples:
+              DiceExample:
+                $ref: '#/components/examples/DICEexample'
+      responses:
+        '200':
+          description: Return a 200 status to indicate that the data was received successfully
+  pie:
+    post:
+      operationId: pie
+      summary: Prompt Input Event
+      tags:
+      - Callbacks
+      description: 'This callback is triggered as a result of a runMenu action. It can be triggered from either a user pressing a number of DTMF digits, or by the `return` command.
+
+
+        It''s a POST request to the specified calling callback URL. Your application can respond with SVAML logic.
+
+
+        Note: PIE callbacks are not issued for DATA Calls, only PSTN and SIP calls.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/pieRequest'
+            examples:
+              PieExample:
+                $ref: '#/components/examples/PIEexample'
+      responses:
+        '200':
+          description: The Prompt Input Event (PIE) can accept a valid SVAML object in response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PieSVAMLRequestBody'
+              examples:
+                hangup:
+                  $ref: '#/components/examples/PieHangupResponse'
+  notify:
+    post:
+      operationId: notify
+      summary: Notification Event
+      tags:
+      - Callbacks
+      description: 'This is the general callback used to send notifications. It''s a POST request to the specified calling callback URL.
+
+
+        If there is no response to the callback within the timeout period, the notification is discarded.'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/notifyRequest'
+            examples:
+              notifyRecFinishExample:
+                $ref: '#/components/examples/NotifyRecordingFinishedExample'
+              notifyRecAvailableExample:
+                $ref: '#/components/examples/NotifyRecordingAvailableExample'
+              notifyAMDExample:
+                $ref: '#/components/examples/NotifyAMDExample'
+              notifyAMDBeepExample:
+                $ref: '#/components/examples/NotifyAMDBeepExample'
+      responses:
+        '200':
+          description: Return a 200 status to indicate that the data was received successfully
+components:
+  schemas:
+    option:
+      type: object
+      description: A configured option that the user can trigger to perform an action.
+      required:
+      - dtmf
+      - action
+      properties:
+        dtmf:
+          type: string
+          description: A DTMF digit the user can press to trigger the configured action.
+          example: '1'
+        action:
+          type: string
+          description: 'Determines which action is taken when the DTMF digit is pressed. The following values are accepted:
+
+
+            - If you want to navigate to another menu, use ```menu(value)```.
+
+            - If you want to perform another behavior you have coded in your application, use ```return (value)```, where `(value)` is the name of the method you want to execute.'
+          example: menu(sub)
+    svaml.action.connectStream:
+      type: object
+      description: Determines how to route a call to a Stream/websocket server. Available to use in a response to an [Incoming Call Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ice) callback.
+      required:
+      - name
+      - destination
+      properties:
+        name:
+          type: string
+          description: The name property. Must have the value `connectStream`.
+          x-enumDescriptions:
+            connectStream: The `connectStream` action.
+          enum:
+          - connectStream
+          default: connectStream
+        destination:
+          $ref: '#/components/schemas/destinationWebSocket'
+        streamingOptions:
+          type: object
+          description: Optional parameters for the WebSocket stream.
+          properties:
+            version:
+              type: integer
+              description: The version of the streaming feature.
+              example: 1
+            sampleRate:
+              type: integer
+              description: The sample rate for the audio stream in Hz.
+              example: 44100
+        maxDuration:
+          type: integer
+          description: The max duration of the call in seconds (max 14400 seconds). If the call is still connected at that time, it will be automatically disconnected.
+          example: 3600
+        callHeaders:
+          type: array
+          description: These custom parameters (headers/messages) are sent to your WebSocket server in the initial message when the ConnectStream is established.
+          items:
+            $ref: '#/components/schemas/callHeader'
+    destinationMxp:
+      type: object
+      description: The type of device and number or endpoint to call.
+      required:
+      - type
+      - endpoint
+      properties:
+        type:
+          $ref: '#/components/schemas/mxpDestination'
+        endpoint:
+          type: string
+          description: For type `userName` the value is the username for a data endpoint.
+          format: user name
+          example: myUserName
+    notifyRequest:
+      description: The request body of a Notify Event.
+      allOf:
+      - $ref: '#/components/schemas/webhooksEventRequest'
+      - type: object
+        properties:
+          event:
+            type: string
+            description: Must have the value `notify`.
+            default: notify
+            x-enumDescriptions:
+              notify: A Notification Event.
+            enum:
+            - notify
+          type:
+            type: string
+            description: The type of information communicated in the notification.
+          destination:
+            type: string
+            description: Used in some types of events, it presents the destination of the generated recording or transcription files.
+          amd:
+            $ref: '#/components/schemas/amdObject'
+          custom:
+            type: string
+            description: An optional parameter containing notification-specific information.
+    pstnDestination:
+      type: string
+      description: Type `number` used for PSTN endpoints.
+      x-enumDescriptions:
+        number: A e.164 formatted number for PSTN endpoints.
+        Number: A e.164 formatted number for PSTN endpoints.
+      enum:
+      - number
+      - Number
+      example: number
+    IceSVAMLRequestBody:
+      type: object
+      description: SVAML is a call control markup language. When a server receives a callback event from the Sinch platform, it can respond with a SVAML object to control the voice call. The following is an example of a SVAML object type and its contents.
+      properties:
+        instructions:
+          type: array
+          description: The collection of instructions that can perform various tasks during the call. You can include as many instructions as necessary.
+          items:
+            $ref: '#/components/schemas/svaml.instruction.ice'
+        action:
+          $ref: '#/components/schemas/svaml.action.ice'
+    svaml.action.park:
+      type: object
+      description: Parks the call and places the caller on hold. The caller is placed into a loop, listening to an IVR prompt (either a pre-recorded audio file or generated by text to speech). If the call is unparked, prompts will stop playing immediately. If the max duration is reached, the last prompt will be fully played until the call ends.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The name property. Must have the value `park`.
+          x-enumDescriptions:
+            park: The `park` action.
+          enum:
+          - park
+          default: park
+        locale:
+          type: string
+          description: The voice and language you want to use for the text-to-speech message. This can either be defined by the ISO 639 locale and language code or by specifying a particular voice. Supported languages and voices are detailed [here](https://developers.sinch.com/docs/voice/api-reference/voice-locales).
+          example: en-US
+        introPrompt:
+          type: string
+          description: That prompt that is played when the call is first answered. You can use text-to-speech using the `#tts[]` element, SSML commands using the `#ssml[]` element.
+          example: '#tts[Welcome]'
+        holdPrompt:
+          type: string
+          description: The prompt that is played on repeat until the call is unparked or the until the `maxDuration` value is reached. You can use text-to-speech using the `#tts[]` element, SSML commands using the `#ssml[]` element.
+          example: '#tts[Thank you for your patience, your call is very important to us.]'
+        maxDuration:
+          type: integer
+          description: The maximum amount of time in seconds that the `holdPrompt` will be played.
+          example: 180
+    svaml.action.runMenu:
+      type: object
+      description: Plays an interactive voice response (IVR) menu to the callee. This menu can play pre-recorded files or text-to-speech messages, collect DTMF tones, and trigger the [Prompt Input Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/pie) (PIE) callback towards your backend, notifying you of the actions the callee took. Available to use in a response to an [Incoming Call Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ice) callback or an [Answered Call Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ace) callback. Also be used in combination with the [Conferences](https://developers.sinch.com/docs/voice/api-reference/voice/conferences) endpoint of the Calling API.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The name property. Must have the value `runMenu`.
+          x-enumDescriptions:
+            runMenu: The `runMenu` action.
+          enum:
+          - runMenu
+          default: runMenu
+        barge:
+          type: boolean
+          description: '''Barging'' means that the user can press a DTMF digit before the prompt has finished playing. If a valid input is pressed, the message will stop playing and accept the input. If `barge` is disabled, the user must listen to the entire prompt before input is accepted. By default, barging is enabled.'
+          default: true
+        locale:
+          type: string
+          description: The voice and language you want to use for the text-to-speech message. This can either be defined by the ISO 639 locale and language code or by specifying a particular voice. Supported languages and voices are detailed [here](https://developers.sinch.com/docs/voice/api-reference/voice-locales). If using the `enableVoice` to enable voice detection, the `locale` property is required in order to select the input language.
+          example: en-US
+        mainMenu:
+          type: string
+          description: Selects the menu item from the `menus` array to play first.
+          example: main
+        enableVoice:
+          type: boolean
+          description: Enables voice detection. If enabled, users can say their answers to prompts in addition to entering them using the keypad.
+        menus:
+          type: array
+          description: The list of menus available. The menu with the `id` value of `main` will always play first. If no menu has an `id` value of `main`, an error is returned.
+          items:
+            $ref: '#/components/schemas/menu'
+    webhooksCallEventRequest:
+      type: object
+      properties:
+        timestamp:
+          $ref: '#/components/schemas/timeStamp'
+        custom:
+          type: string
+          description: A string that can be used to pass custom information related to the call.
+        applicationKey:
+          type: string
+          description: The unique application key. You can find it in the Sinch [dashboard](https://dashboard.sinch.com/voice/apps).
+    callResult:
+      type: string
+      x-enumDescriptions:
+        N/A: Not applicable
+        ANSWERED: The call was answered.
+        BUSY: The line called was busy.
+        NOANSWER: The line called failed to answer.
+        FAILED: The call failed.
+      enum:
+      - N/A
+      - ANSWERED
+      - BUSY
+      - NOANSWER
+      - FAILED
+      description: Contains the result of a call.
+      example: ANSWERED
+    svaml.action.connectPstn:
+      type: object
+      description: Determines how a PSTN call is connected. Available to use in a response to an [Incoming Call Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ice) callback.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The name property. Must have the value `connectPstn`.
+          x-enumDescriptions:
+            connectPstn: The `connectPstn` action.
+          enum:
+          - connectPstn
+          default: connectPstn
+        number:
+          type: string
+          description: Used to override where PSTN call is connected. If not specified, the extension the client called is used.
+          example: '+461234567890'
+        locale:
+          type: string
+          description: Specifies the locale. Uses the language code according to `ISO 639`, a dash (`-`), and a country code according to `ISO 3166-1 alpha-2`. If not specified, the default locale of `en-US` is used.
+          default: en-US
+        maxDuration:
+          type: integer
+          description: The max duration of the call in seconds (max 14400 seconds). If the call is still connected at that time, it will be automatically disconnected.
+          example: 3000
+        dialTimeout:
+          type: integer
+          description: The max duration the call will wait in ringing unanswered state before terminating with ```TIMEOUT/NO ANSWER``` on PSTN leg and ```NA/BUSY```on MXP leg.
+          example: 3000
+        cli:
+          type: string
+          description: Used to override the CLI (or caller ID) of the client. The phone number of the person who initiated the call is shown as the CLI. To set your own CLI, you may use your verified number or your Dashboard virtual number.
+          example: private
+        suppressCallbacks:
+          type: boolean
+          description: If enabled, suppresses [ACE](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ace) and [DICE](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/dice) callbacks for the call.
+          example: false
+        dtmf:
+          type: string
+          description: 'A string that determines the DTMF tones to play to the callee when the call is picked up.
+
+            Valid characters are: `0-9`, `#`, and `w`. `w` renders a 500ms pause. For example, the string `ww1234#w#`, plays a 1 second pause, the DTMF tones for `1`, `2`, `3`, `4`, and `#`, followed by a 500ms pause and finally the `#` tone.
+
+            This is useful if the callout destination requires a conference PIN code or an extension. If there is a calling party, it will hear progress while the DTMF is sent.'
+          example: ww1234#w#
+        indications:
+          type: string
+          description: The locale's tone to play while ringing.
+          x-enumDescriptions:
+            at: Austria
+            au: Australia
+            bg: Bulgaria
+            br: Brazil
+            be: Belgium
+            ch: Switzerland
+            cl: Chile
+            cn: China
+            cz: Czech Republic
+            de: Germany
+            dk: Denmark
+            ee: Estonia
+            es: Spain
+            fi: Finland
+            fr: France
+            gr: Greece
+            hu: Hungary
+            il: Israel
+            in: India
+            it: Italy
+            lt: Lithuania
+            jp: Japan
+            mx: Mexico
+            my: Malaysia
+            nl: Netherlands
+            'false': Norway
+            nz: New Zealand
+            ph: Philippines
+            pl: Poland
+            pt: Portugal
+            ru: Russia
+            se: Sweden
+            sg: Singapore
+            th: Thailand
+            uk: United Kingdom
+            us: United States
+            tw: Taiwan
+            ve: Venezuela
+            za: South Africa
+          enum:
+          - at
+          - au
+          - bg
+          - br
+          - be
+          - ch
+          - cl
+          - cn
+          - cz
+          - de
+          - dk
+          - ee
+          - es
+          - fi
+          - fr
+          - gr
+          - hu
+          - il
+          - in
+          - it
+          - lt
+          - jp
+          - mx
+          - my
+          - nl
+          - false
+          - nz
+          - ph
+          - pl
+          - pt
+          - ru
+          - se
+          - sg
+          - th
+          - uk
+          - us
+          - tw
+          - ve
+          - za
+          example: us
+        amd:
+          $ref: '#/components/schemas/amdRequest'
+    PieSVAMLRequestBody:
+      type: object
+      description: SVAML is a call control markup language. When a server receives a callback event from the Sinch platform, it can respond with a SVAML object to control the voice call. The following is an example of a SVAML object type and its contents.
+      properties:
+        instructions:
+          type: array
+          description: The collection of instructions that can perform various tasks during the call. You can include as many instructions as necessary.
+          items:
+            $ref: '#/components/schemas/svaml.instruction.pie'
+        action:
+          $ref: '#/components/schemas/svaml.action.pie'
+    menu:
+      type: object
+      description: An IVR menu that contains an audio prompt as well as configured options.
+      required:
+      - id
+      properties:
+        id:
+          type: string
+          description: The identifier of a menu. One menu must have the ID value of `main`.
+          example: main
+        mainPrompt:
+          type: string
+          description: 'The main voice prompt that the user hears when the menu starts the first time.
+
+
+            You can use text-to-speech using the `#tts[]` element, SSML commands using the `#ssml[]` element, pre-recorded messages, or URL references to external media resources. You can use multiple prompts by separating each prompt with a semi-colon (`;`). If multiple prompts are used, they will be played in the order they are specified, without any pauses between playback. For external media resources, you can use an `#href[...]` or directly specify the full URL. Check the [Supported audio formats](https://developers.sinch.com/docs/voice/api-reference/supported-audio-formats) section for more information.'
+        repeatPrompt:
+          type: string
+          description: 'The prompt that will be played if valid or expected DTMF digits are not entered.
+
+
+            You can use text-to-speech using the `#tts[]` element, SSML commands using the `#ssml[]` element, pre-recorded messages, or URL references to external media resources. You can use multiple prompts by separating each prompt with a semi-colon (`;`). If multiple prompts are used, they will be played in the order they are specified, without any pauses between playback. For external media resources, you can use an `#href[...]` or directly specify the full URL. Check the [Supported audio formats](https://developers.sinch.com/docs/voice/api-reference/supported-audio-formats) section for more information.'
+        repeats:
+          type: integer
+          description: The number of times that the `repeatPrompt` is played.
+          example: 3
+        maxDigits:
+          type: integer
+          description: The maximum number of digits expected for a user to enter. Once these digits are collected, a [Prompt Input Event (PIE)](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/pie) is triggered containing these digits.
+        timeoutMills:
+          type: integer
+          description: Determines silence for the purposes of collecting a DTMF or voice response in milliseconds. If the timeout is reached, the response is considered completed and will be submitted.
+          default: 5000
+        maxTimeoutMills:
+          type: integer
+          description: Sets a limit for the maximum amount of time allowed to collect voice input.
+          default: 20000
+        options:
+          type: array
+          description: The set of options available in the menu.
+          items:
+            $ref: '#/components/schemas/option'
+    conferenceDtmfOptions:
+      type: object
+      description: Options to control how DTMF signals are used by the participant in the conference. For information on how to use this feature, read more [here](https://developers.sinch.com/docs/voice/api-reference/conference-dtmf).
+      properties:
+        mode:
+          type: string
+          description: Determines what DTMF mode the participant will use in the call.
+          x-enumDescriptions:
+            ignore: Nothing is done with the participant's DTMF signals. This is the default mode. Any DTMF signals that the participant sends can still be heard by all participants, but no action will be performed.
+            forward: The participant's DTMF signals are forwarded to all other participants in the conference.
+            detect: The participant's DTMF signals are detected by the conference and sent to your backend server using a [Prompt Input Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/pie) (PIE) callback.
+          enum:
+          - ignore
+          - forward
+          - detect
+          default: ignore
+        maxDigits:
+          type: integer
+          description: "The maximum number of accepted digits before sending the collected input via a PIE callback. The default value is `1`. If the value is greater than `1`, the PIE callback is triggered by one of the three following events:\n  - No additional digit is entered before the `timeoutMills` timeout period has elapsed.\n  - The `#` character is entered.\n  - The maximum number of digits has been entered."
+          default: 1
+        timeoutMills:
+          type: integer
+          description: The number of milliseconds that the system will wait between entered digits before triggering the PIE callback. The default value is `3000`.
+          default: 3000
+    svaml.action.hangup:
+      type: object
+      description: Hangs up a call. Available to use in a response to an [Incoming Call Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ice) callback or an [Answered Call Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ace) callback.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The name property. Must have the value `hangup`.
+          x-enumDescriptions:
+            hangup: The `hangup` action.
+          enum:
+          - hangup
+          default: hangup
+    svaml.instruction.startRecordingOptions:
+      type: object
+      properties:
+        destinationUrl:
+          type: string
+        credentials:
+          type: string
+        format:
+          type: string
+        notificationEvents:
+          type: boolean
+        transcriptionOptions:
+          type: object
+          properties:
+            enabled:
+              type: boolean
+            locale:
+              type: string
+    iceRequest:
+      description: The request body of an Incoming Call Event.
+      required:
+      - event
+      allOf:
+      - $ref: '#/components/schemas/webhooksEventRequest'
+      - $ref: '#/components/schemas/webhooksCallEventRequest'
+      - type: object
+        properties:
+          event:
+            description: Must have the value `ice`.
+            allOf:
+            - $ref: '#/components/schemas/webhooksEventRequestType'
+            x-enumDescriptions:
+              ice: An Incoming Call Event.
+            enum:
+            - ice
+          callResourceUrl:
+            type: string
+            description: The path of the API resource.
+          userRate:
+            $ref: '#/components/schemas/price'
+          cli:
+            type: string
+            description: The number that will be displayed to the recipient of the call. To set your own CLI, you may use your verified number or your Dashboard virtual number and add it to the `connectPSTN` SVAML response to the Incoming Call Event request.  It must be in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format.
+          to:
+            $ref: '#/components/schemas/destination'
+          domain:
+            $ref: '#/components/schemas/domain'
+          originationType:
+            $ref: '#/components/schemas/domain'
+          duration:
+            type: integer
+            description: The duration of the call in seconds.
+          rdnis:
+            type: string
+            description: The redirected dialled number identification service.
+          callHeaders:
+            type: array
+            description: If the call is initiated by a Sinch SDK client, call headers are the headers specified by the *caller* client. Read more about call headers [here](https://developers.sinch.com/docs/voice/api-reference/call-headers).
+            items:
+              $ref: '#/components/schemas/callHeader'
+    svaml.action.continue:
+      type: object
+      description: Continues to set up a call. Available to use in a response to an [Answered Call Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ace) callback.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The name property. Must have the value `continue`.
+          x-enumDescriptions:
+            continue: The `continue` action.
+          enum:
+          - continue
+          default: continue
+    destinationDid:
+      type: object
+      description: The type of device and phone number called.
+      required:
+      - type
+      - endpoint
+      properties:
+        type:
+          $ref: '#/components/schemas/didDestination'
+        endpoint:
+          type: string
+          description: Number that the caller has called
+          example: '+3197121281500'
+    svaml.instruction.sendDtmf:
+      type: object
+      description: Plays DTMF tones in the call.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The `name` property. Must have the value `sendDtmf`.
+          x-enumDescriptions:
+            sendDtmf: The `sendDtmf` instruction.
+          enum:
+          - sendDtmf
+          default: sendDtmf
+        value:
+          type: string
+          description: 'A string that determines the DTMF tones to play to the callee when the call is picked up.
+
+            Valid characters are: `0-9`, `#`, and `w`. `w` renders a 500ms pause. For example, the string `ww1234#w#`, plays a 1 second pause, the DTMF tones for `1`, `2`, `3`, `4`, and `#`, followed by a 500ms pause and finally the `#` tone.
+
+            This is useful if the callout destination requires a conference PIN code or an extension. If there is a calling party, it will hear progress while the DTMF is sent.'
+          example: ww1234#w#
+    svaml.instruction.ice:
+      type: object
+      description: Instructions allow an application to play a message or file, start recording, and various other tasks. For more information about instructions, see the [SVAML](https://developers.sinch.com/docs/voice/api-reference/svaml/) documentation.
+      anyOf:
+      - $ref: '#/components/schemas/svaml.instruction.playFiles'
+      - $ref: '#/components/schemas/svaml.instruction.say'
+      - $ref: '#/components/schemas/svaml.instruction.sendDtmf'
+      - $ref: '#/components/schemas/svaml.instruction.setCookie'
+      - $ref: '#/components/schemas/svaml.instruction.answer'
+      - $ref: '#/components/schemas/svaml.instruction.startRecording'
+      - $ref: '#/components/schemas/svaml.instruction.stopRecording'
+      discriminator:
+        propertyName: name
+        mapping:
+          playFiles: '#/components/schemas/svaml.instruction.playFiles'
+          say: '#/components/schemas/svaml.instruction.say'
+          sendDtmf: '#/components/schemas/svaml.instruction.sendDtmf'
+          setCookie: '#/components/schemas/svaml.instruction.setCookie'
+          answer: '#/components/schemas/svaml.instruction.answer'
+          startRecording: '#/components/schemas/svaml.instruction.startRecording'
+          stopRecording: '#/components/schemas/svaml.instruction.stopRecording'
+    price:
+      type: object
+      properties:
+        currencyId:
+          type:
+          - string
+          - 'null'
+        amount:
+          type: number
+          format: float
+    destination:
+      type: object
+      description: Known destination
+      oneOf:
+      - $ref: '#/components/schemas/destinationDid'
+      - $ref: '#/components/schemas/destinationMxp'
+      - $ref: '#/components/schemas/destinationPstn'
+      - $ref: '#/components/schemas/destinationSip'
+      discriminator:
+        propertyName: type
+        mapping:
+          did: '#/components/schemas/destinationDid'
+          username: '#/components/schemas/destinationMxp'
+          Username: '#/components/schemas/destinationMxp'
+          number: '#/components/schemas/destinationPstn'
+          Number: '#/components/schemas/destinationPstn'
+          sip: '#/components/schemas/destinationSip'
+    svaml.instruction.say:
+      type: object
+      description: Plays a synthesized text-to-speech message to the end user. The message is provided in the text field.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The `name` property. Must have the value `say`.
+          x-enumDescriptions:
+            say: The `say` instruction.
+          enum:
+          - say
+          default: say
+        text:
+          type: string
+          description: Contains the message that will be spoken. Default maximum length is 600 characters. To change this limit, please contact support.
+          example: Hello, thank you for calling Sinch!
+        locale:
+          type: string
+          description: The voice and language you want to use for the text-to-speech message. This can either be defined by the ISO 639 locale and language code or by specifying a particular voice. Supported languages and voices are detailed [here](https://developers.sinch.com/docs/voice/api-reference/voice-locales).
+          example: en-US
+    svaml.action.pie:
+      type: object
+      description: The action that will control the call. Each SVAML object can only include one action.
+      anyOf:
+      - $ref: '#/components/schemas/svaml.action.hangup'
+      - $ref: '#/components/schemas/svaml.action.continue'
+      - $ref: '#/components/schemas/svaml.action.connectPstn'
+      - $ref: '#/components/schemas/svaml.action.connectConf'
+      - $ref: '#/components/schemas/svaml.action.connectSip'
+      - $ref: '#/components/schemas/svaml.action.runMenu'
+      discriminator:
+        propertyName: name
+        mapping:
+          hangup: '#/components/schemas/svaml.action.hangup'
+          continue: '#/components/schemas/svaml.action.continue'
+          connectPstn: '#/components/schemas/svaml.action.connectPstn'
+          connectConf: '#/components/schemas/svaml.action.connectConf'
+          connectSip: '#/components/schemas/svaml.action.connectSip'
+          runMenu: '#/components/schemas/svaml.action.runMenu'
+    svaml.instruction.pie:
+      type: object
+      description: Instructions allow an application to play a message or file, start recording, and various other tasks. For more information about instructions, see the [SVAML](https://developers.sinch.com/docs/voice/api-reference/svaml/) documentation.
+      anyOf:
+      - $ref: '#/components/schemas/svaml.instruction.playFiles'
+      - $ref: '#/components/schemas/svaml.instruction.say'
+      - $ref: '#/components/schemas/svaml.instruction.sendDtmf'
+      - $ref: '#/components/schemas/svaml.instruction.setCookie'
+      - $ref: '#/components/schemas/svaml.instruction.startRecording'
+      - $ref: '#/components/schemas/svaml.instruction.stopRecording'
+      discriminator:
+        propertyName: name
+        mapping:
+          playFiles: '#/components/schemas/svaml.instruction.playFiles'
+          say: '#/components/schemas/svaml.instruction.say'
+          sendDtmf: '#/components/schemas/svaml.instruction.sendDtmf'
+          setCookie: '#/components/schemas/svaml.instruction.setCookie'
+          startRecording: '#/components/schemas/svaml.instruction.startRecording'
+          stopRecording: '#/components/schemas/svaml.instruction.stopRecording'
+    destinationSip:
+      type: object
+      description: The type of device and number or endpoint to call.
+      required:
+      - type
+      - endpoint
+      properties:
+        type:
+          $ref: '#/components/schemas/sipDestination'
+        endpoint:
+          type: string
+          description: For type `sip` the value is the SIP address for a SIP endpoint.
+          format: sip address
+          example: +19876543210@example.sip.sinch.com
+    AceSVAMLRequestBody:
+      type: object
+      description: SVAML is a call control markup language. When a server receives a callback event from the Sinch platform, it can respond with a SVAML object to control the voice call. The following is an example of a SVAML object type and its contents.
+      properties:
+        instructions:
+          type: array
+          description: The collection of instructions that can perform various tasks during the call. You can include as many instructions as necessary.
+          items:
+            $ref: '#/components/schemas/svaml.instruction.ace'
+        action:
+          $ref: '#/components/schemas/svaml.action.ace'
+    svaml.instruction.startRecording:
+      type: object
+      description: Starts a recording of the call.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The `name` property. Must have the value `startRecording`.
+          x-enumDescriptions:
+            startRecording: The `startRecording` instruction.
+          enum:
+          - startRecording
+          default: startRecording
+        options:
+          $ref: '#/components/schemas/svaml.instruction.startRecordingOptions'
+    svaml.action.connectMxp:
+      type: object
+      description: Determines how an application-to-application call is connected. Available to use in a response to an [Incoming Call Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ice) callback.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The name property. Must have the value `connectMxp`.
+          x-enumDescriptions:
+            connectMxp: The `connectMxp` action.
+          enum:
+          - connectMxp
+          default: connectMxp
+        destination:
+          $ref: '#/components/schemas/destinationMxp'
+        callheaders:
+          type: array
+          description: An optional parameter that allows you to specify or override call headers provided to the receiving Sinch SDK client. Read more about call headers [here](https://developers.sinch.com/docs/voice/api-reference/call-headers/).
+          items:
+            $ref: '#/components/schemas/callHeader'
+    destinationPstn:
+      type: object
+      description: The type of device and number or endpoint to call.
+      required:
+      - type
+      - endpoint
+      properties:
+        type:
+          $ref: '#/components/schemas/pstnDestination'
+        endpoint:
+          type: string
+          description: If the type is `number` the value of the endpoint is a phone number.
+          format: e164 for numbers
+          example: '+12125550123'
+    svaml.instruction.setCookie:
+      type: object
+      required:
+      - name
+      description: Creates a cookie for the duration of the call.
+      properties:
+        name:
+          type: string
+          description: The `name` property. Must have the value `setCookie`.
+          x-enumDescriptions:
+            setCookie: The `setCookie` instruction.
+          enum:
+          - setCookie
+          default: setCookie
+        key:
+          type: string
+          description: The name of the cookie you want to set.
+          example: cookie_name
+        value:
+          type: string
+          description: The value of the cookie you want to set.
+          example: cookie_value
+    pieRequest:
+      description: The request body of a Prompt Input Event.
+      required:
+      - event
+      allOf:
+      - $ref: '#/components/schemas/webhooksEventRequest'
+      - type: object
+        properties:
+          event:
+            type: string
+            description: Must have the value `pie`.
+            default: pie
+            x-enumDescriptions:
+              pie: A Prompt Input Event.
+            enum:
+            - pie
+          timestamp:
+            $ref: '#/components/schemas/timeStamp'
+          menuResult:
+            type: object
+            description: An object containing information about the returned menu result.
+            properties:
+              menuId:
+                type: string
+                description: The ID of the menu that triggered the prompt input event.
+              type:
+                type: string
+                description: The type of information that's returned.
+                x-enumDescriptions:
+                  error: Returned if there's an error with the input.
+                  return: Returned when the event has been triggered from a `return` command.
+                  sequence: Returned when the event has been triggered from collecting DTMF digits.
+                  timeout: Returned when the timeout period has elapsed.
+                  hangup: Returned when the call is hung up.
+                  invalidinput: Returned when the value of the input is invalid.
+                enum:
+                - error
+                - return
+                - sequence
+                - timeout
+                - hangup
+                - invalidinput
+              value:
+                type: string
+                description: The value of the returned information.
+              inputMethod:
+                type: string
+                description: The type of input received.
+                x-enumDescriptions:
+                  dtmf: The input is key presses of specified digits.
+                  voice: The input is voice answers.
+                enum:
+                - dtmf
+                - voice
+          custom:
+            type: string
+            description: A string that can be used to pass custom information related to the call.
+          applicationKey:
+            type: string
+            description: The unique application key. You can find it in the Sinch [dashboard](https://dashboard.sinch.com/voice/apps).
+    svaml.action.ace:
+      type: object
+      description: The action that will control the call. Each SVAML object can only include one action.
+      anyOf:
+      - $ref: '#/components/schemas/svaml.action.hangup'
+      - $ref: '#/components/schemas/svaml.action.continue'
+      - $ref: '#/components/schemas/svaml.action.connectConf'
+      - $ref: '#/components/schemas/svaml.action.runMenu'
+      discriminator:
+        propertyName: name
+        mapping:
+          hangup: '#/components/schemas/svaml.action.hangup'
+          continue: '#/components/schemas/svaml.action.continue'
+          connectConf: '#/components/schemas/svaml.action.connectConf'
+          runMenu: '#/components/schemas/svaml.action.runMenu'
+    svaml.instruction.playFiles:
+      type: object
+      description: Plays Interactive Voice Response (IVR) files for the supported locale or SSML commands at the Sinch backend. An IVR message is played only on the caller's side.
+      required:
+      - name
+      - ids
+      properties:
+        name:
+          type: string
+          description: The `name` property. Must have the value `playFiles`.
+          x-enumDescriptions:
+            playFiles: The `playFiles` instruction.
+          enum:
+          - playFiles
+          default: playFiles
+        ids:
+          type: array
+          description: The IDs of the files which will be played. These can be a URL to a file, SSML commands using the `#ssml[]` element, or text using the `#tts[]` element.
+          items:
+            type: string
+          example:
+          - '#ssml[Thank you for calling Sinch!]'
+        locale:
+          type: string
+          description: If using SSML or TTS, this is a required field. The voice and language you want to use for the text-to-speech message. This can either be defined by the ISO 639 locale and language code or by specifying a particular voice. Supported languages and voices are detailed [here](https://developers.sinch.com/docs/voice/api-reference/voice-locales).
+          example: en-US
+    timeStamp:
+      type: string
+      format: date-time
+      description: The timestamp in UTC format.
+      example: '2023-04-21T14:45:51Z'
+    svaml.action.ice:
+      type: object
+      description: The action that will control the call. Each SVAML object can only include one action.
+      anyOf:
+      - $ref: '#/components/schemas/svaml.action.hangup'
+      - $ref: '#/components/schemas/svaml.action.connectPstn'
+      - $ref: '#/components/schemas/svaml.action.connectMxp'
+      - $ref: '#/components/schemas/svaml.action.connectConf'
+      - $ref: '#/components/schemas/svaml.action.connectSip'
+      - $ref: '#/components/schemas/svaml.action.runMenu'
+      - $ref: '#/components/schemas/svaml.action.park'
+      - $ref: '#/components/schemas/svaml.action.connectStream'
+      discriminator:
+        propertyName: name
+        mapping:
+          hangup: '#/components/schemas/svaml.action.hangup'
+          connectPstn: '#/components/schemas/svaml.action.connectPstn'
+          connectMxp: '#/components/schemas/svaml.action.connectMxp'
+          connectConf: '#/components/schemas/svaml.action.connectConf'
+          connectSip: '#/components/schemas/svaml.action.connectSip'
+          runMenu: '#/components/schemas/svaml.action.runMenu'
+          park: '#/components/schemas/svaml.action.park'
+          connectStream: '#/components/schemas/svaml.action.connectStream'
+    svaml.instruction.answer:
+      type: object
+      description: Forces the callee to answer the call.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The `name` property. Must have the value `answer`.
+          x-enumDescriptions:
+            answer: The `answer` instruction.
+          enum:
+          - answer
+          default: answer
+    amdRequest:
+      type: object
+      description: The `amd` object enables [Answering Machine Detection](https://developers.sinch.com/docs/voice/api-reference/amd_v2) (AMD) and sets whether it works synchronously or asychronously.
+      properties:
+        enabled:
+          type: boolean
+          description: If set to `true`, then AMD is enabled for the call.
+          example: true
+        async:
+          type: boolean
+          description: Determines if AMD is set to operate synchronously or asychronously. Refer to the [AMD](https://developers.sinch.com/docs/voice/api-reference/amd_v2) documentation for more information about this setting.
+    diceRequest:
+      description: The request body of a Disconnected Call Event.
+      required:
+      - event
+      allOf:
+      - $ref: '#/components/schemas/webhooksEventRequest'
+      - $ref: '#/components/schemas/webhooksCallEventRequest'
+      - type: object
+        properties:
+          event:
+            type: string
+            description: Must have the value `dice`.
+            x-enumDescriptions:
+              dice: A Disconnected Call Event.
+            enum:
+            - dice
+          reason:
+            type: string
+            description: The reason the call was disconnected.
+            enum:
+            - N/A
+            - ESTABLISHED
+            - OTHERPEERANSWERED
+            - TIMEOUT
+            - CALLERHANGUP
+            - CALLEEHANGUP
+            - BLOCKED
+            - MANAGERHANGUP
+            - NOCREDITPARTNER
+            - CLIENTNETWORK
+            - CONGESTION
+            - GENERALERROR
+            - CANCEL
+            - USERNOTFOUND
+            - CALLBACKERROR
+            x-enumDescriptions:
+              N/A: Not applicable.
+              ESTABLISHED: Call successfully connected.
+              OTHERPEERANSWERED: Call was answered by another instance of the same user.
+              TIMEOUT: The call exceeded the configured timeout.
+              CALLERHANGUP: The caller hung up the call.
+              CALLEEHANGUP: The callee hung up the call.
+              BLOCKED: The call was blocked.
+              MANAGERHANGUP: The call manager hung up the call.
+              NOCREDITPARTNER: No sufficient credit to make the call.
+              CLIENTNETWORK: The call was disconnected due to a network related issue.
+              CONGESTION: No routes available to connect the call.
+              GENERALERROR: A non-specified error ended the call.
+              CANCEL: The call was canceled.
+              USERNOTFOUND: The user was not found.
+              CALLBACKERROR: An error with the callback ended the call.
+          result:
+            $ref: '#/components/schemas/callResult'
+          debit:
+            $ref: '#/components/schemas/price'
+          userRate:
+            $ref: '#/components/schemas/price'
+          to:
+            $ref: '#/components/schemas/destination'
+          duration:
+            type: integer
+            description: The duration of the call in seconds.
+          from:
+            type: string
+            description: Information about the initiator of the call.
+          callHeaders:
+            type: array
+            description: If the call was initiated by a Sinch SDK client, call headers are the headers specified by the *caller* client. Read more about call headers [here](https://developers.sinch.com/docs/voice/api-reference/call-headers/).
+            items:
+              $ref: '#/components/schemas/callHeader'
+    amdObject:
+      type: object
+      description: If [Answering Machine Detection](https://developers.sinch.com/docs/voice/api-reference/amd_v2) (AMD) is enabled, this object contains information about whether the call was answered by a machine.
+      properties:
+        status:
+          type: string
+          description: The determination by the system of who answered the call.
+          x-enumDescriptions:
+            machine: An answering machine was detected as answering the call.
+            human: A human was detected as answering the call.
+            notsure: The system was unable to determine who answered the call.
+            hangup: The call was hung up.
+          enum:
+          - machine
+          - human
+          - notsure
+          - hangup
+          example: machine
+        reason:
+          type: string
+          description: The reason that the system used to determine who answered the call.
+          x-enumDescriptions:
+            longgreeting: If the greeting is too long, this could be indicative of an answering machine.
+            initialsilence: If there is an initial silence after the call is answered before the greeting starts, this could be indicative of an answering machine.
+            beep: If there is a beep in the call, this could be indicative of an answering machine.
+            n/a: This is displayed if a reason isn't available.
+          enum:
+          - longgreeting
+          - initialsilence
+          - beep
+          - n/a
+          example: longgreeting
+        duration:
+          type: integer
+          description: The length of the call.
+          example: 3
+    svaml.instruction.ace:
+      type: object
+      description: Instructions allow an application to play a message or file, start recording, and various other tasks. For more information about instructions, see the [SVAML](https://developers.sinch.com/docs/voice/api-reference/svaml/) documentation.
+      anyOf:
+      - $ref: '#/components/schemas/svaml.instruction.playFiles'
+      - $ref: '#/components/schemas/svaml.instruction.say'
+      - $ref: '#/components/schemas/svaml.instruction.setCookie'
+      - $ref: '#/components/schemas/svaml.instruction.startRecording'
+      - $ref: '#/components/schemas/svaml.instruction.stopRecording'
+      discriminator:
+        propertyName: name
+        mapping:
+          playFiles: '#/components/schemas/svaml.instruction.playFiles'
+          say: '#/components/schemas/svaml.instruction.say'
+          setCookie: '#/components/schemas/svaml.instruction.setCookie'
+          startRecording: '#/components/schemas/svaml.instruction.startRecording'
+          stopRecording: '#/components/schemas/svaml.instruction.stopRecording'
+    domain:
+      type: string
+      x-enumDescriptions:
+        pstn: A call on the Public Switched Telephone Network.
+        mxp: A data call.
+        PSTN: A call on the Public Switched Telephone Network.
+        MXP: A data call.
+      enum:
+      - pstn
+      - mxp
+      - PSTN
+      - MXP
+      description: Can be either `pstn` for PSTN endpoint or `mxp` for data (app or web) clients.
+      example: pstn
+    destinationWebSocket:
+      type: object
+      description: Specifies where to route the Stream call.
+      required:
+      - type
+      - endpoint
+      properties:
+        type:
+          type: string
+          description: This attribute defines the streaming protocol - currently only `Websocket` is supported.
+          enum:
+          - Websocket
+          x-enumDescriptions:
+            Websocket: Use websocket stream protocol
+          example: Websocket
+        endpoint:
+          type: string
+          description: The Stream/Websocket server address.
+          example: wss://yourcompany.com/websocket-server
+    aceRequest:
+      description: The request body of an Answered Call Event.
+      required:
+      - event
+      allOf:
+      - $ref: '#/components/schemas/webhooksEventRequest'
+      - $ref: '#/components/schemas/webhooksCallEventRequest'
+      - type: object
+        properties:
+          event:
+            type: string
+            description: Must have the value `ace`.
+            x-enumDescriptions:
+              ace: An Answered Call Event.
+            enum:
+            - ace
+          amd:
+            $ref: '#/components/schemas/amdObject'
+    callHeader:
+      type: object
+      description: Call Headers can be used to pass custom data from a Sinch SDK client to another, or specified in an ICE response to be made available to the receiving client. Further, if Call Headers is specified they will be available in ICE and DICE events.
+      properties:
+        key:
+          type: string
+          description: The call header key of the key value pair.
+        value:
+          type: string
+          description: The call header value of the key value pair.
+    didDestination:
+      type: string
+      description: Type `did` for Direct Inward Dialling
+      x-enumDescriptions:
+        did: A DID phone number
+      enum:
+      - did
+    webhooksEventRequest:
+      type: object
+      discriminator:
+        propertyName: event
+      required:
+      - event
+      properties:
+        event:
+          $ref: '#/components/schemas/webhooksEventRequestType'
+        callid:
+          type: string
+          description: Used in some types of events, it presents the unique ID assigned to this call.
+        conferenceId:
+          type: string
+          description: Used in some types of events, it presents the unique Conference ID assigned to this call.
+        version:
+          type: integer
+          description: The current API version.
+    svaml.action.connectConf:
+      type: object
+      description: Connects an incoming call to a conference. Available to use in a response to an [Incoming Call Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ice) callback.
+      required:
+      - name
+      - conferenceId
+      properties:
+        name:
+          type: string
+          description: The name property. Must have the value `connectConf`.
+          x-enumDescriptions:
+            connectConf: The `connectConf` action.
+          enum:
+          - connectConf
+          default: connectConf
+        conferenceId:
+          type: string
+          description: The unique identifier of the conference. Shouldn't exceed 64 characters.
+          example: myConference
+        conferenceDtmfOptions:
+          $ref: '#/components/schemas/conferenceDtmfOptions'
+        moh:
+          description: Means "music on hold". If this optional parameter is included, plays music to the first participant in a conference while they're alone and waiting for other participants to join. If `moh` isn't specified, the user will only hear silence while alone in the conference.
+          allOf:
+          - $ref: '#/components/schemas/musicOnHold'
+    musicOnHold:
+      type: string
+      description: Available Music On Hold values
+      x-enumDescriptions:
+        ring: Plays a progress tone.
+        music1: Plays music choice 1.
+        music2: Plays music choice 2.
+        music3: Plays music choice 3.
+      enum:
+      - ring
+      - music1
+      - music2
+      - music3
+    svaml.action.connectSip:
+      type: object
+      description: Determines how to route a call to a SIP server. Available to use in a response to an [Incoming Call Event](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ice) callback.
+      required:
+      - name
+      - destination
+      properties:
+        name:
+          type: string
+          description: The name property. Must have the value `connectSip`.
+          x-enumDescriptions:
+            connectSip: The `connectSip` action.
+          enum:
+          - connectSip
+          default: connectSip
+        destination:
+          $ref: '#/components/schemas/destinationSip'
+        maxDuration:
+          type: integer
+          description: The max duration of the call in seconds (max 14400 seconds). If the call is still connected at that time, it will be automatically disconnected.
+          example: 3000
+        cli:
+          type: string
+          description: Used to override the CLI (or caller ID) of the client. The phone number of the person who initiated the call is shown as the CLI. To set your own CLI, you may use your verified number or your Dashboard virtual number.
+          example: private
+        transport:
+          type: string
+          description: An optional parameter to specify the SIP transport protocol. If unspecified, UDP is used.
+          x-enumDescriptions:
+            UDP: User Datagram Protocol
+            TCP: Transmission Control Protocol
+            TLS: Transport Layer Security
+          enum:
+          - UDP
+          - TCP
+          - TLS
+        suppressCallbacks:
+          type: boolean
+          description: If enabled, suppresses [ACE](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/ace) and [DICE](https://developers.sinch.com/docs/voice/api-reference/voice/callbacks/dice) callbacks for the call.
+          example: false
+        callHeaders:
+          type: array
+          description: '[Private SIP headers](https://developers.sinch.com/docs/voice/api-reference/sip-trunking/#receiving-calls-from-sinch-platform-to-your-sip-infrastructure) to send with the call.'
+          items:
+            $ref: '#/components/schemas/callHeader'
+        moh:
+          description: Means "music on hold". If this optional parameter is included, plays music to the connected participant if the SIP call is placed on hold. If `moh` isn't specified and the SIP call is placed on hold, the user will only hear silence while during the holding period .
+          allOf:
+          - $ref: '#/components/schemas/musicOnHold'
+    svaml.instruction.stopRecording:
+      type: object
+      description: Stops the recording of the call.
+      required:
+      - name
+      properties:
+        name:
+          type: string
+          description: The `name` property. Must have the value `stopRecording`.
+          x-enumDescriptions:
+            stopRecording: The `stopRecording` instruction.
+          enum:
+          - stopRecording
+          default: stopRecording
+    sipDestination:
+      type: string
+      description: Type `sip` for SIP infrastructures.
+      x-enumDescriptions:
+        sip: A SIP address for SIP infrastructures.
+      enum:
+      - sip
+      example: sip
+    webhooksEventRequestType:
+      type: string
+      x-enumDescriptions:
+        ice: An Incoming Call Event is a type of event sent to your server when a phone number assigned to your Voice application receives an incoming call.
+        ace: An Answered Call Event is a type of event sent to your server when an outgoing call made by your Voice application is answered.
+        dice: A Disconnected Call Event is a type of event sent to your server when a call is disconnected.
+        pie: A Prompt Input Event is a type of event sent to your server when a prompt input is submitted.
+        notify: A Notification Event is a type of event sent to your server when a particular action occurs, such as a recording starting or finishing.
+      enum:
+      - ice
+      - ace
+      - dice
+      - pie
+      - notify
+    mxpDestination:
+      type: string
+      description: Type `userName` used for data endpoints.
+      x-enumDescriptions:
+        username: A username for data endpoints.
+        Username: A username for data endpoints.
+      enum:
+      - username
+      - Username
+      example: username
+  examples:
+    NotifyRecordingAvailableExample:
+      summary: Recording available notification
+      description: An example of a Notify Event that a recording is available for download.
+      value:
+        event: notify
+        callId: da2d576b-d35a-476a-93cc-09e083fe8729
+        version: 1
+        type: recording_available
+        destination: path/to/my/recording.mp3
+    NotifyRecordingFinishedExample:
+      summary: Recording finished notification
+      description: An example of a Notify Event that a recording is finished.
+      value:
+        event: notify
+        callId: da2d576b-d35a-476a-93cc-09e083fe8729
+        version: 1
+        type: recording_finished
+    AcePlayMenuResponse:
+      summary: Play menu response SVAML
+      description: A SVAML response to an Answered Call Event that plays a menu to the callee.
+      value:
+        action:
+          name: runMenu
+          barge: true
+          menus:
+          - id: main
+            mainPrompt: '#tts[This is the main menu. Press 1 for support or 2 to continue to the next menu.]'
+            options:
+            - dtmf: '1'
+              action: return(support)
+            - dtmf: '2'
+              action: menu(sub)
+          - id: sub
+            mainPrompt: '#tts[This is the sub menu. Enter your 4-digit PIN]'
+            repeatPrompt: '#tts[Please enter your 4-digit pin.]'
+            repeats: 3
+            maxDigits: 4
+    AceHangupResponse:
+      summary: Hangup response SVAML
+      description: A SVAML response to an Answered Call Event that plays a message to the callee and then hangs up the call.
+      value:
+        instructions:
+        - name: say
+          text: This is a call from Sinch. This call will now end.
+          locale: en-US
+        action:
+          name: hangup
+    PieHangupResponse:
+      summary: Hangup response SVAML
+      description: A SVAML response to an Prompt Input Event that plays a message to the callee and then hangs up the call.
+      value:
+        instructions:
+        - name: say
+          text: Thank you for pressing 1. This call will now end.
+          locale: en-US
+        action:
+          name: hangup
+    NotifyAMDBeepExample:
+      summary: Answering Machine Beep detected
+      description: An example of a Notify Event issued after the AMD engine has finished detection and the beep is detected, signalling the machine is ready to gather the message.
+      value:
+        event: notify
+        callId: da2d576b-d35a-476a-93cc-09e083fe8729
+        version: 1
+        type: amd_beep
+        amd:
+          status: machine
+          reason: beep
+          duration: 8
+    DICEexample:
+      summary: DICE Example
+      description: An example of a Disconnected Call Event.
+      value:
+        event: dice
+        callId: 3b0a7ccd-05e1-4728-bafd-023b77c47784
+        timestamp: '2022-03-21T13:14:19Z'
+        reason: GENERALERROR
+        result: FAILED
+        version: 1
+        debit:
+          currencyId: USD
+          amount: 0
+        userRate:
+          currencyId: USD
+          amount: 0.368
+        to:
+          type: did
+          endpoint: '3197121281500'
+        applicationKey: 3b216e8d-e274-4ff9-ae80-5d11897006b0
+        from: '31639136121'
+    IceSayResponse:
+      summary: Say response SVAML
+      description: A SVAML response to an Incoming Call Event that plays a message to the caller and then hangs up the call.
+      value:
+        instructions:
+        - name: say
+          text: Thank you for calling Sinch! This call will now end.
+        action:
+          name: hangup
+    ICEexample:
+      summary: ICE Example
+      description: An example of an Incoming Call Event.
+      value:
+        event: ice
+        callId: 3b0a7ccd-05e1-4728-bafd-023b77c47784
+        callResourceUrl: https://calling-euc1.api.sinch.com/calling/v1/calls/id/3b0a7ccd-05e1-4728-bafd-023b77c47784
+        timestamp: '2022-03-21T13:13:59Z'
+        version: 1
+        userRate:
+          currencyId: USD
+          amount: 0.03
+        cli: '31639136121'
+        to:
+          type: did
+          endpoint: '+3197121281500'
+        domain: pstn
+        applicationKey: 3b216e8d-e385-4ff9-ae80-5d11897006b0
+        originationType: PSTN
+    PIEexample:
+      summary: PIE Example
+      description: An example of a Prompt Input Event.
+      value:
+        event: pie
+        callId: 3b0a7ccd-05e1-4728-bafd-023b77c47784
+        timestamp: '2022-03-21T13:14:19Z'
+        menuResult:
+          menuId: sub
+          type: sequence
+          value: '3576'
+          inputMethod: dtmf
+        version: 1
+        applicationKey: 3b216e8d-e274-4ff9-ae80-5d11897006b0
+    NotifyAMDExample:
+      summary: Answering Machine Detection finished notification
+      description: An example of a Notify Event issued after the AMD engine has finished detection.
+      value:
+        event: notify
+        callId: da2d576b-d35a-476a-93cc-09e083fe8729
+        version: 1
+        type: amd
+        amd:
+          status: machine
+          reason: longgreeting
+          duration: 3
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/voice/api-reference/authentication#basic-authentication).
+    Signed:
+      type: apiKey
+      in: header
+      name: Authorization
+      description: For more information about signed request authentication, see [Request Signing](https://developers.sinch.com/docs/voice/api-reference/authentication/signed-request).

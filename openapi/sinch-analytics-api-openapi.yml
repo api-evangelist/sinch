@@ -1,0 +1,66 @@
+openapi: 3.2.0
+info:
+  title: Chatlayer Analytics API
+  version: 1.0.0
+  contact:
+    name: Support
+    url: www.sinch.com
+    email: support@sinch.com
+servers:
+- url: https://analytics.api.chatlayer.ai
+  description: Europe
+- url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+  description: US
+- url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+  description: APAC
+- url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+  description: South America
+security:
+- basicAuth: []
+tags:
+- name: Analytics
+paths:
+  /v1/echo:
+    post:
+      tags:
+      - Analytics
+      summary: Check connectivity
+      operationId: Analytics_Echo
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EchoRequest'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EchoResponse'
+components:
+  schemas:
+    EchoRequest:
+      required:
+      - message
+      type: object
+      properties:
+        message:
+          title: The message to echo back
+          type: string
+    EchoResponse:
+      type: object
+      properties:
+        message:
+          title: The echoed message
+          type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Generate your access token on the [Chatlayer platform](https://app.chatlayer.ai/settings/api-access/tokens).
+externalDocs:
+  description: Learn more
+  url: https://developers.sinch.com/docs/chatlayer-analytics/
+x-original-swagger-version: '2.0'

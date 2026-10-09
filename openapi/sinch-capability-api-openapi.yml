@@ -1,66 +1,214 @@
 openapi: 3.2.0
 info:
-  title: Sinch Conversation Capability API
-  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
+  title: Sinch Capability API
   version: '1.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  description: 'Operations tagged Capability across 2 of this provider''s published API definitions: sinch-conversation-api-openapi.yaml, original-sinch-conversation-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
+- url: https://{region}.conversation.api.sinch.com
+  variables:
+    region:
+      default: us
+      enum:
+      - us
+      - eu
+      - br
+  description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
 - url: https://us.conversation.api.sinch.com
   description: US Production Server
 - url: https://eu.conversation.api.sinch.com
   description: EU Production Server
 - url: https://br.conversation.api.sinch.com
   description: Brazil Production Server
-security:
-- oAuth2: []
-- basicAuth: []
 tags:
-- name: Capability
-  description: Query channel capabilities for specific contacts to determine which channels can be used to reach them.
+- description: A capability query determines which options are available for reaching a contact on the channels on which the contact has a channel identity.
+  name: Capability
+  x-displayName: Capability
 paths:
   /v1/projects/{project_id}/capability:query:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
     post:
-      operationId: queryCapability
-      summary: Query Channel Capability
-      description: Queries the capability of a specific channel for a contact to determine if the channel can be used to reach them.
+      description: This method is asynchronous - it immediately returns the requested Capability registration. Capability check is then delivered as a callback to registered webhooks with trigger CAPABILITY for every reachable channel.
       tags:
       - Capability
-      parameters:
-      - $ref: '#/components/parameters/ProjectId'
+      summary: Capability lookup
+      operationId: Capability_QueryCapability
       requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CapabilityQueryRequest'
+        $ref: '#/components/requestBodies/QueryCapabilityRequest'
       responses:
         '200':
-          description: Capability result
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CapabilityQueryResponse'
+          $ref: '#/components/responses/queryCapabilityResponse'
         '400':
-          description: Invalid request
+          $ref: '#/components/responses/400Error'
         '401':
-          description: Unauthorized
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.capability;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.CapabilityService;\nimport com.sinch.sdk.domains.conversation.models.v1.ChannelRecipientIdentities;\nimport com.sinch.sdk.domains.conversation.models.v1.ChannelRecipientIdentity;\nimport com.sinch.sdk.domains.conversation.models.v1.ConversationChannel;\nimport com.sinch.sdk.domains.conversation.models.v1.Recipient;\nimport com.sinch.sdk.domains.conversation.models.v1.capability.request.QueryCapabilityRequest;\nimport com.sinch.sdk.domains.conversation.models.v1.capability.response.QueryCapabilityResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class Capability {\n\n  private static final Logger LOGGER = Logger.getLogger(Capability.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the Conversation App where the recipient channel is configured\n    String conversationApplicationId = \"CONVERSATION_APP_ID\";\n    // The channel to look up the capabilities for\n    ConversationChannel recipientChannel = ConversationChannel.SMS;\n    // The phone number of the recipient to look up the capabilities for\n    String recipientPhoneNumber = \"RECIPIENT_PHONE_NUMBER\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    CapabilityService capabilityService = client.conversation().v1().capability();\n\n    Recipient channelRecipients =\n        ChannelRecipientIdentities.of(\n            ChannelRecipientIdentity.builder()\n                .setChannel(recipientChannel)\n                .setIdentity(recipientPhoneNumber)\n                .build());\n\n    QueryCapabilityRequest request =\n        QueryCapabilityRequest.builder()\n            .setAppId(conversationApplicationId)\n            .setRecipient(channelRecipients)\n            .build();\n\n    LOGGER.info(\n        String.format(\"Trigger capability lookup for phone number '%s'\", recipientPhoneNumber));\n\n    QueryCapabilityResponse response = capabilityService.lookup(request);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation App where the recipient channel is configured\n  const appId = 'CONVERSATION_APP_ID';\n  // The phone number of the recipient to look up the capabilities for\n  const recipientPhoneNumber = 'RECIPIENT_PHONE_NUMBER';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.capability.lookup({\n      lookupCapabilityRequestBody: {\n        app_id: appId,\n        recipient: {\n          identified_by: {\n            channel_identities: [\n              {\n                channel: 'RCS',\n                identity: recipientPhoneNumber,\n              },\n            ],\n          },\n        },\n      },\n    });\n    console.log('✅ Successfully looked up the recipient capabilities - check the CAPABILITY webhook for the result.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to look up the recipient capabilities for phone number ${recipientPhoneNumber}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+      security:
+      - Basic: []
+      - oAuth2: []
+    servers:
+    - url: https://{region}.conversation.api.sinch.com
+      variables:
+        region:
+          default: us
+          enum:
+          - us
+          - eu
+          - br
+      description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
 components:
   schemas:
-    CapabilityQueryResponse:
+    QueryCapabilityResponse:
+      description: 'A CapabilityResponse contains the identity of the recipient for which
+
+        a capability lookup will be performed.'
       type: object
+      title: Represents an explicit Capability registration
       properties:
         app_id:
+          description: The ID of the app to use for capability lookup.
           type: string
-          description: The app ID
         recipient:
-          type: object
-          description: The queried recipient
+          $ref: '#/components/schemas/Recipient'
         request_id:
           type: string
-          description: The capability query request ID
+          description: ID for the asynchronous response, will be generated if not set.
+    ChannelIdentities:
+      required:
+      - channel_identities
+      type: object
+      properties:
+        channel_identities:
+          description: 'A list of specific channel identities.
+
+            The API will use these identities when sending to specific channels.'
+          type: array
+          items:
+            $ref: '#/components/schemas/ChannelRecipientIdentity'
+    ContactIDField:
+      type: object
+      title: Contact ID
+      properties:
+        contact_id:
+          title: Contact ID string
+          description: The ID of the contact.
+          type: string
+          example: '{CONTACT_ID}'
+    RecipientBase:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/IdentifiedByField'
+      - $ref: '#/components/schemas/ContactIDField'
+    ConversationChannel:
+      type: string
+      title: Channel Identifier
+      description: The identifier of the channel you want to include. Must be one of the enum values.
+      example: WHATSAPP
+      x-enumDescriptions:
+        SMS: The SMS channel.
+        RCS: The RCS channel.
+        WHATSAPP: The WhatsApp channel.
+        MMS: The MMS channel.
+        KAKAOTALK: The KakaoTalk channel.
+        KAKAOTALKCHAT: The KakaoTalk chat channel (used primarily in ConsultationTalk).
+        VIBERBM: The Viber Business Messages channel.
+        LINE: The LINE channel.
+        INSTAGRAM: The Instagram channel.
+        MESSENGER: The Facebook Messenger channel.
+        WECHAT: The WeChat channel.
+        TELEGRAM: The Telegram channel.
+        APPLEBC: The Apple Messages for Business channel.
+      enum:
+      - SMS
+      - RCS
+      - WHATSAPP
+      - MMS
+      - KAKAOTALK
+      - KAKAOTALKCHAT
+      - VIBERBM
+      - LINE
+      - INSTAGRAM
+      - MESSENGER
+      - WECHAT
+      - TELEGRAM
+      - APPLEBC
+    IdentifiedByField:
+      type: object
+      title: Channel Identities
+      properties:
+        identified_by:
+          title: Channel Identity List
+          type: object
+          description: The identity as specified by the channel.
+          allOf:
+          - $ref: '#/components/schemas/ChannelIdentities'
+    ChannelRecipientIdentity:
+      type: object
+      required:
+      - identity
+      - channel
+      properties:
+        channel:
+          $ref: '#/components/schemas/ConversationChannel'
+        identity:
+          description: The channel recipient identity.
+          type: string
+    QueryCapability:
+      type: object
+      required:
+      - app_id
+      - recipient
+      properties:
+        app_id:
+          description: The ID of the app to use for capability lookup.
+          type: string
+          example: '{APP_ID}'
+        recipient:
+          $ref: '#/components/schemas/Recipient'
+        request_id:
+          type: string
+          description: 'ID for the asynchronous response, will be generated if not set.
+
+            Currently this field is not used for idempotency.'
+    runtimeError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/protobufAny'
+            message:
+              type: string
+            status:
+              type: string
+    Recipient:
+      description: Identifies the recipient.
+      allOf:
+      - $ref: '#/components/schemas/RecipientBase'
+    protobufAny:
+      type: object
+      properties:
+        type_url:
+          type: string
+        value:
+          type: string
+          format: byte
     ChannelIdentity:
       type: object
       properties:
@@ -109,7 +257,83 @@ components:
                   type: array
                   items:
                     $ref: '#/components/schemas/ChannelIdentity'
+    CapabilityQueryResponse:
+      type: object
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        recipient:
+          type: object
+          description: The queried recipient
+        request_id:
+          type: string
+          description: The capability query request ID
+  responses:
+    403Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 403
+            message: You do not have access to the requested resource.
+            status: UNAUTHORIZED
+            details: []
+    501Error:
+      description: Something went wrong on our end, try again with exponential back-off. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 501
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    500Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 500
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    400Error:
+      description: Malformed request. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 400
+            message: Malformed request
+            status: INVALID_REQUEST
+            details: []
+    401Error:
+      description: Incorrect credentials. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            type: object
+    queryCapabilityResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/QueryCapabilityResponse'
   parameters:
+    project_id:
+      name: project_id
+      description: The unique ID of the project. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+      in: path
+      required: true
+      schema:
+        type: string
     ProjectId:
       name: project_id
       in: path
@@ -117,10 +341,22 @@ components:
       description: The unique project identifier
       schema:
         type: string
+  requestBodies:
+    QueryCapabilityRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/QueryCapability'
+      description: The query capability request.
+      required: true
   securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/conversation/api-reference/#authentication).
     oAuth2:
       type: oauth2
-      description: OAuth 2.0 client credentials flow using project key ID and secret.
+      description: The user name and password are your client_id and key_secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
       flows:
         clientCredentials:
           tokenUrl: https://auth.sinch.com/oauth2/token
@@ -132,3 +368,14 @@ components:
 externalDocs:
   description: Sinch Conversation API Documentation
   url: https://developers.sinch.com/docs/conversation
+x-refined-from:
+- sinch-conversation-api-openapi.yaml
+- original-sinch-conversation-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

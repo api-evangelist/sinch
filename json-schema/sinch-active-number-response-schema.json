@@ -1,0 +1,462 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-active-number-response-schema.json",
+  "title": "Active Number Response",
+  "description": "The phone number that has been bought by a customer and assigned to a project.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-numbers-api-openapi.yml#/components/schemas/ActiveNumberResponse",
+  "type": "object",
+  "properties": {
+    "phoneNumber": {
+      "$ref": "#/$defs/PhoneNumber"
+    },
+    "projectId": {
+      "type": "string",
+      "description": "Project ID. Your project ID can be found on your [Sinch Customer Dashboard](https://dashboard.sinch.com/settings/project-management)."
+    },
+    "displayName": {
+      "type": "string",
+      "description": "User supplied name for the phone number."
+    },
+    "regionCode": {
+      "$ref": "#/$defs/RegionCode"
+    },
+    "type": {
+      "$ref": "#/$defs/NumberType"
+    },
+    "capability": {
+      "description": "The capability of the number.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/NumberCapability"
+      }
+    },
+    "money": {
+      "$ref": "#/$defs/money"
+    },
+    "paymentIntervalMonths": {
+      "type": "integer",
+      "format": "int32",
+      "description": "How often the recurring price is charged in months.",
+      "readOnly": true
+    },
+    "nextChargeDate": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The date of the next charge.",
+      "readOnly": true
+    },
+    "expireAt": {
+      "type": "string",
+      "format": "date-time",
+      "description": "The timestamp when the subscription will expire if an expiration date has been set.",
+      "readOnly": true
+    },
+    "smsConfiguration": {
+      "$ref": "#/$defs/smsConfiguration"
+    },
+    "voiceConfiguration": {
+      "$ref": "#/$defs/VoiceConfiguration"
+    },
+    "callbackUrl": {
+      "type": "string",
+      "description": "The callback URL to be called for a rented number's provisioning / deprovisioning operations."
+    }
+  },
+  "$defs": {
+    "NumberCapability": {
+      "type": "string",
+      "enum": [
+        "SMS",
+        "VOICE"
+      ],
+      "x-enumDescriptions": {
+        "SMS": "The SMS product can use the number.",
+        "VOICE": "The Voice product can use the number."
+      },
+      "default": "SMS",
+      "description": "The capabilities the phone number supports: SMS, Voice, or both",
+      "title": "Capability"
+    },
+    "NumberType": {
+      "type": "string",
+      "enum": [
+        "MOBILE",
+        "LOCAL",
+        "TOLL_FREE"
+      ],
+      "x-enumDescriptions": {
+        "MOBILE": "Numbers that belong to a specific range.",
+        "LOCAL": "Numbers that are assigned to a specific geographic region.",
+        "TOLL_FREE": "Numbers that are free of charge for the calling party but billed for all arriving calls."
+      },
+      "description": "The number type.",
+      "title": "Type",
+      "nullable": false
+    },
+    "PhoneNumber": {
+      "type": "string",
+      "description": "The phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format with leading `+`. Example `+12025550134`.",
+      "title": "Phone Number"
+    },
+    "ProvisioningStatus": {
+      "default": "WAITING",
+      "description": "The provisioning status. It will be either `WAITING`, `IN_PROGRESS` or `FAILED`. If the provisioning fails, a reason for the failure will be provided. [See a full list of provisioning error descriptions]<(https://developers.sinch.com/docs/numbers/api-reference/error-codes/provisioning-errors) and troubleshooting recommendations.",
+      "enum": [
+        "PROVISIONING_STATUS_UNSPECIFIED",
+        "WAITING",
+        "IN_PROGRESS",
+        "FAILED"
+      ],
+      "x-enumDescriptions": {
+        "PROVISIONING_STATUS_UNSPECIFIED": "The status is currently unknown.",
+        "WAITING": "Waiting for provisioning",
+        "IN_PROGRESS": "Provisioning in progress",
+        "FAILED": "Provisioning failed. See [provisioning error descriptions](https://developers.sinch.com/docs/numbers/api-reference/error-codes/provisioning-errors)"
+      },
+      "title": "Provisioning Status"
+    },
+    "RegionCode": {
+      "type": "string",
+      "description": "ISO 3166-1 alpha-2 country code of the phone number. Example: US, GB or SE.",
+      "title": "Region Code",
+      "nullable": false
+    },
+    "ScheduledVoiceProvisioning": {
+      "type": "object",
+      "readOnly": true,
+      "description": "Represents the ongoing or failed scheduled voice provisioning job. This field will be empty if the number was successfully provisioned provisioned for voice.",
+      "required": [
+        "type"
+      ],
+      "oneOf": [
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningEST"
+        },
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningFAX"
+        },
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningRTC"
+        }
+      ],
+      "title": "Scheduled Voice Provisioning"
+    },
+    "ScheduledVoiceProvisioningCommon": {
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "type": "object",
+          "properties": {
+            "type": {
+              "$ref": "#/$defs/VoiceApplicationType"
+            },
+            "lastUpdatedTime": {
+              "type": "string",
+              "description": "Timestamp when the status was last updated.",
+              "format": "date-time",
+              "readOnly": true
+            },
+            "status": {
+              "$ref": "#/$defs/ProvisioningStatus"
+            }
+          }
+        }
+      ]
+    },
+    "ScheduledVoiceProvisioningEST": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceTrunkId"
+        }
+      ]
+    },
+    "ScheduledVoiceProvisioningFAX": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceServiceId"
+        }
+      ]
+    },
+    "ScheduledVoiceProvisioningRTC": {
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/ScheduledVoiceProvisioningCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceAppId"
+        }
+      ]
+    },
+    "SmsErrorCode": {
+      "type": "string",
+      "x-enumDescriptions": {
+        "ERROR_CODE_UNSPECIFIED": "Code not specified.",
+        "INTERNAL_ERROR": "Internal server error.",
+        "SMS_PROVISIONING_FAILED": "Provisioning for SMS failed.",
+        "CAMPAIGN_PROVISIONING_FAILED": "Provisioning for campaign failed.",
+        "CAMPAIGN_NOT_AVAILABLE": "The specified campaign is not available.",
+        "EXCEEDED_10DLC_LIMIT": "Exceeded the 10DLC limit.",
+        "NUMBER_PROVISIONING_FAILED": "Failed to provision the number.",
+        "PARTNER_SERVICE_UNAVAILABLE": "The third party service is unavailable.",
+        "CAMPAIGN_PENDING_ACCEPTANCE": "The campaign is awaiting acceptance.",
+        "MNO_SHARING_ERROR": "Sharing error.",
+        "CAMPAIGN_EXPIRED": "The specific campaign has expired.",
+        "CAMPAIGN_MNO_REJECTED": "The MNO for the campaign was rejected.",
+        "CAMPAIGN_MNO_SUSPENDED": "The MNO for the campaign was suspended.",
+        "CAMPAIGN_MNO_REVIEW": "The MNO for the campaign is under review.",
+        "INSUFFICIENT_BALANCE": "The credit balance for the account is insufficient to cover the fees.",
+        "MOCK_CAMPAIGN_NOT_ALLOWED": "Mock campaign is not permitted.",
+        "TFN_NOT_ALLOWED": "The Toll-Free number is not allowed.",
+        "INVALID_NNID": "The specified NNID is invalid."
+      },
+      "enum": [
+        "ERROR_CODE_UNSPECIFIED",
+        "INTERNAL_ERROR",
+        "SMS_PROVISIONING_FAILED",
+        "CAMPAIGN_PROVISIONING_FAILED",
+        "CAMPAIGN_NOT_AVAILABLE",
+        "EXCEEDED_10DLC_LIMIT",
+        "NUMBER_PROVISIONING_FAILED",
+        "PARTNER_SERVICE_UNAVAILABLE",
+        "CAMPAIGN_PENDING_ACCEPTANCE",
+        "MNO_SHARING_ERROR",
+        "CAMPAIGN_EXPIRED",
+        "CAMPAIGN_MNO_REJECTED",
+        "CAMPAIGN_MNO_SUSPENDED",
+        "CAMPAIGN_MNO_REVIEW",
+        "INSUFFICIENT_BALANCE",
+        "MOCK_CAMPAIGN_NOT_ALLOWED",
+        "TFN_NOT_ALLOWED",
+        "INVALID_NNID"
+      ],
+      "description": "The error codes that show the reason of failure of a scheduled provisioning",
+      "title": "SMS Error Code"
+    },
+    "VoiceAppId": {
+      "type": "object",
+      "properties": {
+        "appId": {
+          "type": "string",
+          "description": "Your app ID for the Voice API. The `appId` can be found in your [Sinch Customer Dashboard](https://dashboard.sinch.com/voice/apps)."
+        }
+      }
+    },
+    "VoiceApplicationType": {
+      "type": "string",
+      "description": "The voice application type. Examples are RTC, EST, FAX",
+      "x-enumDescriptions": {
+        "RTC": "Voice [see documentation](https://developers.sinch.com/docs/voice)",
+        "EST": "Elastic SIP Trunking [see documentation](https://developers.sinch.com/docs/est)",
+        "FAX": "FAX application [see documentation](https://developers.sinch.com/docs/fax/overview)"
+      },
+      "enum": [
+        "RTC",
+        "EST",
+        "FAX"
+      ],
+      "default": "RTC"
+    },
+    "VoiceConfiguration": {
+      "title": "VoiceConfiguration",
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/VoiceConfigurationRTC"
+        },
+        {
+          "$ref": "#/$defs/VoiceConfigurationEST"
+        },
+        {
+          "$ref": "#/$defs/VoiceConfigurationFAX"
+        }
+      ],
+      "description": "The current voice configuration for this number. During scheduled provisioning, the app ID, service ID, or trunk ID value may be empty in a response if it is still processing or if it has failed. The status of scheduled provisioning will show under a `scheduledVoiceProvisioning` object if it's still running. Once processed successfully, the `appId`/`serviceId`/`trunkId` sent will appear directly under the `voiceConfiguration` object."
+    },
+    "VoiceConfigurationCommon": {
+      "title": "Common VoiceConfiguration fields",
+      "type": "object",
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/VoiceApplicationType"
+        },
+        "lastUpdatedTime": {
+          "type": "string",
+          "description": "Timestamp when the status was last updated.",
+          "format": "date-time",
+          "readOnly": true
+        },
+        "scheduledVoiceProvisioning": {
+          "readOnly": true,
+          "allOf": [
+            {
+              "$ref": "#/$defs/ScheduledVoiceProvisioning"
+            }
+          ]
+        }
+      }
+    },
+    "VoiceConfigurationEST": {
+      "title": "EST VoiceConfiguration",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/VoiceConfigurationCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceTrunkId"
+        }
+      ]
+    },
+    "VoiceConfigurationFAX": {
+      "title": "FAX VoiceConfiguration",
+      "type": "object",
+      "required": [
+        "type"
+      ],
+      "allOf": [
+        {
+          "$ref": "#/$defs/VoiceConfigurationCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceServiceId"
+        }
+      ]
+    },
+    "VoiceConfigurationRTC": {
+      "title": "RTC VoiceConfiguration",
+      "type": "object",
+      "allOf": [
+        {
+          "$ref": "#/$defs/VoiceConfigurationCommon"
+        },
+        {
+          "$ref": "#/$defs/VoiceAppId"
+        }
+      ]
+    },
+    "VoiceServiceId": {
+      "type": "object",
+      "properties": {
+        "serviceId": {
+          "type": "string",
+          "description": "The service ID if the type is FAX. The `serviceId` can be found in your [Sinch Customer Dashboard](https://dashboard.sinch.com/fax/services)."
+        }
+      }
+    },
+    "VoiceTrunkId": {
+      "type": "object",
+      "properties": {
+        "trunkId": {
+          "type": "string",
+          "description": "The trunk ID if the type is EST. The `trunkId` can be found in your [Sinch Customer Dashboard](https://dashboard.sinch.com/trunks/your-trunks)."
+        }
+      }
+    },
+    "money": {
+      "type": "object",
+      "description": "An object giving details on currency code and the amount charged.",
+      "properties": {
+        "currencyCode": {
+          "type": "string",
+          "description": "The 3-letter currency code defined in [ISO 4217](https://www.iso.org/iso-4217-currency-codes.html)."
+        },
+        "amount": {
+          "type": "string",
+          "description": "The amount in decimal form.\nFor example `2.00`.\nThere are no guarantees on the precision unless documented by the message origin. The amount cannot be updated and is read-only."
+        }
+      },
+      "title": "Money"
+    },
+    "scheduledProvisioning": {
+      "type": "object",
+      "description": "Represents the ongoing or failed scheduled provisioning job. This field will be empty if the number was both successfully provisioned to the SMS platform and linked to the 10DLC campaign.",
+      "properties": {
+        "servicePlanId": {
+          "type": "string",
+          "description": "The SMS service plan that the scheduled provisioning job will configure with the number.",
+          "readOnly": true
+        },
+        "campaignId": {
+          "type": "string",
+          "description": "TCR campaign ID that the scheduled provisioning job will configure with the number.",
+          "readOnly": true
+        },
+        "status": {
+          "$ref": "#/$defs/ProvisioningStatus"
+        },
+        "lastUpdatedTime": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp when the status was last updated.",
+          "readOnly": true
+        },
+        "errorCodes": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/SmsErrorCode"
+          },
+          "readOnly": true
+        }
+      },
+      "title": "Scheduled Provisioning"
+    },
+    "smsConfiguration": {
+      "type": "object",
+      "title": "SMS Configuration",
+      "description": "The current SMS configuration for this number.\n\nOnce the `servicePlanId` is sent, it enters scheduled provisioning.\n\nThe status of scheduled provisioning will show under a `scheduledProvisioning` object if it's still running. Once processed successfully, the `servicePlanId` sent will appear directly under the `smsConfiguration` object.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/smsConfigurationBase"
+        },
+        {
+          "type": "object",
+          "properties": {
+            "scheduledProvisioning": {
+              "readOnly": true,
+              "allOf": [
+                {
+                  "$ref": "#/$defs/scheduledProvisioning"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    "smsConfigurationBase": {
+      "title": "Base SMS Configuration",
+      "type": "object",
+      "required": [
+        "servicePlanId"
+      ],
+      "properties": {
+        "servicePlanId": {
+          "type": "string",
+          "description": "The `servicePlanId` can be found in the [Sinch Customer Dashboard](https://dashboard.sinch.com/sms/api/rest). The service plan ID is what ties this number to the configured SMS service."
+        },
+        "campaignId": {
+          "type": "string",
+          "description": "Only for US phone numbers. This `campaignId` is required to send SMS traffic to US; click [here](https://community.sinch.com/t5/10DLC/What-is-10DLC/ta-p/7845) to read more about 10DLC A2P messaging. So, it is the current campaign ID for this number. The `campaignId` is found on your TCR platform."
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-callback-config-response-schema.json",
+  "title": "CallbackConfigResponse",
+  "description": "Response body for the GET Callback Configuration endpoint. The HMAC secret is masked — only the last 6 characters are shown.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-compliance-brands-api-openapi.yml#/components/schemas/CallbackConfigResponse",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "description": "Project ID this callback configuration belongs to.",
+      "type": "string",
+      "readOnly": true
+    },
+    "hmacSecretMask": {
+      "description": "Masked representation of the HMAC secret. Only the last 6 characters are visible\n(e.g. `••••••1b11ee`). To see the full secret, rotate it via\n`POST /v1/projects/{projectId}/callbackConfig/rotate` or set a new one via `PATCH`.",
+      "type": "string",
+      "readOnly": true
+    }
+  }
+}

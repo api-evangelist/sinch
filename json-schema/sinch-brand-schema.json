@@ -1,0 +1,140 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-brand-schema.json",
+  "title": "Brand",
+  "description": "The brand object that contains the brand details.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-brands-api-openapi.yml#/components/schemas/Brand",
+  "properties": {
+    "brandId": {
+      "description": "The unique identifier for the brand.",
+      "type": "string",
+      "readOnly": true
+    },
+    "brandName": {
+      "description": "The name of the brand.",
+      "type": "string"
+    },
+    "brandMetadataId": {
+      "description": "The unique identifier for the brand metadata.",
+      "type": "string"
+    },
+    "status": {
+      "type": "object",
+      "readOnly": true,
+      "allOf": [
+        {
+          "$ref": "#/$defs/BrandStatus"
+        }
+      ]
+    },
+    "data": {
+      "description": "The list of categories included in the brand metadata. Each of them includes a list of attributes.",
+      "items": {
+        "$ref": "#/$defs/BrandCategory"
+      },
+      "type": "array"
+    },
+    "logs": {
+      "description": "The list of logs related to the brand.",
+      "items": {
+        "$ref": "#/$defs/BrandLog"
+      },
+      "type": "array",
+      "readOnly": true
+    },
+    "callbackUrl": {
+      "description": "The URL to receive the brand status update callback. The URL must be a valid URL and must be reachable from Sinch.",
+      "type": "string"
+    },
+    "createTime": {
+      "description": "The date and time when the brand was created.",
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+    },
+    "updateTime": {
+      "description": "The date and time when the brand was updated.",
+      "type": "string",
+      "format": "date-time",
+      "readOnly": true
+    }
+  },
+  "type": "object",
+  "$defs": {
+    "BrandCategory": {
+      "description": "The list of attributes included in the category. Each key is the name of the attribute in the metadata endpoint response and the value is the value of the attribute assigned by the customer. Json format is '{key:value, key:value}' with types like string, integer or boolean.",
+      "type": "object",
+      "additionalProperties": {
+        "oneOf": [
+          {
+            "type": "string"
+          },
+          {
+            "type": "integer"
+          },
+          {
+            "type": "boolean"
+          }
+        ]
+      }
+    },
+    "BrandLog": {
+      "description": "The log object that contains the brand status change details.",
+      "properties": {
+        "status": {
+          "$ref": "#/$defs/BrandStatus"
+        },
+        "createTime": {
+          "description": "The date and time when the brand status was changed.",
+          "type": "string",
+          "format": "date-time"
+        },
+        "comment": {
+          "description": "The message related to the brand status change.",
+          "type": "string"
+        },
+        "author": {
+          "description": "Author. It can be either a customer or an agent.",
+          "enum": [
+            "CUSTOMER",
+            "AGENT"
+          ],
+          "x-enumDescriptions": {
+            "CUSTOMER": "Customer",
+            "AGENT": "Agent"
+          },
+          "format": "enum",
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "BrandStatus": {
+      "enum": [
+        "DRAFT",
+        "NEW",
+        "PENDING",
+        "PENDING_REVIEW",
+        "REJECTED",
+        "INCOMPLETE",
+        "COMPLETED",
+        "ARCHIVED"
+      ],
+      "x-enumDescriptions": {
+        "DRAFT": "The brand is in draft status. It can be updated and submitted for validation.",
+        "NEW": "A new brand created, not processed yet.",
+        "PENDING": "The brand info is under review.",
+        "PENDING_REVIEW": "When a brand is in incomplete status, customer can update the brand. Updating the brand moves the brand to PENDING_REVIEW state, what means that is waiting for another review after the customer changes.",
+        "REJECTED": "The brand has been rejected.",
+        "INCOMPLETE": "The brand is incomplete. The customer can update the brand to complete it.",
+        "COMPLETED": "The brand validation has been completed and the brand is approved for integration against the brand type specification.",
+        "ARCHIVED": "The brand is archived after a cancellation. It can not be updated or submitted for validation."
+      },
+      "type": "string",
+      "format": "enum"
+    }
+  }
+}

@@ -1,0 +1,1150 @@
+openapi: 3.0.3
+externalDocs:
+  description: >-
+    All endpoints available under this API require Bearer token authentication.
+    Please check oauth api documentation if you need more details.
+  url: >-
+    https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth/
+info:
+  description: >-
+    This API describes the set of endpoints available to create customer
+    brands. 
+
+
+    The list of endpoints allows to create, update and delete a customer brand
+    and also get the current state.
+  title: Sinch Brands API
+  version: 0.0.1
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+paths:
+  /v1/projects/{projectId}/callback-configuration:
+    get:
+      description: >-
+        The endpoint receives as path param project id. If the project exists,
+        the details of the callback configuration are returned.
+      operationId: getCallbackConfiguration
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigurationResponse'
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: Get a callback configuration by project id.
+      tags:
+        - callback-configuration
+    put:
+      description: >-
+        The endpoint updates the callback configuration with specified project
+        ID
+      operationId: updateCallbackConfiguration
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackConfigurationUpdateBody'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigurationResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Project validation error'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Update a callback configuration
+      tags:
+        - callback-configuration
+  /v1/projects/{projectId}/brands:
+    post:
+      description: >-
+        The endpoint creates a new brand for the specified project in draft
+        status. Drafts are not validated against the brand type format, this is
+        done at submission. A brand in draft status is editable.
+      operationId: createBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Brand'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Create a brand
+      tags:
+        - brands
+    get:
+      description: >-
+        The endpoint receives as path param project id. If the project exists,
+        the list of brands for the project is returned. Additional filters can
+        be applied as query params. By default, ARCHIVED brands are not
+        returned. To include them, the status filter must be used.
+      operationId: listBrands
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: query
+          description: The brand status to filter the brands.
+          name: status
+          required: false
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/BrandStatus'
+        - in: query
+          description: The brand metadata type to filter the brands
+          name: brandType
+          required: false
+          schema:
+            $ref: '#/components/schemas/BrandType'
+        - in: query
+          name: orderBy
+          description: >-
+            Ordering of the results: field name with an optional order separated
+            by a comma. Fields that support ordering are 'brandName', 'status',
+            'createTime', 'updateTime' with possible ordering 'desc' or 'asc'
+          schema:
+            type: string
+          example: brandName,asc
+        - in: query
+          name: pageSize
+          description: Size of the page to be returned.
+          schema:
+            format: int32
+            type: integer
+          example: 100
+        - in: query
+          name: pageToken
+          description: >-
+            Page token to request subsequent pages when using pagination. This
+            should be the value generated by the system in a previous list
+            request.
+          schema:
+            type: string
+        - in: query
+          name: brandName
+          description: Filter brands by brand name.
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/ListBrandResponse'
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: List brands for a project
+      tags:
+        - brands
+  /v1/projects/{projectId}/brands/{brandId}:
+    get:
+      description: >-
+        The endpoint receives as path param project id and brand id. If the
+        project and brand exist, the details of the brand are returned.
+      operationId: getBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Customer's brand id
+          name: brandId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project or brand id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: Get a brand by project and brand id.
+      tags:
+        - brands
+    delete:
+      description: >-
+        The endpoint receives as path param project id and brand id. If the
+        project and brand exist, the brand is deleted.
+      operationId: deleteBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Customer's brand id
+          name: brandId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content: {}
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project or brand id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Delete a brand by project and brand id.
+      tags:
+        - brands
+    put:
+      description: >-
+        The endpoint receives as path param project id and brand id. If the
+        project and brand exist, the brand is updated. Only NEW and
+        PENDING_REVIEW brands can be updated.
+      operationId: updateBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Customer's brand id
+          name: brandId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/BrandUpdateRequest'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project or brand id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Update a brand by project and brand id.
+      tags:
+        - brands
+  /v1/projects/{projectId}/brands/{brandId}:submit:
+    post:
+      description: >-
+        The endpoint submit the brand for validation. The brand must be in DRAFT
+        or INCOMPLETE status. The brand is validated against the brand type
+        format and the status is updated accordingly (PENDING_REVIEW from
+        INCOMPLETE, NEW from DRAFT).
+      operationId: submitBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: path
+          description: Customer's brand id
+          name: brandId
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Any validation error'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Submit a brand
+      tags:
+        - brands
+      callbacks:
+        Brand Status Update:
+          '{$request.body#/callbackUrl}':
+            post:
+              description: >-
+                The endpoint receives a callback when the brand status is
+                updated. To receive callback notifications, the customer must
+                provide a callback URL in the create Brand request body. The
+                callback URL must be a valid URL and must be reachable from
+                Sinch. Read brands callback configuration documentation for more
+                details.
+              summary: Callback for brand status update
+              requestBody:
+                content:
+                  application/json:
+                    schema:
+                      $ref: '#/components/schemas/CallbackEventBody'
+              responses:
+                '200':
+                  description: OK
+                4XX:
+                  description: Customer has refused callback event for any reason.
+              security:
+                - hmacAuth: []
+  /v1/projects/{projectId}/brands:submit:
+    post:
+      description: >-
+        The endpoint creates and submits a new brand for the specified project
+        in new status. The brand is validated against the brand type format.
+      operationId: createAndSubmitBrand
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Brand'
+        required: true
+      responses:
+        '200':
+          description: Brand created and submitted successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Brand'
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Brand validation error'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - write
+      summary: Create and submit a brand
+      tags:
+        - brands
+  /v1/projects/{projectId}/brand-metadata:
+    get:
+      description: >-
+        Given a brand type in a query param, this endpoint returns the metadata
+        required to build the brand registration form. The metadata is based on
+        different brand categories that contain different set of attributes.
+        Each attribute comes with its own set of validation rules.
+      operationId: getBrandMetadata
+      parameters:
+        - in: path
+          description: Customer's project id
+          name: projectId
+          required: true
+          schema:
+            type: string
+        - in: query
+          description: The brand type for which the metadata is requested.
+          name: brandType
+          required: true
+          schema:
+            $ref: '#/components/schemas/BrandType'
+      responses:
+        '200':
+          description: Successfully retrieved Brand Metadata
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandMetadata'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: Brand Metadata type not found'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+        - OAuth2:
+            - read
+      summary: Get brand metadata
+      tags:
+        - brands
+components:
+  schemas:
+    CallbackEventBody:
+      description: The body of the callback event.
+      properties:
+        eventId:
+          description: The ID of the event.
+          example: ee34ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+        eventType:
+          description: The type of the event. Possible values are BRAND_STATUS_UPDATE.
+          enum:
+            - BRAND_STATUS_UPDATE
+          x-enumDescriptions:
+            BRAND_STATUS_UPDATE: Brand status update event.
+          example: BRAND_STATUS_UPDATE
+          type: string
+        projectId:
+          description: The ID of the project to which the event belongs.
+          example: aad4ccbf-919d-462f-8587-dec95a1b11b0
+          type: string
+        resourceId:
+          description: Corresponds to the brand id the event belongs to.
+          example: aad4ccbf-919d-462f-8587-dec953242342
+          type: string
+        resourceType:
+          description: >-
+            The type of the brand metadata. Possible values are
+            US_SHORT_CODE_REGISTRY.
+          enum:
+            - US_SHORT_CODE_REGISTRY
+          x-enumDescriptions:
+            US_SHORT_CODE_REGISTRY: Brand metadata type for US Short Code Registry.
+          example: US_SHORT_CODE_REGISTRY
+          type: string
+        status:
+          $ref: '#/components/schemas/BrandStatus'
+        comments:
+          description: >-
+            Comments related to the brand status update. For instance, an
+            incomplete brand status update can include the reason why the brand
+            is incomplete, or the fields that must be updated.
+          example: Brand is incomplete. Please update the address field.
+          type: string
+        createTime:
+          description: The date and time when the event was created.
+          example: '2023-10-01 12:00:00+00:00'
+          type: string
+          format: date-time
+      type: object
+    ListBrandResponse:
+      description: List of brands object
+      properties:
+        brands:
+          description: List of brands
+          items:
+            $ref: '#/components/schemas/BasicBrand'
+          type: array
+        nextPageToken:
+          description: Token to request the next page of results.
+          type: string
+        totalSize:
+          description: Total count of brands matching provided search criteria
+          format: int32
+          type: integer
+      type: object
+    BrandUpdateRequest:
+      description: Brand Update Request
+      properties:
+        brandName:
+          description: The name of the brand.
+          example: My End Customer Brand Name
+          type: string
+        data:
+          description: >-
+            The list of categories included in the brand metadata. Each of them
+            includes a list of attributes.
+          items:
+            $ref: '#/components/schemas/BrandCategory'
+          type: array
+        callbackUrl:
+          description: >-
+            The URL to receive the brand status update callback. The URL must be
+            a valid URL and must be reachable from Sinch.
+          example: https://example.com/callback
+          type: string
+          format: uri
+      type: object
+    Brand:
+      description: The brand object that contains the brand details.
+      properties:
+        brandId:
+          description: The unique identifier for the brand.
+          example: '1234567890'
+          type: string
+          readOnly: true
+        brandName:
+          description: The name of the brand.
+          example: My End Customer Brand Name
+          type: string
+        brandMetadataId:
+          description: The unique identifier for the brand metadata.
+          example: '4444444444'
+          type: string
+        status:
+          type: object
+          readOnly: true
+          allOf:
+            - $ref: '#/components/schemas/BrandStatus'
+        data:
+          description: >-
+            The list of categories included in the brand metadata. Each of them
+            includes a list of attributes.
+          items:
+            $ref: '#/components/schemas/BrandCategory'
+          type: array
+        logs:
+          description: The list of logs related to the brand.
+          items:
+            $ref: '#/components/schemas/BrandLog'
+          type: array
+          readOnly: true
+        callbackUrl:
+          description: >-
+            The URL to receive the brand status update callback. The URL must be
+            a valid URL and must be reachable from Sinch.
+          example: https://example.com/callback
+          type: string
+        createTime:
+          description: The date and time when the brand was created.
+          example: '2023-10-01 12:00:00+00:00'
+          type: string
+          format: date-time
+          readOnly: true
+        updateTime:
+          description: The date and time when the brand was updated.
+          example: '2023-10-01 12:00:00+00:00'
+          type: string
+          format: date-time
+          readOnly: true
+      type: object
+    BasicBrand:
+      description: >-
+        Basic brand content used for listing brands matching the search
+        criteria.
+      properties:
+        brandId:
+          description: The unique identifier for the brand.
+          example: '1234567890'
+          type: string
+          readOnly: true
+        brandName:
+          description: The name of the brand.
+          example: My End Customer Brand Name
+          type: string
+        brandMetadataId:
+          description: The unique identifier for the brand metadata.
+          example: '4444444444'
+          type: string
+        status:
+          type: object
+          readOnly: true
+          allOf:
+            - $ref: '#/components/schemas/BrandStatus'
+        callbackUrl:
+          description: >-
+            The URL to receive the brand status update callback. The URL must be
+            a valid URL and must be reachable from Sinch.
+          example: https://example.com/callback
+          type: string
+        createTime:
+          description: The date and time when the brand was created.
+          example: '2023-10-01 12:00:00+00:00'
+          type: string
+          format: date-time
+          readOnly: true
+        updateTime:
+          description: The date and time when the brand was updated.
+          example: '2023-10-01 12:00:00+00:00'
+          type: string
+          format: date-time
+          readOnly: true
+      type: object
+    BrandLog:
+      description: The log object that contains the brand status change details.
+      properties:
+        status:
+          $ref: '#/components/schemas/BrandStatus'
+        createTime:
+          description: The date and time when the brand status was changed.
+          example: '2023-10-01 12:00:00+00:00'
+          type: string
+          format: date-time
+        comment:
+          description: The message related to the brand status change.
+          example: Brand created successfully.
+          type: string
+        author:
+          description: Author. It can be either a customer or an agent.
+          enum:
+            - CUSTOMER
+            - AGENT
+          x-enumDescriptions:
+            CUSTOMER: Customer
+            AGENT: Agent
+          example: CUSTOMER
+          format: enum
+          type: string
+      type: object
+    BrandStatus:
+      enum:
+        - DRAFT
+        - NEW
+        - PENDING
+        - PENDING_REVIEW
+        - REJECTED
+        - INCOMPLETE
+        - COMPLETED
+        - ARCHIVED
+      x-enumDescriptions:
+        DRAFT: >-
+          The brand is in draft status. It can be updated and submitted for
+          validation.
+        NEW: A new brand created, not processed yet.
+        PENDING: The brand info is under review.
+        PENDING_REVIEW: >-
+          When a brand is in incomplete status, customer can update the brand.
+          Updating the brand moves the brand to PENDING_REVIEW state, what means
+          that is waiting for another review after the customer changes.
+        REJECTED: The brand has been rejected.
+        INCOMPLETE: >-
+          The brand is incomplete. The customer can update the brand to complete
+          it.
+        COMPLETED: >-
+          The brand validation has been completed and the brand is approved for
+          integration against the brand type specification.
+        ARCHIVED: >-
+          The brand is archived after a cancellation. It can not be updated or
+          submitted for validation.
+      type: string
+      format: enum
+      example: INCOMPLETE
+    BrandCategory:
+      description: >-
+        The list of attributes included in the category. Each key is the name of
+        the attribute in the metadata endpoint response and the value is the
+        value of the attribute assigned by the customer. Json format is
+        '{key:value, key:value}' with types like string, integer or boolean.
+      type: object
+      additionalProperties:
+        oneOf:
+          - type: string
+          - type: integer
+          - type: boolean
+      example:
+        companyName: My Company Name
+        website: https://www.mycompany.com
+        employeeCount: 150
+        isPublic: false
+    BrandMetadata:
+      description: The metadata required to build the brand registration form.
+      properties:
+        brandMetadataId:
+          description: The unique identifier for the brand metadata.
+          example: '4444444444'
+          type: string
+        brandType:
+          $ref: '#/components/schemas/BrandType'
+        marketCode:
+          description: The market code for the brand metadata type.
+          example: US
+          type: string
+        majorVersion:
+          description: The major version of the brand metadata type.
+          example: 1
+          type: integer
+        minorVersion:
+          description: The minor version of the brand metadata type.
+          example: 0
+          type: integer
+        createTime:
+          description: The date and time when the brand metadata was created.
+          example: '2023-10-01 12:00:00+00:00'
+          type: string
+          format: date-time
+        data:
+          description: >-
+            The list of categories included in the brand metadata. Each of them
+            includes a list of attributes.
+          items:
+            $ref: '#/components/schemas/BrandMetadataCategory'
+          type: array
+    BrandMetadataCategory:
+      description: >-
+        A category of data that contains a set of attributes and validation
+        rules.
+      properties:
+        categoryType:
+          description: Category type
+          example: BRAND_CLIENT_ADDRESS
+          type: string
+        title:
+          description: Title is useful to display the category in the UI.
+          example: Address Information
+          type: string
+        attributes:
+          description: The list of attributes included in the category.
+          items:
+            $ref: '#/components/schemas/BrandMetadataCategoryAttribute'
+          type: array
+    BrandMetadataCategoryAttribute:
+      description: An attribute of a category that contains a set of validation rules.
+      properties:
+        description:
+          description: >-
+            Attribute description. It should be used as a description, hoover or
+            helping text in a UI.
+          example: Street Address must be a valid address in United States.
+          type: string
+        title:
+          description: >-
+            Title of the attribute that can be used in the UI to request the
+            attribute field.
+          example: Address Line 1
+          type: string
+        required:
+          description: Indicates whether the attribute is required or not.
+          example: true
+          type: boolean
+        type:
+          description: The type of the attribute.
+          example: string
+          type: string
+        maxLength:
+          description: Max length of text field
+          example: 11
+          type: integer
+        minLength:
+          description: Min length of text field
+          example: 3
+          type: integer
+        name:
+          description: Name of the field. Serves as a key (reference) to a field
+          example: address1
+          type: string
+        pattern:
+          description: Regex pattern validation
+          example: ^[+][0-9]+$
+          type: string
+        message:
+          description: Pattern validation message
+          properties:
+            pattern:
+              description: Pattern validation message
+              example: The number needs to start with country code. For example +1
+              type: string
+            maxLength:
+              description: Max length of the field value
+              example: Address value length must be less than 100 characters
+              type: string
+            minLength:
+              description: Min length of the field value
+              example: Address value length must be greater than 3 characters
+              type: string
+            minItems:
+              description: >-
+                The minimum number of items in the array that must be selected.
+                Used in array types.
+              example: You must select at least 1 item from the list
+              type: string
+        items:
+          description: >-
+            Some attributes can be an array of items. This field is used to
+            define the values the customer can select.
+          properties:
+            type:
+              description: >-
+                The type of the attribute. Along with the type, api can provide
+                a set of values under enum property
+              example: string
+              type: string
+            enum:
+              description: The list of possible values for the attribute.
+              items:
+                type: string
+              example:
+                - value1
+                - value2
+              type: array
+          type: object
+        minItems:
+          description: >-
+            The minimum number of items in the array that must be selected. Used
+            in array types.
+          example: 1
+          type: integer
+        multiline:
+          description: Indicates whether the attribute is a multiline text field or not.
+          example: true
+          type: boolean
+      type: object
+    BrandType:
+      enum:
+        - US_SHORT_CODE_REGISTRY
+      x-enumDescriptions:
+        US_SHORT_CODE_REGISTRY: US Short Code Registry, for US Short Code Campaigns.
+      type: string
+      format: enum
+      example: US_SHORT_CODE_REGISTRY
+    CallbackConfigurationResponse:
+      properties:
+        hmacSecret:
+          description: >-
+            The HMAC secret used for hashing the callback body using the
+            HMAC-SHA1 algorithm - and for creating the X-Sinch-Signature header.
+          example: d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+        projectId:
+          type: string
+      type: object
+    CallbackConfigurationUpdateBody:
+      properties:
+        hmacSecret:
+          description: The HMAC secret to be updated for the specified project
+          example: d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+      type: object
+    RestError:
+      properties:
+        error:
+          $ref: '#/components/schemas/InternalRestError'
+      type: object
+    InternalRestError:
+      properties:
+        code:
+          format: int32
+          type: integer
+          example: 400
+        details:
+          items:
+            $ref: '#/components/schemas/ErrorDetails'
+          type: array
+        message:
+          type: string
+          example: Brand Name already exists for this brand type
+        status:
+          type: string
+          enum:
+            - INVALID_ARGUMENT
+            - UNKNOWN
+            - NOT_FOUND
+            - UNAUTHENTICATED
+            - FAILED_PRECONDITION
+            - ALREADY_EXISTS
+          x-enumDescriptions:
+            INVALID_ARGUMENT: >-
+              The request was invalid or cannot be served. This can happen if
+              the request body is malformed, or if a required field is missing.
+              Expected on 400 error code.
+            UNKNOWN: >-
+              An unknown error occurred. This can happen if the server
+              encountered an unexpected condition that.
+            NOT_FOUND: >-
+              The requested resource was not found. This can happen if the
+              resource does not exist or if the resource ID is incorrect.
+            UNAUTHENTICATED: >-
+              The request is not authenticated. This can happen if the request
+              does not include a valid authentication token.
+            ALREADY_EXISTS: >-
+              The resource already exists. This can happen if the request tries
+              to create a resource that already exists.
+            FAILED_PRECONDITION: >-
+              The request cannot be served due to a failed precondition. This
+              can happen if the request is not valid for the current state of
+              the resource.
+          example: INVALID_ARGUMENT
+      type: object
+    ErrorDetails:
+      type: object
+      oneOf:
+        - $ref: '#/components/schemas/NotFoundDetails'
+        - $ref: '#/components/schemas/InvalidRequestDetails'
+      discriminator:
+        propertyName: type
+        mapping:
+          ResourceInfo: '#/components/schemas/NotFoundDetails'
+          BadRequest: '#/components/schemas/InvalidRequestDetails'
+    NotFoundDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: For not found details.
+          enum:
+            - ResourceInfo
+          x-enumDescriptions:
+            ResourceInfo: Value indicate it is related to a NotFound error
+          example: ResourceInfo
+        resourceType:
+          type: string
+          description: >-
+            The type of the resource that was not found. Brand, Project,
+            BrandType, etc.
+          example: Brand
+        resourceName:
+          type: string
+          description: >-
+            Corresponds to the unique identifier of the resource that was not
+            found.
+          example: '1234567890'
+        description:
+          type: string
+          description: A human-readable description of the error.
+          example: The brand with the specified ID was not found.
+    InvalidRequestDetails:
+      type: object
+      description: >-
+        this body is expected when invalid argument, failed precondition or
+        already exists error occurs.
+      properties:
+        type:
+          type: string
+          description: For invalid arguments details, this value is always BadRequest.
+          example: BadRequest
+          enum:
+            - BadRequest
+          x-enumDescriptions:
+            BadRequest: Value indicate it is related to a InvalidRequest error
+        fieldViolations:
+          items:
+            $ref: '#/components/schemas/FieldViolation'
+          type: array
+    FieldViolation:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field that contains the error
+          example: brandName
+        description:
+          type: string
+          example: Brand name already exists for this brand type
+      description: >-
+        A field violation error that contains the field name, reason and value
+        that caused the error.
+  securitySchemes:
+    OAuth2:
+      description: >-
+        The username and password are your Key ID and Key Secret from the Access
+        keys section in the Sinch Customer Dashboard. Exchange these for a
+        bearer token (access token).
+      flows:
+        clientCredentials:
+          scopes:
+            read: read
+            write: write
+          tokenUrl: https://auth.sinch.com/oauth2/token
+      type: oauth2
+    hmacAuth:
+      type: http
+      scheme: hmac
+      description: >-
+        Used for hashing callbacks. Please refer to the callback-configuration
+        endpoints for more information.
+servers:
+  - description: Production server
+    url: https://brand.registrations.api.sinch.com
+tags:
+  - description: Create and manage Customer Brands
+    name: brands
+    x-displayName: Brands
+  - description: >-
+      You can set up callback URLs to receive event notifications when your
+      brand status is updated.
+
+      When delivering events the order is not guaranteed (for example, a failed
+      event scheduled for retry will not block other events that were queued).
+
+      The client's callback handler must implement the state machine that can
+      decide what to do with unexpected events, for example, "old" events or
+      invalid state transitions. In these cases the handler could use the API to
+      GET the latest state for the resource.
+
+      The callback handler is expected to "ingest" the event and respond with
+      200 OK. The domain-specific business logic and processes should be
+      executed outside of the callback request, as internal asynchronous jobs.
+
+      An HMAC encrypted secret is used for hashing the payload and sending the
+      hashed String via the X-Sinch-Signature header - that you can use to
+      validate that an incoming request is secure. Hmac secret value can be
+      checked with GET endpoint, and it can be updated with PUT endpoint
+    name: callback-configuration
+    x-displayName: callback-configuration
+x-explorer-enabled: false
+x-samples-languages:
+  - curl
+  - java
+  - csharp
+  - node
+  - php

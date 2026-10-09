@@ -1,0 +1,191 @@
+openapi: 3.2.0
+info:
+  title: Chatlayer Analytics Users API
+  version: 1.0.0
+  contact:
+    name: Support
+    url: www.sinch.com
+    email: support@sinch.com
+servers:
+- url: https://analytics.api.chatlayer.ai
+  description: Europe
+- url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+  description: US
+- url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+  description: APAC
+- url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+  description: South America
+security:
+- basicAuth: []
+tags:
+- name: Users
+paths:
+  /v1/bots/{bot_id}/users:
+    get:
+      tags:
+      - Users
+      summary: Get user analytics
+      operationId: Analytics_GetUsers
+      parameters:
+      - name: bot_id
+        in: path
+        description: Identifies the bot.
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Identifies the bot version.
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the data series.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the data series, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: channel_type
+        in: query
+        description: Filter by specific channels, multiple values separated by comma.
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: Filter by specific languages, multiple values separated by comma.
+        schema:
+          type: string
+      - name: bucket
+        in: query
+        description: 'Time interval in which results will be grouped.
+
+          Supported values are 1h,1d,1w. The interval should be smaller
+
+          than the range specified in the  [start_time,end_time)'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUsersResponse'
+  /v1/bots/{bot_id}/users/activity:
+    get:
+      tags:
+      - Users
+      summary: Get user activity by day of week and time of day
+      operationId: Analytics_GetUserActivity
+      parameters:
+      - name: bot_id
+        in: path
+        description: Identifies the bot.
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Identifies the bot version.
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the data series.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the data series, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: channel_type
+        in: query
+        description: Filter by specific channels, multiple values separated by comma.
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: Filter by specific languages, multiple values separated by comma.
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetUserActivityResponse'
+components:
+  schemas:
+    Serie:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            type: integer
+            format: int32
+        mean:
+          type: integer
+          description: The mean value.
+          format: int32
+        max:
+          type: integer
+          description: The max value.
+          format: int32
+        min:
+          type: integer
+          description: The min value.
+          format: int32
+        sum:
+          type: integer
+          description: The sum of all values.
+          format: int32
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+    SeriesData:
+      type: object
+      properties:
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/Serie'
+        series_labels:
+          type: array
+          items:
+            type: string
+        x_values:
+          type: array
+          items:
+            type: string
+    GetUsersResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetUserActivityResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Generate your access token on the [Chatlayer platform](https://app.chatlayer.ai/settings/api-access/tokens).
+externalDocs:
+  description: Learn more
+  url: https://developers.sinch.com/docs/chatlayer-analytics/
+x-original-swagger-version: '2.0'

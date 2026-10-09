@@ -1,0 +1,93 @@
+openapi: 3.2.0
+info:
+  title: Sinch Numbers Available Regions API
+  description: The Sinch Numbers API enables developers to programmatically search for, purchase, configure, and manage phone numbers across multiple countries. It supports local, national, mobile, and toll-free number types that can be used with Sinch SMS, Voice, and Conversation APIs. The API provides endpoints for listing available numbers by region and type, activating numbers, updating number configurations, and releasing numbers when they are no longer needed.
+  version: '1.0'
+  contact:
+    name: Sinch Support
+    url: https://www.sinch.com/contact-us/
+  termsOfService: https://www.sinch.com/terms-of-service/
+servers:
+- url: https://numbers.api.sinch.com
+  description: Global Production Server
+security:
+- oAuth2: []
+- basicAuth: []
+tags:
+- name: Available Regions
+  description: List available regions and number types that can be provisioned.
+paths:
+  /v1/projects/{project_id}/availableRegions:
+    get:
+      operationId: listAvailableRegions
+      summary: List Available Regions
+      description: Returns a list of available regions and the types of phone numbers that can be provisioned in each region.
+      tags:
+      - Available Regions
+      parameters:
+      - $ref: '#/components/parameters/ProjectId'
+      - name: types
+        in: query
+        description: Filter by number types
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - LOCAL
+            - MOBILE
+            - TOLL_FREE
+      responses:
+        '200':
+          description: List of available regions
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AvailableRegionList'
+        '401':
+          description: Unauthorized
+components:
+  parameters:
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
+  schemas:
+    AvailableRegionList:
+      type: object
+      properties:
+        availableRegions:
+          type: array
+          description: List of available regions
+          items:
+            type: object
+            properties:
+              regionCode:
+                type: string
+                description: The ISO 3166-1 alpha-2 country code
+              regionName:
+                type: string
+                description: The region name
+              types:
+                type: array
+                description: Available number types in this region
+                items:
+                  type: string
+  securitySchemes:
+    oAuth2:
+      type: oauth2
+      description: OAuth 2.0 client credentials flow.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Key ID as username and key secret as password.
+externalDocs:
+  description: Sinch Numbers API Documentation
+  url: https://developers.sinch.com/docs/numbers

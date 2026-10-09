@@ -1,0 +1,253 @@
+openapi: 3.2.0
+info:
+  title: Chatlayer Analytics Intents API
+  version: 1.0.0
+  contact:
+    name: Support
+    url: www.sinch.com
+    email: support@sinch.com
+servers:
+- url: https://analytics.api.chatlayer.ai
+  description: Europe
+- url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+  description: US
+- url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+  description: APAC
+- url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+  description: South America
+security:
+- basicAuth: []
+tags:
+- name: Intents
+paths:
+  /v1/bots/{bot_id}/intents:
+    get:
+      tags:
+      - Intents
+      summary: Get most used intents
+      operationId: Analytics_GetIntents
+      parameters:
+      - name: bot_id
+        in: path
+        description: Identifies the bot.
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Identifies the bot version.
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the data series.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the data series, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: channel_type
+        in: query
+        description: Filter by specific channels, multiple values separated by comma.
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: Filter by specific languages, multiple values separated by comma.
+        schema:
+          type: string
+      - name: bucket
+        in: query
+        description: 'Time interval in which results will be grouped.
+
+          Supported values are 1h,1d,1w. The interval should be smaller
+
+          than the range specified in the  [start_time,end_time)'
+        schema:
+          type: string
+      - name: after
+        in: query
+        description: Pagination cursor
+        schema:
+          type: string
+      - name: before
+        in: query
+        description: Pagination cursor
+        schema:
+          type: string
+      - name: first
+        in: query
+        description: First x items. Used in combination with after
+        schema:
+          type: integer
+          format: int64
+      - name: last
+        in: query
+        description: Last x items. Used in combination with before
+        schema:
+          type: integer
+          format: int64
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIntentsResponse'
+  /v1/bots/{bot_id}/intents/insights:
+    get:
+      tags:
+      - Intents
+      operationId: Analytics_GetIntentInsights
+      parameters:
+      - name: bot_id
+        in: path
+        description: Identifies the bot.
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Identifies the bot version.
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the data series.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the data series, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: channel_type
+        in: query
+        description: Filter by specific channels, multiple values separated by comma.
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: Filter by specific languages, multiple values separated by comma.
+        schema:
+          type: string
+      - name: bucket
+        in: query
+        description: 'Time interval in which results will be grouped.
+
+          Supported values are 1h,1d,1w. The interval should be smaller
+
+          than the range specified in the  [start_time,end_time)'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetIntentInsightsResponse'
+      summary: Analytics get intent insights
+      x-summary-source: derived
+components:
+  schemas:
+    Serie:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            type: integer
+            format: int32
+        mean:
+          type: integer
+          description: The mean value.
+          format: int32
+        max:
+          type: integer
+          description: The max value.
+          format: int32
+        min:
+          type: integer
+          description: The min value.
+          format: int32
+        sum:
+          type: integer
+          description: The sum of all values.
+          format: int32
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+    Pagination:
+      type: object
+      properties:
+        start_cursor:
+          title: Starting cursor for the returned dataset
+          type: string
+        end_cursor:
+          title: Ending cursor for the returned dataset
+          type: string
+        has_more:
+          title: Defines if there is more data. This means more data after the dataset when using after, or more data before the dataset when using before
+          type: boolean
+    GetIntentInsightsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetIntentsResponse:
+      type: object
+      properties:
+        data:
+          type: array
+          items:
+            $ref: '#/components/schemas/IntentInfo'
+        pagination:
+          $ref: '#/components/schemas/Pagination'
+    IntentInfo:
+      type: object
+      properties:
+        intent_id:
+          title: Id of the intent. This is also the name of the intent
+          type: string
+        count:
+          title: Total count of these intents
+          type: integer
+          format: int32
+        rank:
+          title: Ordering position for this intent. Starts at 1
+          type: integer
+          format: int32
+    SeriesData:
+      type: object
+      properties:
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/Serie'
+        series_labels:
+          type: array
+          items:
+            type: string
+        x_values:
+          type: array
+          items:
+            type: string
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Generate your access token on the [Chatlayer platform](https://app.chatlayer.ai/settings/api-access/tokens).
+externalDocs:
+  description: Learn more
+  url: https://developers.sinch.com/docs/chatlayer-analytics/
+x-original-swagger-version: '2.0'

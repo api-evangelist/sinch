@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-template-by-name-response-schema.json",
+  "title": "TemplateByNameResponse",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-fax-api-openapi.yml#/components/schemas/TemplateByNameResponse",
+  "type": "object",
+  "properties": {
+    "template": {
+      "type": "object",
+      "description": "The email template.",
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/TemplateName"
+        },
+        "createdAt": {
+          "type": "string",
+          "description": "The timestamp on which the template was created.",
+          "format": "date-time"
+        },
+        "id": {
+          "type": "string",
+          "description": "The ID of the template."
+        },
+        "version": {
+          "type": "object",
+          "properties": {
+            "tag": {
+              "type": "string",
+              "description": "The tag for the template."
+            },
+            "template": {
+              "type": "string",
+              "description": "The contents of the template."
+            },
+            "createdAt": {
+              "type": "string",
+              "description": "The timestamp on which the template was created.",
+              "format": "date-time"
+            },
+            "comment": {
+              "type": "string",
+              "description": "Optional field for comments if necessary."
+            },
+            "active": {
+              "type": "boolean",
+              "description": "Displays whether the template is active or not."
+            },
+            "id": {
+              "type": "string",
+              "description": "The ID for the template version."
+            },
+            "headers": {
+              "type": "object",
+              "description": "Headers that are sent along with the template."
+            }
+          }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "TemplateName": {
+      "type": "string",
+      "description": "The name of the email template.",
+      "enum": [
+        "successful outbound fax",
+        "unsuccessful outbound fax",
+        "successful inbound fax",
+        "unsuccessful inbound fax"
+      ],
+      "x-enumDescriptions": {
+        "successful outbound fax": "The template for a successful outbound fax.",
+        "unsuccessful outbound fax": "The template for an unsuccessful outbound fax.",
+        "successful inbound fax": "The template for a successful inbound fax.",
+        "unsuccessful inbound fax": "The template for an unsuccessful inbound fax."
+      }
+    }
+  }
+}

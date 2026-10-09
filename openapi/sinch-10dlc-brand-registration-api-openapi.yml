@@ -1,0 +1,1052 @@
+openapi: 3.2.0
+info:
+  title: 10DLC Brand Registration API
+  description: Service for creating and listing US 10DLC brand and campaign registrations and TFN Verifications.
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- url: https://us10dlc.numbers.api.sinch.com
+  description: HTTP 10DLC API Server (Default(US))
+security:
+- BasicAuth: []
+- OAuth2: []
+tags:
+- name: 10DLC Brand Registration
+  description: Create or look up brand registration for 10DLC virtual numbers
+paths:
+  /v1/projects/{projectId}/brandRegistrations:submit:
+    post:
+      tags:
+      - 10DLC Brand Registration
+      summary: Create Brand Registrations
+      description: 'Create a 10DLC brand registration at TCR (The Campaign Registry).
+
+        There are 2 types of registrations:
+
+
+        1. **Simplified Registration** - only verifies your brand.
+
+        2. **Full Registration** - performs a vetting and grants a vetted verified brand.'
+      operationId: BrandRegistrationService_CreateBrandRegistrationRequest
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      requestBody:
+        description: The request body to of the brand to be created
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateBrandRegistration'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateBrandRegistrationResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: projectId
+                      description: invalid value
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+      x-codegen-request-body-name: body
+  /v1/projects/{projectId}/brandRegistrations:
+    get:
+      tags:
+      - 10DLC Brand Registration
+      summary: List Brand Registrations
+      description: Lists all brand registrations per project.
+      operationId: BrandRegistrationService_ListBrandRegistrationRequest
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListBrandRegistrationResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: projectId
+                      description: invalid value
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+  /v1/projects/{projectId}/brandRegistrations/{brandRegistrationId}:
+    get:
+      tags:
+      - 10DLC Brand Registration
+      summary: Brand Registration Status
+      description: Get brand registration details using brand registration ID when creating a brand.
+      operationId: BrandRegistrationService_GetBrandRegistrationRequest
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/brandRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandRegistration'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: projectId
+                      description: invalid value
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+    patch:
+      tags:
+      - 10DLC Brand Registration
+      summary: Brand Registration Update
+      description: Update Brand Registration details
+      operationId: BrandRegistrationService_Update10DlcBrand
+      parameters:
+      - name: projectId
+        in: path
+        description: Your project id can be found if you log into your account on dashboard.sinch.com.
+        required: true
+        schema:
+          type: string
+      - name: brandRegistrationId
+        in: path
+        description: The Brand Registration ID is returned in the response when creating the brand
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/TenDlcBrandUpdateRequest'
+        required: true
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandRegistration'
+        '400':
+          description: 'INVALID_ARGUMENT: If the brandRegistrationId is not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: brandRegistrationId
+                      description: Invalid brandRegistrationId xyz
+        '404':
+          description: Brand could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: ''
+                  status: NOT_FOUND
+                  details:
+                  - type: ResourceInfo
+                    resourceType: BrandRegistration
+                    resourceName: xyz
+                    owner: ''
+                    description: ''
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+      x-codegen-request-body-name: body
+  /v1/projects/{projectId}/brandRegistrations/{brandRegistrationId}/feedback:
+    get:
+      tags:
+      - 10DLC Brand Registration
+      summary: Brand Registration Feedback
+      description: 'Returns feedback information for brand registrations that were rejected.
+
+        Following are the applicable category IDs:
+
+
+        * **TAX_ID** - Data mismatch related to tax id and its associated properties.
+
+        * **STOCK_SYMBOL** - Non public entity registered as a public for profit entity or the stock information mismatch.
+
+        * **GOVERNMENT_ENTITY** - Non government entity registered as a government entity. Must be a U.S. government entity.
+
+        * **NONPROFIT** - No IRS 501c tax-exempt status found.
+
+        * **OTHERS** - Details of the data misrepresentation if any.'
+      operationId: BrandRegistrationService_GetBrandRegistrationFeedback
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/brandRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandRegistrationFeedbackResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the brandRegistrationId is not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: brandRegistrationId
+                      description: Invalid brandRegistrationId xyz
+        '404':
+          description: Brand could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: ''
+                  status: NOT_FOUND
+                  details:
+                  - type: ResourceInfo
+                    resourceType: BrandRegistration
+                    resourceName: xyz
+                    owner: ''
+                    description: ''
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/projects/{projectId}/brandRegistrations:fetchByTcrBrandId:
+    get:
+      tags:
+      - 10DLC Brand Registration
+      summary: Get Brand Details
+      description: Get the US 10DLC brand details using the TCR brand ID.
+      operationId: BrandRegistrationService_fetchBrandRegistrationRequest
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/brandId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandRegistration'
+        '400':
+          description: 'INVALID_ARGUMENT: If the input parameters are not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: Invalid projectId
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: projectId
+                      description: invalid value
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+  /v1/projects/{projectId}/brandRegistrations/{brandRegistrationId}/upgrade:
+    post:
+      tags:
+      - 10DLC Brand Registration
+      summary: Brand Registration Upgrade
+      description: Upgrades brand from `SIMPLIFIED` to `FULL`.
+      operationId: BrandRegistrationService_Upgrade10DlcBrandToFullRegistration
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/brandRegistrationId'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/BrandRegistration'
+        '400':
+          description: 'INVALID_ARGUMENT: If the brandRegistrationId is not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: brandRegistrationId
+                      description: Invalid brandRegistrationId xyz
+        '404':
+          description: Brand could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: ''
+                  status: NOT_FOUND
+                  details:
+                  - type: ResourceInfo
+                    resourceType: BrandRegistration
+                    resourceName: xyz
+                    owner: ''
+                    description: ''
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                type: object
+  /v1/projects/{projectId}/brandRegistrations/{brandRegistrationId}/vettingInfo:
+    get:
+      tags:
+      - 10DLC Brand Registration
+      summary: Brand Registration Vetting Information
+      description: Returns the vetting information of a brand registration. Include optional query parameters to filter results by vetting partner ID, vetting class, or status.
+      operationId: BrandRegistrationService_VettingInfo
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/brandRegistrationId'
+      - $ref: '#/components/parameters/vettingStatus'
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TenDlcVettingInfoResponse'
+        '400':
+          description: 'INVALID_ARGUMENT: If the brandRegistrationId is not valid'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 400
+                  message: ''
+                  status: INVALID_ARGUMENT
+                  details:
+                  - type: BadRequest
+                    fieldViolations:
+                    - field: brandRegistrationId
+                      description: Invalid brandRegistrationId xyz
+        '404':
+          description: Brand could not be found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 404
+                  message: ''
+                  status: NOT_FOUND
+                  details:
+                  - type: ResourceInfo
+                    resourceType: BrandRegistration
+                    resourceName: xyz
+                    owner: ''
+                    description: ''
+        '429':
+          description: Over limit
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+              example:
+                error:
+                  code: 429
+                  message: Over limit
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/error'
+  /v1/projects/{projectId}/brandRegistrations/{bundleId}/resend2faEmail:
+    post:
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - name: bundleId
+        required: true
+        in: path
+        description: The ID of the bundle associated with the brand registration.
+        schema:
+          type: string
+      operationId: resend2faEmail
+      summary: Resend 2FA Email
+      description: Resends the two-factor authentication email.
+      responses:
+        '200':
+          description: No response
+          content: {}
+      tags:
+      - 10DLC Brand Registration
+components:
+  schemas:
+    VettingProvider:
+      type: string
+      default: AEGIS
+      enum:
+      - AEGIS
+      x-enumDescriptions:
+        AEGIS: Aegis is the vetting provider.
+    VettingClass:
+      type: string
+      default: STANDARD
+      enum:
+      - STANDARD
+      x-enumDescriptions:
+        STANDARD: Standard vetting class.
+    CreateBrandRegistration:
+      title: Brand Registration Request
+      type: object
+      properties:
+        displayName:
+          type: string
+          description: Display name is defined by the user
+        brandRegistrationType:
+          $ref: '#/components/schemas/BrandRegistrationType'
+        companyDetails:
+          $ref: '#/components/schemas/CompanyDetails'
+        financialDetails:
+          $ref: '#/components/schemas/FinancialDetails'
+        contactDetails:
+          $ref: '#/components/schemas/ContactDetails'
+        mock:
+          type: boolean
+          description: Defines if created brand should be mocked or real one
+    BrandRegistration:
+      title: Brand Registration Details
+      type: object
+      properties:
+        brandRegistrationId:
+          type: string
+          description: Output only. Brand registration Id
+          readOnly: true
+        brandId:
+          type: string
+          description: Output only. TCR brand Id
+          readOnly: true
+        identityStatus:
+          type: string
+          description: Identity status for the brand.
+          readOnly: true
+        displayName:
+          type: string
+          description: Output only. Display name defined by user
+          readOnly: true
+        brandRegistrationStatus:
+          $ref: '#/components/schemas/BrandRegistrationStatus'
+        brandRegistrationType:
+          $ref: '#/components/schemas/BrandRegistrationType'
+        companyDetails:
+          $ref: '#/components/schemas/CompanyDetails'
+        financialDetails:
+          $ref: '#/components/schemas/FinancialDetails'
+        contactDetails:
+          $ref: '#/components/schemas/ContactDetails'
+        mock:
+          type: boolean
+          description: Defines if created brand should be mocked or real one
+    TenDlcVettingInfoResponse:
+      type: object
+      properties:
+        vettingInfo:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/VettingInfo'
+    BrandRegistrationFeedbackResponse:
+      type: object
+      properties:
+        brandId:
+          type: string
+          readOnly: true
+        category:
+          type: array
+          readOnly: true
+          items:
+            $ref: '#/components/schemas/Category'
+    fieldViolations:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field which produced the error.
+          example: order_by
+        description:
+          type: string
+          description: The description of the error.
+          example: Invalid `order_by` number.
+    VettingInfo:
+      type: object
+      properties:
+        vettingId:
+          type: string
+          readOnly: true
+        provider:
+          $ref: '#/components/schemas/VettingProvider'
+        vettingStatus:
+          $ref: '#/components/schemas/VettingStatus'
+        vettingClass:
+          $ref: '#/components/schemas/VettingClass'
+        vettingToken:
+          type: string
+          readOnly: true
+        vettingScore:
+          type: integer
+          format: int32
+          readOnly: true
+        reasons:
+          type: array
+          readOnly: true
+          items:
+            type: string
+        vettingDetails:
+          type: object
+          additionalProperties:
+            type: string
+          readOnly: true
+        vettedDate:
+          type: string
+          format: date-time
+          readOnly: true
+        createDate:
+          type: string
+          format: date-time
+          readOnly: true
+    VettingStatus:
+      type: string
+      default: ACTIVE
+      enum:
+      - PENDING
+      - UNSCORE
+      - ACTIVE
+      - FAILED
+      - EXPIRED
+      x-enumDescriptions:
+        PENDING: Pending vetting.
+        UNSCORE: Undergoing vetting process.
+        ACTIVE: Active status.
+        FAILED: Vetting failed.
+        EXPIRED: Vetting expired.
+    BrandVerticalType:
+      title: Brand Vertical Type
+      type: string
+      description: '- PROFESSIONAL
+
+        - REAL_ESTATE
+
+        - HEALTHCARE
+
+        - HUMAN_RESOURCES
+
+        - ENERGY
+
+        - ENTERTAINMENT
+
+        - RETAIL
+
+        - AGRICULTURE
+
+        - INSURANCE
+
+        - POSTAL
+
+        - EDUCATION
+
+        - HOSPITALITY
+
+        - FINANCIAL
+
+        - POLITICAL
+
+        - GAMBLING
+
+        - LEGAL
+
+        - CONSTRUCTION
+
+        - NGO
+
+        - MANUFACTURING
+
+        - GOVERNMENT
+
+        - TECHNOLOGY
+
+        - COMMUNICATION'
+      enum:
+      - PROFESSIONAL
+      - REAL_ESTATE
+      - HEALTHCARE
+      - HUMAN_RESOURCES
+      - ENERGY
+      - ENTERTAINMENT
+      - RETAIL
+      - TRANSPORTATION
+      - AGRICULTURE
+      - INSURANCE
+      - POSTAL
+      - EDUCATION
+      - HOSPITALITY
+      - FINANCIAL
+      - POLITICAL
+      - GAMBLING
+      - LEGAL
+      - CONSTRUCTION
+      - NGO
+      - MANUFACTURING
+      - GOVERNMENT
+      - TECHNOLOGY
+      - COMMUNICATION
+      x-enumDescriptions:
+        PROFESSIONAL: Professional services.
+        REAL_ESTATE: Real estate organizations.
+        HEALTHCARE: Healthcare organizations.
+        HUMAN_RESOURCES: Staffing agencies and HR.
+        ENERGY: Related to energy industry.
+        ENTERTAINMENT: Music, film, and sports product.
+        RETAIL: Retail organizations.
+        TRANSPORTATION: Transportation services.
+        AGRICULTURE: Agricultural services.
+        INSURANCE: Insurance industry.
+        POSTAL: Courier and delivery services.
+        EDUCATION: Schools, tutoring, and child-care services.
+        HOSPITALITY: Hotels, restaurants, and travel agencies.
+        FINANCIAL: Banking services, brokerages.
+        POLITICAL: Political campaigns, PACs.
+        GAMBLING: Gambling and lottery.
+        LEGAL: Attorneys, court reporting.
+        CONSTRUCTION: Construction industry.
+        NGO: Non-governmental organizations.
+        MANUFACTURING: Manufacturing industries.
+        GOVERNMENT: Government services.
+        TECHNOLOGY: Technology services.
+        COMMUNICATION: Communication services.
+    errorDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: A more specific description of the error.
+          example: BadRequest
+        resourceType:
+          type: string
+          description: The type of resource relevant to the error, if applicable.
+        resourceName:
+          type: string
+          description: The name of the resource, if applicable.
+        owner:
+          type: string
+          description: The owner of the resource, if applicable.
+        description:
+          type: string
+          description: A description of the error, if applicable.
+        fieldViolations:
+          type: array
+          description: An array of all the field violations which contributed to the error.
+          items:
+            $ref: '#/components/schemas/fieldViolations'
+    ListBrandRegistrationResponse:
+      type: object
+      properties:
+        brandRegistrations:
+          type: array
+          items:
+            $ref: '#/components/schemas/BrandRegistration'
+        nextPageToken:
+          type: string
+        totalSize:
+          type: integer
+          format: int32
+    CompanyDetails:
+      title: Company Details
+      type: object
+      properties:
+        companyName:
+          type: string
+          description: The legal name of the end user business
+        companyEmail:
+          type: string
+          description: The email address of support contact
+        businessContactEmail:
+          type: string
+          description: The email address of the primary business contact.
+        brandName:
+          type: string
+          description: The brand name the business wants to register
+        country:
+          type: string
+          description: 2 letter ISO-2 country code. E.g. US, CA
+        streetAddress:
+          type: string
+          description: Street name and house number. E.g. 1000 Sunset Hill Road
+        city:
+          type: string
+          description: City name
+        postalCode:
+          type: string
+          description: Zipcode or postal code. E.g. 21012
+        state:
+          type: string
+          description: State or province. For the United States, please use 2 character codes. E.g. 'CA' for California.
+        webAddress:
+          type: string
+          description: The website of the business
+    BrandRegistrationStatus:
+      title: Brand Registration Status
+      type: string
+      description: '- DRAFT: Registration has not yet been submitted. Only feasible when creating a brand registration in dashboard.sinch.com - IN_PROGRESS: Registration had been submitted for review - REJECTED: Registration has been rejected. Please contact your account manager for further information - APPROVED: Brand registration has been completed - UPGRADE: The Brand is being upgraded to FULL registration'
+      default: DRAFT
+      enum:
+      - DRAFT
+      - IN_PROGRESS
+      - REJECTED
+      - APPROVED
+      - UPGRADE
+      x-enumDescriptions:
+        DRAFT: Registration has not yet been submitted.
+        IN_PROGRESS: Registration had been submitted for review.
+        REJECTED: Registration has been rejected.
+        APPROVED: Brand registration has been completed.
+        UPGRADE: Brand is being upgraded to FULL registration.
+    ContactDetails:
+      title: Contact Details
+      type: object
+      properties:
+        firstName:
+          type: string
+          description: First name of business contact
+        lastName:
+          type: string
+          description: Last name of business contact
+        phoneNumber:
+          type: string
+          description: The support contact telephone in e.164 format. E.g. +12023339999
+        email:
+          type: string
+          description: The email address to the end user contact person
+    error:
+      required:
+      - error
+      type: object
+      properties:
+        error:
+          type: object
+          required:
+          - code
+          - message
+          properties:
+            code:
+              type: integer
+              description: The error code.
+              example: 400
+            message:
+              type: string
+              description: The error message.
+              example: Invalid argument.
+            status:
+              type: string
+              description: The status of the error.
+              example: INVALID_ARGUMENT
+            details:
+              type: array
+              description: An array of objects describing the error in more detail, if applicable.
+              items:
+                $ref: '#/components/schemas/errorDetails'
+    BrandEntityType:
+      title: Brand Entity Type
+      type: string
+      description: '- PUBLIC: A public company registered on a stock exchange
+
+        - PRIVATE: A private company
+
+        - CHARITY_NON_PROFIT: A charity or non-profit company'
+      default: PUBLIC
+      enum:
+      - PUBLIC
+      - PRIVATE
+      - CHARITY_NON_PROFIT
+      x-enumDescriptions:
+        PUBLIC: A public company registered on a stock exchange
+        PRIVATE: A private company
+        CHARITY_NON_PROFIT: A charity or non-profit company
+    TenDlcBrandUpdateRequest:
+      type: object
+      properties:
+        companyDetails:
+          $ref: '#/components/schemas/CompanyDetails'
+        financialDetails:
+          $ref: '#/components/schemas/FinancialDetails'
+        contactDetails:
+          $ref: '#/components/schemas/ContactDetails'
+    CreateBrandRegistrationResponse:
+      title: Brand Registration Response
+      type: object
+      properties:
+        brandRegistrationId:
+          type: string
+          description: Output only. Brand registration Id
+          readOnly: true
+    Category:
+      type: object
+      properties:
+        id:
+          description: The category ID.
+          type: string
+          readOnly: true
+          enum:
+          - TAX_ID
+          - STOCK_SYMBOL
+          - GOVERNMENT_ENTITY
+          - NONPROFIT
+          - OTHERS
+          x-enumDescriptions:
+            TAX_ID: Data mismatch related to tax id and its associated properties.
+            STOCK_SYMBOL: Non public entity registered as a public for profit entity or the stock information mismatch.
+            GOVERNMENT_ENTITY: Non government entity registered as a government entity. Must be a U.S. government entity.
+            NONPROFIT: No IRS 501c tax-exempt status found.
+            OTHERS: Details of the data misrepresentation if any.
+        displayName:
+          type: string
+          readOnly: true
+        description:
+          type: string
+          readOnly: true
+        fields:
+          type: array
+          readOnly: true
+          items:
+            type: string
+    BrandRegistrationType:
+      title: Brand Registration Type
+      type: string
+      description: '- SIMPLIFIED: Simplified Registration costs 10USD and will only verify your brand. - FULL: Full Registration will cost 50USD but perform an vetting and grant a vetted verified brand.'
+      default: SIMPLIFIED
+      enum:
+      - SIMPLIFIED
+      - FULL
+      - BRAND_REGISTRATION_TYPE_UNSPECIFIED
+      x-enumDescriptions:
+        SIMPLIFIED: Simplified Registration costs 10USD and will only verify your brand.
+        FULL: Full Registration will cost 50USD but perform a vetting and grant a vetted verified brand.
+        BRAND_REGISTRATION_TYPE_UNSPECIFIED: Type not specified.
+    FinancialDetails:
+      title: Financial Details
+      type: object
+      properties:
+        brandEntityType:
+          $ref: '#/components/schemas/BrandEntityType'
+        brandVerticalType:
+          $ref: '#/components/schemas/BrandVerticalType'
+        taxIdCountry:
+          type: string
+          description: In what country is your tax id registered
+        taxIdCorporate:
+          type: string
+          description: The tax id of the business
+        stockSymbol:
+          type: string
+          description: The company stock symbol
+        exchange:
+          type: string
+          description: In what stock exchange is the company registered
+  parameters:
+    vettingStatus:
+      name: vettingStatus
+      in: query
+      required: true
+      schema:
+        type: string
+        enum:
+        - PENDING
+        - UNSCORE
+        - ACTIVE
+        - FAILED
+        - EXPIRED
+        x-enumDescriptions:
+          PENDING: Pending vetting.
+          UNSCORE: Undergoing vetting process.
+          ACTIVE: Active status.
+          FAILED: Vetting failed.
+          EXPIRED: Vetting expired.
+        default: ACTIVE
+    projectId:
+      name: projectId
+      in: path
+      required: true
+      schema:
+        type: string
+      description: Sinch uses projects to group resources such as contacts and apps together to manage and connect a unique set of keys and secret IDs for all your Sinch API products. To identify a project, it is given a unique alphanumeric identifier that ties it to your account. Your project ID can be found in the [Customer Dashboard](https://dashboard.sinch.com/settings/project-management).
+    brandId:
+      name: brandId
+      description: Brand Id to be qualified
+      in: query
+      required: true
+      schema:
+        type: string
+    brandRegistrationId:
+      name: brandRegistrationId
+      description: The Brand Registration ID is returned in the response when creating the brand
+      in: path
+      required: true
+      schema:
+        type: string
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: Our basic security works with any project. Simply use the client_id and client_secret that were displayed when you created your access key through the dashboard in the [Access keys section](https://dashboard.sinch.com/settings/access-keys).
+    OAuth2:
+      type: oauth2
+      description: This is the recommended way to access our APIs in production.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

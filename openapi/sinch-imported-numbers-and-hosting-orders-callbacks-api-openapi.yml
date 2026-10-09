@@ -1,0 +1,344 @@
+openapi: 3.2.0
+info:
+  title: Imported Numbers and Hosting Orders Callbacks API
+  description: API for importing, hosting, and qualifying numbers to enable them for use with Sinch SMS text messaging services.
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: support@sinch.com
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  version: '1.0'
+servers:
+- url: https://imported.numbers.api.sinch.com
+  description: Global API
+security:
+- Basic: []
+- OAuth2.0: []
+tags:
+- name: Imported Numbers and Hosting Orders Callbacks
+  description: You can set up callback URLs to receive event notifications when your numbers are updated.
+paths:
+  /v1/projects/{projectId}/callbackConfiguration:
+    get:
+      summary: Get callbacks configuration
+      description: Returns the callbacks configuration for the specified project
+      operationId: GetCallbackConfiguration
+      responses:
+        '200':
+          description: Callbacks configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfiguration'
+        '400':
+          description: 400 Invalid Argument error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidArgument'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      tags:
+      - Imported Numbers and Hosting Orders Callbacks
+    patch:
+      summary: Update callback configuration
+      description: Updates the callbacks configuration for the specified project
+      operationId: UpdateCallbackConfiguration
+      requestBody:
+        description: The callback configuration details to be updated.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackConfigurationUpdate'
+      responses:
+        '200':
+          description: Callback configuration
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfiguration'
+        '400':
+          description: 400 Invalid Argument error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InvalidArgument'
+        '404':
+          description: 404 Not Found error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        '500':
+          description: 500 Internal Server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/InternalError'
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      tags:
+      - Imported Numbers and Hosting Orders Callbacks
+webhooks:
+  EventsCallback:
+    post:
+      tags:
+      - Imported Numbers and Hosting Orders Callbacks
+      summary: Event notification
+      description: A notification of an event sent to your configured callback URL.
+      operationId: ImportedNumberService_EventsCallback
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackPayload'
+      responses:
+        default:
+          description: 200 OK
+components:
+  schemas:
+    FieldViolation:
+      type: object
+      properties:
+        field:
+          type: string
+        description:
+          type: string
+    InvalidArgument:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+              - 400
+              x-enumDescriptions:
+                '400': An invalid argument error code.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+              - INVALID_ARGUMENT
+              x-enumDescriptions:
+                INVALID_ARGUMENT: An invalid argument error.
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/BadRequest'
+    CallbackConfigurationUpdate:
+      title: CallbackConfigurationUpdate
+      type: object
+      properties:
+        hmacSecret:
+          type: string
+          description: The HMAC secret to be updated for the specified project
+      description: The request to update the callbacks configuration for the current project.
+    InternalError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+              - 500
+              x-enumDescriptions:
+                '500': An internal server error code.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+              - INTERNAL
+              - UNKNOWN
+              x-enumDescriptions:
+                INTERNAL: Internal server error.
+                UNKNOWN: Unknown error.
+            details:
+              type: array
+              items:
+                type: object
+    BadRequest:
+      type: object
+      properties:
+        type:
+          type: string
+          enum:
+          - BadRequest
+          x-enumDescriptions:
+            BadRequest: A bad request error.
+        fieldViolations:
+          type: array
+          items:
+            $ref: '#/components/schemas/FieldViolation'
+    NotFound:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              enum:
+              - 404
+              x-enumDescriptions:
+                '404': A not found error code.
+            message:
+              type: string
+            status:
+              type: string
+              enum:
+              - NOT_FOUND
+              x-enumDescriptions:
+                NOT_FOUND: Could not find the resource.
+            details:
+              type: array
+              items:
+                type: object
+    CallbackConfiguration:
+      description: Response message containing the callbacks configuration for a specific project.
+      type: object
+      properties:
+        projectId:
+          type: string
+          description: ID of the project the configuration belongs to.
+          example: a99aa9aa-b888-777c-dd6d-ee55e5555555
+        hmacSecret:
+          type: string
+          description: The HMAC secret used for hashing the callback body using the HMAC-SHA1 algorithm - and for creating the `X-Sinch-Signature` header.
+          example: YOUR_hmac_secret
+    CallbackPayload:
+      type: object
+      properties:
+        resourceType:
+          type: string
+          description: The type of the resource.
+          enum:
+          - IMPORTED_NUMBER
+          - HOSTING_ORDER_NUMBER
+          x-enumDescriptions:
+            IMPORTED_NUMBER: Numbers imported individually or previously imported successfully via hosting orders but later updated.
+            HOSTING_ORDER_NUMBER: Numbers that are imported as part of a hosting order.
+          example: IMPORTED_NUMBER
+        eventType:
+          type: string
+          description: The type of the event.
+          enum:
+          - PROVISIONING_TO_SMS_PLATFORM
+          - DEPROVISIONING_TO_SMS_PLATFORM
+          - LINK_TO_10DLC_CAMPAIGN
+          - UNLINK_TO_10DLC_CAMPAIGN
+          - HOSTING_PROCESS
+          - OSR_UPDATE
+          - DELETE
+          x-enumDescriptions:
+            PROVISIONING_TO_SMS_PLATFORM: An event that occurs when a number is linked to a Service Plan ID.
+            DEPROVISIONING_TO_SMS_PLATFORM: An event that occurs when a number is unlinked from a Service Plan ID.
+            LINK_TO_10DLC_CAMPAIGN: An event that occurs when a number is linked to a Campaign.
+            UNLINK_TO_10DLC_CAMPAIGN: An event that occurs when a number is unlinked from a Campaign.
+            HOSTING_PROCESS: An event that indicates the success or failure of a number's hosting process.
+            OSR_UPDATE: An event that occurs when an OSR update is performed for a number.
+            DELETE: An event that occurs when a number is deleted.
+          example: LINK_TO_10DLC_CAMPAIGN
+        eventId:
+          type: string
+          description: The ID of the event.
+          example: abcd1234efghijklmnop567890
+        timestamp:
+          type: string
+          description: The date and time when the callback was created and added to the callbacks queue in ISO 8601 format (UTC).
+          format: date-time
+          example: '2023-06-06T07:45:27.785357Z'
+        projectId:
+          type: string
+          description: The ID of the project to which the event belongs.
+          example: abcd12ef-ab12-ab12-bc34-abcdef123456
+        resourceId:
+          type: string
+          description: The unique identifier of the resource, depending on the resource type. For example, a phone number, a hosting order ID, or a brand ID.
+          example: '+12345612345'
+        status:
+          type: string
+          description: The status of the event. For example, `SUCCEEDED` or `FAILED`.
+          x-enumDescriptions:
+            SUCCEEDED: The event has succeeded.
+            FAILED: The event has failed.
+          enum:
+          - SUCCEEDED
+          - FAILED
+          example: FAILED
+        failureCode:
+          type: string
+          description: If the status is FAILED, a failure code will be provided. For numbers provisioning to SMS platform, there won't be any extra `failureCode`, as the result is binary. For campaign provisioning-related failures, refer to the list for the possible values.
+          example: CAMPAIGN_NOT_AVAILABLE
+          enum:
+          - CAMPAIGN_NOT_AVAILABLE
+          - EXCEEDED_10DLC_LIMIT
+          - NUMBER_PROVISIONING_FAILED
+          - PARTNER_SERVICE_UNAVAILABLE
+          - CAMPAIGN_PENDING_ACCEPTANCE
+          - MNO_SHARING_ERROR
+          - CAMPAIGN_PROVISIONING_FAILED
+          - CAMPAIGN_EXPIRED
+          - CAMPAIGN_MNO_REJECTED
+          - CAMPAIGN_MNO_SUSPENDED
+          - CAMPAIGN_MNO_REVIEW
+          - INSUFFICIENT_BALANCE
+          - MOCK_CAMPAIGN_NOT_ALLOWED
+          - TFN_NOT_ALLOWED
+          - INVALID_NNID
+          x-enumDescriptions:
+            CAMPAIGN_NOT_AVAILABLE: The specified campaign is not available.
+            EXCEEDED_10DLC_LIMIT: Exceeded the limit for 10DLC.
+            NUMBER_PROVISIONING_FAILED: Provisioning the number failed.
+            PARTNER_SERVICE_UNAVAILABLE: The third party service is unavailable.
+            CAMPAIGN_PENDING_ACCEPTANCE: The campaign is not yet accepted.
+            MNO_SHARING_ERROR: Error with MNO.
+            CAMPAIGN_PROVISIONING_FAILED: The campaign failed to provision.
+            CAMPAIGN_EXPIRED: The campaign expired.
+            CAMPAIGN_MNO_REJECTED: The campaign MNO was rejected.
+            CAMPAIGN_MNO_SUSPENDED: The campaign MNO was suspended.
+            CAMPAIGN_MNO_REVIEW: The campaign MNO is under review.
+            INSUFFICIENT_BALANCE: Not enough credit in the account.
+            MOCK_CAMPAIGN_NOT_ALLOWED: Provisioning not allowed for mock campaigns.
+            TFN_NOT_ALLOWED: Toll free numbers not allowed.
+            INVALID_NNID: Invalid NNID.
+  parameters:
+    projectId:
+      name: projectId
+      description: Found on your [Sinch Customer Dashboard](https://dashboard.sinch.com/settings/project-management). Settings > Projects.
+      in: path
+      required: true
+      schema:
+        type: string
+        example: d1923022-5199-4bb3-a513-c47b3a656bc5
+  securitySchemes:
+    Basic:
+      type: http
+      description: Your key ID and Key secret serve as the username and password, respectively. Both can be found in the [Sinch Customer Dashboard](https://dashboard.sinch.com/settings/access-keys).For more information about basic authentication in the Numbers API, click [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/basic).
+      scheme: basic
+    OAuth2.0:
+      type: oauth2
+      description: The username and password are your Key ID and Key Secret from the [Access keys section](https://dashboard.sinch.com/settings/access-keys) in the Sinch Customer Dashboard. Exchange these for a bearer token (access token). Learn how [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

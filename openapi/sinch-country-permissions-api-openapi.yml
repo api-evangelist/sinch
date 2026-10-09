@@ -1,0 +1,149 @@
+openapi: 3.2.0
+info:
+  title: Elastic SIP Trunk Country Permissions API
+  description: This document provides a detailed user guide and reference documentation on the Sinch Elastic SIP Trunk API.
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    email: support@sinch.com
+    name: support at sinch
+servers:
+- url: https://elastic-trunking.api.sinch.com
+security:
+- Basic: []
+- OAuth2.0: []
+tags:
+- name: Country Permissions
+  description: Country permissions are used to control which countries can be dialed from a specific SIP trunk.
+paths:
+  /v1/projects/{projectId}/countryPermissions:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+      - Country Permissions
+      summary: Fetch all country permissions
+      description: Fetches the list of country permissions.
+      operationId: getCountryPermissions
+      responses:
+        '200':
+          description: The list of countries available
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  countryPermissions:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/CountryPermission'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.countryPermissions.list({});\n    if (!response.countryPermissions?.length) {\n      console.log('No country permissions found.');\n      return;\n    }\n    console.log(`✅ Found ${response.countryPermissions.length} country permissions.`);\n    response.countryPermissions.forEach((countryPermission) => {\n      console.log(countryPermission);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list the country permissions:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /v1/projects/{projectId}/countryPermissions/{isoCode}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: isoCode
+      in: path
+      description: The ISO code of the country.
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Country Permissions
+      summary: Fetch country permission
+      description: Fetches the requested country permission.
+      operationId: getCountryPermission
+      responses:
+        '200':
+          description: The returned country permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryPermission'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The country code you want to get permissions for\n  const countryCode = 'US';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.countryPermissions.get({\n      isoCode: countryCode,\n    });\n    console.log('✅ Successfully retrieved the country permissions.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the country permissions for country code ${countryCode}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+    put:
+      tags:
+      - Country Permissions
+      summary: Update country permission
+      description: Update the requested country permission.
+      operationId: updateCountryPermission
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CountryPermission'
+      responses:
+        '200':
+          description: The updated country permission
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CountryPermission'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // Replace with the country code you want to update permissions for\n  const countryCode = 'US';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.countryPermissions.update({\n      isoCode: countryCode,\n      updateCountryPermissionRequestBody: {\n        enabled: true,\n      },\n    });\n    console.log('✅ Successfully updated the country permissions.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to update the country permissions for the country code ${countryCode}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+components:
+  schemas:
+    CountryPermission:
+      description: With country permissions you can control which countries can be dialed from your account. For beta only, countries supported are US,CA and * if you would like to allow international dialing.
+      type: object
+      required:
+      - enabled
+      properties:
+        isoCode:
+          description: The [ISO code](https://en.wikipedia.org/wiki/ISO_3166-1_alpha-2) of the country
+          type: string
+          readOnly: true
+          maxLength: 2
+          example: US
+        name:
+          description: Country name in english
+          type: string
+          example: United States/Canada
+          readOnly: true
+        continent:
+          description: Continent of the country
+          type: string
+          example: North America
+          readOnly: true
+        countryDialingCodes:
+          description: The country calling codes as an array, most countries have only one but some have multiple like the San Marino, China, and a few others.
+          type: array
+          readOnly: true
+          items:
+            type: string
+            description: The country calling code
+            example: '+1'
+        enabled:
+          readOnly: false
+          type: boolean
+          description: If the country is enabled or not. When this is enabled regular numbers can be dialed from the account.
+          default: true
+          example: true
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: The `projectId` is a required parameter you must include when making any API calls. You can find your project ID on your [Build dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+  securitySchemes:
+    Basic:
+      type: http
+      description: To use basic authentication, use your Access Key ID as your username and your Access Key Secret as your password. To read about more basic authentication, see the [Basic Authentication](https://developers.sinch.com/docs/est/api-reference/est#basic) section.
+      scheme: basic
+    OAuth2.0:
+      type: oauth2
+      description: To use OAuth 2.0 authentication, use your Access Key ID and Access Key Secret to obtain your bearer token. For detailed instructions on how to do this, see the [OAuth Authentication](https://developers.sinch.com/docs/est/api-reference/est#oauth) section.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

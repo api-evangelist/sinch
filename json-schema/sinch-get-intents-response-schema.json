@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-get-intents-response-schema.json",
+  "title": "GetIntentsResponse",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-chatlayer-analytics-api-openapi.yml#/components/schemas/GetIntentsResponse",
+  "type": "object",
+  "properties": {
+    "data": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/IntentInfo"
+      }
+    },
+    "pagination": {
+      "$ref": "#/$defs/Pagination"
+    }
+  },
+  "$defs": {
+    "IntentInfo": {
+      "type": "object",
+      "properties": {
+        "intent_id": {
+          "title": "Id of the intent. This is also the name of the intent",
+          "type": "string"
+        },
+        "count": {
+          "title": "Total count of these intents",
+          "type": "integer",
+          "format": "int32"
+        },
+        "rank": {
+          "title": "Ordering position for this intent. Starts at 1",
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
+    "Pagination": {
+      "type": "object",
+      "properties": {
+        "start_cursor": {
+          "title": "Starting cursor for the returned dataset",
+          "type": "string"
+        },
+        "end_cursor": {
+          "title": "Ending cursor for the returned dataset",
+          "type": "string"
+        },
+        "has_more": {
+          "title": "Defines if there is more data. This means more data after the dataset when using after, or more data before the dataset when using before",
+          "type": "boolean"
+        }
+      }
+    }
+  }
+}

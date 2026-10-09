@@ -1,0 +1,398 @@
+openapi: 3.2.0
+info:
+  title: Provisioning WhatsApp Flows API
+  description: The WhatsApp flows endpoint lets you retrieve and manage WhatsApp Flows associated with the project.
+  version: 1.2.117
+servers:
+- url: https://provisioning.api.sinch.com
+  description: Production server
+security:
+- BasicAuth: []
+  BearerAuth: []
+  OAuth2Production: []
+tags:
+- name: WhatsApp Flows
+  description: The WhatsApp flows endpoint lets you retrieve and manage WhatsApp Flows associated with the project.
+paths:
+  /v1/projects/{projectId}/whatsapp/flows:
+    get:
+      description: Retrieve the list of flows created in the WhatsApp business account (WABA) associated with the project.
+      operationId: WhatsappFlowsController_listFlows_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: pageToken
+        required: false
+        in: query
+        schema:
+          type: string
+        description: The page token if retrieving the next page from a previous query.
+      - name: pageSize
+        required: false
+        in: query
+        schema:
+          type: number
+          minimum: 1
+          maximum: 100
+        description: The page size requested.
+      responses:
+        '200':
+          description: Flows
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappFlowListDto'
+              examples:
+                response:
+                  summary: Flows response
+                  description: "\n    Successful response to a \"list flows in a project\" query.\n    "
+                  value:
+                    totalSize: 2
+                    pageSize: 50
+                    flows:
+                    - id: '12345678765432'
+                      name: flow1
+                      status: FLOW_STATUS_PUBLISHED
+                    - id: '98765676543654567'
+                      name: flow2
+                      status: FLOW_STATUS_DRAFT
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for WhatsApp.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for WhatsApp.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_found-0:
+                  summary: ProjectNotFoundError
+                  value:
+                    errorCode: project_not_found
+                    message: Project not found.
+                    resolution: Verify that the projectId is correct.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get flows in the WhatsApp business account (WABA) associated to the project
+      tags:
+      - WhatsApp Flows
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+  /v1/projects/{projectId}/whatsapp/flows/{flowId}/screens:
+    get:
+      description: Retrieve the list of screens in a flow.
+      operationId: WhatsappFlowsController_listFlowScreens_v1
+      parameters:
+      - name: projectId
+        required: true
+        in: path
+        description: The unique ID of the project. You can find this on the <a href="https://dashboard.sinch.com/">Sinch Dashboard</a>.
+        schema:
+          type: string
+      - name: flowId
+        required: true
+        in: path
+        schema:
+          type: string
+      responses:
+        '200':
+          description: Flow screens
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappFlowScreenListDto'
+              examples:
+                response:
+                  summary: Flow screens response
+                  description: "\n    Successful response to a \"list screens for a flow\" query.\n    "
+                  value:
+                    screens:
+                    - id: MY_FIRST_SCREEN
+        '400':
+          description: BadRequest
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_initialized-0:
+                  summary: ProjectNotInitializedError
+                  value:
+                    errorCode: project_not_initialized
+                    message: Project not initialized for WhatsApp.
+                    resolution: Verify that the project ID is correct and that it has been onboarded for WhatsApp.
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                unauthorized_error-0:
+                  summary: UnauthorizedErrorError
+                  value:
+                    errorCode: unauthorized_error
+                    message: Unauthorized error.
+                    resolution: Verify that projectId is correct.
+        '404':
+          description: NotFound
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                project_not_found-0:
+                  summary: ProjectNotFoundError
+                  value:
+                    errorCode: project_not_found
+                    message: Project not found.
+                    resolution: Verify that the projectId is correct.
+                flow_not_found-1:
+                  summary: FlowNotFoundError
+                  value:
+                    errorCode: flow_not_found
+                    message: Flow not found.
+                    resolution: Verify that the parameters are correct.
+                flow_screens_not_found-2:
+                  summary: FlowScreensNotFoundError
+                  value:
+                    errorCode: flow_screens_not_found
+                    message: Flow screens not found.
+                    resolution: Verify if the flow screens exist.
+        '500':
+          description: InternalServerError
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WhatsappPapiErrorDto'
+              examples:
+                internal_error-0:
+                  summary: InternalErrorError
+                  value:
+                    errorCode: internal_error
+                    message: Internal server error.
+                    resolution: Please wait and try again, if the error persist please contact support.
+      summary: Get screens of a flow
+      tags:
+      - WhatsApp Flows
+      x-badges:
+      - name: GA
+        position: after
+        color: green
+components:
+  schemas:
+    WhatsappFlowDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier for the flow.
+          uniqueItems: false
+        name:
+          type: string
+          description: Name of the flow.
+          uniqueItems: false
+        status:
+          x-enumDescriptions:
+            FLOW_STATUS_DEPRECATED: The structured interaction flow is deprecated and restricted from future deployment triggers.
+            FLOW_STATUS_DRAFT: The structured interaction flow configuration is saved as an unsubmitted draft.
+            FLOW_STATUS_PUBLISHED: The structured interaction flow has been published and is active for active production routing.
+            UNRECOGNIZED: The value returned by an upstream system is not recognized by this API version.
+          description: Flow status.
+          uniqueItems: false
+          allOf:
+          - $ref: '#/components/schemas/WhatsappWhatsAppFlowStatusesEnum'
+      required:
+      - id
+      - name
+      - status
+    WhatsappFlowListDto:
+      type: object
+      properties:
+        totalSize:
+          type: number
+          description: Total size of the entries matching the search query.
+          uniqueItems: false
+        pageSize:
+          type: number
+          description: Requested size of the page.
+          uniqueItems: false
+        previousPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch previous batch of entries.
+          uniqueItems: false
+        nextPageToken:
+          type: string
+          description: Encoded token to use in list request to fetch next batch of entries.
+          uniqueItems: false
+        flows:
+          description: List of flows in the WABA linked to the project.
+          uniqueItems: false
+          type: array
+          items:
+            $ref: '#/components/schemas/WhatsappFlowDto'
+      required:
+      - totalSize
+      - pageSize
+      - flows
+    WhatsappPapiErrorDto:
+      type: object
+      properties:
+        errorCode:
+          type: string
+          description: Error code identifying the type of error.
+          uniqueItems: false
+        message:
+          type: string
+          description: Human-readable error message.
+          uniqueItems: false
+        resolution:
+          type: string
+          description: Suggested resolution for the error.
+          uniqueItems: false
+        additionalInformation:
+          type: object
+          additionalProperties:
+            oneOf:
+            - type: array
+              items:
+                type: string
+          description: Additional context about the error.
+          uniqueItems: false
+      required:
+      - errorCode
+      - message
+      - resolution
+    WhatsappWhatsAppFlowStatusesEnum:
+      type: string
+      enum:
+      - FLOW_STATUS_DEPRECATED
+      - FLOW_STATUS_DRAFT
+      - FLOW_STATUS_PUBLISHED
+      - UNRECOGNIZED
+      description: Flow status.
+    WhatsappFlowScreenDto:
+      type: object
+      properties:
+        id:
+          type: string
+          description: Unique identifier of the screen which works as a page url.
+          uniqueItems: false
+      required:
+      - id
+    WhatsappFlowScreenListDto:
+      type: object
+      properties:
+        screens:
+          description: List of screens for flow.
+          uniqueItems: false
+          type: array
+          items:
+            $ref: '#/components/schemas/WhatsappFlowScreenDto'
+      required:
+      - screens
+  securitySchemes:
+    BasicAuth:
+      type: http
+      scheme: basic
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+    OAuth2Production:
+      type: oauth2
+      description: OAuth2 authorization for production
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes:
+            '-': '-'
+x-tagGroup-upscale:
+  name: Upscale
+  tags:
+  - Upscale Admin Feature Flag
+  - Upscale Admin Log Operation
+  - Upscale Admin Migrations
+  - Upscale Admin Sms
+  - Upscale Admin Upscales
+  - Internal
+  - Upscale Sms
+  - Upscale Upscales
+x-tagGroup-notification:
+  name: Notification
+  tags:
+  - Notification Admin Feature Flag
+  - Notification Admin Log Operation
+  - Internal
+x-tagGroups:
+- name: Webhook
+  tags:
+  - Webhooks
+- name: WhatsApp
+  tags:
+  - WhatsApp Accounts
+  - WhatsApp
+  - WhatsApp Flows
+  - WhatsApp Senders
+  - WhatsApp Solutions
+  - WhatsApp Templates
+- name: Bundles
+  tags:
+  - Bundles
+- name: KakaoTalk
+  tags:
+  - KakaoTalk Categories
+  - KakaoTalk Senders
+  - KakaoTalk Templates
+- name: Conversation
+  tags:
+  - Conversation
+- name: RCS
+  tags:
+  - RCS Accounts
+  - RCS Questionnaire
+  - RCS Senders
+- name: SMS
+  tags:
+  - SMS Apps

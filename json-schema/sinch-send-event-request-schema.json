@@ -1,0 +1,348 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-send-event-request-schema.json",
+  "title": "SendEventRequest",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-conversation-api-openapi.yml#/components/schemas/SendEventRequest",
+  "type": "object",
+  "required": [
+    "app_id",
+    "recipient",
+    "event"
+  ],
+  "properties": {
+    "app_id": {
+      "description": "The ID of the app sending the event.",
+      "type": "string"
+    },
+    "callback_url": {
+      "description": "Overwrites the default callback url for delivery receipts for this message\nThe REST URL should be of the form: `http://host[:port]/path`",
+      "type": "string"
+    },
+    "channel_priority_order": {
+      "description": "Optional. A single element array that dictates on what channel should\nthe Conversation API try to send the event.\nIt overrides any default set on the contact. Providing more than one\noption has no effect.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/ConversationChannel"
+      }
+    },
+    "event": {
+      "$ref": "#/$defs/AppEventField"
+    },
+    "event_metadata": {
+      "description": "Optional. Eventual metadata that should be associated to the event.",
+      "type": "string"
+    },
+    "queue": {
+      "$ref": "#/$defs/MessageQueue"
+    },
+    "recipient": {
+      "$ref": "#/$defs/RecipientRequest"
+    }
+  },
+  "$defs": {
+    "Agent": {
+      "description": "Represents an agent that is involved in a conversation.",
+      "type": "object",
+      "title": "Agent",
+      "properties": {
+        "display_name": {
+          "description": "Agent's display name",
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/$defs/AgentType"
+        },
+        "picture_url": {
+          "description": "The Agent's picture url.",
+          "type": "string"
+        }
+      }
+    },
+    "AgentJoinedEventField": {
+      "type": "object",
+      "title": "Agent Joined Event Type",
+      "properties": {
+        "agent_joined_event": {
+          "title": "Agent Joined Event",
+          "type": "object",
+          "properties": {
+            "agent": {
+              "$ref": "#/$defs/Agent"
+            }
+          },
+          "required": [
+            "agent"
+          ]
+        }
+      }
+    },
+    "AgentLeftEventField": {
+      "type": "object",
+      "title": "Agent Left Event Type",
+      "properties": {
+        "agent_left_event": {
+          "title": "Agent Left Event",
+          "type": "object",
+          "properties": {
+            "agent": {
+              "$ref": "#/$defs/Agent"
+            }
+          },
+          "required": [
+            "agent"
+          ]
+        }
+      }
+    },
+    "AgentType": {
+      "description": "Agent's classification. It can be UNKNOWN_AGENT_TYPE, HUMAN or BOT.",
+      "enum": [
+        "UNKNOWN_AGENT_TYPE",
+        "HUMAN",
+        "BOT"
+      ],
+      "x-enumDescriptions": {
+        "UNKNOWN_AGENT_TYPE": "The default AgentType. When the agent type is unknown.",
+        "HUMAN": "Human agent.",
+        "BOT": "Bot agent."
+      },
+      "type": "string",
+      "default": "UNKNOWN_AGENT_TYPE"
+    },
+    "AppEventField": {
+      "type": "object",
+      "title": "App Event Type",
+      "properties": {
+        "app_event": {
+          "description": "Event originating from an app",
+          "type": "object",
+          "title": "App Event",
+          "oneOf": [
+            {
+              "$ref": "#/$defs/ComposingEventField"
+            },
+            {
+              "$ref": "#/$defs/ComposingEndEventField"
+            },
+            {
+              "$ref": "#/$defs/ReadMessageEventField"
+            },
+            {
+              "$ref": "#/$defs/CommentReplyEventField"
+            },
+            {
+              "$ref": "#/$defs/AgentJoinedEventField"
+            },
+            {
+              "$ref": "#/$defs/AgentLeftEventField"
+            },
+            {
+              "$ref": "#/$defs/GenericEventField"
+            }
+          ]
+        }
+      }
+    },
+    "ChannelIdentities": {
+      "required": [
+        "channel_identities"
+      ],
+      "type": "object",
+      "properties": {
+        "channel_identities": {
+          "description": "A list of specific channel identities.\nThe API will use these identities when sending to specific channels.",
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/ChannelRecipientIdentity"
+          }
+        }
+      }
+    },
+    "ChannelRecipientIdentity": {
+      "type": "object",
+      "required": [
+        "identity",
+        "channel"
+      ],
+      "properties": {
+        "channel": {
+          "$ref": "#/$defs/ConversationChannel"
+        },
+        "identity": {
+          "description": "The channel recipient identity.",
+          "type": "string"
+        }
+      }
+    },
+    "CommentReplyEventField": {
+      "type": "object",
+      "title": "Comment Reply Event Type",
+      "properties": {
+        "comment_reply_event": {
+          "title": "Comment Reply Event",
+          "description": "Represents a response to a comment event.",
+          "type": "object",
+          "required": [
+            "text"
+          ],
+          "properties": {
+            "text": {
+              "description": "The text of the comment reply.",
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    "ComposingEndEventField": {
+      "type": "object",
+      "title": "Composing End Event Type",
+      "properties": {
+        "composing_end_event": {
+          "title": "Composing End Event",
+          "type": "object",
+          "description": "Represents a typing-end indicator. Stops a typing indicator previously shown to the contact."
+        }
+      }
+    },
+    "ComposingEventField": {
+      "type": "object",
+      "title": "Composing",
+      "properties": {
+        "composing_event": {
+          "title": "Composing Event Type",
+          "type": "object",
+          "description": "Represents a typing indicator shown to the contact."
+        }
+      }
+    },
+    "ContactIDField": {
+      "type": "object",
+      "title": "Contact ID",
+      "properties": {
+        "contact_id": {
+          "title": "Contact ID string",
+          "description": "The ID of the contact.",
+          "type": "string"
+        }
+      }
+    },
+    "ConversationChannel": {
+      "type": "string",
+      "title": "Channel Identifier",
+      "description": "The identifier of the channel you want to include. Must be one of the enum values.",
+      "x-enumDescriptions": {
+        "SMS": "The SMS channel.",
+        "RCS": "The RCS channel.",
+        "WHATSAPP": "The WhatsApp channel.",
+        "MMS": "The MMS channel.",
+        "KAKAOTALK": "The KakaoTalk channel.",
+        "KAKAOTALKCHAT": "The KakaoTalk chat channel (used primarily in ConsultationTalk).",
+        "VIBERBM": "The Viber Business Messages channel.",
+        "LINE": "The LINE channel.",
+        "INSTAGRAM": "The Instagram channel.",
+        "MESSENGER": "The Facebook Messenger channel.",
+        "WECHAT": "The WeChat channel.",
+        "TELEGRAM": "The Telegram channel.",
+        "APPLEBC": "The Apple Messages for Business channel."
+      },
+      "enum": [
+        "SMS",
+        "RCS",
+        "WHATSAPP",
+        "MMS",
+        "KAKAOTALK",
+        "KAKAOTALKCHAT",
+        "VIBERBM",
+        "LINE",
+        "INSTAGRAM",
+        "MESSENGER",
+        "WECHAT",
+        "TELEGRAM",
+        "APPLEBC"
+      ]
+    },
+    "GenericEventField": {
+      "type": "object",
+      "title": "Generic Type",
+      "properties": {
+        "generic_event": {
+          "title": "Generic Event",
+          "type": "object",
+          "properties": {
+            "payload": {
+              "description": "Arbitrary data set to the event. A valid JSON object.",
+              "type": "object"
+            }
+          },
+          "description": "Event that contains only a flexible payload field.",
+          "required": [
+            "payload"
+          ]
+        }
+      }
+    },
+    "IdentifiedByField": {
+      "type": "object",
+      "title": "Channel Identities",
+      "properties": {
+        "identified_by": {
+          "title": "Channel Identity List",
+          "type": "object",
+          "description": "The identity as specified by the channel.",
+          "allOf": [
+            {
+              "$ref": "#/$defs/ChannelIdentities"
+            }
+          ]
+        }
+      }
+    },
+    "MessageQueue": {
+      "type": "string",
+      "description": "Select the priority type for the message",
+      "default": "NORMAL_PRIORITY",
+      "x-enumDescriptions": {
+        "NORMAL_PRIORITY": "The normal priority queue.",
+        "HIGH_PRIORITY": "The high priority queue."
+      },
+      "enum": [
+        "NORMAL_PRIORITY",
+        "HIGH_PRIORITY"
+      ]
+    },
+    "ReadMessageEventField": {
+      "type": "object",
+      "title": "Read Message Event Type",
+      "properties": {
+        "read_message_event": {
+          "title": "Read Message Event",
+          "type": "object",
+          "description": "Marks an inbound (contact) message as read on the channel, producing a read receipt for the contact. Supported on WhatsApp and RCS."
+        }
+      }
+    },
+    "RecipientBase": {
+      "type": "object",
+      "oneOf": [
+        {
+          "$ref": "#/$defs/IdentifiedByField"
+        },
+        {
+          "$ref": "#/$defs/ContactIDField"
+        }
+      ]
+    },
+    "RecipientRequest": {
+      "description": "Identifies the recipient. If [Dispatch Mode](https://developers.sinch.com/docs/conversation/processing-modes/) is used, you must use the `identified_by` field.",
+      "allOf": [
+        {
+          "$ref": "#/$defs/RecipientBase"
+        }
+      ]
+    }
+  }
+}

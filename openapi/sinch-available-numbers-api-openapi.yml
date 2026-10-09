@@ -153,49 +153,6 @@ components:
       schema:
         type: string
   schemas:
-    AvailableNumber:
-      type: object
-      properties:
-        phoneNumber:
-          type: string
-          description: The phone number in E.164 format
-        regionCode:
-          type: string
-          description: The ISO 3166-1 alpha-2 country code
-        type:
-          type: string
-          description: The number type
-        capability:
-          type: array
-          description: The number capabilities
-          items:
-            type: string
-        setupPrice:
-          $ref: '#/components/schemas/Money'
-        monthlyPrice:
-          $ref: '#/components/schemas/Money'
-        paymentIntervalMonths:
-          type: integer
-          description: The billing interval in months
-    RentNumberRequest:
-      type: object
-      properties:
-        smsConfiguration:
-          $ref: '#/components/schemas/SmsConfiguration'
-        voiceConfiguration:
-          $ref: '#/components/schemas/VoiceConfiguration'
-        callbackUrl:
-          type: string
-          format: uri
-          description: Callback URL for the number
-    AvailableNumberList:
-      type: object
-      properties:
-        availableNumbers:
-          type: array
-          description: List of available numbers
-          items:
-            $ref: '#/components/schemas/AvailableNumber'
     VoiceConfiguration:
       type: object
       properties:
@@ -212,6 +169,45 @@ components:
             status:
               type: string
               description: Provisioning status
+    AvailableNumberList:
+      type: object
+      properties:
+        availableNumbers:
+          type: array
+          description: List of available numbers
+          items:
+            $ref: '#/components/schemas/AvailableNumber'
+    SmsConfiguration:
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: The SMS service plan ID to associate
+        campaignId:
+          type: string
+          description: The campaign ID for 10DLC
+        scheduledProvisioning:
+          type: object
+          description: Scheduled provisioning details
+          properties:
+            servicePlanId:
+              type: string
+              description: Target service plan ID
+            campaignId:
+              type: string
+              description: Target campaign ID
+            status:
+              type: string
+              description: Provisioning status
+    Money:
+      type: object
+      properties:
+        currencyCode:
+          type: string
+          description: The ISO 4217 currency code
+        amount:
+          type: string
+          description: The monetary amount as a string
     ActiveNumber:
       type: object
       properties:
@@ -256,37 +252,41 @@ components:
           type: string
           format: uri
           description: The callback URL for the number
-    SmsConfiguration:
+    RentNumberRequest:
       type: object
       properties:
-        servicePlanId:
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        voiceConfiguration:
+          $ref: '#/components/schemas/VoiceConfiguration'
+        callbackUrl:
           type: string
-          description: The SMS service plan ID to associate
-        campaignId:
-          type: string
-          description: The campaign ID for 10DLC
-        scheduledProvisioning:
-          type: object
-          description: Scheduled provisioning details
-          properties:
-            servicePlanId:
-              type: string
-              description: Target service plan ID
-            campaignId:
-              type: string
-              description: Target campaign ID
-            status:
-              type: string
-              description: Provisioning status
-    Money:
+          format: uri
+          description: Callback URL for the number
+    AvailableNumber:
       type: object
       properties:
-        currencyCode:
+        phoneNumber:
           type: string
-          description: The ISO 4217 currency code
-        amount:
+          description: The phone number in E.164 format
+        regionCode:
           type: string
-          description: The monetary amount as a string
+          description: The ISO 3166-1 alpha-2 country code
+        type:
+          type: string
+          description: The number type
+        capability:
+          type: array
+          description: The number capabilities
+          items:
+            type: string
+        setupPrice:
+          $ref: '#/components/schemas/Money'
+        monthlyPrice:
+          $ref: '#/components/schemas/Money'
+        paymentIntervalMonths:
+          type: integer
+          description: The billing interval in months
   securitySchemes:
     oAuth2:
       type: oauth2

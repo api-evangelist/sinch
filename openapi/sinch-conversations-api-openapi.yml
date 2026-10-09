@@ -1,26 +1,294 @@
 openapi: 3.2.0
 info:
-  title: Sinch Conversation Conversations API
-  description: The Sinch Conversation API is an omnichannel messaging platform that enables developers to send and receive messages across multiple channels including SMS, RCS, WhatsApp, Facebook Messenger, Instagram, Viber, Telegram, KakaoTalk, and LINE through a single unified API.
+  title: Sinch Conversations API
   version: '1.0'
-  contact:
-    name: Sinch Support
-    url: https://www.sinch.com/contact-us/
-  termsOfService: https://www.sinch.com/terms-of-service/
+  description: 'Operations tagged Conversations across 2 of this provider''s published API definitions: sinch-chatlayer-analytics-api-openapi.yaml, original-sinch-conversation-openapi.yml. Each path carries the servers of the definition it was published in.'
 servers:
+- url: https://analytics.api.chatlayer.ai
+  description: Europe
+- url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+  description: US
+- url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+  description: APAC
+- url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+  description: South America
 - url: https://us.conversation.api.sinch.com
   description: US Production Server
 - url: https://eu.conversation.api.sinch.com
   description: EU Production Server
 - url: https://br.conversation.api.sinch.com
   description: Brazil Production Server
-security:
-- oAuth2: []
-- basicAuth: []
 tags:
 - name: Conversations
-  description: Manage conversations which are collections of messages tied to a specific app and contact.
 paths:
+  /v1/bots/{bot_id}/conversations:
+    get:
+      tags:
+      - Conversations
+      summary: Get conversation analytics
+      operationId: Analytics_GetConversations
+      parameters:
+      - name: bot_id
+        in: path
+        description: Identifies the bot.
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Identifies the bot version.
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the data series.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the data series, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: channel_type
+        in: query
+        description: Filter by specific channels, multiple values separated by comma.
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: language
+        in: query
+        description: Filter by specific languages, multiple values separated by comma.
+        style: form
+        explode: true
+        schema:
+          type: array
+          items:
+            type: string
+      - name: bucket
+        in: query
+        description: 'Time interval in which results will be grouped.
+
+          Supported values are 1h,1d,1w. The interval should be smaller
+
+          than the range specified in the  [start_time,end_time)'
+        schema:
+          type: string
+      - name: group_by
+        in: query
+        description: Group by a specific category. Can be channel_type or language
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConversationsResponse'
+      security:
+      - basicAuth: []
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
+  /v1/bots/{bot_id}/conversations/insights:
+    get:
+      tags:
+      - Conversations
+      operationId: Analytics_GetConversationsInsights
+      parameters:
+      - name: bot_id
+        in: path
+        description: Identifies the bot.
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        description: Identifies the bot version.
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the data series.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the data series, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: channel_type
+        in: query
+        description: Filter by specific channels, multiple values separated by comma.
+        schema:
+          type: string
+      - name: language
+        in: query
+        description: Filter by specific languages, multiple values separated by comma.
+        schema:
+          type: string
+      - name: stat
+        in: query
+        description: The stat to return, one of 'num_conversations', 'duration_seconds', 'num_messages'
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConversationsInsightsResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics get conversations insights
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
+  /v1/bots/{bot_id}/conversations/{conversation_id}/flow:
+    get:
+      tags:
+      - Conversations
+      operationId: Analytics_GetConversationFlow
+      parameters:
+      - name: bot_id
+        in: path
+        description: Identifies the bot
+        required: true
+        schema:
+          type: string
+      - name: conversation_id
+        in: path
+        description: Identifies the conversation
+        required: true
+        schema:
+          type: string
+      - name: version
+        in: query
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date of the a range containing the conversation
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The end date of the a range containing the conversation
+        required: true
+        schema:
+          type: string
+      - name: message_id
+        in: query
+        description: 'Identifies a message withing a conversation. Optional.
+
+          When specified only the transitions for the given message will be included'
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetConversationFlowResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics get conversation flow
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
+  /v1/teams/{team_id}/conversations:
+    get:
+      tags:
+      - Conversations
+      operationId: Analytics_GetTeamConversationsUsage
+      parameters:
+      - name: team_id
+        in: path
+        description: Identifies the team.
+        required: true
+        schema:
+          type: string
+      - name: start_time
+        in: query
+        description: The starting date for the time range of the data series.
+        required: true
+        schema:
+          type: string
+      - name: end_time
+        in: query
+        description: The ending date for the time range of the data series, exclusive.
+        required: true
+        schema:
+          type: string
+      - name: bucket
+        in: query
+        description: 'Time interval in which results will be grouped.
+
+          Supported values are 1d, 1w, 1m. The interval should be smaller
+
+          than the range specified in the  [start_time,end_time).'
+        required: true
+        schema:
+          type: string
+      - name: group_by
+        in: query
+        description: Group data by field, comma separated. Can be any of [bot_id, bot_version, team_id, channel_type, language, campaign_id, campaign_source]
+        schema:
+          type: string
+      responses:
+        '200':
+          description: A successful response.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/GetTeamUsageResponse'
+      security:
+      - basicAuth: []
+      summary: Analytics get team conversations usage
+      x-summary-source: derived
+    servers:
+    - url: https://analytics.api.chatlayer.ai
+      description: Europe
+    - url: https://analytics.api.prod.us-east4.gcp.chatlayer.ai
+      description: US
+    - url: https://analytics.api.prod.asia-south1.gcp.chatlayer.ai
+      description: APAC
+    - url: https://analytics.api.prod.sa-east1.gcp.chatlayer.ai
+      description: South America
   /v1/projects/{project_id}/conversations:
     get:
       operationId: listConversations
@@ -65,6 +333,9 @@ paths:
                 $ref: '#/components/schemas/ConversationList'
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
     post:
       operationId: createConversation
       summary: Create a Conversation
@@ -90,6 +361,16 @@ paths:
           description: Invalid request
         '401':
           description: Unauthorized
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://us.conversation.api.sinch.com
+      description: US Production Server
+    - url: https://eu.conversation.api.sinch.com
+      description: EU Production Server
+    - url: https://br.conversation.api.sinch.com
+      description: Brazil Production Server
   /v1/projects/{project_id}/conversations/{conversation_id}:
     get:
       operationId: getConversation
@@ -111,6 +392,9 @@ paths:
           description: Unauthorized
         '404':
           description: Conversation not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
     patch:
       operationId: updateConversation
       summary: Update a Conversation
@@ -137,6 +421,9 @@ paths:
           description: Unauthorized
         '404':
           description: Conversation not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
     delete:
       operationId: deleteConversation
       summary: Delete a Conversation
@@ -153,6 +440,16 @@ paths:
           description: Unauthorized
         '404':
           description: Conversation not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://us.conversation.api.sinch.com
+      description: US Production Server
+    - url: https://eu.conversation.api.sinch.com
+      description: EU Production Server
+    - url: https://br.conversation.api.sinch.com
+      description: Brazil Production Server
   /v1/projects/{project_id}/conversations/{conversation_id}:stop:
     post:
       operationId: stopConversation
@@ -170,8 +467,145 @@ paths:
           description: Unauthorized
         '404':
           description: Conversation not found
+      security:
+      - oAuth2: []
+      - basicAuth: []
+    servers:
+    - url: https://us.conversation.api.sinch.com
+      description: US Production Server
+    - url: https://eu.conversation.api.sinch.com
+      description: EU Production Server
+    - url: https://br.conversation.api.sinch.com
+      description: Brazil Production Server
 components:
   schemas:
+    GetConversationFlowResponse:
+      type: object
+      properties:
+        bot_id:
+          type: string
+        conversation_id:
+          type: string
+        user_id:
+          type: string
+        transitions:
+          type: array
+          items:
+            $ref: '#/components/schemas/FlowTransition'
+    Serie:
+      type: object
+      properties:
+        values:
+          type: array
+          items:
+            type: integer
+            format: int32
+        mean:
+          type: integer
+          description: The mean value.
+          format: int32
+        max:
+          type: integer
+          description: The max value.
+          format: int32
+        min:
+          type: integer
+          description: The min value.
+          format: int32
+        sum:
+          type: integer
+          description: The sum of all values.
+          format: int32
+        labels:
+          type: object
+          additionalProperties:
+            type: string
+    GetTeamUsageResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    GetConversationsInsightsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    Step:
+      type: object
+      properties:
+        id:
+          type: string
+        type:
+          type: string
+    SeriesData:
+      type: object
+      properties:
+        series:
+          type: array
+          items:
+            $ref: '#/components/schemas/Serie'
+        series_labels:
+          type: array
+          items:
+            type: string
+        x_values:
+          type: array
+          items:
+            type: string
+    GetConversationsResponse:
+      type: object
+      properties:
+        data:
+          $ref: '#/components/schemas/SeriesData'
+    FlowTransition:
+      type: object
+      properties:
+        id:
+          type: string
+        from_step:
+          $ref: '#/components/schemas/Step'
+        to_step:
+          $ref: '#/components/schemas/Step'
+        depth:
+          type: integer
+          format: int64
+        timestamp:
+          type: string
+          format: date-time
+    CreateConversationRequest:
+      type: object
+      required:
+      - app_id
+      - contact_id
+      properties:
+        app_id:
+          type: string
+          description: The app ID
+        contact_id:
+          type: string
+          description: The contact ID
+        active:
+          type: boolean
+          description: Whether the conversation is active
+          default: true
+        active_channel:
+          type: string
+          description: The active channel
+        metadata:
+          type: string
+          description: Conversation metadata
+    UpdateConversationRequest:
+      type: object
+      properties:
+        active:
+          type: boolean
+          description: Updated active status
+        active_channel:
+          type: string
+          description: Updated active channel
+        metadata:
+          type: string
+          description: Updated metadata
     Conversation:
       type: object
       properties:
@@ -196,18 +630,6 @@ components:
         metadata_json:
           type: object
           description: Structured conversation metadata
-    UpdateConversationRequest:
-      type: object
-      properties:
-        active:
-          type: boolean
-          description: Updated active status
-        active_channel:
-          type: string
-          description: Updated active channel
-        metadata:
-          type: string
-          description: Updated metadata
     ConversationList:
       type: object
       properties:
@@ -219,36 +641,7 @@ components:
         next_page_token:
           type: string
           description: Pagination token for the next page
-    CreateConversationRequest:
-      type: object
-      required:
-      - app_id
-      - contact_id
-      properties:
-        app_id:
-          type: string
-          description: The app ID
-        contact_id:
-          type: string
-          description: The contact ID
-        active:
-          type: boolean
-          description: Whether the conversation is active
-          default: true
-        active_channel:
-          type: string
-          description: The active channel
-        metadata:
-          type: string
-          description: Conversation metadata
   parameters:
-    ProjectId:
-      name: project_id
-      in: path
-      required: true
-      description: The unique project identifier
-      schema:
-        type: string
     ConversationId:
       name: conversation_id
       in: path
@@ -256,7 +649,18 @@ components:
       description: The unique conversation identifier
       schema:
         type: string
+    ProjectId:
+      name: project_id
+      in: path
+      required: true
+      description: The unique project identifier
+      schema:
+        type: string
   securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+      description: Generate your access token on the [Chatlayer platform](https://app.chatlayer.ai/settings/api-access/tokens).
     oAuth2:
       type: oauth2
       description: OAuth 2.0 client credentials flow using project key ID and secret.
@@ -264,10 +668,14 @@ components:
         clientCredentials:
           tokenUrl: https://auth.sinch.com/oauth2/token
           scopes: {}
-    basicAuth:
-      type: http
-      scheme: basic
-      description: Key ID as username and key secret as password.
-externalDocs:
-  description: Sinch Conversation API Documentation
-  url: https://developers.sinch.com/docs/conversation
+x-refined-from:
+- sinch-chatlayer-analytics-api-openapi.yaml
+- original-sinch-conversation-openapi.yml
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-original-swagger-version: '2.0'

@@ -1,0 +1,804 @@
+openapi: 3.2.0
+info:
+  title: Elastic SIP Trunk Access Control List API
+  description: This document provides a detailed user guide and reference documentation on the Sinch Elastic SIP Trunk API.
+  version: 1.0.0
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    email: support@sinch.com
+    name: support at sinch
+servers:
+- url: https://elastic-trunking.api.sinch.com
+security:
+- Basic: []
+- OAuth2.0: []
+tags:
+- name: Access Control List
+  description: 'The Access Control List (ACL) endpoint has operations that allow you to create, view, update, and remove ACLs.
+
+    You use ACLs to control which IP addresses can send traffic to your SIP trunk. You can create multiple ACLs and assign them to multiple SIP trunks. In order to make outbound calls you need to have at least one ACL set up.'
+  x-displayName: Access Control Lists
+paths:
+  /v1/projects/{projectId}/accessControlLists:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    get:
+      tags:
+      - Access Control List
+      summary: List ACLs
+      description: Fetches the list of Access Control List entries.
+      operationId: getAccessControlList
+      responses:
+        '200':
+          description: The list of ACL entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    accessControlLists:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/AccessControlList'
+                - $ref: '#/components/schemas/Pagination'
+              examples:
+                listAcls:
+                  $ref: '#/components/examples/aclListResponse'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.accessControlList.list({});\n    if (response.data.length === 0) {\n      console.log('No ACLs found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} ACLs.`);\n    response.data.forEach((acl) => {\n      console.log(acl);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list the ACLs:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+    post:
+      tags:
+      - Access Control List
+      summary: Create an ACL
+      description: Create an access control list entry with at least one IP address or IP range.
+      operationId: createAccessControlList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/AccessControlList'
+            examples:
+              createNewAcl:
+                $ref: '#/components/examples/createAclReq'
+      responses:
+        '200':
+          description: The list of access control list entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessControlList'
+              examples:
+                createNewAcl:
+                  $ref: '#/components/examples/createAclRes'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try{\n    const response = await sinch.elasticSipTrunking.accessControlList.create({\n      createAccessControlListBody: {\n        name: 'My new ACL',\n        ipRanges: [\n          {\n            description: 'Location 1',\n            ipAddress: '15.15.15.15',\n            range: 20,\n          },\n        ],\n      },\n    });\n    console.log('✅ Successfully created the ACL.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error('❌ Failed to create the ACL:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /v1/projects/{projectId}/accessControlLists/{id}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: id
+      in: path
+      description: The ID of the access control list entry.
+      required: true
+      schema:
+        type: string
+    get:
+      tags:
+      - Access Control List
+      operationId: getAccessListById
+      summary: Get access control list
+      description: Return an access control list by its ID.
+      responses:
+        '200':
+          description: The returned access control list.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessControlList'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ID of the ACL to retrieve\n  const aclId = 'ACL_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.accessControlList.get({\n      id: aclId,\n    });\n    console.log('✅ Successfully retrieved the ACL.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the ACL with ID ${aclId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+    put:
+      tags:
+      - Access Control List
+      summary: Update ACL
+      description: Create an access control list entry with at least one IP address or IP range.
+      operationId: updateAccessControlList
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+              - name
+              properties:
+                name:
+                  type: string
+                  description: Your name for the access control list entry.
+                  example: LA Office
+                enabled:
+                  type: boolean
+                  description: Whether the access control list entry is enabled. You can use this to disable a list temporarily without deleting it.
+                  default: true
+                ipRanges:
+                  type: array
+                  description: An array of all the IP ranges to update.
+                  items:
+                    $ref: '#/components/schemas/IpRange'
+            examples:
+              updateAcl:
+                $ref: '#/components/examples/updateAclReq'
+      responses:
+        '200':
+          description: The list of access control list entries
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AccessControlList'
+              examples:
+                updateAcl:
+                  $ref: '#/components/examples/updateAclRes'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ID of the ACL to update\n  const aclId = 'ACL_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.accessControlList.update({\n      id: aclId,\n      updateAccessControlListRequestBody: {\n        name: 'Updated ACL name',\n        enabled: false,\n      },\n    });\n    console.log('✅ Successfully updated the ACL.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to update the ACL with ID ${aclId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+    delete:
+      description: Delete an access control list entry.
+      summary: Delete ACL
+      operationId: deleteAccessControlList
+      tags:
+      - Access Control List
+      responses:
+        '204':
+          description: No Content
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ID of the ACL to delete\n  const aclId = 'ACL_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    await sinch.elasticSipTrunking.accessControlList.delete({\n      id: aclId,\n    });\n    console.log(`✅ Successfully deleted the ACL with ID ${aclId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete the ACL with ID ${aclId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /v1/projects/{projectId}/accessControlLists/{id}/trunks:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: id
+      in: path
+      description: The ID of the access control list entry.
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Get trunks for ACL
+      description: Returns a list of all trunks which use the specified access control list.
+      operationId: trunksByACL
+      tags:
+      - Access Control List
+      responses:
+        '200':
+          description: The list of trunks which use the access control list.
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    trunks:
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/SipTrunk'
+                - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ACL ID you want to list SIP Trunks for\n  const aclId = 'ACL_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.accessControlList.listTrunks({\n      id: aclId,\n    });\n    if (response.data.length === 0) {\n      console.log(`No SIP Trunks found for the ACL with ID ${aclId}.`);\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} SIP Trunks for the ACL with ID ${aclId}.`);\n    response.data.forEach((trunk) => {\n      console.log(trunk);\n    });\n  } catch (err) {\n    console.error(`❌ Failed to list the SIP Trunks for the ACL with ID ${aclId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /v1/projects/{projectId}/accessControlLists/{accessControlListId}/ipRanges:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: accessControlListId
+      in: path
+      description: The ID of the access control list entry. that you want to work with
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: addIpRangeToAccessControlList
+      description: Add an IP range to an access control list entry.
+      summary: Add IP range to ACL
+      tags:
+      - Access Control List
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpRange'
+            examples:
+              addIpRange:
+                $ref: '#/components/examples/addIpRangeReq'
+      responses:
+        '200':
+          description: The list of IP ranges
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpRange'
+              examples:
+                addIpRange:
+                  $ref: '#/components/examples/addIpRangeRes'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ID of the ACL to which to add an IP range\n  const aclId = 'ACL_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.accessControlList.addIpRange({\n      accessControlListId: aclId,\n      addIpRangeRequestBody: {\n        description: 'IP range name',\n        ipAddress: '11.12.13.14',\n        range: 27,\n      },\n    });\n    console.log('✅ Successfully added IP range to ACL:');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to add IP range to the ACL with ID ${aclId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+    get:
+      operationId: getIpRangesForAccessControlList
+      summary: List all IP ranges for ACL
+      description: Get all IP ranges for an access control list entry.
+      tags:
+      - Access Control List
+      responses:
+        '200':
+          description: The list of IP ranges
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    ipRanges:
+                      type: array
+                      description: The list of IP ranges
+                      items:
+                        $ref: '#/components/schemas/IpRange'
+                - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ID of the ACL to list the IP ranges from\n  const aclId = 'ACL_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.accessControlList.listIpRanges({\n      accessControlListId: aclId,\n    });\n    if (response.data.length === 0) {\n      console.log(`No IP ranges found for the ACL with ID ${aclId}.`);\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} IP ranges for ACL with ID ${aclId}.`);\n    response.data.forEach((ipRange) => {\n      console.log(ipRange);\n    });\n  } catch (err) {\n    console.error(`❌ Failed to list the IP ranges for the ACL with ID ${aclId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /v1/projects/{projectId}/accessControlLists/{accessControlListId}/ipRanges/{ipRangeId}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: accessControlListId
+      in: path
+      description: The ID of the access control list entry that you want to update.
+      required: true
+      schema:
+        type: string
+    - name: ipRangeId
+      in: path
+      description: The ID of the IP range that you want to update.
+      required: true
+      schema:
+        type: string
+    delete:
+      operationId: deleteIpRangeFromAccessControlList
+      summary: Delete IP range from ACL
+      tags:
+      - Access Control List
+      description: Remove an IP range to an access control list entry.
+      responses:
+        '204':
+          description: IP range deleted
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ID of the ACL to delete the IP range from\n  const aclId = 'ACL_ID';\n  // The IP Range ID you want to delete from the ACL\n  const ipRangeId = 'IP_RANGE_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    await sinch.elasticSipTrunking.accessControlList.deleteIpRange({\n      accessControlListId: aclId,\n      ipRangeId: ipRangeId,\n    });\n    console.log(`✅ Successfully deleted the IP range ${ipRangeId} from the ACL with ID ${aclId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete the IP range ${ipRangeId} from the ACL with ID ${aclId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+    put:
+      description: Update an IP range to an access control list entry.
+      operationId: updateIpRangeFromAccessControlList
+      summary: Update IP range
+      tags:
+      - Access Control List
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IpRange'
+            examples:
+              updateIpRange:
+                $ref: '#/components/examples/updateIpRangeReq'
+      responses:
+        '200':
+          description: The updated IP range.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IpRange'
+              examples:
+                updateIpRange:
+                  $ref: '#/components/examples/updateAclRes'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The ACL ID you want to update ACL from\n  const aclId = 'ACL_ID';\n  // The IP Range ID you want to update\n  const ipRangeId = 'IP_RANGE_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.elasticSipTrunking.accessControlList.updateIpRange({\n      accessControlListId: aclId,\n      ipRangeId: ipRangeId,\n      updateIpRangeRequestBody: {\n        ipAddress: '11.12.13.14',\n        range: 27,\n      },\n    });\n    console.log('✅ Successfully updated the IP Range.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to update the IP Range ${ipRangeId} in the ACL with ID ${aclId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /v1/projects/{projectId}/trunks/{trunkId}/accessControlLists:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: trunkId
+      in: path
+      description: The ID of the trunk that you want to work with
+      required: true
+      schema:
+        type: string
+    post:
+      operationId: addAccessControlListToTrunk
+      description: Add an access control list entry to a trunk.
+      summary: Add ACL to a trunk
+      tags:
+      - Access Control List
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                accessControlListIds:
+                  type: array
+                  description: Array of AccessControlList ids
+                  items:
+                    type: string
+                    description: The ID of the access control list entry.
+            examples:
+              addAcl:
+                $ref: '#/components/examples/addTrunkAclReq'
+      responses:
+        '200':
+          description: The list of access control list entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    accessControlListIds:
+                      type: array
+                      description: Array of AccessControlList ids
+                      items:
+                        type: string
+                        description: The ID of the access control list entry on assigned to trunk after update.
+              examples:
+                addAcl:
+                  $ref: '#/components/examples/addTrunkAclRes'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The SIP Trunk ID you want to add ACLs to\n  const sipTrunkId = 'SIP_TRUNK_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try{\n    const response = await sinch.elasticSipTrunking.accessControlList.addToTrunk({\n      trunkId: sipTrunkId,\n      addAccessControlListToTrunkRequestBody: {\n        accessControlListIds: [\n          'AN_ACL_ID_TO_ADD',\n          'ANOTHER_ACL_ID_TO_ADD',\n        ],\n      },\n    });\n    console.log('✅ Successfully added the ACLs to the SIP Trunk.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to add the ACLs to the SIP Trunk with ID ${sipTrunkId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+    get:
+      description: Get all access control list entries for a trunk.
+      summary: List all ACLs for a trunk
+      operationId: getAccessControlListsForTrunk
+      tags:
+      - Access Control List
+      responses:
+        '200':
+          description: The list of access control list entries
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    accessControlListIds:
+                      type: array
+                      description: Array of AccessControlList ids
+                      items:
+                        type: string
+                        description: The ID of the access control list entry.
+                - $ref: '#/components/schemas/Pagination'
+              examples:
+                listTrunkAcls:
+                  $ref: '#/components/examples/listTrunkAcls'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The SIP Trunk ID you want to list ACLs for\n  const sipTrunkId = 'SIP_TRUNK_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try{\n    const response = await sinch.elasticSipTrunking.accessControlList.listForTrunk({\n      trunkId: sipTrunkId,\n    });\n    if (response.data.length === 0) {\n      console.log(`No ACLs found for the SIP Trunk with ID ${sipTrunkId}.`);\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} ACLs for the SIP Trunk with ID ${sipTrunkId}.`);\n    response.data.forEach((acl) => {\n      console.log(acl);\n    });\n  } catch (err) {\n    console.error(`❌ Failed to list the ACLs for the SIP Trunk with ID ${sipTrunkId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /v1/projects/{projectId}/trunks/{trunkId}/accessControlLists/{accessControlListId}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: trunkId
+      in: path
+      description: The ID of the trunk that you want to work with
+      required: true
+      schema:
+        type: string
+    - name: accessControlListId
+      in: path
+      description: The ID of the access control list entry. that you want to remove from trunk
+      required: true
+      schema:
+        type: string
+    delete:
+      tags:
+      - Access Control List
+      operationId: deleteAccessControlListFromTrunk
+      summary: Delete ACL from trunk
+      description: Remove an access control list entry from a trunk.
+      responses:
+        '204':
+          description: Access control list entry deleted
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The SIP Trunk ID you want to delete the ACL from\n  const sipTrunkId = 'SIP_TRUNK_ID';\n  // The ACL ID you want to delete from the SIP Trunk\n  const aclId = 'ACL_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try{\n    await sinch.elasticSipTrunking.accessControlList.deleteFromTrunk({\n      trunkId: sipTrunkId,\n      accessControlListId: aclId,\n    });\n    console.log(`✅ Successfully deleted the ACL ${aclId} from the SIP Trunk with ID ${sipTrunkId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete the ACL ${aclId} from the SIP Trunk with ID ${sipTrunkId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+components:
+  examples:
+    createAclReq:
+      summary: Create ACL
+      description: Create a new access control list.
+      value:
+        name: My new ACL
+        enabled: true
+        ipRanges:
+        - description: Location 1
+          ipAddress: 15.15.15.15
+          range: 20
+    listTrunkAcls:
+      summary: List ACLs assigned to a trunk
+      description: All access control lists assigned to a trunk.
+      value:
+        accessControlListIds:
+        - 01HA2E80QCBX185VVP21PJG9CT
+        pageNumber: 1
+        size: 1000
+        totalItems: 1
+    addTrunkAclRes:
+      summary: Add ACLs to trunk
+      description: The access control lists added to a trunk.
+      value:
+        accessControlListIds:
+        - 01HA2E80QCBX185VVP21PJG9CT
+        - 01H8Y95DBJT31F104PWFVV9H8B
+    updateAclReq:
+      summary: Update ACL
+      description: Update an access control list.
+      value:
+        name: Test Prague 5
+        enabled: false
+        ipRanges:
+        - description: Location 1
+          ipAddress: 15.15.15.16
+          range: 20
+    updateAclRes:
+      summary: Update ACL
+      description: The updated access control list.
+      value:
+        name: Test Prague 5
+        projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+        enabled: false
+        id: 01HA9BRJW4J3QE4WBKVC337V4E
+        createTime: '2023-09-14T08:08:48'
+        updateTime: '2023-09-14T08:10:10.187513334'
+        ipRanges:
+        - description: Hradcany
+          ipAddress: 15.15.15.15
+          range: 20
+          projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+          accessControlListId: 01HA9BRJW4J3QE4WBKVC337V4E
+          id: 01HA9BRJYR9Q7ZBDYMXHVWT8S8
+          createTime: '2023-09-14T08:08:48'
+          updateTime: ''
+    aclListResponse:
+      summary: List ACLs
+      description: List all access control lists for the project.
+      value:
+        accessControlLists:
+        - name: My Access Control List
+          projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+          enabled: true
+          id: 01HA2E80QCBX185VVP21PJG9CT
+          createTime: '2023-09-11T15:37:30'
+          updateTime: '2023-09-11T15:38:14'
+          ipRanges:
+          - description: Location 1
+            ipAddress: 54.172.60.0
+            range: 30
+            projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+            accessControlListId: 01HA2E80QCBX185VVP21PJG9CT
+            id: 01HA2E80QMJS5G7MD576GJQD2X
+            createTime: '2023-09-11T15:37:30'
+            updateTime: ''
+          - description: Location 2
+            ipAddress: 54.244.51.0
+            range: 30
+            projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+            accessControlListId: 01HA2E80QCBX185VVP21PJG9CT
+            id: 01HA2E98KCZ1CNN0JP22F4JF3T
+            createTime: '2023-09-11T15:38:11'
+            updateTime: ''
+        - name: My ACL 2
+          projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+          enabled: true
+          id: 01H7ZSW728SHB9984CDGFV37RM
+          createTime: '2023-08-16T18:31:39'
+          updateTime: '2023-08-25T07:51:40'
+          ipRanges:
+          - description: Location 1
+            ipAddress: 137.192.80.69
+            range: 32
+            projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+            accessControlListId: 01H8Y95DBJT31F104PWFVV9H8B
+            id: 01H8Y95DBSPQAN4MD4298TY05Y
+            createTime: '2023-08-28T14:36:02'
+            updateTime: '2023-09-05T10:45:53'
+          - description: Location 2
+            ipAddress: 137.192.78.69
+            range: 32
+            projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+            accessControlListId: 01H8Y95DBJT31F104PWFVV9H8B
+            id: 01H8YC0JTSXXVPBECC289QZG0J
+            createTime: '2023-08-28T15:25:50'
+            updateTime: '2023-09-05T07:59:07'
+          - description: Location 3
+            ipAddress: 20.20.20.20
+            range: 24
+            projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+            accessControlListId: 01H8Y95DBJT31F104PWFVV9H8B
+            id: 01HA1ZPH6E2BTSG0MFM38BRYF6
+            createTime: '2023-09-11T11:23:17'
+            updateTime: ''
+        pageNumber: '1'
+        size: 1000
+        totalItems: 2
+    updateIpRangeReq:
+      summary: Update IP range
+      description: Request to update an IP range for an access control list.
+      value:
+        ipAddress: 11.12.13.14
+        range: 27
+    addTrunkAclReq:
+      summary: Add ACLs to trunk
+      description: Request to add access control lists to a trunk.
+      value:
+        accessControlListIds:
+        - 01HA2E80QCBX185VVP21PJG9CT
+        - 01H8Y95DBJT31F104PWFVV9H8B
+    createAclRes:
+      summary: Create ACL
+      description: The newly created access control list.
+      value:
+        name: My new ACL
+        projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+        enabled: true
+        id: 01HA9BRJW4J3QE4WBKVC337V4E
+        createTime: '2023-09-14T08:08:48.264185988'
+        updateTime: null,
+        ipRanges:
+        - description: Location 1
+          ipAddress: 15.15.15.15
+          range: 20
+          projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+          accessControlListId: 01HA9BRJW4J3QE4WBKVC337V4E
+          id: 01HA9BRJYR9Q7ZBDYMXHVWT8S8
+          createTime: '2023-09-14T08:08:48.346874339'
+          updateTime: ''
+    addIpRangeRes:
+      summary: Add IP range
+      description: The added IP range.
+      value:
+        description: IP range name
+        ipAddress: 11.12.13.14
+        range: 27
+        projectId: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+        accessControlListId: 01H8Y95DBJT31F104PWFVV9H8B
+        id: 01HA9BYAH3J5TFDGK62991YYWC
+        createTime: '2023-09-14T08:11:56.324855024'
+        updateTime: ''
+    addIpRangeReq:
+      summary: Add IP range
+      description: Request to add an IP range to an access control list.
+      value:
+        description: IP range name
+        ipAddress: 11.12.13.14
+        range: 27
+  schemas:
+    IpRange:
+      type: object
+      description: A single or range of IP addresses.
+      properties:
+        id:
+          type: string
+          description: The ID of the IP range.
+          readOnly: true
+        description:
+          type: string
+          description: A description of the IP range.
+          example: West wing of office
+        ipAddress:
+          type: string
+          description: The start of the IP range.
+          example: 10.0.1.1
+        range:
+          type: integer
+          description: 'A range, also known as a CIDR, represents the number of leading bits that define the network portion of an IP address in CIDR notation. The range is specified after a slash (/) at the end of the IP address. The remaining bits define specific hosts within the network.
+
+            - 10.0.0.0/8: Represents all IP addresses from 10.0.0.0 to 10.255.255.255, allowing for over 16 million unique host addresses.
+
+            - 172.16.0.0/16: Includes all IP addresses from 172.16.0.0 to 172.16.255.255, providing up to 65,536 unique host addresses.
+
+            - 192.168.1.0/24: Encompasses all IP addresses from 192.168.1.0 to 192.168.1.255, offering 256 unique host addresses.
+
+            - 192.168.1.0/32: Encompasses one ip address'
+          default: 32
+          example: 32
+        createTime:
+          x-version: 1
+          readOnly: true
+          x-PII: false
+          x-v1: true
+          type: string
+          format: date-time
+          description: The time the call was created.
+          example: '2021-11-01T23:20:50Z'
+        updateTime:
+          readOnly: true
+          x-version: 1
+          x-PII: false
+          x-v1: true
+          type: string
+          format: date-time
+          description: The time the call was created.
+          example: '2021-11-01T23:20:50Z'
+        projectId:
+          x-version: 1
+          readOnly: true
+          type: string
+          description: The ID of the project.
+        accessControlListId:
+          x-version: 1
+          readOnly: true
+          type: string
+          description: The ID of the access control list.
+    Pagination:
+      type: object
+      readOnly: true
+      properties:
+        totalItems:
+          type: integer
+          readOnly: true
+          format: int32
+          description: Total size of the result.
+          example: 10000
+        pageNumber:
+          readOnly: true
+          type: string
+          description: The token to be used for listing the next page
+          example: '1'
+        size:
+          type: integer
+          readOnly: true
+          format: int32
+          description: The number of items per page. default is 1000
+          example: 2000
+    AccessControlList:
+      type: object
+      required:
+      - name
+      - ipRanges
+      properties:
+        id:
+          type: string
+          description: The ID of the access control list entry.
+          readOnly: true
+        name:
+          type: string
+          description: Your name for the access control list entry.
+          example: LA Office
+        enabled:
+          type: boolean
+          description: Whether the access control list entry is enabled. You can use this to disable an list temporarily without deleting it.
+          default: true
+        ipRanges:
+          type: array
+          minItems: 1
+          description: The associated IP ranges. When creating you need to submit at least one IP range.
+          items:
+            $ref: '#/components/schemas/IpRange'
+        trunks:
+          type: array
+          readOnly: true
+          description: The associated SIP trunks ID.
+          items:
+            type: string
+            description: The ID of the SIP trunk.
+        createTime:
+          x-version: 1
+          readOnly: true
+          x-PII: false
+          x-v1: true
+          type: string
+          format: date-time
+          description: The time the call was created.
+          example: '2021-11-01T23:20:50Z'
+        updateTime:
+          readOnly: true
+          x-version: 1
+          x-PII: false
+          x-v1: true
+          type: string
+          format: date-time
+          description: The time the call was created.
+          example: '2021-11-01T23:20:50Z'
+        projectId:
+          x-version: 1
+          readOnly: true
+          type: string
+          description: The ID of the project.
+    SipTrunk:
+      required:
+      - name
+      - hostName
+      type: object
+      properties:
+        id:
+          type: string
+          readOnly: true
+          description: The SIP trunk id.
+          example: ''
+        hostName:
+          type: string
+          description: The host of the domain you would like to have for you trunk.
+          example: acme-domain-1
+        topLevelDomain:
+          readOnly: true
+          type: string
+          description: The top level domain to which the SIP trunk belongs.
+          example: .elastic-sip.sinch.com
+        domain:
+          readOnly: true
+          type: string
+          description: The fully qualified name of the domain, which is a combination of your 'hostName' and the 'topLevelDomain'.
+          example: acme-domain-1.elastic-sip.sinch.com
+        name:
+          type: string
+          description: The friendly name of your SIP trunk.
+          example: Acme Trunk
+        callsPerSecond:
+          minimum: 1
+          readOnly: true
+          type: integer
+          description: Number of calls started per second, to increase this please contact your account manager.
+          example: 100
+          default: 1
+        enableCallerName:
+          type: boolean
+          description: Enable caller name lookup for incoming calls. US and canada only.
+          example: true
+          default: false
+        callForwardNumber:
+          type: string
+          description: The valid E.164 phone number that will be dialed on inbound calls when no SIP endpoints are available. Required if `enableCallForward` property is `true`.
+          example: '+17208511190'
+          default: ''
+        enableCallForward:
+          type: boolean
+          description: "When enabled, if an inbound call can not be delivered to a SIP endpoint, calls will be forwarded to the configured `callForwardNumber`. To forward all calls without trying SIP, simply disable (or delete) all SIP endpoints on this trunk. Logs (and billing) will be created for 2 calls (inbound and outbound). \n**Note:** Since there is no SIP connection, PCAPs will not be generated."
+          example: true
+          default: false
+        createTime:
+          type: string
+          readOnly: true
+          description: The date and time that the SIP trunk was created.
+          format: date-time
+          example: '2022-01-01T00:00:00Z'
+        updateTime:
+          type: string
+          description: The date and time that the SIP trunk was last modified.
+          format: date-time
+          readOnly: true
+          example: '2022-01-01T00:00:00Z'
+        projectId:
+          type: string
+          readOnly: true
+          description: The ID of the account.
+          example: 1bf62742-7b84-4666-9cbe-8e5734fd57d0
+      description: A created SIP trunk.
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: The `projectId` is a required parameter you must include when making any API calls. You can find your project ID on your [Build dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+  securitySchemes:
+    Basic:
+      type: http
+      description: To use basic authentication, use your Access Key ID as your username and your Access Key Secret as your password. To read about more basic authentication, see the [Basic Authentication](https://developers.sinch.com/docs/est/api-reference/est#basic) section.
+      scheme: basic
+    OAuth2.0:
+      type: oauth2
+      description: To use OAuth 2.0 authentication, use your Access Key ID and Access Key Secret to obtain your bearer token. For detailed instructions on how to do this, see the [OAuth Authentication](https://developers.sinch.com/docs/est/api-reference/est#oauth) section.
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

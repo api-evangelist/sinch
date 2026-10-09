@@ -1,0 +1,430 @@
+openapi: 3.2.0
+info:
+  description: 'This API describes the set of endpoints available to create US Short Code Campaign requests.
+
+
+    The list of endpoints allows to create, update and delete a campaign and also get the current state.
+
+    Additional endpoints are available to get specific content or add notes to communicate to backoffice teams.'
+  title: Sinch US ShortCode Campaigns Campaigns Callbacks API
+  version: 0.0.1
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- description: Production server
+  url: https://usshortcode.registrations.api.sinch.com
+tags:
+- description: You can set up callback URLs to receive event notifications when your campaign status is updated or when a new note is addeed to your campaign or any of the carrier orders.
+  name: Campaigns Callbacks
+  x-displayName: Campaigns Callbacks
+paths:
+  /v1/projects/{projectId}/callback-configuration:
+    get:
+      description: The endpoint receives as path param project id. If the project exists, the details of the callback configuration are returned.
+      operationId: getCallbackConfiguration
+      parameters:
+      - in: path
+        description: Customer's project id
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigurationResponse'
+          description: OK
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+      - OAuth2:
+        - read
+      summary: Get a callback configuration by project id
+      tags:
+      - Campaigns Callbacks
+    put:
+      description: The endpoint updates the callback configuration with specified project ID
+      operationId: updateCallbackConfiguration
+      parameters:
+      - in: path
+        description: Customer's project id
+        name: projectId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackConfigurationUpdateBody'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigurationResponse'
+          description: OK
+        '400':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Project validation error'
+        '404':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '500':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+      - OAuth2:
+        - write
+      summary: Update a callback configuration
+      tags:
+      - Campaigns Callbacks
+webhooks:
+  EventsCallback:
+    post:
+      tags:
+      - Campaigns Callbacks
+      summary: Event notification
+      description: A notification of an event sent to your configured callback URL.
+      operationId: EventsCallback
+      security:
+      - hmacAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackEventBody'
+      responses:
+        default:
+          description: 200 OK
+components:
+  schemas:
+    FieldViolation:
+      type: object
+      properties:
+        field:
+          type: string
+          description: The field that contains the error
+          example: carrierIds
+        description:
+          type: string
+          example: Carrier Id 123 does not exist.
+      description: A field violation error that contains the field name, reason and value that caused the error.
+    NotFoundDetails:
+      type: object
+      properties:
+        type:
+          type: string
+          description: For not found details.
+          enum:
+          - ResourceInfo
+          x-enumDescriptions:
+            ResourceInfo: Value indicate it is related to a NotFound error
+          example: ResourceInfo
+        resourceType:
+          type: string
+          description: The type of the resource that was not found. Campaign, Project, Carrier, CarrierOrder, Brand, etc.
+          example: Campaign
+        resourceName:
+          type: string
+          description: Corresponds to the unique identifier of the resource that was not found.
+          example: '1234567890'
+        description:
+          type: string
+          description: A human-readable description of the error.
+          example: The campaign with the specified ID was not found.
+    CarrierOrderNoteBody:
+      description: Body object linked to callback body when event type is CARRIER_ORDER_NOTE.
+      type: object
+      properties:
+        campaignId:
+          description: The ID of the campaign to which the event belongs.
+          example: '20000'
+          type: string
+        carrierOrderId:
+          description: The ID of the carrier order to which the event belongs.
+          example: '20010'
+          type: string
+        note:
+          $ref: '#/components/schemas/Note'
+    CallbackConfigurationUpdateBody:
+      properties:
+        hmacSecret:
+          description: The HMAC secret to be updated for the specified project
+          example: d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+      type: object
+    CallbackConfigurationResponse:
+      properties:
+        hmacSecret:
+          description: The HMAC secret used for hashing the callback body using the HMAC-SHA1 algorithm - and for creating the X-Sinch-Signature header.
+          example: d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+        projectId:
+          type: string
+      type: object
+    CallbackEventBody:
+      description: Callback event body.
+      properties:
+        eventId:
+          description: The ID of the event.
+          example: ee34ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+        eventType:
+          description: The type of the event. Possible values are CARRIER_ORDER_NOTE, CARRIER_ORDER_STATUS_UPDATE, CAMPAIGN_NOTE, CAMPAIGN_STATUS_UPDATE.
+          enum:
+          - CARRIER_ORDER_NOTE
+          - CARRIER_ORDER_STATUS_UPDATE
+          - CAMPAIGN_NOTE
+          - CAMPAIGN_STATUS_UPDATE
+          x-enumDescriptions:
+            CARRIER_ORDER_NOTE: A new carrier order note has been added. Fields in data are campaignId, carrierId and note (author, text, createdAt).
+            CARRIER_ORDER_STATUS_UPDATE: The event is related to a carrier order status update. Fields in data are campaignId, carrierOrderId and newStatus (CarrierOrderStatus).
+            CAMPAIGN_NOTE: A new campaign note has been added. Fields in data are campaignId and note (author, text, createdAt).
+            CAMPAIGN_STATUS_UPDATE: The event is related to a campaign status update. Fields in data are campaignId and newStatus (CampaignStatus).
+          example: CAMPAIGN_STATUS_UPDATE
+          type: string
+        projectId:
+          description: The ID of the project to which the event belongs.
+          example: aad4ccbf-919d-462f-8587-dec95a1b11b0
+          type: string
+        resourceId:
+          description: Corresponds to the campaign id in case of CAMPAIGN_NOTE and CAMPAIGN_STATUS_UPDATE events. Corresponds to the carrier order id in case of CARRIER_ORDER_NOTE and CARRIER_ORDER_STATUS_UPDATE events.
+          example: '123123'
+          type: string
+        resourceType:
+          description: The type of the resource. Possible values are CAMPAIGN and CARRIER_ORDER.
+          enum:
+          - CAMPAIGN
+          - CARRIER_ORDER
+          x-enumDescriptions:
+            CAMPAIGN: The event is related to a campaign.
+            CARRIER_ORDER: The event is related to a carrier order.
+          example: CAMPAIGN
+          type: string
+        shortcode:
+          description: The short code related to the event.
+          type: string
+        data:
+          oneOf:
+          - $ref: '#/components/schemas/CampaignStatusUpdateBody'
+          - $ref: '#/components/schemas/CampaignNoteBody'
+          - $ref: '#/components/schemas/CarrierOrderStatusUpdateBody'
+          - $ref: '#/components/schemas/CarrierOrderNoteBody'
+          discriminator:
+            propertyName: eventType
+        createTime:
+          description: The date and time when the event was created.
+          example: '2023-10-01 12:00:00+00:00'
+          type: string
+          format: date-time
+      type: object
+    CampaignStatus:
+      description: Campaign status
+      enum:
+      - DRAFT
+      - PENDING_REVIEW
+      - REVIEWING
+      - READY_CARRIER_SUBMISSION
+      - CARRIER_SUBMITTED
+      - COMPLETED
+      - CANCELLED
+      - DEPROVISIONED
+      - AWAITING_CLIENT_UPDATE
+      x-enumDescriptions:
+        DRAFT: A working draft campaign, not submitted for review
+        PENDING_REVIEW: Submitted campaign, waiting for review
+        REVIEWING: An agent is actively reviewing the campaign
+        READY_CARRIER_SUBMISSION: Agent has completed review and is ready to submit to carriers
+        CARRIER_SUBMITTED: Campaign information has been submitted to carriers (at this point follow carrier order status updates)
+        COMPLETED: Campaign has been approved by all carriers and is ready for use
+        CANCELLED: Campaign has been cancelled
+        DEPROVISIONED: An approved campaign that has been deprovisioned and is no longer in use
+        AWAITING_CLIENT_UPDATE: Some information must be edited or added to the campaign to continue the review process
+      example: DRAFT
+      format: enum
+      type: string
+    CarrierOrderStatus:
+      description: Carrier order status
+      enum:
+      - PENDING
+      - SUBMITTED
+      - APPROVED
+      - REJECTED
+      - PROVISIONED_BY_CARRIER
+      - PROVISIONED_BY_SINCH
+      - CLIENT_CERTIFICATION_REQUESTED
+      - CARRIER_CERTIFICATION_REQUESTED
+      - CERTIFIED
+      - DEPROVISIONED
+      - CERTIFICATION_FAILURE
+      - CANCELLED
+      x-enumDescriptions:
+        PENDING: Campaign has not been submitted yet to the carrier.
+        SUBMITTED: Campaign has been submitted to the carrier.
+        APPROVED: Campaign has been approved by carrier.
+        REJECTED: Campaign has not been approved by carrier.
+        PROVISIONED_BY_CARRIER: Short Code has been approved and configured on Sinch’s bind by this carrier.
+        PROVISIONED_BY_SINCH: Short Code has been set up on client’s account.
+        CLIENT_CERTIFICATION_REQUESTED: Campaign is ready to be tested by Sinch Team (to test opt-in and auto-responses such as HELP and STOP)
+        CARRIER_CERTIFICATION_REQUESTED: Campaign has passed Sinch testing and is pending certification/testing with the Carrier(not all carriers require this) where they will test opt-in and auto-responses for HELP and STOP.
+        CERTIFIED: Campaign has passed certification on this carrier and it is now LIVE! Ready for live traffic
+        DEPROVISIONED: Used when cancelling the connectivity part with this carrier.
+        CERTIFICATION_FAILURE: Testing failed. It can be due to keyword and auto-responses not set up as described in the campaign or the call to action is not live or not compliant.
+        CANCELLED: When the overall SC Campaign is not longer active with all carriers and the SC lease is cancelled.
+      example: PENDING
+      format: enum
+      type: string
+    ErrorDetails:
+      type: object
+      oneOf:
+      - $ref: '#/components/schemas/NotFoundDetails'
+      - $ref: '#/components/schemas/InvalidRequestDetails'
+      discriminator:
+        propertyName: type
+        mapping:
+          ResourceInfo: '#/components/schemas/NotFoundDetails'
+          BadRequest: '#/components/schemas/InvalidRequestDetails'
+    InternalRestError:
+      properties:
+        code:
+          format: int32
+          type: integer
+        details:
+          items:
+            $ref: '#/components/schemas/ErrorDetails'
+          type: array
+        message:
+          type: string
+        status:
+          type: string
+      type: object
+    Note:
+      description: Notes used to contact customer and agents.
+      properties:
+        author:
+          description: Author. It can be either a customer or an agent.
+          enum:
+          - CUSTOMER
+          - AGENT
+          x-enumDescriptions:
+            CUSTOMER: Customer
+            AGENT: Agent
+          example: CUSTOMER
+          format: enum
+          type: string
+        text:
+          description: Note text
+          example: This is a note
+          type: string
+        createdAt:
+          description: Note creation date
+          example: '2023-01-01T00:00:00Z'
+          type: string
+          format: date-time
+      type: object
+    InvalidRequestDetails:
+      type: object
+      description: this body is expected when invalid argument, failed precondition or already exists error occurs.
+      properties:
+        type:
+          type: string
+          description: For invalid arguments details, this value is always BadRequest.
+          example: BadRequest
+          enum:
+          - BadRequest
+          x-enumDescriptions:
+            BadRequest: Value indicate it is related to a InvalidRequest error
+        fieldViolations:
+          items:
+            $ref: '#/components/schemas/FieldViolation'
+          type: array
+    CarrierOrderStatusUpdateBody:
+      description: Body object linked to callback body when event type is CARRIER_ORDER_STATUS_UPDATE.
+      type: object
+      properties:
+        campaignId:
+          description: The ID of the campaign to which the event belongs.
+          example: '20000'
+          type: string
+        carrierOrderId:
+          description: The ID of the carrier order to which the event belongs.
+          example: '20010'
+          type: string
+        newStatus:
+          $ref: '#/components/schemas/CarrierOrderStatus'
+    CampaignNoteBody:
+      description: Body object linked to callback body when event type is CAMPAIGN_NOTE.
+      type: object
+      properties:
+        campaignId:
+          description: The ID of the campaign to which the event belongs.
+          example: '20000'
+          type: string
+        note:
+          $ref: '#/components/schemas/Note'
+    CampaignStatusUpdateBody:
+      description: Body object linked to callback body when event type is CAMPAIGN_STATUS_UPDATE.
+      type: object
+      properties:
+        campaignId:
+          description: The ID of the campaign to which the event belongs.
+          example: '20000'
+          type: string
+        newStatus:
+          $ref: '#/components/schemas/CampaignStatus'
+    RestError:
+      properties:
+        error:
+          $ref: '#/components/schemas/InternalRestError'
+      type: object
+  securitySchemes:
+    OAuth2:
+      description: The username and password are your Key ID and Key Secret from the Access keys section in the Sinch Customer Dashboard. Exchange these for a bearer token (access token).
+      flows:
+        clientCredentials:
+          scopes:
+            read: read
+            write: write
+          tokenUrl: https://auth.sinch.com/oauth2/token
+      type: oauth2
+    hmacAuth:
+      type: http
+      scheme: hmac
+      description: Used for hashing callbacks. Please refer to the callback-configuration endpoints for more information.
+externalDocs:
+  description: All endpoints available under this API require Bearer token authentication. Please check oauth api documentation if you need more details.
+  url: https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth/
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php

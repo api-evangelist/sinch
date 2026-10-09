@@ -1,0 +1,659 @@
+openapi: 3.2.0
+info:
+  version: '3.0'
+  title: Fax Notifications API
+  description: This document provides a detailed user guide and reference documentation on the Fax REST API.
+  contact:
+    name: Contact Fax API Team
+    url: https://www.sinch.com/contact/
+    email: faxteam@sinch.com
+  license:
+    url: https://www.sinch.com/toc
+    name: MIT
+servers:
+- url: https://fax.api.sinch.com
+  description: v3.0 of the Fax API
+security:
+- BasicAuth: []
+- OAuth2: []
+tags:
+- name: Notifications
+  description: Webhooks allow you to get updates in real-time about the status of your faxes.
+paths: {}
+webhooks:
+  incomingFax:
+    post:
+      security:
+      - WebhookBasicAuth: []
+      operationId: incomingFaxEvent
+      tags:
+      - Notifications
+      summary: Incoming fax event
+      description: 'This webhook is triggered when a fax is received on a Sinch number associated with a service. The webhook will contain information about the fax, such as the sender, the recipient, and the content of the fax. You set the callback URL for incoming fax events on the service, either through the dashboard or using the service API.
+
+
+        ### Example payloads
+
+
+        Multipart/form-data request payloads are encoded as forms with a content type of JSON and the actual fax content as a **''file'' application/pdf attachment**.
+
+
+        Application/json request payloads are a JSON object with the file encoded as a base64 string as part of the JSON object.'
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+              - type: object
+                properties:
+                  event:
+                    type: string
+                    description: The value is always `INCOMING_FAX` for this event.
+                    enum:
+                    - INCOMING_FAX
+                    default: INCOMING_FAX
+                  file:
+                    $ref: '#/components/schemas/FileTypeMultiPart'
+              - $ref: '#/components/schemas/GenericEvent'
+            encoding:
+              file:
+                contentType: application/pdf
+              fax:
+                contentType: application/json
+              event:
+                contentType: application/json
+            example:
+              event: INCOMING_FAX
+              eventTime: '2021-11-01T23:25:57Z'
+              fax:
+                id: 01HDFHACK1YN7CCDYRA6ZRMA8Z
+                direction: INBOUND
+                from: '+14155552222'
+                to: '+14155553333'
+                numberOfPages: 1
+                status: COMPLETED
+                price:
+                  amount: '0.00'
+                  currencyCode: USD
+                createTime: '2021-11-01T23:25:57Z'
+                completedTime: '2021-11-01T23:25:57Z'
+                projectId: YOUR_PROJECT_ID
+                serviceId: YOUR_SERVICE_ID
+              file: '{application/pdf}'
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  allOf:
+                  - $ref: '#/components/schemas/WebhookEvents'
+                  description: Always `INCOMING_FAX` for this event.
+                  enum:
+                  - INCOMING_FAX
+                  default: INCOMING_FAX
+                eventTime:
+                  description: Time of the event.
+                  type: string
+                  format: date-time
+                fax:
+                  description: The incoming fax.
+                  $ref: '#/components/schemas/Fax'
+                file:
+                  description: The base64 encoded file.
+                  type: string
+                  example: '{base64_encodedData}'
+                fileType:
+                  $ref: '#/components/schemas/FileTypeJson'
+            example:
+              event: INCOMING_FAX
+              eventTime: '2021-11-01T23:25:57Z'
+              fax:
+                id: 01HDFHACK1YN7CCDYRA6ZRMA8Z
+                direction: INBOUND
+                from: '+14155552222'
+                to: '+14155553333'
+                numberOfPages: 1
+                status: COMPLETED
+                price:
+                  amount: '0.00'
+                  currencyCode: USD
+                createTime: '2021-11-01T23:25:57Z'
+                completedTime: '2021-11-01T23:25:57Z'
+                projectId: YOUR_PROJECT_ID
+                serviceId: YOUR_SERVICE_ID
+              file: '{base64_encodedData}'
+              fileType: PDF
+      responses:
+        '200':
+          description: Returns a 200 OK response if the webhook was received successfully.
+  faxCompleted:
+    post:
+      security:
+      - WebhookBasicAuth: []
+      summary: Fax completed
+      description: Triggered when the fax has been completed. The callback will contain information about the fax, such as the sender, the recipient, and the content of the fax. You must set the callback URL where you want the callback sent when you make a send fax request.
+      operationId: faxCompletedCallback
+      tags:
+      - Notifications
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              allOf:
+              - type: object
+                properties:
+                  event:
+                    type: string
+                    description: Always fax completed for this event.
+                    enum:
+                    - FAX_COMPLETED
+                    default: FAX_COMPLETED
+                  file:
+                    description: The fax content as pdf attachment to the body
+                    type: string
+                    format: binary
+                    contentMediaType: application/pdf
+                    contentEncoding: binary
+              - $ref: '#/components/schemas/GenericEvent'
+            encoding:
+              file:
+                contentType: application/pdf
+              fax:
+                contentType: application/json
+              event:
+                contentType: application/json
+            example:
+              event: FAX_COMPLETED
+              eventTime: '2021-11-01T23:25:57Z'
+              fax:
+                id: 01HDFHACK1YN7CCDYRA6ZRMA8Z
+                direction: INBOUND
+                from: '+14155552222'
+                to: '+14155553333'
+                numberOfPages: 1
+                status: COMPLETED
+                price:
+                  amount: '0.07'
+                  currencyCode: USD
+                createTime: '2021-11-01T23:25:57Z'
+                completedTime: '2021-11-01T23:25:57Z'
+                callbackUrl: https://www.my-website.com/callback
+                callbackUrlContentType: multipart/form-data
+                imageConversionMethod: HALFTONE
+                projectId: YOUR_PROJECT_ID
+                serviceId: YOUR_SERVICE_ID
+              file: '{application/pdf}'
+          application/json:
+            schema:
+              type: object
+              properties:
+                event:
+                  allOf:
+                  - $ref: '#/components/schemas/WebhookEvents'
+                  description: Always `FAX_COMPLETED` for this event.
+                  enum:
+                  - FAX_COMPLETED
+                  default: FAX_COMPLETED
+                eventTime:
+                  description: Time of the event.
+                  type: string
+                  format: date-time
+                fax:
+                  description: The incoming fax.
+                  $ref: '#/components/schemas/Fax'
+                files:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/FaxBase64File'
+            example:
+              event: FAX_COMPLETED
+              eventTime: '2021-11-01T23:25:57Z'
+              fax:
+                id: 01HDFHACK1YN7CCDYRA6ZRMA8Z
+                direction: INBOUND
+                from: '+14155552222'
+                to: '+14155553333'
+                numberOfPages: 1
+                status: COMPLETED
+                price:
+                  amount: '0.07'
+                  currencyCode: USD
+                createTime: '2021-11-01T23:25:57Z'
+                completedTime: '2021-11-01T23:25:57Z'
+                callbackUrl: https://www.my-website.com/callback
+                callbackUrlContentType: application/json
+                projectId: YOUR_PROJECT_ID
+                serviceId: YOUR_SERVICE_ID
+              files:
+              - file: '{base64ecnodeddata}'
+                fileType: PDF
+      responses:
+        '200':
+          description: Returns a 200 OK response if the webhook was received successfully.
+components:
+  schemas:
+    Resolution:
+      type: string
+      description: The resolution for the fax. If this is set at the service, this applies to all faxes sent using that service. If this is set on the fax, this will override the service setting.
+      enum:
+      - FINE
+      - SUPERFINE
+      x-enumDescriptions:
+        FINE: Most commonly accepted fax resolution at 200 dpi.
+        SUPERFINE: Higher but less commonly accepted fax resolution at 400 dpi. May be required when sending small text or detailed images.
+    FaxId:
+      type: string
+      readOnly: true
+      description: The id of a fax
+      example: 01F3J0G1M4WQR6HGY6HCF6JA0K
+    Money:
+      description: This is where we need description to be overridden by `$ref:` description
+      type: object
+      readOnly: true
+      properties:
+        currencyCode:
+          readOnly: true
+          description: The 3-letter currency code defined in ISO 4217.
+          type: string
+          example: USD
+        amount:
+          readOnly: true
+          description: The amount with 4 decimals and decimal delimiter `.`.
+          type: string
+          example: '0.0040'
+    WebhookEvents:
+      type: string
+      enum:
+      - INCOMING_FAX
+      - FAX_COMPLETED
+      x-enumDescriptions:
+        INCOMING_FAX: A webhook event triggered by an fax is incoming.
+        FAX_COMPLETED: A webhook event triggered by a fax that has successfully completed.
+      description: The different events that can trigger a webhook
+    FaxBase64File:
+      type: object
+      properties:
+        file:
+          type: string
+          format: base64
+          contentEncoding: base64
+          description: When application/json Base64 encoded file content, this is only present when using application/json for request/response.
+          example: '{base64-encoded content}'
+        fileType:
+          $ref: '#/components/schemas/FileTypeJson'
+    Fax:
+      type: object
+      properties:
+        id:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/FaxId'
+        direction:
+          allOf:
+          - $ref: '#/components/schemas/FaxDirection'
+          readOnly: true
+        from:
+          allOf:
+          - $ref: '#/components/schemas/PhoneNumber'
+          readOnly: false
+          description: 'For `INBOUND` faxes, this is the number where the fax is sent from
+
+            For `OUTBOUND` faxes, this is the Sinch number you want to have as sender'
+        to:
+          allOf:
+          - $ref: '#/components/schemas/PhoneNumber'
+          readOnly: false
+          description: "For `INBOUND` faxes, this is the Sinch number someone sent the fax to.\nFor `OUTBOUND` faxes, this is the phone number you want to send a fax to.\n\nYou can add multiple numbers by adding them as an array. For example:\n\n  application/json\n\n  ```json\n  \"to\": [\"+14155552222\", \"+14155553333\"]\n  ```\n\n  multipart/form\n  ```json\n  to=+14155552222&to=+14155553333\n\n  ```"
+        contentUrl:
+          anyOf:
+          - type: string
+            format: url
+            description: 'Single URL. Fetched documents must be one of the following file types: `.docx`, `html.`, `.jpg`, `.pdf`, `.png`, `.tif`, `.txt`.'
+            example: https://example.com/fax.pdf
+          - type: array
+            items:
+              type: string
+              format: url
+            description: 'Multiple URLs. Fetched documents must be one of the following file types: `.docx`, `html.`, `.jpg`, `.pdf`, `.png`, `.tif`, `.txt`.'
+            example:
+            - https://www.google.com
+            - https://www.sinch.com
+          format: URL
+          description: 'Give us any URL on the Internet (including ones with basic authentication)
+
+            At least one file or contentUrl parameter is required.
+
+            Please note: If you are passing fax a secure URL (starting with https://), make sure that your SSL certificate (including your intermediate cert, if you have one) is installed properly, valid, and up-to-date.
+
+            If the file parameter is specified as well, content from URLs will be rendered before content from files.
+
+
+            You can add multiple URLs by adding them as an array them with a comma when posting as multipart/form-data
+
+
+            For example: "https://developers.sinch.com/fax/fax.pdf, https://developers.sinch.com/" or if posting JSON `"contentUrl": ["https://developers.sinch.com/fax/fax.pdf", "https://developers.sinch.com/"]`'
+          example: https://developers.sinch.com/fax/fax.pdf
+        numberOfPages:
+          type: integer
+          readOnly: true
+          description: The number of pages in the fax.
+        status:
+          $ref: '#/components/schemas/FaxStatus'
+        price:
+          description: The total price for this fax. This field is populated after the final fax price is calculated.
+          allOf:
+          - $ref: '#/components/schemas/Money'
+          readOnly: true
+        barCodes:
+          description: The bar codes found in the fax. This field is populated when Sinch detects bar codes on incoming faxes.
+          readOnly: true
+          type: array
+          items:
+            $ref: '#/components/schemas/BarCode'
+        createTime:
+          readOnly: true
+          type: string
+          format: date-time
+          description: A timestamp representing the time when the initial API call was made.
+        completedTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: If the job is complete, this is a timestamp representing the time the job was completed.
+        pagesSentSuccessfully:
+          type: integer
+          description: The number of pages successfully sent to the receiving side in the fax.
+          readOnly: true
+          example: 3
+        headerText:
+          description: Text that will be displayed at the top of each page of the fax. 50 characters maximum. Default header text is "-". Note that the header is not applied until the fax is transmitted, so it will not appear on fax PDFs or thumbnails.
+          type: string
+          maximum: 50
+          default: ''
+        headerPageNumbers:
+          type: boolean
+          description: If true, page numbers will be displayed in the header. Default is true.
+          default: true
+        headerTimeZone:
+          type: string
+          format: timezone
+          description: A [TZ database name](https://en.wikipedia.org/wiki/List_of_tz_database_time_zones) string specifying the timezone for the header timestamp.
+          default: America/New_York
+        retryDelaySeconds:
+          description: The number of seconds to wait between retries if the fax is not yet completed.
+          type: integer
+          minimum: 30
+          maximum: 300
+          default: 60
+        labels:
+          x-version: 2
+          description: You can use this to attach labels to your call that you can use in your BI solutions.
+          allOf:
+          - $ref: '#/components/schemas/Labels'
+          example:
+            customerId: '1234'
+            customerName: John Doe
+        callbackUrl:
+          type: string
+          description: 'The URL to which a callback will be sent when the fax is completed. The callback will be sent as a POST request with a JSON body. The callback will be sent to the URL specified in the `callbackUrl` parameter, if provided, otherwise it will be sent to the URL specified in the `callbackUrl` field of the Fax Service object.
+
+
+            Note: If a callback URL uses basicauth credentials, when the callback URL is retrieved those credentials are masked. It is not possible to retrieve previously-set credentials through the API.'
+          format: URL
+          example: https://www.my-website.com/callback
+        callbackUrlContentType:
+          description: The content type of the callback.
+          type: string
+          default: multipart/form-data
+          enum:
+          - multipart/form-data
+          - application/json
+          x-enumDescriptions:
+            multipart/form-data: The callback will be sent as a multipart/form-data request with files as attachments to the body.
+            application/json: The callback will be sent as a JSON request with the files as base64 encoded strings in the JSON object.
+        imageConversionMethod:
+          $ref: '#/components/schemas/ImageConversionMethod'
+        errorType:
+          readOnly: true
+          allOf:
+          - $ref: '#/components/schemas/ErrorType'
+        errorCode:
+          readOnly: true
+          type: integer
+          description: One of the error numbers listed in the [Fax Error Messages section](https://developers.sinch.com/docs/fax/api-reference/fax/error-messages).
+        errorMessage:
+          readOnly: true
+          type: string
+          description: One of the error codes listed in the [Fax Error Messages section](https://developers.sinch.com/docs/fax/api-reference/fax/error-messages).
+        maxRetries:
+          readOnly: false
+          type: integer
+          description: '| The number of times the fax will be retired before cancel. Default value is set in your fax service.
+
+            | The maximum number of retries is 5.'
+          maximum: 5
+          minimum: 0
+        retryCount:
+          readOnly: true
+          type: integer
+          description: The number of times the fax has been retried.
+        hasFile:
+          readOnly: true
+          type: boolean
+          description: Only shown on the fax result. This indicates if the content of the fax is stored with Sinch. (true or false)
+        resolution:
+          $ref: '#/components/schemas/Resolution'
+        coverPageId:
+          type: string
+          description: The cover page id you want to use for the fax
+        coverPageData:
+          $ref: '#/components/schemas/CoverPageData'
+        inProgressNotifications:
+          type: boolean
+          description: If set to `true`, you will receive a webhook notification for each page sent on an outbound fax.
+          default: false
+        fromCountry:
+          readOnly: true
+          type: string
+          description: The country code in ISO 3166-1 alpha-2 format of the number sending the fax.
+          example: US
+        toCountry:
+          readOnly: true
+          type: string
+          description: The country code in ISO 3166-1 alpha-2 format of the number receiving the fax.
+          example: US
+        projectId:
+          readOnly: true
+          x-version: 1
+          allOf:
+          - $ref: '#/components/schemas/ProjectId'
+        serviceId:
+          readOnly: false
+          x-version: 1
+          allOf:
+          - $ref: '#/components/schemas/ServiceId'
+    Labels:
+      type: object
+      title: label
+      description: 'You can use this to attach labels to your call that you can use in your applications. It is a key value store.
+
+
+        - `application/json` format: `"labels": {"label1":"value1"}`
+
+        - `multipart/form-data` format: `labels[label1] = value1`'
+      additionalProperties:
+        type: string
+        x-additionalPropertiesName: labelKey
+      example:
+        use-case: fraudPrevention
+        costCenter: sales
+    ServiceId:
+      x-PII: false
+      x-v1: true
+      readOnly: true
+      type: string
+      example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      description: ID of the fax service used.
+    CoverPageData:
+      type: object
+      title: Cover page data
+      description: 'You can use this to specify custom data for your cover page that will be sent as part of the fax. It is a key value store. Read more about how to use this [here](https://developers.sinch.com/docs/fax/api-reference/fax/cover-pages/). All keys used must be lower case.
+
+
+        - `application/json` format: `"coverPageData": {"customfield1":"customdata1"}`
+
+        - `multipart/form-data` format: `coverPageData[customfield1] = customdata1`'
+      additionalProperties:
+        type: string
+        x-additionalPropertiesName: coverPageKey
+      example:
+        toName: Acme Corp
+    GenericEvent:
+      type: object
+      properties:
+        event:
+          $ref: '#/components/schemas/WebhookEvents'
+        eventTime:
+          description: Time of the event.
+          type: string
+          format: date-time
+        fax:
+          $ref: '#/components/schemas/Fax'
+    ProjectId:
+      type: string
+      x-PII: false
+      x-v1: false
+      description: The `Id` of the project associated with the call.
+      x-Internal: to support future account keys
+      readOnly: true
+      example: ae00f005-e392-44dc-b3f5-a657a2684dg3
+    ErrorType:
+      readOnly: true
+      description: Error type
+      type: string
+      enum:
+      - DOCUMENT_CONVERSION_ERROR
+      - CALL_ERROR
+      - FAX_ERROR
+      - FATAL_ERROR
+      - GENERAL_ERROR
+      x-enumDescriptions:
+        DOCUMENT_CONVERSION_ERROR: A documentation conversion error.
+        CALL_ERROR: A call error.
+        FAX_ERROR: A fax error.
+        FATAL_ERROR: A fatal error.
+        GENERAL_ERROR: A general error.
+    BarCode:
+      type: object
+      description: Sinch will scan all pages of all incoming faxes for Code-128 and DataMatrix bar codes and include this information in webhook requests and via the API.
+      properties:
+        type:
+          type: string
+          description: The type of barcode found.
+          enum:
+          - CODE_128
+          - DATA_MATRIX
+          x-enumDescriptions:
+            CODE_128: Code-128 barcode.
+            DATA_MATRIX: DataMatrix barcode.
+        page:
+          description: The page number on which the barcode was found.
+          type: integer
+        value:
+          description: The  information of the barcode.
+          type: string
+    FileTypeJson:
+      type: string
+      description: When request/response is application/json and file is part of payload. This is the file type of the file.
+      enum:
+      - DOCX
+      - PDF
+      - TIF
+      - JPG
+      - TXT
+      - HTML
+      - PNG
+      x-enumDescriptions:
+        DOCX: Microsoft Word
+        PDF: PDF
+        TIF: TIFF
+        JPG: JPEG
+        TXT: Text
+        HTML: HTML
+        PNG: PNG
+    FaxStatus:
+      type: string
+      description: The status of the fax
+      readOnly: true
+      enum:
+      - QUEUED
+      - IN_PROGRESS
+      - COMPLETED
+      - FAILURE
+      x-enumDescriptions:
+        QUEUED: The operation is currently in a queue on a server and should be executed very soon.
+        IN_PROGRESS: The fax is currently being sent (OUTBOUND) or received (INBOUND).
+        COMPLETED: The fax operation succeeded. Everything went as normally planned.
+        FAILURE: The fax operation failed. Details of the error can be found in the error_code field. For OUTBOUND fax, this means that NONE of the recipients received the fax.
+    FaxDirection:
+      type: string
+      description: The direction of the fax.
+      readOnly: true
+      enum:
+      - OUTBOUND
+      - INBOUND
+      x-enumDescriptions:
+        OUTBOUND: The fax was sent by you via the API.
+        INBOUND: The fax was received on one of your numbers.
+      example: OUTBOUND
+    PhoneNumber:
+      x-PII: true
+      x-v1: true
+      type: string
+      format: phoneNumber
+      description: A phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format, including the leading '+'.
+      example: '+15551235656'
+    FileTypeMultiPart:
+      description: When request/response is multipart/form-data and file is part of payload. This is the file type of the file.
+      enum:
+      - application/docx
+      - application/pdf
+      - application/tif
+      - application/jpg
+      - application/txt
+      - application/html
+      - application/png
+      x-enumDescriptions:
+        application/docx: Microsoft Word
+        application/pdf: PDF
+        application/tif: TIFF
+        application/jpg: JPEG
+        application/txt: Text
+        application/html: HTML
+        application/png: PNG
+    ImageConversionMethod:
+      type: string
+      description: Determines how documents are converted to black and white on OUTBOUND faxes only.  Image conversion is not done on INBOUND faxes. Defaults to value selected on Fax Service object.
+      enum:
+      - HALFTONE
+      - MONOCHROME
+      x-enumDescriptions:
+        HALFTONE: Converts the image to halftone.
+        MONOCHROME: Converts the image to monochrome.
+      default: HALFTONE
+  securitySchemes:
+    WebhookBasicAuth:
+      type: http
+      scheme: basic
+      description: 'You can validate whether a webhook is genuine by providing credentials you set and will check on your server side along with the callback URL, as in this example: `https://username:password@www.YourWebhookWebsite.com`'
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: The user name and password is your keyId and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+    OAuth2:
+      type: oauth2
+      description: The user name and password is your key id and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

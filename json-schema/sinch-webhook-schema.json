@@ -1,0 +1,160 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-webhook-schema.json",
+  "title": "Webhook",
+  "description": "Represents a destination for receiving callbacks from the Conversation API.",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-conversation-api-openapi.yml#/components/schemas/Webhook",
+  "type": "object",
+  "required": [
+    "target"
+  ],
+  "properties": {
+    "app_id": {
+      "description": "The app that this webhook belongs to.",
+      "type": "string"
+    },
+    "client_credentials": {
+      "$ref": "#/$defs/ClientCredentials"
+    },
+    "id": {
+      "description": "The ID of the webhook.",
+      "type": "string",
+      "readOnly": true
+    },
+    "secret": {
+      "description": "Optional secret be used to sign contents of webhooks sent by the Conversation API.\nYou can then use the secret to verify the signature.",
+      "type": "string",
+      "format": "password"
+    },
+    "target": {
+      "description": "The target url where events should be sent to.\nMaximum URL length is 742.\nThe conversation-api.*.sinch.com subdomains are forbidden.",
+      "type": "string"
+    },
+    "target_type": {
+      "$ref": "#/$defs/WebhookTargetType"
+    },
+    "triggers": {
+      "description": "An array of triggers that should trigger the webhook and result in an\nevent being sent to the target url.\nRefer to the list of [Webhook Triggers](https://developers.sinch.com/docs/conversation/callbacks/#webhook-triggers)\nfor a complete list.",
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/WebhookTrigger"
+      }
+    }
+  },
+  "$defs": {
+    "ClientCredentials": {
+      "type": "object",
+      "description": "Optional. Used for OAuth2 authentication.",
+      "required": [
+        "client_id",
+        "client_secret",
+        "endpoint"
+      ],
+      "properties": {
+        "client_id": {
+          "description": "The Client ID that will be used in the OAuth2 Client Credentials flow.",
+          "type": "string"
+        },
+        "client_secret": {
+          "description": "The Client Secret that will be used in the OAuth2 Client Credentials flow.",
+          "type": "string",
+          "format": "password"
+        },
+        "endpoint": {
+          "description": "The endpoint that will be used in the OAuth2 Client Credentials flow. Expected to return a JSON with an access token and `expires_in` value (in seconds). The `expires_in` value, which must be a minimum of 30 seconds and a maximum of 3600 seconds, is how long Sinch will save the access token before asking for a new one.",
+          "type": "string"
+        },
+        "scope": {
+          "description": "Optional. Space-separated string per RFC 6749. Used to limit the access granted by the token.\nMax length: 1024 characters.\nIf blank or omitted, this is not included in the token request.\n",
+          "type": "string",
+          "maxLength": 1024
+        },
+        "response_type": {
+          "description": "Optional. When granting `client_credentials`, this is generally omitted. If you do provide a value, it will be forwarded to your OAuth provider as-is.\nMax length: 64 characters.\n",
+          "type": "string",
+          "maxLength": 64
+        },
+        "token_request_type": {
+          "description": "Optional. Controls how `client_id` and `client_secret` are sent to the token endpoint. Either `BASIC` or `FORM`. If not set or unrecognized, `BASIC` is used by default.\n",
+          "type": "string",
+          "x-enumDescriptions": {
+            "BASIC": "Sent using the HTTP Authorization header (Basic auth). In this case, `client_id` and `client_secret` are NOT included in the form body.",
+            "FORM": "Sent in the form body as `client_id` and `client_secret`. No Authorization header is added."
+          },
+          "enum": [
+            "BASIC",
+            "FORM"
+          ],
+          "default": "BASIC"
+        }
+      }
+    },
+    "WebhookTargetType": {
+      "type": "string",
+      "default": "DISMISS",
+      "x-enumDescriptions": {
+        "DISMISS": "Events won't be sent.",
+        "HTTP": "Events will be sent to an HTTP target."
+      },
+      "enum": [
+        "DISMISS",
+        "HTTP"
+      ]
+    },
+    "WebhookTrigger": {
+      "description": "Each webhook can subscribe to one or more of the following triggers",
+      "type": "string",
+      "x-enumDescriptions": {
+        "UNSPECIFIED_TRIGGER": "Using this value will cause errors.",
+        "MESSAGE_DELIVERY": "Subscribe to delivery receipts for a message sent.",
+        "EVENT_DELIVERY": "Subscribe to delivery receipts for a event sent.",
+        "MESSAGE_INBOUND": "Subscribe to inbound messages from end users on the underlying channels.",
+        "EVENT_INBOUND": "Subscribe to inbound events from end users on the underlying channels.",
+        "CONVERSATION_START": "Subscribe to an event that is triggered when a new conversation has been started.",
+        "CONVERSATION_STOP": "Subscribe to an event that is triggered when a active conversation has been stopped.",
+        "CONTACT_CREATE": "Subscribe to an event that is triggered when a new contact has been created.",
+        "CONTACT_DELETE": "Subscribe to an event that is triggered when a contact has been deleted.",
+        "CONTACT_MERGE": "Subscribe to an event that is triggered when a two contacts are merged.",
+        "CONTACT_UPDATE": "Subscribe to an event that is triggered when a contact is updated.",
+        "UNSUPPORTED": "Subscribe to callbacks that are not natively supported by the Conversation API.",
+        "OPT_IN": "Subscribe to opt_ins.",
+        "OPT_OUT": "Subscribe to opt_outs.",
+        "CAPABILITY": "Subscribe to see get capability results.",
+        "CONVERSATION_DELETE": "Subscribe to get an event when a conversation is deleted.",
+        "CONTACT_IDENTITIES_DUPLICATION": "Subscribe to get an event when contact identity duplications are found during message or event processing.",
+        "CHANNEL_EVENT": "Subscribe to direct channel event.",
+        "SMART_CONVERSATION": "Subscribe to [Smart conversation analysis](https://developers.sinch.com/docs/smart-conversations).",
+        "MESSAGE_INBOUND_SMART_CONVERSATION_REDACTION": "Subscribe to [analysis](https://developers.sinch.com/docs/smart-conversations) for messages from end-users.",
+        "RECORD_NOTIFICATION": "Subscribe to Record Notifications.",
+        "MESSAGE_SUBMIT": "Subscribe to message submit Notifications."
+      },
+      "enum": [
+        "UNSPECIFIED_TRIGGER",
+        "MESSAGE_DELIVERY",
+        "EVENT_DELIVERY",
+        "MESSAGE_INBOUND",
+        "EVENT_INBOUND",
+        "CONVERSATION_START",
+        "CONVERSATION_STOP",
+        "CONTACT_CREATE",
+        "CONTACT_DELETE",
+        "CONTACT_MERGE",
+        "CONTACT_UPDATE",
+        "UNSUPPORTED",
+        "OPT_IN",
+        "OPT_OUT",
+        "CAPABILITY",
+        "CONVERSATION_DELETE",
+        "CONTACT_IDENTITIES_DUPLICATION",
+        "CHANNEL_EVENT",
+        "SMART_CONVERSATION",
+        "MESSAGE_INBOUND_SMART_CONVERSATION_REDACTION",
+        "RECORD_NOTIFICATION",
+        "MESSAGE_SUBMIT"
+      ]
+    }
+  }
+}

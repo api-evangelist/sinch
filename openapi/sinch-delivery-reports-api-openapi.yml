@@ -113,38 +113,6 @@ paths:
           description: Unauthorized
 components:
   schemas:
-    DeliveryReport:
-      type: object
-      properties:
-        batch_id:
-          type: string
-          description: The batch identifier
-        type:
-          type: string
-          description: The delivery report type
-        statuses:
-          type: array
-          description: List of status objects with counts
-          items:
-            type: object
-            properties:
-              code:
-                type: integer
-                description: The status code
-              status:
-                type: string
-                description: The delivery status
-              count:
-                type: integer
-                description: The number of recipients with this status
-              recipients:
-                type: array
-                description: List of recipient phone numbers
-                items:
-                  type: string
-        total_message_count:
-          type: integer
-          description: Total number of messages in the batch
     DeliveryReportList:
       type: object
       properties:
@@ -185,6 +153,38 @@ components:
           type: string
           format: date-time
           description: When the operator reported the status
+    DeliveryReport:
+      type: object
+      properties:
+        batch_id:
+          type: string
+          description: The batch identifier
+        type:
+          type: string
+          description: The delivery report type
+        statuses:
+          type: array
+          description: List of status objects with counts
+          items:
+            type: object
+            properties:
+              code:
+                type: integer
+                description: The status code
+              status:
+                type: string
+                description: The delivery status
+              count:
+                type: integer
+                description: The number of recipients with this status
+              recipients:
+                type: array
+                description: List of recipient phone numbers
+                items:
+                  type: string
+        total_message_count:
+          type: integer
+          description: Total number of messages in the batch
   parameters:
     BatchId:
       name: batch_id
@@ -208,3 +208,4 @@ components:
 externalDocs:
   description: Sinch SMS API Documentation
   url: https://developers.sinch.com/docs/sms
+x-ae-provenance: origin unrecorded (catalog pass before 2026-09); NOT a provider-published document. Kept on 2026-10-08 because its /xms/v1/{service_plan_id}/... paths match the SMS REST API reference nav at https://developers.sinch.com/docs/sms/api-reference (Batches, Delivery reports, Groups, Inbounds), which publishes no downloadable OpenAPI bundle (searched 2026-10-08). Moved out of _original/ because _original asserts provider publication.

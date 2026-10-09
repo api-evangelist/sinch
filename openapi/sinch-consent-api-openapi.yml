@@ -1,0 +1,357 @@
+openapi: 3.2.0
+info:
+  description: '# Overview
+
+
+    Send and receive messages globally over SMS, RCS, WhatsApp, Viber Business, Facebook messenger and other popular channels using the Sinch Conversation API.'
+  title: Conversation API | Sinch Consent API
+  version: '1.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    email: support@sinch.com
+    name: support at sinch
+servers:
+- url: https://{region}.conversation.api.sinch.com
+  variables:
+    region:
+      default: us
+      enum:
+      - us
+      - eu
+      - br
+  description: The {region} variable must be set to us, eu, or br, and it must match the region in which you created your Conversation API app.
+security:
+- Basic: []
+- oAuth2: []
+tags:
+- description: Consent queries provide a way to retrieve any identities stored within a given consent list. You can also retrieve audit records that provide details for a given identity's journey through consent management.
+  name: Consent
+  x-displayName: Consents
+paths:
+  /v1/projects/{project_id}/apps/{app_id}/consents/{list_type}:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    - $ref: '#/components/parameters/app_id'
+    - $ref: '#/components/parameters/list_type'
+    get:
+      description: Get all identities contained within a consent list for a given project id, app id, and list type.
+      tags:
+      - Consent
+      summary: Get identities from consent list
+      operationId: Consents_GetConsents
+      parameters:
+      - description: 'Optional. The maximum number of records to fetch. The default is 10
+
+          and the maximum is 50.'
+        name: page_size
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - description: 'Optional. The page number to fetch. Defaults to first page (0). DEPRECATED: please use page_token instead.'
+        name: page_number
+        deprecated: true
+        in: query
+        schema:
+          type: integer
+          format: int32
+      - name: page_token
+        in: query
+        description: 'A page token, received from a previous Get identities from consent list call.
+
+          Provide this to retrieve a subsequent page.'
+        schema:
+          type: string
+      responses:
+        '200':
+          $ref: '#/components/responses/getIdentitiesFromConsentResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '404':
+          $ref: '#/components/responses/404Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.consents;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConsentsService;\nimport com.sinch.sdk.domains.conversation.models.v1.consents.ConsentsListType;\nimport com.sinch.sdk.domains.conversation.models.v1.consents.response.ConsentsListResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class ListIdentities {\n\n  private static final Logger LOGGER = Logger.getLogger(ListIdentities.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the Conversation App\n    String appId = \"CONVERSATION_APP_ID\";\n\n    // The consent list type to query\n    ConsentsListType listType = ConsentsListType.OPT_OUT_ALL;\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConsentsService consentsService = client.conversation().v1().consents();\n\n    LOGGER.info(\n        String.format(\"List identities from consent list '%s' for app '%s'\", listType, appId));\n\n    ConsentsListResponse response = consentsService.listIdentities(appId, listType);\n\n    LOGGER.info(\"Response: \");\n\n    response.iterator().forEachRemaining(f -> LOGGER.info(f.toString()));\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation App to list the Consent Identities from\n  const appId = 'CONVERSATION_APP_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.consents.listIdentities({\n      app_id: appId,\n      list_type: 'OPT_OUT_ALL',\n    });\n    if (response.data.length === 0) {\n      console.log('No Consent Identities found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Consent Identities.`);\n    response.data.forEach((consentIdentity) => {\n      console.log(consentIdentity);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list the Consent Identities:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /v1/projects/{project_id}/apps/{app_id}/consents/identities/{identity}:
+    parameters:
+    - $ref: '#/components/parameters/project_id'
+    - $ref: '#/components/parameters/app_id'
+    - $ref: '#/components/parameters/identity'
+    get:
+      description: Get all audit records associated with the given identity from the consent lists within the specified project and app.
+      tags:
+      - Consent
+      summary: Get audit records from consent lists
+      operationId: Consents_GetConsentsAuditRecords
+      responses:
+        '200':
+          $ref: '#/components/responses/getAuditRecordsFromConsentResponse'
+        '400':
+          $ref: '#/components/responses/400Error'
+        '401':
+          $ref: '#/components/responses/401Error'
+        '403':
+          $ref: '#/components/responses/403Error'
+        '404':
+          $ref: '#/components/responses/404Error'
+        '500':
+          $ref: '#/components/responses/500Error'
+        '501':
+          $ref: '#/components/responses/501Error'
+      x-codeSamples:
+      - lang: Java
+        source: "/**\n * Sinch Java Snippet\n *\n * <p>This snippet is available at https://github.com/sinch/sinch-sdk-java\n *\n * <p>See https://github.com/sinch/sinch-sdk-java/blob/main/examples/snippets/README.md for details\n */\npackage conversation.consents;\n\nimport com.sinch.sdk.SinchClient;\nimport com.sinch.sdk.domains.conversation.api.v1.ConsentsService;\nimport com.sinch.sdk.domains.conversation.models.v1.consents.response.AuditRecordsResponse;\nimport com.sinch.sdk.models.Configuration;\nimport com.sinch.sdk.models.ConversationRegion;\nimport java.util.logging.Logger;\nimport utils.Settings;\n\npublic class ListAuditRecords {\n\n  private static final Logger LOGGER = Logger.getLogger(ListAuditRecords.class.getName());\n\n  public static void main(String[] args) {\n\n    String projectId = Settings.getProjectId().orElse(\"MY_PROJECT_ID\");\n    String keyId = Settings.getKeyId().orElse(\"MY_KEY_ID\");\n    String keySecret = Settings.getKeySecret().orElse(\"MY_KEY_SECRET\");\n    String conversationRegion = Settings.getConversationRegion().orElse(\"MY_CONVERSATION_REGION\");\n\n    // The ID of the Conversation App\n    String appId = \"CONVERSATION_APP_ID\";\n\n    // The identity to retrieve audit records for (e.g. a phone number)\n    String identity = \"MY_IDENTITY\";\n\n    Configuration configuration =\n        Configuration.builder()\n            .setProjectId(projectId)\n            .setKeyId(keyId)\n            .setKeySecret(keySecret)\n            .setConversationRegion(ConversationRegion.from(conversationRegion))\n            .build();\n\n    SinchClient client = new SinchClient(configuration);\n\n    ConsentsService consentsService = client.conversation().v1().consents();\n\n    LOGGER.info(String.format(\"List audit records for identity '%s' in app '%s'\", identity, appId));\n\n    AuditRecordsResponse response = consentsService.listAuditRecords(appId, identity);\n\n    LOGGER.info(\"Response: \" + response);\n  }\n}\n"
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n  const conversationRegion = process.env.SINCH_CONVERSATION_REGION ?? 'MY_CONVERSATION_REGION';\n\n  // The ID of the Conversation App to list the audit records from, for a given identity\n  const appId = 'CONVERSATION_APP_ID';\n  // The phone number of the recipient in E.164 format without the leading '+' (e.g., 46701234567)\n  const recipientPhoneNumber = 'RECIPIENT_PHONE_NUMBER';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret, conversationRegion });\n\n  try {\n    const response = await sinch.conversation.consents.listAuditRecords({\n      app_id: appId,\n      identity: recipientPhoneNumber,\n    });\n    console.log('✅ Successfully listed the audit records.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to list the audit records for the identity ${recipientPhoneNumber} in the Conversation App with ID ${appId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+components:
+  responses:
+    403Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 403
+            message: You do not have access to the requested resource.
+            status: UNAUTHORIZED
+            details: []
+    501Error:
+      description: Something went wrong on our end, try again with exponential back-off. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 501
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    getAuditRecordsFromConsentResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetAuditRecordsFromConsentResponse'
+    500Error:
+      description: Correct credentials but you don't have access to the requested resource. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 500
+            message: There was an internal server error.
+            status: INTERNAL_ERROR
+            details: []
+    404Error:
+      description: No information was found. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 404
+            message: information not found
+            status: NOT_FOUND
+            details: []
+    400Error:
+      description: Malformed request. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/runtimeError'
+          example:
+            code: 400
+            message: Malformed request
+            status: INVALID_REQUEST
+            details: []
+    401Error:
+      description: Incorrect credentials. See [common error responses](https://developers.sinch.com/docs/conversation/api-reference/#common-error-responses) for more information.
+      content:
+        application/json:
+          schema:
+            type: object
+    getIdentitiesFromConsentResponse:
+      description: A successful response.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/GetIdentitiesFromConsentResponse'
+  parameters:
+    app_id:
+      name: app_id
+      description: The unique ID of the app. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+      in: path
+      required: true
+      schema:
+        type: string
+    project_id:
+      name: project_id
+      description: The unique ID of the project. You can find this on the [Sinch Dashboard](https://dashboard.sinch.com/convapi/apps).
+      in: path
+      required: true
+      schema:
+        type: string
+    list_type:
+      name: list_type
+      description: The consent list type. One of `OPT_OUT_ALL`, `OPT_OUT_MARKETING`, and or `OPT_OUT_NOTIFICATION`.
+      in: path
+      required: true
+      schema:
+        $ref: '#/components/schemas/ConsentsListType'
+    identity:
+      name: identity
+      description: An identity to use on Consent audit records queries.
+      in: path
+      required: true
+      schema:
+        type: string
+  schemas:
+    ConsentsListType:
+      type: string
+      description: The consent list type. See [consent management](https://developers.sinch.com/docs/conversation/consent-management) page for more information.
+      enum:
+      - OPT_OUT_ALL
+      - OPT_OUT_MARKETING
+      - OPT_OUT_NOTIFICATION
+      x-enumDescriptions:
+        OPT_OUT_ALL: List type that blocks all kinds of messages
+        OPT_OUT_MARKETING: List type that blocks only marketing messages
+        OPT_OUT_NOTIFICATION: List type that blocks only notification messages
+    AuditRecord:
+      description: Represents a consent audit record from the Conversation API.
+      type: object
+      title: AuditRecord
+      required:
+      - operation
+      - origin
+      - list_type
+      - project_id
+      - app_id
+      - datetime
+      properties:
+        origin:
+          description: The origin from the opt-out or opt-in. This could be the Batch API or an MO (when matched with an end-user MO).
+          type: string
+          enum:
+          - ORIGIN_API
+          - ORIGIN_MO
+          x-enumDescriptions:
+            ORIGIN_API: The opt-in or opt-out came from the API.
+            ORIGIN_MO: The opt-in or optout came from an MO.
+        operation:
+          description: The operation that the audit record refers to. Can be INSERT, UPDATE or DELETE.
+          type: string
+          enum:
+          - OPERATION_INSERT
+          - OPERATION_UPDATE
+          - OPERATION_DELETE
+          x-enumDescriptions:
+            OPERATION_INSERT: The Insert operation
+            OPERATION_UPDATE: The Update operation
+            OPERATION_DELETE: The Delete operation
+        list_type:
+          allOf:
+          - description: The list type of the consent list the audit record refers to.
+          - $ref: '#/components/schemas/ConsentsListType'
+        project_id:
+          description: The project ID associated with the consent list the audit record refers to.
+          type: string
+        app_id:
+          description: The app ID associated with the consent list the audit record refers to.
+          type: string
+        datetime:
+          description: Datetime of when the consent list audit record happened.
+          type: string
+          format: date-time
+    GetIdentitiesFromConsentResponse:
+      type: object
+      properties:
+        identities:
+          type: array
+          description: List of identities belonging to a specific project ID, app ID, and list type
+          items:
+            $ref: '#/components/schemas/Identity'
+        next_page_token:
+          description: Token for the next page of the search, to be used in the next call.
+          type: string
+    Identity:
+      description: Represents a identity from the Conversation API.
+      type: object
+      title: Identity
+      required:
+      - identity
+      properties:
+        identity:
+          description: The identity from Conversation API.
+          type: string
+    GetAuditRecordsFromConsentResponse:
+      type: object
+      properties:
+        identity:
+          $ref: '#/components/schemas/Identity'
+        audit_records:
+          type: array
+          description: List of audit records associated with the given identity
+          items:
+            $ref: '#/components/schemas/AuditRecord'
+    runtimeError:
+      type: object
+      properties:
+        error:
+          type: object
+          properties:
+            code:
+              type: integer
+              format: int32
+            details:
+              type: array
+              items:
+                $ref: '#/components/schemas/protobufAny'
+            message:
+              type: string
+            status:
+              type: string
+    protobufAny:
+      type: object
+      properties:
+        type_url:
+          type: string
+        value:
+          type: string
+          format: byte
+  securitySchemes:
+    Basic:
+      type: http
+      scheme: basic
+      description: For more information about basic authentication, see [Basic Authentication](https://developers.sinch.com/docs/conversation/api-reference/#authentication).
+    oAuth2:
+      type: oauth2
+      description: The user name and password are your client_id and key_secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php
+x-readme:
+  proxy-enabled: true
+  samples-enabled: true

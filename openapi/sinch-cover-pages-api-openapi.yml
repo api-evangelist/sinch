@@ -1,0 +1,235 @@
+openapi: 3.2.0
+info:
+  version: '3.0'
+  title: Fax Cover pages API
+  description: This document provides a detailed user guide and reference documentation on the Fax REST API.
+  contact:
+    name: Contact Fax API Team
+    url: https://www.sinch.com/contact/
+    email: faxteam@sinch.com
+  license:
+    url: https://www.sinch.com/toc
+    name: MIT
+servers:
+- url: https://fax.api.sinch.com
+  description: v3.0 of the Fax API
+security:
+- BasicAuth: []
+- OAuth2: []
+tags:
+- name: Cover pages
+  description: You can add cover pages to Sinch Fax either via the API or the Build dashboard.
+paths:
+  /v3/projects/{projectId}/services/{id}/coverPages:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: id
+      description: the serviceId
+      required: true
+      in: path
+      schema:
+        type: string
+    post:
+      description: Add a cover page to your service
+      summary: Add cover page
+      operationId: addCoverPage
+      tags:
+      - Cover pages
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CoverPage'
+      responses:
+        '200':
+          description: The added  coverpage, or an [Error](https://developers.sinch.com/docs/fax/api-reference/fax/error-messages)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverPage'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  // The Fax Service ID you want to add the Cover Page to\n  const serviceId = 'FAX_SERVICE_ID';\n\n  try {\n    const response = await sinch.fax.coverPages.add({\n      serviceId,\n      addCoverPageRequestBody: {\n        name: 'New cover page created with the Node.js SDK',\n        file: {\n          fileContent: 'V2VsY29tZSB0byBTaW5jaCE=',\n          fileType: 'PDF',\n        },\n      },\n    });\n    console.log('✅ Successfully added a cover page to the Fax Service.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error('❌ Failed to add a cover page to the Fax Service:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+    get:
+      description: List all cover page to a service
+      summary: List cover pages
+      operationId: listCoverPages
+      tags:
+      - Cover pages
+      responses:
+        '200':
+          description: List of coverpages [Error](https://developers.sinch.com/docs/fax/api-reference/fax/error-messages)
+          content:
+            application/json:
+              schema:
+                allOf:
+                - type: object
+                  properties:
+                    coverPages:
+                      description: List of cover pages
+                      type: array
+                      items:
+                        $ref: '#/components/schemas/CoverPage'
+                - $ref: '#/components/schemas/Pagination'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  // The Fax Service ID you want to list the Cover Page from\n  const serviceId = 'FAX_SERVICE_ID';\n\n  try {\n    const response = await sinch.fax.coverPages.list({ serviceId });\n    if (response.data.length === 0) {\n      console.log('No Cover Pages found.');\n      return;\n    }\n    console.log(`✅ Found ${response.data.length} Cover Pages.`);\n    response.data.forEach((coverPage) => {\n      console.log(coverPage);\n    });\n  } catch (err) {\n    console.error('❌ Failed to list Cover Pages:');\n    console.error(err);\n  }\n}\n\nmain();\n"
+  /v3/projects/{projectId}/services/{id}/coverPages/{coverPageId}:
+    parameters:
+    - $ref: '#/components/parameters/ProjectId'
+    - name: id
+      description: The serviceId containing the cover page you want to work with.
+      required: true
+      in: path
+      schema:
+        type: string
+    - name: coverPageId
+      in: path
+      required: true
+      schema:
+        type: string
+        description: The coverPageId you want to work with.
+    delete:
+      tags:
+      - Cover pages
+      operationId: deleteCoverPage
+      summary: Delete a cover page
+      description: Remove delete a cover page from a service.
+      responses:
+        '204':
+          description: The cover page was deleted.
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax Service ID you want to delete a Cover Page from\n  const serviceId = 'FAX_SERVICE_ID';\n  // The Cover Page ID you want to delete\n  const coverPageId = 'COVER_PAGE_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    await sinch.fax.coverPages.delete({ serviceId, coverPageId });\n    console.log(`✅ Successfully deleted the Cover Page with ID ${coverPageId} from the Fax Service with ID ${serviceId}.`);\n  } catch (err) {\n    console.error(`❌ Failed to delete the Cover Page with ID ${coverPageId} from the Fax Service with ID ${serviceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+    get:
+      tags:
+      - Cover pages
+      operationId: getCoverPage
+      summary: Get a cover page
+      description: Get a cover page by ID.
+      responses:
+        '200':
+          description: The requested cover page, or an [Error](https://developers.sinch.com/docs/fax/api-reference/fax/error-messages)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CoverPage'
+      x-codeSamples:
+      - lang: Node.js
+        source: "/**\n * Sinch Node.js Snippet\n * See: https://github.com/sinch/sinch-sdk-node/examples/snippets\n */\nimport { SinchClient } from '@sinch/sdk-core';\nimport * as dotenv from 'dotenv';\ndotenv.config();\n\nasync function main() {\n  const projectId = process.env.SINCH_PROJECT_ID ?? 'MY_PROJECT_ID';\n  const keyId = process.env.SINCH_KEY_ID ?? 'MY_KEY_ID';\n  const keySecret = process.env.SINCH_KEY_SECRET ?? 'MY_KEY_SECRET';\n\n  // The Fax Service ID you want to retrieve a Cover Page from\n  const serviceId = 'FAX_SERVICE_ID';\n  // The Cover Page ID you want to retrieve\n  const coverPageId = 'COVER_PAGE_ID';\n\n  const sinch = new SinchClient({ projectId, keyId, keySecret });\n\n  try {\n    const response = await sinch.fax.coverPages.get({ serviceId, coverPageId });\n    console.log('✅ Successfully retrieved the Cover Page.');\n    console.log(JSON.stringify(response, null, 2));\n  } catch (err) {\n    console.error(`❌ Failed to retrieve the Cover Page with ID ${coverPageId} from the Fax Service with ID ${serviceId}:`);\n    console.error(err);\n  }\n}\n\nmain();\n"
+components:
+  schemas:
+    Pagination:
+      type: object
+      readOnly: true
+      properties:
+        page:
+          readOnly: true
+          type: integer
+          description: Current page
+        totalPages:
+          readOnly: true
+          type: integer
+          description: Total number of pages.
+        pageSize:
+          readOnly: true
+          type: integer
+          description: Number of items per page.
+        totalItems:
+          type: integer
+          readOnly: true
+          format: int32
+          description: Total size of the result.
+    CoverPage:
+      description: A cover page resource
+      type: object
+      required:
+      - file
+      - name
+      properties:
+        id:
+          type: string
+          format: ulid
+          readOnly: true
+          description: ID of the cover page
+        name:
+          description: The friendly name of the cover page.
+          example: Acme Company cover page
+        file:
+          type: object
+          required:
+          - fileContent
+          - fileType
+          properties:
+            fileContent:
+              type: string
+              format: base64
+              contentEncoding: base64
+              description: A PDF Cover encoded as base64
+            fileType:
+              type: string
+              enum:
+              - PDF
+              description: For now only PDF is supported.
+              x-enumDescriptions:
+                PDF: A PDF file.
+              default: PDF
+          description: A PDF Cover encoded as base64
+        projectId:
+          allOf:
+          - $ref: '#/components/schemas/ProjectId'
+          readOnly: true
+        serviceId:
+          allOf:
+          - $ref: '#/components/schemas/ServiceId'
+          readOnly: true
+        createdTime:
+          type: string
+          format: date-time
+          readOnly: true
+          description: The date and time the cover page was created.
+        updatedTime:
+          type: string
+          readOnly: true
+          format: date-time
+          description: The date and time the cover page was updated.
+    ProjectId:
+      type: string
+      x-PII: false
+      x-v1: false
+      description: The `Id` of the project associated with the call.
+      x-Internal: to support future account keys
+      readOnly: true
+      example: ae00f005-e392-44dc-b3f5-a657a2684dg3
+    ServiceId:
+      x-PII: false
+      x-v1: true
+      readOnly: true
+      type: string
+      example: 01GVRB50KEQFFE1SGMPFRNBG6J
+      description: ID of the fax service used.
+  parameters:
+    ProjectId:
+      name: projectId
+      in: path
+      required: true
+      description: The `projectId` is a required parameter you must include when making any API calls. You can find your project ID on your [Build dashboard](https://dashboard.sinch.com).
+      schema:
+        type: string
+        example: 3acb7ae1-cf3d-4112-ba5e-3a9d8c71cd47
+  securitySchemes:
+    WebhookBasicAuth:
+      type: http
+      scheme: basic
+      description: 'You can validate whether a webhook is genuine by providing credentials you set and will check on your server side along with the callback URL, as in this example: `https://username:password@www.YourWebhookWebsite.com`'
+    BasicAuth:
+      type: http
+      scheme: basic
+      description: The user name and password is your keyId and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+    OAuth2:
+      type: oauth2
+      description: The user name and password is your key id and key secret from the [Access keys sections](https://dashboard.sinch.com/settings/access-keys)
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

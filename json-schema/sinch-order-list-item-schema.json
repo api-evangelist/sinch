@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-order-list-item-schema.json",
+  "title": "OrderListItem",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-porting-api-openapi.yml#/components/schemas/OrderListItem",
+  "type": "object",
+  "properties": {
+    "id": {
+      "type": "number",
+      "description": "The unique identifier for the order",
+      "readOnly": true
+    },
+    "status": {
+      "$ref": "#/$defs/OrderStatus"
+    },
+    "customerOrderReference": {
+      "type": "string",
+      "description": "Your reference you specified when creating the order",
+      "default": ""
+    },
+    "createdDate": {
+      "readOnly": true,
+      "description": "The date the order was created, in `YYYY-MM-DD` format.",
+      "type": "string",
+      "format": "date"
+    },
+    "phoneNumberQuantity": {
+      "type": "number",
+      "readOnly": true,
+      "description": "The number of phone numbers in the order, a helper property for you, this can also be done by and counting on the `numbers` collection"
+    },
+    "focQuantity": {
+      "type": "number",
+      "readOnly": true,
+      "description": "The number of phone numbers that are confirmed, a helper property for you, this can also be done by and counting on the `numbers` collection and  filtering on status `CONFIRMED`"
+    },
+    "activatedQuantity": {
+      "type": "number",
+      "readOnly": true,
+      "description": "The number of phone numbers that are activated, The number of phone numbers that are confirmed, a helper property for you, this can also be done by and counting on the `numbers` collection and  filtering on status `COMPLETE`"
+    },
+    "rejectedQuantity": {
+      "type": "number",
+      "readOnly": true,
+      "description": "The number of phone numbers that are rejected, This can be done by counting on the `phoneNumbers` collection and  filtering on status `REJECTED`"
+    },
+    "excludedQuantity": {
+      "type": "number",
+      "readOnly": true,
+      "description": "The number of phone numbers that are activated, The number of phone numbers that are confirmed, a helper property for you, this can also be done by and counting on the `numbers` collection and filtering on status `EXCLUDED`"
+    }
+  },
+  "$defs": {
+    "OrderStatus": {
+      "type": "string",
+      "description": "The current status of the port order.",
+      "enum": [
+        "PENDING",
+        "CONFIRMED",
+        "COMPLETED",
+        "CANCELED"
+      ],
+      "readOnly": true,
+      "x-enumDescriptions": {
+        "ORDER_BUILDING": "The order is being created",
+        "PENDING": "The order is pending, and can be updated",
+        "CONFIRMED": "The order is confirmed, and can not be updated but if onDemand is true it can be activated",
+        "COMPLETED": "The order is completed, the port has completed and the numbers are active",
+        "CANCELED": "The order is cancelled, either by the customer or by the system"
+      }
+    }
+  }
+}

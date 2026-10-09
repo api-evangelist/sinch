@@ -1,0 +1,62 @@
+generated: '2026-10-08'
+method: searched
+source: https://sinch.com/legal/ (legal index, 21 pages); https://sinch.com/legal/data-protection-agreement-sub-processors/;
+  https://trust.sinch.com/; https://developers.sinch.com/docs/fax/hipaa.md; https://developers.sinch.com/docs/conversation/api-reference/conversation.md
+  (regional servers); security/sinch-trust-center.yml
+name: Sinch regulatory posture signals
+signals:
+  subprocessors:
+    url: https://sinch.com/legal/data-protection-agreement-sub-processors/
+    status: 200
+    evidence:
+    - quote: 'Amazon Web Services EMEA SARL Address: 38 Avenue John F. Kennedy, L-1855 Luxembourg'
+      source: https://sinch.com/legal/data-protection-agreement-sub-processors/
+      http_status: 200
+      fetched: '2026-10-08'
+    pointer_type: Subprocessors
+    note: '97-row table: Third Party Entity, Hosting Location, Sinch Region, Sinch Service, Activity; no last-updated date
+      printed'
+  data_residency:
+    url: https://developers.sinch.com/docs/conversation/api-reference/conversation
+    status: 200
+    evidence:
+    - quote: https://{region}.conversation.api.sinch.com
+      source: https://developers.sinch.com/docs/conversation/api-reference/conversation.md
+      http_status: 200
+      fetched: '2026-10-08'
+    pointer_type: DataResidency
+    note: regional endpoints are a routing fact, not a residency commitment; no dedicated data-residency policy page was found
+  security_compliance_hipaa:
+    url: https://developers.sinch.com/docs/fax/hipaa
+    status: 200
+    evidence:
+    - quote: When using the Sinch Fax API to send faxes, you should ensure that your faxes meet HIPAA compliance standards.
+      source: https://developers.sinch.com/docs/fax/hipaa.md
+      http_status: 200
+      fetched: '2026-10-08'
+    pointer_type: null
+  law_enforcement_requests:
+    url: https://sinch.com/legal/legal-law-enforcement-support/
+    status: 200
+    evidence:
+    - quote: This information is intended only for United States and Canadian law enforcement.
+      source: https://sinch.com/legal/legal-law-enforcement-support/
+      http_status: 200
+      fetched: '2026-10-08'
+    pointer_type: null
+absent:
+- sbom
+- support_lifetime
+- accessibility_conformance
+- training_data_summary
+- ai_transparency
+- global_privacy_control
+- data_subject_request
+- incident_notification
+- age_assurance
+- notice_and_action
+- transparency_report
+- exit_assistance
+note: Absent signals were looked for on the legal index, the trust center portal and the developer portal; none carried the
+  substance (a VPAT, a named SBOM format, a GPC statement, a transparency report). The trust center DPA/sub-processor request
+  routes through a DocuSign form.

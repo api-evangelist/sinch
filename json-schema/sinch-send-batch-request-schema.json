@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-send-batch-request-schema.json",
+  "title": "SendBatchRequest",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-batches-api-openapi.yml#/components/schemas/SendBatchRequest",
+  "type": "object",
+  "required": [
+    "to",
+    "from",
+    "body"
+  ],
+  "properties": {
+    "to": {
+      "type": "array",
+      "description": "List of recipient phone numbers in E.164 format or group IDs",
+      "items": {
+        "type": "string"
+      }
+    },
+    "from": {
+      "type": "string",
+      "description": "The sender phone number in E.164 format or short code"
+    },
+    "body": {
+      "type": "string",
+      "description": "The message body text"
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "mt_text",
+        "mt_binary"
+      ],
+      "description": "The type of batch message"
+    },
+    "delivery_report": {
+      "type": "string",
+      "enum": [
+        "none",
+        "summary",
+        "full",
+        "per_recipient"
+      ],
+      "description": "The type of delivery report requested"
+    },
+    "send_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Scheduled send time for the batch"
+    },
+    "expire_at": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Expiration time for undelivered messages"
+    },
+    "callback_url": {
+      "type": "string",
+      "format": "uri",
+      "description": "URL to receive delivery report callbacks"
+    },
+    "flash_message": {
+      "type": "boolean",
+      "description": "Whether to send as a flash message",
+      "default": false
+    },
+    "parameters": {
+      "type": "object",
+      "description": "Parameterized message substitution values",
+      "additionalProperties": {
+        "type": "object",
+        "additionalProperties": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

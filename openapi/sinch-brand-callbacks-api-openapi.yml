@@ -1,0 +1,335 @@
+openapi: 3.2.0
+info:
+  x-sinch-standards-version: standards-2026-03-31
+  description: 'This API describes the set of endpoints available to create customer brands.
+
+
+    The list of endpoints allows to create, update and delete a customer brand and also get the current state.'
+  title: Sinch Compliance API - Brands Brand Callbacks API
+  version: 1.0.0
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: Support@sinch.com
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+servers:
+- description: Production server. Data processed and stored within Europe.
+  url: https://compliance.api.sinch.com
+tags:
+- description: You can set up callback URLs to receive event notifications when your brand status is updated.
+  name: brand-callbacks
+  x-displayName: Brand Callbacks
+paths:
+  /v1/projects/{projectId}/callbackConfig:
+    get:
+      x-sinch-stability: preview
+      description: 'Returns the callback configuration for the specified project. The HMAC secret is masked —
+
+        only the last 6 characters are visible. To retrieve the full secret, rotate it using
+
+        `POST /v1/projects/{projectId}/callbackConfig/rotate` or set a new one via `PATCH`.'
+      operationId: getCallbackConfig
+      parameters:
+      - in: path
+        description: Customer's project id
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigResponse'
+              example:
+                projectId: proj-123
+                hmacSecretMask: ••••••1b11ee
+          description: OK
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+      - OAuth2:
+        - read
+      summary: Get a callback configuration by project id
+      tags:
+      - brand-callbacks
+    patch:
+      x-sinch-stability: preview
+      description: 'Sets a customer-provided HMAC secret for the specified project. The full secret is returned
+
+        once in the response body — this is the only time it is visible in plain text. Store it
+
+        securely immediately after this call.'
+      operationId: updateCallbackConfig
+      parameters:
+      - in: path
+        description: Customer's project id
+        name: projectId
+        required: true
+        schema:
+          type: string
+      requestBody:
+        required: true
+        description: The new HMAC secret to associate with the project ID.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CallbackConfigUpdateBody'
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigSecretResponse'
+              example:
+                projectId: proj-123
+                hmacSecret: d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          description: Secret updated. The full secret is returned once — store it securely.
+        '400':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'BAD_REQUEST: Project validation error'
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+      - OAuth2:
+        - write
+      summary: Set a customer-provided HMAC secret for webhook signing
+      tags:
+      - brand-callbacks
+  /v1/projects/{projectId}/callbackConfig/rotate:
+    post:
+      x-sinch-stability: preview
+      description: 'Generates a new server-side HMAC secret for the specified project and replaces the
+
+        existing one. The full secret is returned once in the response body — this is the only
+
+        time it is visible in plain text. Store it securely immediately after this call.
+
+
+        Use this endpoint when you want Sinch to generate a cryptographically random secret
+
+        rather than supplying your own.'
+      operationId: rotateCallbackSecret
+      parameters:
+      - in: path
+        description: Customer's project id
+        name: projectId
+        required: true
+        schema:
+          type: string
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CallbackConfigSecretResponse'
+              example:
+                projectId: proj-123
+                hmacSecret: f9a3dd71-4c2e-4f87-b901-abc123def456
+          description: New secret generated. The full secret is returned once — store it securely.
+        '401':
+          $ref: '#/components/responses/Unauthorized'
+        '403':
+          $ref: '#/components/responses/Forbidden'
+        '404':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'NOT_FOUND: The project id introduced does not exist.'
+        '429':
+          $ref: '#/components/responses/TooManyRequests'
+        '500':
+          content:
+            application/problem+json:
+              schema:
+                $ref: '#/components/schemas/RestError'
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+      security:
+      - OAuth2:
+        - write
+      summary: Rotate the HMAC secret for webhook signing
+      tags:
+      - brand-callbacks
+components:
+  schemas:
+    CallbackConfigSecretResponse:
+      description: 'Response body returned once after setting or rotating the HMAC secret. The full secret is
+
+        included here and will not be returned again in plain text. Store it securely immediately.'
+      type: object
+      properties:
+        projectId:
+          description: Project ID this callback configuration belongs to.
+          type: string
+          readOnly: true
+        hmacSecret:
+          description: The full HMAC secret for webhook signature verification. Returned only once — on creation or rotation.
+          type: string
+          format: password
+          readOnly: true
+          examples:
+          - d1c7ccbf-919d-462f-8587-dec95a1b11ee
+    CallbackConfigUpdateBody:
+      description: Request body for the Update Callback Configuration endpoint.
+      properties:
+        hmacSecret:
+          description: The HMAC secret to be updated for the specified project
+          examples:
+          - d1c7ccbf-919d-462f-8587-dec95a1b11ee
+          type: string
+          format: password
+      type: object
+    CallbackConfigResponse:
+      description: Response body for the GET Callback Configuration endpoint. The HMAC secret is masked — only the last 6 characters are shown.
+      type: object
+      properties:
+        projectId:
+          description: Project ID this callback configuration belongs to.
+          type: string
+          readOnly: true
+        hmacSecretMask:
+          description: 'Masked representation of the HMAC secret. Only the last 6 characters are visible
+
+            (e.g. `••••••1b11ee`). To see the full secret, rotate it via
+
+            `POST /v1/projects/{projectId}/callbackConfig/rotate` or set a new one via `PATCH`.'
+          type: string
+          readOnly: true
+          examples:
+          - ••••••1b11ee
+    InternalRestError:
+      description: Detailed information about a specific error that occurred during the processing of a request. This is used in the `errors` field of the `RestError` schema to provide more granular information about the error.
+      properties:
+        pointer:
+          description: JSON pointer to the field that caused the error, following RFC 6901.
+          type: string
+          examples:
+          - /brandName
+          - /entityType
+        detail:
+          description: A human-readable explanation specific to this occurrence of the problem. Like title, this field is not intended for end users, but rather for developers to understand the details of the error that occurred.
+          type: string
+          examples:
+          - Brand Name already exists for this brand type
+      type: object
+    RestError:
+      description: Standard error response body for the Sinch Compliance API. It follows the RFC 7807 specification for problem details. The body contains either an `errors` list with structured field-level details or a `detail` field with a plain text explanation.
+      type: object
+      required:
+      - type
+      - title
+      properties:
+        type:
+          description: A URI reference that identifies the problem type. This URI reference should provide a human-readable explanation of the problem type when dereferenced.
+          type: string
+          format: uri
+          examples:
+          - https://developers.sinch.com/docs/errors/registry/validation-error
+        title:
+          description: A short, human-readable summary of the problem type. It should not change from occurrence to occurrence of the problem, except for localization purposes.
+          type: string
+          examples:
+          - Validation Error
+      oneOf:
+      - description: Response with a list of structured error details, each pointing to a specific field.
+        properties:
+          errors:
+            description: Detailed information about the error. This field can contain multiple error details to provide more context about the error that occurred.
+            type: array
+            items:
+              $ref: '#/components/schemas/InternalRestError'
+      - description: Response with a plain text explanation of the error.
+        properties:
+          detail:
+            description: A human-readable explanation of the error that occurred.
+            type: string
+            examples:
+            - Project not found
+  responses:
+    Unauthorized:
+      description: 'UNAUTHENTICATED: Missing or invalid authentication credentials.'
+      headers:
+        WWW-Authenticate:
+          description: Authentication challenge per RFC 7235.
+          schema:
+            type: string
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+    TooManyRequests:
+      description: 'RESOURCE_EXHAUSTED: Too many requests. The client has exceeded the rate limit.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+    Forbidden:
+      description: 'PERMISSION_DENIED: The authenticated user does not have permission to perform this operation.'
+      content:
+        application/problem+json:
+          schema:
+            $ref: '#/components/schemas/RestError'
+  securitySchemes:
+    OAuth2:
+      description: The username and password are your Key ID and Key Secret from the Access keys section in the Sinch Customer Dashboard. Exchange these for a bearer token (access token).
+      flows:
+        clientCredentials:
+          scopes:
+            read: read
+            write: write
+          tokenUrl: https://auth.sinch.com/oauth2/token
+      type: oauth2
+    hmacAuth:
+      type: apiKey
+      in: header
+      name: X-Sinch-Signature
+      description: HMAC-SHA256 signature used to authenticate webhook deliveries. The signature is computed over the request body using the project's HMAC secret and sent in the X-Sinch-Signature header. Please refer to the Brand Callback endpoints for more information.
+externalDocs:
+  description: All endpoints available under this API require Bearer token authentication. Please check oauth api documentation if you need more details.
+  url: https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth/
+x-explorer-enabled: false
+x-samples-languages:
+- curl
+- java
+- csharp
+- node
+- php

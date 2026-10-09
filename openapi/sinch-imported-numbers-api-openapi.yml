@@ -1,0 +1,628 @@
+openapi: 3.2.0
+info:
+  title: Hosting Orders Imported Numbers API
+  description: API for importing, hosting, and qualifying numbers to enable them for use with Sinch SMS text messaging services.
+  contact:
+    name: Support
+    url: https://www.sinch.com
+    email: support@sinch.com
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  version: '1.0'
+servers:
+- url: https://imported.numbers.api.sinch.com
+  description: Global API
+security:
+- Basic: []
+- OAuth2.0: []
+tags:
+- name: Imported Numbers
+  description: 'Use the Imported Numbers API endpoints to list imported numbers or import a number that''s already been provisioned with an NNID for use with Sinch. Imported numbers can be used with Sinch SMS services.
+
+
+    Note: The SMS enablement process is only supported in United States and Canada.'
+paths:
+  /v1/projects/{projectId}/importedNumbers:
+    get:
+      tags:
+      - Imported Numbers
+      summary: List imported numbers
+      description: Lists all imported numbers for the project.
+      operationId: ImportNumberService_ListImportedNumbers
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/regionCode'
+      - $ref: '#/components/parameters/numberPattern.pattern'
+      - $ref: '#/components/parameters/numberPattern.searchPattern'
+      - $ref: '#/components/parameters/pageSize'
+      - $ref: '#/components/parameters/pageToken'
+      - $ref: '#/components/parameters/orderBy'
+      - $ref: '#/components/parameters/servicePlanId'
+      - $ref: '#/components/parameters/campaignId'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListImportedNumbersResponse'
+        '400':
+          description: If the page_token, number_pattern or order_by is not valid.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    post:
+      tags:
+      - Imported Numbers
+      summary: Import number
+      description: 'You can use the Import Numbers API to import a non-Sinch number that you want to enable for SMS with Sinch as the Direct Connectivity Aggregator (DCA) without porting (or even partially porting) the number.
+
+
+        Note: Customers who are importing numbers (i.e. want to use their own NNID) will need to complete the NNID provisioning process to support proper message routing with the carriers. To learn more, refer to the article How can you provision a Network Number ID (NNID)?'
+      operationId: ImportNumberService_ImportNumber
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateImportedNumberRequest'
+            examples:
+              ProvisioningExample:
+                summary: Importing a qualified number
+                value:
+                  regionCode: US
+                  smsConfiguration:
+                    servicePlanId: YOUR_service_plan_id
+                    campaignId: YOUR_campaign_id
+                    migrateToSinchTmo: true
+                  phoneNumber: '+11234567890'
+                  displayName: MyPhoneNumber
+                  callbackUrl: https://www.your-callback-server.com/callback
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportedNumber'
+        '400':
+          description: 'INVALID_ARGUMENT: If the importedNumber.phoneNumber, importedNumber.smsConfiguration.servicePlanId is not valid.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: The imported number already exists.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /v1/projects/{projectId}/importedNumbers/{phoneNumber}:
+    get:
+      tags:
+      - Imported Numbers
+      summary: Get imported number
+      description: Returns the imported number you specify in the path.
+      operationId: ImportNumberService_GetImportedNumber
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/phoneNumber'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportedNumberResponse'
+        '404':
+          description: The imported number could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+      - Imported Numbers
+      summary: Delete imported number
+      description: Delete an imported number from the project.
+      operationId: ImportNumberService_DeleteImportedNumber
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/phoneNumber'
+      responses:
+        '200':
+          description: OK
+          content: {}
+        '404':
+          description: The imported number could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    patch:
+      tags:
+      - Imported Numbers
+      summary: Update imported number
+      description: 'Update an imported phone number. You can perform the following updates:
+
+
+        * Update the name that displays for a customer by modifying the `displayName` parameter.
+
+        * Unlink the number from an SMS service or campaign by updating the `smsConfiguration` configuration object. To unlink a number, submit the request with an empty string (`””`) in the service plan ID or campaign ID fields.
+
+        * Before linking a number to a new service or campaign, it must be unlinked from any existing service or campaign. Then, link the number to a new SMS service or campaign by updating the service plan ID or campaign ID with the new desired value.'
+      operationId: ImportNumberService_UpdateImportedNumber
+      parameters:
+      - $ref: '#/components/parameters/projectId'
+      - $ref: '#/components/parameters/phoneNumber'
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ImportedNumber'
+            examples:
+              UnlinkNumber:
+                summary: Unlink a number with a campaign and service plan
+                value:
+                  displayName: My Display Name
+                  smsConfiguration:
+                    servicePlanId: ''
+                    campaignId: ''
+                  callbackUrl: https://www.your-callback-server.com/callback
+              LinkNumber:
+                summary: Link a number from a campaign and service plan
+                value:
+                  displayName: My Display Name
+                  smsConfiguration:
+                    servicePlanId: YOUR_service_plan_id
+                    campaignId: YOUR_campaign_id
+                  callbackUrl: https://www.your-callback-server.com/callback
+        required: true
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ImportedNumber'
+        '400':
+          description: 'INVALID_ARGUMENT: If the fieldMask is not provided or importedNumber.smsConfiguration.servicePlanId is not valid.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: The imported number could not be found.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '500':
+          description: 'INTERNAL: Internal server error. Typically, a server bug.'
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+components:
+  schemas:
+    ImportedNumber:
+      type: object
+      properties:
+        phoneNumber:
+          type: string
+          description: The phone number in e.164 format with leading +.
+          example: '+12025550134'
+        projectId:
+          type: string
+          description: The ID of the project resource. You can find your project ID on dashboard.sinch.com.
+          example: YOUR_project_id
+        regionCode:
+          type: string
+          description: ISO 3166-1 alpha-2 country code of the phone number. Example US, UK or SE.
+          example: US
+        displayName:
+          type: string
+          description: User supplied name for the phone number.
+          example: MyPhoneNumber
+        smsConfiguration:
+          $ref: '#/components/schemas/SmsConfiguration'
+        callbackUrl:
+          type: string
+          description: The client's callback URL to be called upon finishing the number import.
+          example: https://www.your-callback-server.com/callback
+    ListImportedNumbersResponse:
+      title: List Imported Numbers Response
+      type: object
+      properties:
+        importedNumbers:
+          type: array
+          items:
+            $ref: '#/components/schemas/ImportedNumberResponse'
+          description: List of numbers associated to the client project specified in `ListImportedNumbers`.
+        nextPageToken:
+          type: string
+          description: The token to be used for listing the next page.
+        totalSize:
+          type: integer
+          description: https://cloud.google.com/apis/design/design_patterns#list_pagination
+          format: int32
+      description: Response message to list your imported phone numbers
+    ErrorCode:
+      type: string
+      description: An optional string field that contains an error code if the operation failed. This field is empty ("") when there is no error.
+      example: ''
+    SmsProvisioning:
+      description: An object giving details about the SMS provisioning of the number.
+      type: object
+      properties:
+        smsProvisioning:
+          description: An object giving details about the SMS provisioning of the number.
+          type: object
+          properties:
+            serviceType:
+              $ref: '#/components/schemas/ServiceType'
+            serviceId:
+              description: A unique identifier for the service being provisioned.
+              type: string
+              example: 0130a21c9ed6461ba3a1fefda83f7ec7
+            type:
+              $ref: '#/components/schemas/Type'
+            state:
+              $ref: '#/components/schemas/State'
+            updateTime:
+              type: string
+              description: A timestamp in ISO 8601 format (UTC) indicating the last time the provisioning status was updated.
+              example: '2023-02-02T21:00:07.467353Z'
+            errorMessage:
+              type: string
+              description: If an error occurred during provisioning, this field will contain a descriptive message. It will be an empty string if no error is present.
+              example: ''
+            errorCode:
+              type: string
+              description: If an error occurred during provisioning, this field will contain the error code. This field is also an empty string when no error has occurred.
+              example: ''
+    ErrorMessage:
+      type: string
+      description: An optional string field that provides a human-readable message describing the error. This field is empty ("") when no error has occurred.
+    SmsConfiguration:
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: The current SMS configuration for this number. The `servicePlanId`` can be found when logging into dashboard.sinch.com in the SMS>APIs section.
+          example: YOUR_service_plan_id
+        scheduledProvisioning:
+          $ref: '#/components/schemas/ScheduledProvisioning'
+        campaignId:
+          type: string
+          description: The current campaign ID assigned to this number.
+          example: YOUR_campaign_id
+        migrateToSinchTmo:
+          type: boolean
+          readOnly: true
+          description: Displays if a number is assigned to another aggregator in T-Mobile's platform, and requires migration from previous aggregator to Sinch.
+      description: Configuration for SMS
+    CampaignProvisioning:
+      description: An object giving details about the campaign provisioning of the number.
+      type: object
+      properties:
+        campaignProvisioning:
+          description: An object giving details about the campaign provisioning of the number.
+          type: object
+          properties:
+            serviceType:
+              $ref: '#/components/schemas/ServiceType'
+            serviceId:
+              description: A unique identifier for the service being provisioned.
+              type: string
+              example: CDCQLGJ
+            type:
+              $ref: '#/components/schemas/Type'
+            state:
+              $ref: '#/components/schemas/State'
+            updateTime:
+              type: string
+              description: A timestamp in ISO 8601 format (UTC) indicating the last time the provisioning status was updated.
+              example: '2023-02-02T21:00:07.467353Z'
+            errorMessage:
+              type: string
+              description: If an error occurred during provisioning, this field will contain a descriptive message. It will be an empty string if no error is present.
+              example: ''
+            errorCode:
+              type: string
+              description: If an error occurred during provisioning, this field will contain the error code. This field is also an empty string when no error has occurred.
+              example: ''
+    State:
+      type: string
+      description: Indicates the current state of the operation.
+      enum:
+      - DONE
+      - FAILED
+      - IN_PROGRESS
+      - WAITING
+      - STATE_UNSPECIFIED
+      x-enumDescriptions:
+        DONE: The operation was completed successfully.
+        FAILED: The operation has failed.
+        IN_PROGRESS: The operation is currently in progress.
+        WAITING: The operation is pending and has not yet started.
+        STATE_UNSPECIFIED: The state is unspecified.
+      example: DONE
+    ScheduledProvisioning:
+      readOnly: true
+      type: object
+      properties:
+        servicePlanId:
+          type: string
+          description: Service plan of the scheduled provisioning task.
+          example: YOUR_service_plan_id
+        status:
+          type: integer
+          description: Status of the pending change.
+          format: enum
+        lastUpdatedTime:
+          type: string
+          description: Timestamp when the status was last updated.
+          format: date-time
+        campaignId:
+          type: string
+          description: The campaign of the scheduled provisioning task.
+          example: YOUR_campaign_id
+        errorCodes:
+          type: array
+          items:
+            type: integer
+            format: enum
+          description: A list of error codes, if applicable, for the scheduled provisioning task.
+      description: Ongoing Provisioning for SMS service
+    ImportedNumberResponse:
+      allOf:
+      - $ref: '#/components/schemas/ImportedNumber'
+      - $ref: '#/components/schemas/MnoConfiguration'
+      - $ref: '#/components/schemas/SmsProvisioning'
+      - $ref: '#/components/schemas/CampaignProvisioning'
+    ServiceType:
+      description: The type of service.
+      type: string
+      enum:
+      - SMS
+      - CAMPAIGN
+      x-enumDescriptions:
+        SMS: SMS provisioning.
+        CAMPAIGN: Campaign provisioning.
+    CarrierState:
+      type: object
+      description: Contains information about the state of the carrier.
+      properties:
+        state:
+          $ref: '#/components/schemas/State'
+        errorCode:
+          $ref: '#/components/schemas/ErrorCode'
+        errorMessage:
+          $ref: '#/components/schemas/ErrorMessage'
+        updateTime:
+          $ref: '#/components/schemas/UpdateTime'
+    ErrorResponse:
+      type: object
+      properties:
+        code:
+          example: '404'
+          type: string
+          description: The HTTP response code for the error.
+        message:
+          example: The imported number could not be found.
+          type: string
+          description: The friendly message describing the reason for the error response.
+        status:
+          example: NOT_FOUND
+          type: string
+          description: The HTTP response status for the error.
+      description: The schema for an error response.
+    UpdateTime:
+      type: string
+      description: A timestamp in ISO 8601 format indicating the last time the status was updated.
+      example: '2025-04-02T19:45:28.650924Z'
+    CreateImportedNumberRequest:
+      title: Create Imported Number
+      required:
+      - regionCode
+      - smsConfiguration
+      allOf:
+      - $ref: '#/components/schemas/ImportedNumber'
+    Type:
+      description: Specifies the type of operation. This value of this field is either "PROVISIONING" or "DEPROVISIONING".
+      type: string
+      enum:
+      - PROVISIONING
+      - DEPROVISIONING
+      x-enumDescriptions:
+        PROVISIONING: The operation is provisioning the number.
+        DEPROVISIONING: The operation is deprovisioning the number.
+    MnoConfiguration:
+      type: object
+      properties:
+        mnoConfiguration:
+          type: object
+          description: The mnoConfiguration object represents the status and progress of configuration operations for SMS and MMS services across different carriers (AT&T and T-Mobile). Each key within this object (smsAtt, smsTmo, mmsAtt and mmsTmo) corresponds to a specific service type (SMS or MMS) associated with a particular mobile network operator.
+          properties:
+            smsAtt:
+              description: Contains information about SMS-enabled ATT&T numbers.
+              allOf:
+              - $ref: '#/components/schemas/CarrierState'
+              - type: object
+                properties:
+                  operation:
+                    $ref: '#/components/schemas/Operation'
+            smsTmo:
+              description: Contains information about SMS-enabled T-Mobile numbers.
+              allOf:
+              - $ref: '#/components/schemas/CarrierState'
+              - type: object
+                properties:
+                  operation:
+                    $ref: '#/components/schemas/Operation'
+            mmsAtt:
+              description: Contains information about MMS-enabled AT&T numbers.
+              allOf:
+              - $ref: '#/components/schemas/CarrierState'
+              - type: object
+                properties:
+                  operation:
+                    $ref: '#/components/schemas/Operation'
+            mmsTmo:
+              description: Contains information about MMS-enabled T-Mobile numbers.
+              allOf:
+              - $ref: '#/components/schemas/CarrierState'
+              - type: object
+                properties:
+                  operation:
+                    $ref: '#/components/schemas/Operation'
+    Operation:
+      type: string
+      description: Specifies the type of action being performed.
+      enum:
+      - PROVISIONING
+      - DEPROVISIONING
+      - OPERATION_UNSPECIFIED
+      x-enumDescriptions:
+        PROVISIONING: The service is being configured or activated.
+        DEPROVISIONING: The service is being deactivated or removed.
+        OPERATION_UNSPECIFIED: The operation is unspecified.
+  parameters:
+    pageSize:
+      name: pageSize
+      description: The maximum number of items to return, server can enforce an upper limit and overwrite the value.
+      in: query
+      required: false
+      schema:
+        type: integer
+        example: 20
+    numberPattern.searchPattern:
+      name: numberPattern.searchPattern
+      description: 'Search pattern to apply. The options are, `START`, `CONTAIN`, and `END`.
+
+        Numbers that begin with the `numberPattern.pattern` entered. Often used to search for a specific area code.'
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - START
+        - CONTAIN
+        - END
+        x-enumDescriptions:
+          START: Number starts with specified pattern.
+          CONTAIN: Number contains specified pattern.
+          END: Number ends with specified pattern.
+        example: START
+    regionCode:
+      name: regionCode
+      description: Region code to filter by. ISO 3166-1 alpha-2 country code of the phone number. Currently supported are US, CA
+      in: query
+      required: false
+      schema:
+        type: string
+        example: US
+    phoneNumber:
+      name: phoneNumber
+      description: The phone number in [E.164](https://community.sinch.com/t5/Glossary/E-164/ta-p/7537) format with leading `+`.
+      in: path
+      required: true
+      schema:
+        type: string
+        example: '+12025550134'
+    campaignId:
+      name: campaignId
+      description: The hosting order campaignId
+      in: query
+      required: true
+      schema:
+        type: string
+        example: 123e4567-e89b-12d3-a456-426614174000
+    pageToken:
+      name: pageToken
+      description: The next page token value returned from a previous listing.
+      in: query
+      required: false
+      schema:
+        type: string
+        example: C2VNYXJrEg4KDCsxMjAxMjI2MzUyOQ==
+    projectId:
+      name: projectId
+      description: Found on your [Sinch Customer Dashboard](https://dashboard.sinch.com/settings/project-management). Settings > Projects.
+      in: path
+      required: true
+      schema:
+        type: string
+        example: d1923022-5199-4bb3-a513-c47b3a656bc5
+    servicePlanId:
+      name: servicePlanId
+      description: The hosting order servicePlanId
+      in: query
+      required: true
+      schema:
+        type: string
+        example: 324e4567-e89b-12d3-a456-426614174000
+    numberPattern.pattern:
+      name: numberPattern.pattern
+      description: 'Sequence of digits to search for. If you prefer or need certain digits in sequential order, you can enter the sequence of numbers here.
+
+        When using `START`, a plus sign (+) must be included and URL encoded. For example, to search for area code 206 in the US, the url encoded string would be `%2B1206`'
+      in: query
+      required: false
+      schema:
+        type: string
+        example: '+1732'
+    orderBy:
+      name: orderBy
+      description: Parameter used to order the returned hosting orders
+      in: query
+      required: false
+      schema:
+        type: string
+        enum:
+        - createdTime
+        - updatedTime
+        x-enumDescriptions:
+          createdTime: Order by the time the hosting order was created.
+          updatedTime: Order by the time the hosting order was last updated.
+  securitySchemes:
+    Basic:
+      type: http
+      description: Your key ID and Key secret serve as the username and password, respectively. Both can be found in the [Sinch Customer Dashboard](https://dashboard.sinch.com/settings/access-keys).For more information about basic authentication in the Numbers API, click [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/basic).
+      scheme: basic
+    OAuth2.0:
+      type: oauth2
+      description: The username and password are your Key ID and Key Secret from the [Access keys section](https://dashboard.sinch.com/settings/access-keys) in the Sinch Customer Dashboard. Exchange these for a bearer token (access token). Learn how [here](https://developers.sinch.com/docs/numbers/api-reference/authentication/oauth).
+      flows:
+        clientCredentials:
+          tokenUrl: https://auth.sinch.com/oauth2/token
+          scopes: {}

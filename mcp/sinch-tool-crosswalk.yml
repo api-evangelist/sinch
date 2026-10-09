@@ -1,0 +1,170 @@
+generated: '2026-10-08'
+method: derived
+source: mcp/sinch-mcp.yml (25 documented @sinch/mcp tools) bound to operationIds in openapi/sinch-conversation-api-openapi.yml,
+  sinch-template-management-api-openapi.yml, sinch-verification-api-openapi.yml, sinch-number-lookup-api-openapi.yml, sinch-voice-api-openapi.yml
+  and sinch-numbers-api-openapi.yml
+name: Sinch MCP tool to REST crosswalk
+surfaces:
+  openapi:
+  - openapi/sinch-conversation-api-openapi.yml
+  - openapi/sinch-template-management-api-openapi.yml
+  - openapi/sinch-verification-api-openapi.yml
+  - openapi/sinch-number-lookup-api-openapi.yml
+  - openapi/sinch-voice-api-openapi.yml
+  - openapi/sinch-numbers-api-openapi.yml
+  mcp_local: npx -y @sinch/mcp (stdio; needs Sinch credentials, not run here)
+  mcp_remote: 'https://developers.sinch.com/mcp (documentation tools only: describe-tools, execute — no REST binding)'
+  graphql: null
+crosswalk:
+- tool: send-text-message
+  category: Conversation
+  rest:
+  - Messages_SendMessage
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: text_message body of the Send Message request
+- tool: send-media-message
+  category: Conversation
+  rest:
+  - Messages_SendMessage
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: media_message body
+- tool: send-template-message
+  category: Conversation
+  rest:
+  - Messages_SendMessage
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: template_message body (omni template)
+- tool: send-whatsapp-template-message
+  category: Conversation
+  rest:
+  - Messages_SendMessage
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: template_message with a WhatsApp channel template
+- tool: send-choice-message
+  category: Conversation
+  rest:
+  - Messages_SendMessage
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: choice_message body
+- tool: send-location-message
+  category: Conversation
+  rest:
+  - Messages_SendMessage
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: location_message body; README says it geocodes with a Google key first
+- tool: list-conversation-apps
+  category: Conversation
+  rest:
+  - App_ListApps
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+- tool: list-messaging-templates
+  category: Conversation
+  rest:
+  - Templates_v2_ListTemplates
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: Template Management API (openapi/sinch-template-management-api-openapi.yml)
+- tool: number-lookup
+  category: Verification
+  rest:
+  - NumberLookupV2_Lookup
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: medium
+  note: README calls it a lookup of status and capabilities; the public Number Lookup API v2 exposes one operation
+- tool: start-sms-verification
+  category: Verification
+  rest:
+  - StartVerification
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: method sms
+- tool: report-sms-verification
+  category: Verification
+  rest:
+  - ReportVerificationByIdentity
+  - ReportVerificationById
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: either report form; the README does not say which
+- tool: tts-callout
+  category: Voice
+  rest:
+  - Callouts
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: ttsCallout body of the Callout Request
+- tool: conference-callout
+  category: Voice
+  rest:
+  - Callouts
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+  note: conferenceCallout body
+- tool: manage-conference-participant
+  category: Voice
+  rest:
+  - Calling_ManageConferenceParticipant
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+- tool: close-conference
+  category: Voice
+  rest:
+  - Calling_KickConferenceAll
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+- tool: list-available-regions
+  category: Numbers
+  rest:
+  - NumberService_ListAvailableRegions
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+- tool: list-rented-numbers
+  category: Numbers
+  rest:
+  - NumberService_ListActiveNumbers
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+- tool: search-for-available-numbers
+  category: Numbers
+  rest:
+  - NumberService_ListAvailableNumbers
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: high
+- tool: rent-sinch-virtual-numbers
+  category: Numbers
+  rest:
+  - NumberService_RentNumber
+  binding: name/semantics (local stdio server not run; bound from the README description to the published contract)
+  confidence: medium
+  note: RentNumber is marked deprecated in the published contract (new integrations should use number orders); the README
+    does not say which operation the tool calls
+mcp_only:
+- tool: send-email
+  reason: Mailgun (Sinch Email) API, catalogued under the mailgun provider, not in this repo's contracts
+- tool: list-email-templates
+  reason: Mailgun (Sinch Email) API, catalogued under the mailgun provider, not in this repo's contracts
+- tool: retrieve-email-info
+  reason: Mailgun (Sinch Email) API, catalogued under the mailgun provider, not in this repo's contracts
+- tool: list-email-events
+  reason: Mailgun (Sinch Email) API, catalogued under the mailgun provider, not in this repo's contracts
+- tool: analytics-metrics
+  reason: Mailgun (Sinch Email) API, catalogued under the mailgun provider, not in this repo's contracts
+- tool: sinch-mcp-configuration
+  reason: server introspection tool, no REST backing
+meta_tools:
+- tool: describe-tools
+  surface: remote docs server
+- tool: execute
+  surface: remote docs server
+coverage:
+  tools_documented: 25
+  tools_bound: 19
+  mcp_only: 6
+  remote_meta_tools: 2

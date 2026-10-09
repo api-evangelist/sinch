@@ -1,0 +1,647 @@
+openapi: 3.1.0
+info:
+  description: Send and receive MMS messages using the JSON API.
+  title: Sinch Messaging and Content APIs | Sinch
+  version: '2.0'
+  license:
+    name: MIT
+    url: https://www.sinch.com/toc
+  contact:
+    email: support@sinch.com
+    name: support at sinch
+servers:
+  - url: https://api.ci.mblox.com/ep/v2
+security:
+  - ApiKey: []
+paths:
+  /:
+    post:
+      description: This request is used to send, save, or send a saved MMS message.
+      summary: Send, save, or send a saved MMS
+      operationId: MMS
+      tags:
+        - MMS
+      responses:
+        '200':
+          $ref: '#/components/responses/200Success'
+      requestBody:
+        description: This request is used to send, save, or send a saved MMS message.
+        $ref: '#/components/requestBodies/mmsRequest'
+components:
+  examples:
+    sendMMS:
+      value:
+        action: sendmms
+        service-id: YOUR_CAMPAIGN_ID
+        to: RECIPIENT_PHONE_NUMBER_WITH_COUNTRY_CODE
+        from: YOUR_PHONE_NUMBER
+        from-mask: YOUR_MASK
+        message-subject: YOUR_SUBJECT_TEXT
+        fallback-sms-text: TEXT_OF_FALLBACK_SMS
+        disable-fallback-sms-link: false
+        disable-fallback-sms: false
+        fallback-sms-link-expiration: EXPIRATION_DATE_UTC
+        mms-expiry-timestamp: ISO8601_DATE_FORMAT
+        client-reference: CLIENT_SUPPLIED_IDENTIFIER
+        cache-content: true
+        slide:
+          - image:
+              url: '{Image URL}'
+            message-text: '{Slide message text}'
+          - audio:
+              url: '{Audio URL}'
+            message-text: '{Slide message text}'
+          - video:
+              url: '{Video URL}'
+            message-text: '{Slide message text}'
+          - contact:
+              url: '{Contact URL}'
+            message-text: '{Slide message text}'
+          - calendar:
+              url: '{PDF URL}'
+            message-text: '{Slide message text}'
+          - pdf:
+              url: '{PDF URL}'
+            message-text: '{Slide message text}'
+    sendsavedMMS:
+      value:
+        action: sendsavedmms
+        mms-id: MMS_TEMPLATE_ID
+        service-id: YOUR_CAMPAIGN_ID
+        to: RECIPIENT_PHONE_NUMBER_WITH_COUNTRY_CODE
+        from: YOUR_PHONE_NUMBER
+        from-mask: YOUR_MASK
+        message-subject: YOUR_SUBJECT_TEXT
+        fallback-sms-text: TEXT_OF_FALLBACK_SMS
+        disable-fallback-sms: false
+        disable-fallback-sms-link: false
+        mms-expiry-timestamp: MMS_EXPIRY_TIMESTAMP_UTC
+        client-reference: CLIENT_SUPPLIED_IDENTIFIER
+        custom-slides:
+          - custom-message-text: CUSTOM_MESSAGE_TEXT
+            custom-slide: CUSTOM_SLIDE_NUMBER
+    saveMMS:
+      value:
+        action: savemms
+        message-subject: YOUR_SUBJECT_TEXT
+        fallback-sms-text: TEXT_OF_FALLBACK_SMS
+        disable-fallback-sms-link: false
+        disable-fallback-sms: false
+        fallback-sms-link-expiration: EXPIRATION_DATE_UTC
+        client-reference: CLIENT_SUPPLIED_IDENTIFIER
+        name: NAME_OF_MMS_TEMPLATE
+        slide:
+          - image:
+              url: '{Image URL}'
+            message-text: '{Slide message text}'
+          - audio:
+              url: '{Audio URL}'
+            message-text: '{Slide message text}'
+          - video:
+              url: '{Video URL}'
+            message-text: '{Slide message text}'
+          - contact:
+              url: '{Contact URL}'
+            message-text: '{Slide message text}'
+          - calendar:
+              url: '{PDF URL}'
+            message-text: '{Slide message text}'
+          - pdf:
+              url: '{PDF URL}'
+            message-text: '{Slide message text}'
+    sendMMSResponse:
+      value:
+        status: success
+        to: DESTINATION_PHONE_NUMBER
+        tracking-id: UNIQUE-TRANSACTION-ID
+        status-details: MMS request accepted and queued for processing and delivery.
+    saveMMSResponse:
+      value:
+        status: success
+        tracking-id: UNIQUE-TRANSACTION-ID
+        status-details: Save MMS request accepted and queued for processing.
+    sendsavedMMSResponse:
+      value:
+        status: success
+        mms-id: ID_OF_MMS_TEMPLATE
+        tracking-id: UNIQUE-TRANSACTION-ID
+        to: DESTINATION_PHONE_NUMBER
+        from: ORIGIN_PHONE_NUMBER
+        status-details: MMS request accepted and queued for processing and delivery.
+  requestBodies:
+    mmsRequest:
+      description: This request is used to send, save, or send a saved MMS message.
+      required: true
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/mmsRequest'
+          examples:
+            sendmms:
+              $ref: '#/components/examples/sendMMS'
+            sendsavedmms:
+              $ref: '#/components/examples/sendsavedMMS'
+            savemms:
+              $ref: '#/components/examples/saveMMS'
+  schemas:
+    mmsRequest:
+      type: object
+      description: This request is used to send, save, or send a saved MMS message.
+      anyOf:
+        - $ref: '#/components/schemas/sendMMS'
+        - $ref: '#/components/schemas/saveMMS'
+        - $ref: '#/components/schemas/sendSavedMMS'
+      discriminator:
+        propertyName: action
+        mapping:
+          sendmms: '#/components/schemas/sendMMS'
+          savemms: '#/components/schemas/saveMMS'
+          sendsavedmms: '#/components/schemas/sendSavedMMS'
+    sendMMS:
+      description: This is to send an MMS.
+      summary: This is to send an MMS.
+      required:
+        - action
+        - service-id
+        - to
+        - from
+        - slide
+      type: object
+      properties:
+        action:
+          type: string
+          enum:
+            - sendmms
+          x-enumDescriptions:
+            sendmms: Send an MMS
+          description: The action for this API request. In this case, to send an MMS.
+        service-id:
+          type: string
+          description: The ID of the campaign.
+        to:
+          type: string
+          description: Destination phone number with country code.
+        from:
+          type: string
+          description: Shortcode, or Toll Free, or 10DLC with country code.
+        from-mask:
+          type: string
+          description: >-
+            Only carriers in certain countries allow Alphanumeric senders. Not
+            supported in the USA.
+        message-subject:
+          type: string
+          description: >-
+            MMS subject text. Limit to 40 characters for best deliverability.
+            Maximum of 80 characters.
+        fallback-sms-text:
+          type: string
+          description: >-
+            Must be included if `disable-fallback-sms` is set to `false`. Text
+            to be included when SMS sent as a fallback. For best deliverability,
+            limit string to 110 characters.
+        disable-fallback-sms-link:
+          type: boolean
+          description: >-
+            Set to `true` to prevent a link to the MMS content from being
+            included in the SMS fallback message.
+        disable-fallback-sms:
+          type: boolean
+          description: Set to `true` to prevent delivery of fallback SMS message.
+        fallback-sms-link-expiration:
+          type: string
+          format: date-time
+          description: >-
+            Expiration for the SMS fallback link. If not populated, defaults to
+            1 year from the time and date at which the API request was made.
+            Maximum of 1 year. Accepts ISO8601 Date format. Only applies to
+            fallback SMS messages.
+        mms-expiry-timestamp:
+          type: string
+          format: date-time
+          description: >-
+            MMS delivery attempts will stop after the date and time specified in
+            this field. If the MMS is already delivered to the device, it will
+            remain in the device's inbox. If not populated, the expiration value
+            defaults to 3 days from the time and date at which the API request
+            was made. Maximum of 3 days. Accepts ISO8601 Date format.
+        client-reference:
+          type: string
+          description: >-
+            Customer transaction ID of the request. Passed back in all postbacks
+            for this transaction. Maximum length of 64 characters.
+        cache-content:
+          type: boolean
+          description: >-
+            Caching is done for every `sendmms` request by default unless
+            overridden by the API request by populating this field with `false`.
+            If cache is found, the original content won't be downloaded to
+            validate.
+        slide:
+          type: array
+          description: >-
+            Slide content node which contains the content URL. Must contain at
+            least one slide object. A maximum of 8 slides may be specified for a
+            single MMS message. Acceptable slide content includes:
+
+              -  `image` (cannot be used with `video`, `contact`, `calendar`, or `pdf`)
+              -  `audio` (cannot be used with `video`, `contact`, `calendar`, or `pdf`)
+              -  `video` (cannot be used with `image`, `audio`, `contact`, `calendar`, or `pdf`)
+              -  `contact` (cannot be used with `image`, `audio`, or `video`)
+              -  `calendar` (cannot be used with `image`, `audio`, or `video`)
+              -  `pdf` (cannot be used with `image`, `audio`, or `video`)
+              -  `message-text` (maximum of 5000 characters)
+
+            Note that you cannot include multiple files of the same MIME type on
+            the same slide. Also note that, if transcoding is `ON` for the
+            account, the API shall reformat the content when necessary, so it
+            can be delivered to the end-users handset in the best possible way.
+          items:
+            type: object
+            allOf:
+              - anyOf:
+                  - $ref: '#/components/schemas/image'
+                  - $ref: '#/components/schemas/audio'
+                  - $ref: '#/components/schemas/video'
+                  - $ref: '#/components/schemas/contact'
+                  - $ref: '#/components/schemas/calendar'
+                  - $ref: '#/components/schemas/pdf'
+              - $ref: '#/components/schemas/message-text'
+    sendSavedMMS:
+      description: This is to send a saved MMS.
+      summary: This is to send a saved MMS.
+      required:
+        - action
+        - mms-id
+        - service-id
+        - to
+        - from
+      type: object
+      properties:
+        action:
+          type: string
+          description: >-
+            The action for this API request. In this case, the API sends the
+            saved MMS Template from a specified account, using an MMSID, to a
+            single mobile number.
+          enum:
+            - sendsavedmms
+          x-enumDescriptions:
+            sendsavedmms: Send a saved MMS
+        mms-id:
+          type: string
+          description: The ID of the MMS template.
+        service-id:
+          type: string
+          description: The ID of the campaign.
+        to:
+          type: string
+          description: Destination phone number with country code.
+        from:
+          type: string
+          description: Shortcode, or Toll Free, or 10DLC with country code.
+        from-mask:
+          type: string
+          description: >-
+            Only carriers in certain countries allow Alphanumeric senders. Not
+            supported in the USA.
+        message-subject:
+          type: string
+          description: >-
+            MMS subject text. Limit to 40 characters for best deliverability. 
+            Maximum of 80 characters.
+        fallback-sms-text:
+          type: string
+          description: >-
+            Mandatory if `disable-fallback-sms` is set to `false`. Text which is
+            sent when message is sent as SMS fallback. Overrides the setting
+            saved in the MMS template. Limit the number of characters used in
+            the text to between 20 and 110 characters for best results.
+        disable-fallback-sms:
+          type: boolean
+          description: >-
+            Set to `true` to disable the SMS fallback. Overrides the setting
+            saved in the MMS Template.
+        disable-fallback-sms-link:
+          type: boolean
+          description: >-
+            Set to `true` to disable appending a link to the MMS content at the
+            end of the SMS fallback text. Overrides the setting saved in the MMS
+            Template.
+        fallback-sms-link-expiration:
+          type: string
+          format: date-time
+          description: >-
+            Expiration for the SMS fallback link. If not populated, defaults to
+            1 year from the time and date at which the API request was made.
+            Maximum of 1 year. Accepts ISO8601 Date format. Only applies to
+            fallback SMS messages.
+        mms-expiry-timestamp:
+          type: string
+          format: date-time
+          description: >-
+            MMS delivery attempts will stop after the date and time specified in
+            this field. If the MMS is already delivered to the device, it will
+            remain in the device's inbox. If not populated, the expiration value
+            defaults to 3 days from the time and date at which the API request
+            was made. Maximum of 3 days. Accepts ISO8601 Date format.
+        client-reference:
+          type: string
+          description: >-
+            Customer transaction ID of the request. Passed back in all postbacks
+            for this transaction. Maximum length of 64 characters.
+        custom-slides:
+          type: array
+          description: >-
+            Custom slides to dynamically replace the text of already specified
+            slides at the time of sending.
+          items:
+            type: object
+            properties:
+              custom-message-text:
+                type: string
+                description: >-
+                  Any existing text in the slide of the message specified in
+                  `custom-slide` will be replaced with this text.
+              custom-slide:
+                type: string
+                description: >-
+                  Slide number identifying which slide's text content to replace
+                  with `custom-message-text`.
+    saveMMS:
+      description: This is to save an MMS.
+      summary: This is to save an MMS.
+      required:
+        - action
+        - name
+      type: object
+      properties:
+        action:
+          type: string
+          description: >-
+            The action for this API request. In this case, the action stores the
+            MMS defined in the JSON.
+          enum:
+            - savemms
+          x-enumDescriptions:
+            savemms: Save an MMS.
+        message-subject:
+          type: string
+          description: >-
+            MMS subject text. Limit to 40 characters for best deliverability. 
+            Maximum of 80 characters.
+        fallback-sms-text:
+          type: string
+          description: >-
+            Text which gets sent when MMS is sent as SMS fallback. Limit text to
+            110 characters for best deliverability.
+        disable-fallback-sms:
+          type: boolean
+          description: If set to true, this disables the SMS fallback.
+        disable-fallback-sms-link:
+          type: boolean
+          description: >-
+            If set to true, this disables appending a link to the MMS Content at
+            the end of the SMS fallback text.
+        fallback-sms-link-expiration:
+          type: string
+          description: >-
+            Expiration for SMS fallback link. If not passed, it is defaulted to
+            1 year from the date of this API request being made. The maximum
+            duration is 1 year. Accepts ISO8601 Date format. Applies to only
+            fallback SMS.
+        client-reference:
+          type: string
+          description: >-
+            Customer transaction ID of the request. Passed back in all postbacks
+            for this transaction. Maximum length of 64 characters.
+        name:
+          type: string
+          description: MMS template name for internal reference only.
+        slide:
+          type: array
+          description: >-
+            Slide content node which contains the content URL. Must contain at
+            least one slide object. A maximum of 8 slides may be specified for a
+            single MMS message. Acceptable slide content includes:
+
+
+            -  `image` (cannot be used with `video`, `contact`, `calendar`, or
+            `pdf`)
+
+            -  `audio` (cannot be used with `video`, `contact`, `calendar`, or
+            `pdf`)
+
+            -  `video` (cannot be used with `image`, `audio`, `contact`,
+            `calendar`, or `pdf`)
+
+            -  `contact` (cannot be used with `image`, `audio`, or `video`)
+
+            -  `calendar` (cannot be used with `image`, `audio`, or `video`)
+
+            -  `pdf` (cannot be used with `image`, `audio`, or `video`)
+
+            -  `message-text` (maximum of 5000 characters)
+
+
+            Note that you cannot include multiple files of the same MIME type on
+            the same slide. Also note that, if transcoding is `ON` for the
+            account, the API shall reformat the content when necessary, so it
+            can be delivered to the end-users handset in the best possible way.
+          items:
+            type: object
+            allOf:
+              - anyOf:
+                  - $ref: '#/components/schemas/image'
+                  - $ref: '#/components/schemas/audio'
+                  - $ref: '#/components/schemas/video'
+                  - $ref: '#/components/schemas/contact'
+                  - $ref: '#/components/schemas/calendar'
+                  - $ref: '#/components/schemas/pdf'
+              - $ref: '#/components/schemas/message-text'
+    message-text:
+      type: object
+      properties:
+        message-text:
+          type: string
+          description: >-
+            Text that is delivered alongside the content if added in a slide of
+            the MMS. Supports plain text. Maximum of 5000 characters.
+          example: This is an example of message text.
+    image:
+      type: object
+      description: >-
+        Supports .jpg (image/jpg, image/jpeg), .png (image/png), and .gif
+        (image/gif).
+      properties:
+        image:
+          type: object
+          properties:
+            url:
+              type: string
+              description: Public content URL where the image is accessible.
+              example: https://my.link.to/image/
+    audio:
+      type: object
+      description: >-
+        Supports .mp3 (audio/mp3, audio/mpeg), .wav (audio/x-wave, audio/x-wav),
+        and .am (audio/amr).
+      properties:
+        audio:
+          type: object
+          properties:
+            url:
+              type: string
+              description: Public content URL where the audio file is accessible.
+              example: https://my.link.to/audio/
+    video:
+      type: object
+      description: >-
+        Supports .mp4 (video/mp4), .mpg or .mpeg (video/mpeg), .avi
+        (video/x-msvideo), .wmv (video/x-ms-wmv), .mov (video/quicktime), and
+        .3gp (video/3gpp).
+      properties:
+        video:
+          type: object
+          properties:
+            url:
+              type: string
+              description: Public content URL where the video is accessible.
+              example: https://my.link.to/video/
+    contact:
+      type: object
+      description: Supports .vcf and .vcard (text/vcard, text/v-card, text/x-vcard).
+      properties:
+        contact:
+          type: object
+          properties:
+            url:
+              type: string
+              description: Public content URL where the contact card is accessible.
+              example: https://my.link.to/contact/
+    calendar:
+      type: object
+      description: Supports .ics, .ical, .ifb, and .icalendar (text/calendar).
+      properties:
+        calendar:
+          type: object
+          properties:
+            url:
+              type: string
+              description: Public content URL where the calendar is accessible.
+              example: https://my.link.to/calendar/
+    pdf:
+      type: object
+      description: Supports .pdf (application/pdf, application/x-pdf).
+      properties:
+        pdf:
+          type: object
+          properties:
+            url:
+              type: string
+              description: Public content URL where the PDF is accessible.
+              example: https://my.link.to/pdf/
+    responsePayload:
+      type: object
+      properties:
+        status:
+          type: string
+          description: Indicates the status of the action. Either `success` or `failure`.
+          x-enumDescriptions:
+            success: A response indicating success.
+            failure: A response indicating failure.
+          enum:
+            - success
+            - failure
+        status-details:
+          type: string
+          description: >-
+            More details about the status of the action. Returned with `success`
+            status for any action.
+        tracking-id:
+          type: string
+          description: >-
+            Transaction ID for the request. Used for identifying postbacks
+            received for this API request. Returned with `success` status for
+            any action.
+        to:
+          type: string
+          description: >-
+            Destination phone number with country code. Returned when `sendmms`
+            or `sendsavedmms` have a `success` status.
+        mms-id:
+          type: string
+          description: >-
+            The ID of the sent MMS template. Returned when `sendsavedmms` has a
+            `success` status.
+        from:
+          type: string
+          description: >-
+            Shortcode or Toll Free/10DLC number with country code that will be
+            used to send a saved MMS. Returned when `sendsavedmms` has a
+            `success` status.
+        error-code:
+          type: string
+          description: >-
+            Code that identifies the specific error that was encountered.
+            Returned with `failure` status for any action.
+        error-info:
+          type: string
+          description: >-
+            Message that explains the error code. Returned with `failure` status
+            for any action.
+  securitySchemes:
+    ApiKey:
+      type: apiKey
+      in: header
+      name: x-api-key
+  responses:
+    200Success:
+      description: Response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/responsePayload'
+          examples:
+            sendMMS:
+              $ref: '#/components/examples/sendMMSResponse'
+            saveMMS:
+              $ref: '#/components/examples/saveMMSResponse'
+            sendSavedMMS:
+              $ref: '#/components/examples/sendsavedMMSResponse'
+tags:
+  - description: >-
+      This API sends, saves, or sends a saved MMS defined in the JSON to a
+      single mobile number. The sent or saved MMS may contain slides embedded
+      with text, images, videos, audios, and/or other objects. Calls to the API
+      are made in the form of HTTP requests using the POST request method with
+      UTF-8 encoded JSON data passed inside the request body. All requests are
+      expected to include a content-type HTTP header (for example,
+      `Content-Type: application/json; charset=utf-8`).
+
+
+      **Important:**
+
+
+      Sinch will send an HTTP GET request to the server that is specified in the
+      JSON slide of the embedded images, videos, audios, and/or other object
+      URIs to retrieve the contents of the media file. The HTTP response header
+      Sinch receives from the server MUST contain the `Content-Length` field
+      indicating the size of the resource. Otherwise, the API request will fail.
+      Customers using CDNs that employ chunked transfer encoding may run into
+      problems in which the server returns a `Transfer-Encoding` field with a
+      value of "chunked" specified in the HTTP GET response, rather than the
+      server returning `Content-Length`. If a `Transfer-Encoding` field with a
+      value of "chunked" is specified in an HTTP, the API request will be
+      rejected.
+
+
+      **Important:**
+
+
+      All media files are expected to serve a valid content-type header (for
+      example, text/plain, image/gif, audio/mp3, video/mp4, etc.). If a file
+      server serves a file using the application/octet-stream content-type
+      header instead, it may be rejected if the MIME type cannot be determined
+      by other means.
+    name: MMS

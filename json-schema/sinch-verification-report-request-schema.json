@@ -1,0 +1,153 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-verification-report-request-schema.json",
+  "title": "VerificationReportRequest",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-verification-api-openapi.yml#/components/schemas/VerificationReportRequest",
+  "type": "object",
+  "oneOf": [
+    {
+      "$ref": "#/$defs/VerificationReportRequestSms"
+    },
+    {
+      "$ref": "#/$defs/VerificationReportRequestFlashCall"
+    },
+    {
+      "$ref": "#/$defs/VerificationReportRequestPhoneCall"
+    },
+    {
+      "$ref": "#/$defs/VerificationReportRequestWhatsApp"
+    }
+  ],
+  "$defs": {
+    "VerificationReportRequestFlashCall": {
+      "title": "Flash Call Verification Report Request",
+      "required": [
+        "method",
+        "flashCall"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "The type of verification.",
+          "x-enumDescriptions": {
+            "flashcall": "Verification is of flashcall type"
+          },
+          "enum": [
+            "flashcall"
+          ]
+        },
+        "flashCall": {
+          "required": [
+            "cli"
+          ],
+          "description": "A configuration object containing settings specific to flash call verifications.",
+          "type": "object",
+          "properties": {
+            "cli": {
+              "type": "string",
+              "description": "The caller ID of the flash call. Caller ID in flash call verification refers to the phone number from which the call was made to the user's device. The verification system uses this incoming number as One Time Password (OTP)"
+            }
+          }
+        }
+      }
+    },
+    "VerificationReportRequestPhoneCall": {
+      "title": "Phone Call Verification Report Request",
+      "required": [
+        "method",
+        "callout"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "The type of verification.",
+          "x-enumDescriptions": {
+            "callout": "Verification is of Phone Call type"
+          },
+          "enum": [
+            "callout"
+          ]
+        },
+        "callout": {
+          "type": "object",
+          "description": "A configuration object containing settings specific to Phone Call verifications.",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "The code which was received by the user submitting the Phone Call verification."
+            }
+          }
+        }
+      }
+    },
+    "VerificationReportRequestSms": {
+      "title": "SMS Verification Report Request",
+      "type": "object",
+      "required": [
+        "method",
+        "sms"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "The type of verification.",
+          "x-enumDescriptions": {
+            "sms": "SMS verification type"
+          },
+          "enum": [
+            "sms"
+          ]
+        },
+        "sms": {
+          "required": [
+            "code"
+          ],
+          "description": "A configuration object containing settings specific to SMS verifications.",
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "The code which was received by the user submitting the SMS verification."
+            }
+          }
+        }
+      }
+    },
+    "VerificationReportRequestWhatsApp": {
+      "title": "WhatsApp Verification Report Request",
+      "type": "object",
+      "required": [
+        "method",
+        "whatsapp"
+      ],
+      "properties": {
+        "method": {
+          "type": "string",
+          "description": "The type of verification.",
+          "x-enumDescriptions": {
+            "whatsapp": "WhatsApp verification type"
+          },
+          "enum": [
+            "whatsapp"
+          ]
+        },
+        "whatsapp": {
+          "required": [
+            "code"
+          ],
+          "description": "A configuration object containing settings specific to WhatsApp verifications.",
+          "type": "object",
+          "properties": {
+            "code": {
+              "type": "string",
+              "description": "The code which was received by the user submitting the WhatsApp verification."
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,296 @@
+generated: '2026-10-08'
+method: searched
+source: https://developers.sinch.com/docs/functions/cli/installation.md and the command pages under https://developers.sinch.com/docs/functions/cli/commands/
+  (auth, config, functions, env, secrets, templates, numbers, porting, voice, conversation, fax, sip-trunking); package metadata
+  from registry.npmjs.org/@sinch/cli
+name: Sinch CLI
+description: 'The Sinch CLI builds, tests and deploys Sinch Functions from the terminal and manages the Sinch resources those
+  functions use: phone numbers, porting orders, voice services and calls, SIP trunks, conversation apps, fax. Published as
+  @sinch/cli on npm (0.8.1, 2026-10-08; native binaries ship as optional dependencies); the package is catalogued in packages/sinch-packages.yml.'
+docs: https://developers.sinch.com/docs/functions/cli/installation
+repo: https://github.com/sinch/cli
+package: https://www.npmjs.com/package/@sinch/cli
+version: 0.8.1
+install:
+  npm: npm install -g @sinch/cli
+  requirements: Windows 10+, macOS 12+, Linux; Node.js 24+ for Node functions, .NET 10 SDK for C# functions
+  verify: sinch --version
+authentication:
+  command: sinch auth login
+  credentials: Project ID, Key ID and Key Secret from the Sinch Dashboard Access Keys section
+  storage: Key secrets are stored in your OS keychain (Windows Credential Manager, macOS Keychain, or Linux Secret Service).
+    Short-lived session tokens are stored in your local config (~/.sinch/).
+commands:
+  auth:
+  - name: sinch auth login
+    description: Authenticate with the Sinch API. Prompts for Project ID, Key ID and Key Secret, verifies them by obtaining
+      an OAuth 2.0 access token, and stores credentials sec
+  - name: sinch auth status
+    description: 'Show the current authentication state: which credentials are stored and whether the OAuth token is valid.'
+  - name: sinch auth logout
+    description: Remove all stored credentials (keychain secrets and local session tokens). Prompts for confirmation before
+      clearing.
+  config:
+  - name: sinch config set
+    description: Set a configuration value.
+  - name: sinch config get
+    description: Read a configuration value.
+  - name: sinch config list
+    description: Show all current configuration values for the active profile.
+  - name: sinch config profile
+    description: Manage credential profiles for working across multiple Sinch projects. Each profile stores its own credentials
+      in the keychain.
+  - name: sinch config profile list
+  - name: sinch config profile create
+  - name: sinch config profile use
+  - name: sinch config profile delete
+  - name: sinch health
+    description: Check connectivity to the SinchFunctions API.
+  - name: sinch completion
+    description: Generate shell completion scripts for tab completion.
+  functions:
+  - name: sinch functions init
+    description: 'Initialize a new function from a template. Downloads the template, prompts for variables and secrets, sets
+      up the project directory, and installs dependencies. '
+  - name: sinch functions list
+    description: List all functions in the current project.
+  - name: sinch functions deploy
+    description: Deploy the function in the current directory to production. Packages the source into a ZIP, reads configuration
+      from `.env` (Node.js) or `appsettings.json` / `d
+  - name: sinch functions dev
+    description: 'Start a local development server with hot reload. The server restarts automatically when you save changes.
+      On first run, prompts whether to create a tunnel for '
+  - name: sinch functions status
+    description: Show the current status and details of a deployed function.
+  - name: sinch functions logs
+    description: View historical logs for a deployed function. Opens an interactive terminal UI showing a table of requests.
+      Press Enter on any row to see request/response detai
+  - name: sinch functions logs stream
+    description: Alias for `sinch functions logs --follow`. Connects to the live log stream and displays new requests as they
+      arrive.
+  - name: sinch functions download
+    description: Download the deployed source code of a function as a ZIP file.
+  - name: sinch functions delete
+    description: Delete a deployed function. Prompts for confirmation unless `--force` is passed.
+  - name: sinch functions validate
+    description: Check the function configuration before deployment.
+  - name: sinch functions docs
+    description: Generate AI-powered documentation for the function in the current directory. Reads the function source and
+      writes a `README.md`.
+  env_and_secrets:
+  - name: sinch env init
+    description: Create `.env` from your `sinch.json` variables and stored credentials. Use this to recover a deleted or missing
+      `.env` — for example after a fresh clone, or whe
+  - name: sinch secrets list
+    description: List all custom secrets by key name. Values are not shown.
+  - name: sinch secrets add
+    description: Add or update a secret in the OS keychain. If the key already exists, the value is updated.
+  - name: sinch secrets get
+    description: Retrieve a secret from the keychain. The value is hidden by default.
+  - name: sinch secrets delete
+    description: Remove a secret from the keychain. Requires confirmation unless `--force` is passed. **Aliases:** `remove`,
+      `rm`
+  - name: sinch secrets clear
+    description: Remove all custom secrets from the keychain. Requires confirmation unless `--force` is passed.
+  templates:
+  - name: sinch templates list
+    description: List available templates, with optional filters by runtime and category.
+  - name: sinch templates show
+    description: Show detailed information about a specific template, including variables, file list, and README preview.
+  numbers:
+  - name: sinch numbers active
+    description: Manage phone numbers currently active in your project.
+  - name: sinch numbers active list
+    description: List all active phone numbers, with optional filters.
+  - name: sinch numbers active get
+    description: Get details for a specific active number.
+  - name: sinch numbers active update
+    description: Update configuration for an active number (display name, SMS service plan, voice app, or callback URL).
+  - name: sinch numbers active release
+    description: Release an active number, cancelling your subscription. Requires confirmation.
+  - name: sinch numbers available
+    description: 'Search for and rent available phone numbers. This is a group of subcommands: | Subcommand | Purpose | |
+      --- | --- | | `search` | Search for available numbers to'
+  - name: sinch numbers available search
+  - name: sinch numbers available rent
+  - name: sinch numbers order
+    description: Order numbers in regions that require regulatory identity documentation (KYC). Most users never invoke these
+      directly — `available rent` falls back to this flow
+  - name: sinch numbers order create
+    description: 'Runs the whole flow: look up the region''s requirements, choose numbers, reserve them, fill in the questionnaire,
+      upload attachments, submit. Not every region an'
+  - name: sinch numbers order resume
+    description: Continue an order that was interrupted, or fix one that failed validation.
+  - name: sinch numbers order get
+  - name: sinch numbers order list
+  - name: sinch numbers regions
+    description: List regions where phone numbers are available.
+  porting:
+  - name: sinch porting check
+    description: Check whether one or more phone numbers are portable to Sinch.
+  - name: sinch porting config
+    description: Manage the porting configuration for your project — contact information, webhook URL for port status updates,
+      and default port times.
+  - name: sinch porting config get
+    description: Get the current porting configuration.
+  - name: sinch porting config update
+    description: 'Update the porting configuration. Runs interactively by default, pre-filled with the current values. Pass
+      `--non-interactive` with the flags you want to change '
+  - name: sinch porting orders
+    description: Create and manage port-in orders — the request to move numbers from another carrier to Sinch.
+  - name: sinch porting orders create
+    description: Create a new port-in order. Runs interactively by default. For scripting, use `--non-interactive` with flags,
+      or supply the full request body as a JSON file via
+  - name: sinch porting orders list
+    description: List port-in orders with optional filters.
+  - name: sinch porting orders get
+    description: Get the full details of a port-in order.
+  - name: sinch porting orders update
+    description: 'Update a pending port-in order. Interactive by default and fetches the current order so unchanged fields
+      are preserved. Use `--from-file` to replace the entire '
+  - name: sinch porting orders cancel
+    description: Cancel a pending port-in order. Prompts for confirmation by default.
+  - name: sinch porting orders add-note
+    description: Add a note to a port-in order. Useful for recording context or responding to carrier requests.
+  - name: sinch porting documents
+    description: Upload and retrieve supporting documents attached to a port-in order. Losing carriers often require a Letter
+      of Authorization (LOA) or a copy of a recent bill.
+  - name: sinch porting documents upload
+    description: Upload a document to a port-in order. The file is base64-encoded and sent inline.
+  - name: sinch porting documents get
+    description: Download a document from a port-in order. Saves the decoded file to disk by default; use `--json` to print
+      metadata only without writing a file.
+  - name: sinch porting activation
+    description: Manage activation of ported numbers. When a port-in order uses on-demand activation, numbers are ported but
+      not yet live — they must be explicitly activated, op
+  - name: sinch porting activation list
+    description: List the available activation groups for a port-in order.
+  - name: sinch porting activation activate
+    description: Activate ported numbers for an order. Without `--group`, activates all available groups. Prompts for confirmation
+      by default.
+  voice:
+  - name: sinch voice calls
+    description: Place and inspect Voice API v2 calls.
+  - name: sinch voice calls list
+    description: List v2 call records for the project. All filters are optional and combine.
+  - name: sinch voice calls get
+    description: Get one v2 call record. The table prints the whole call resource — project, service, session, bridge and
+      batch IDs, direction, type, origination type, endpoints
+  - name: sinch voice calls create
+    description: Place a v2 call, optionally bridging a media stream or the Voice Relay onto it.
+  - name: sinch voice calls bridge
+    description: Call two parties and bridge them together. `<a>` is dialled first; `<b>` only once `<a>` answers.
+  - name: sinch voice calls hangup
+    description: End one or more legs of a live call.
+  - name: sinch voice calls patch
+    description: 'Run commands against a **live** call. `--dial` is the capability v1 has no equivalent of: it rings a third
+      party and joins them to the bridge the call is alread'
+  - name: sinch voice services
+    description: A **service** is the v2 object that owns inbound call routing. A function opts into it by declaring `VOICE_SERVICE_ID`;
+      the Functions API then points the servic
+  - name: sinch voice services list
+    description: List the v2 services in this project — IDs, which one is the default, and where each one routes inbound calls.
+  - name: sinch voice services get
+    description: Get one service, including its full `callBehavior` — the webhook URL and fallback, or the static SVAML script.
+  - name: sinch voice services create
+    description: Create a service.
+  - name: sinch voice services update
+    description: Point a service's inbound webhook at a URL, setting `callBehavior` to `WEBHOOK` — the mode inbound calls
+      require. `sinch functions deploy` does not call this it
+  - name: sinch voice services delete
+    description: Delete a service. Prompts for confirmation by default; every function routed through the service stops receiving
+      inbound calls.
+  - name: sinch voice v1 applications
+    description: '### sinch voice v1 applications callbacks get Get the webhook callback URLs configured for a Voice application.'
+  - name: sinch voice v1 applications callbacks set
+    description: Set the primary (and optionally fallback) callback URL for a Voice application.
+  - name: sinch voice v1 applications numbers
+    description: '> **NOTE:** These commands manage numbers **attached to a Voice application** — i.e. which DIDs route to
+      this app''s webhook. This is **not** the same as the acc'
+  - name: sinch voice v1 callouts
+    description: Initiate outbound voice calls.
+  - name: sinch voice v1 callouts tts
+    description: Place a text-to-speech outbound call.
+  - name: sinch voice v1 callouts conference
+    description: Call a phone number and connect them to a conference room. Creates the conference if it doesn't exist.
+  - name: sinch voice v1 callouts custom
+    description: Place a custom callout driven by inline SVAML (Sinch Voice Application Markup Language). At least one of
+      `--ice`, `--ace`, or `--pie` is required.
+  - name: sinch voice v1 calls
+    description: 'Query and control in-progress calls. These methods apply to PSTN / SIP calls only. > **NOTE — this is not
+      `sinch voice calls`.** Both trees have a `calls get`, '
+  - name: sinch voice v1 calls get
+    description: Get information about an ongoing or completed call.
+  - name: sinch voice v1 calls hangup
+    description: Hang up an in-progress call (thin wrapper around `voice v1 calls update` with the hangup SVAML action).
+  - name: sinch voice v1 calls update
+    description: Send a SVAML body to an in-progress call.
+  - name: sinch voice v1 calls manage-leg
+    description: Inject audio into a specific leg of a connected call. Intended for playing sound or speaking to one side
+      of a PSTN / SIP call without affecting the other, inclu
+  - name: sinch voice v1 conferences
+    description: Manage conference rooms and their participants. Participants are identified by their per-leg call ID (from
+      `conferences get`), not by phone number.
+  - name: sinch voice v1 conferences get
+    description: Get the participant list for a conference.
+  - name: sinch voice v1 conferences kick
+    description: Remove a single participant from a conference.
+  - name: sinch voice v1 conferences kick-all
+    description: Remove all participants from a conference. Prompts for confirmation by default.
+  - name: sinch voice v1 conferences manage
+    description: Mute/unmute or hold/resume a conference participant. Exactly one action flag is required.
+  conversation:
+  - name: sinch conversation send
+    description: 'Send a message via the Conversation API. Supports 8 message types: text, media, template, card, carousel,
+      choice, location, and list. Run without arguments for '
+  - name: sinch conversation messages
+    description: 'Manage conversation messages: list, get, delete, and update metadata. | Subcommand | Description | | ---
+      | --- | | `sinch conversation messages list` | List mes'
+  - name: sinch conversation contacts
+    description: List and manage contacts in the Conversation API.
+  - name: sinch conversation conversations
+    description: List conversations in a Conversation API app.
+  - name: sinch conversation apps
+    description: 'Manage Conversation API apps. | Subcommand | Description | | --- | --- | | `sinch conversation apps list`
+      | List Conversation apps | | `sinch conversation apps '
+  - name: sinch conversation webhooks
+    description: Manage webhooks for Conversation apps. | Subcommand | Description | | --- | --- | | `sinch conversation webhooks
+      list` | List webhooks for an app | | `sinch con
+  - name: sinch conversation templates
+    description: Manage Conversation message templates via the templatesV2 API. | Subcommand | Description | | --- | --- |
+      | `sinch conversation templates list` | List all messa
+  fax:
+  - name: sinch fax send
+    description: Send a fax from a file or URL.
+  - name: sinch fax status
+    description: Get the current status of a fax.
+  - name: sinch fax get
+    description: Get complete details for a fax, including pricing and retry configuration.
+  - name: sinch fax download
+    description: Download the content of a fax as a PDF.
+  - name: sinch fax auth-status
+    description: Check fax service authentication and configuration.
+  sip_trunking:
+  - name: sinch sip trunks
+    description: Manage SIP trunks. A trunk connects your PBX or SIP infrastructure to the Sinch network.
+  - name: sinch sip trunks list
+  - name: sinch sip trunks get
+  - name: sinch sip trunks create
+  - name: sinch sip trunks update
+  - name: sinch sip trunks delete
+  - name: sinch sip trunks acls
+  - name: sinch sip trunks credential-lists update
+  - name: sinch sip endpoints
+    description: Manage SIP endpoints (registered devices or user agents on a trunk).
+  - name: sinch sip acls
+    description: Manage Access Control Lists (IP allowlists for SIP traffic).
+  - name: sinch sip calls
+    description: View SIP call history and details.
+  - name: sinch sip countries
+    description: List countries where SIP trunking is available.
+  - name: sinch sip credential-lists
+    description: Manage SIP credential lists (username/password pairs for SIP authentication).
+key_flows:
+- sinch auth login -> sinch functions init -> sinch functions dev -> sinch functions deploy -> sinch functions logs stream
+- sinch numbers available search -> sinch numbers available rent -> sinch voice services create
+- sinch porting check -> sinch porting orders create -> sinch porting documents upload -> sinch porting orders get

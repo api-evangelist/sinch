@@ -1,0 +1,204 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-hosting-order-schema.json",
+  "title": "HostingOrder",
+  "x-generated": "2026-10-08",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-imported-numbers-hosting-orders-api-openapi.yml#/components/schemas/HostingOrder",
+  "type": "object",
+  "properties": {
+    "projectId": {
+      "type": "string",
+      "description": "The project ID to which the hosting order is associated."
+    },
+    "hostingOrderId": {
+      "type": "string",
+      "description": "The unique ID of the hosting order."
+    },
+    "displayName": {
+      "type": "string",
+      "description": "The friendly name of the hosting order."
+    },
+    "regionCode": {
+      "type": "string",
+      "description": "The region code of the hosting order. Number hosting is only available for the US and Canada, so you must enter either \"US\" or \"CA\"."
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "HOSTING_ORDER_STATE_UNSPECIFIED",
+        "DRAFT",
+        "SUBMITTED",
+        "WAITING_FOR_LOA_SIGNATURE",
+        "IN_PROGRESS",
+        "COMPLETED",
+        "REJECTED"
+      ],
+      "x-enumDescriptions": {
+        "HOSTING_ORDER_STATE_UNSPECIFIED": "State is unspecified.",
+        "DRAFT": "Hosting order is a draft.",
+        "SUBMITTED": "Hosting order has been submitted.",
+        "WAITING_FOR_LOA_SIGNATURE": "Hosting order is waiting for the LoA signature.",
+        "IN_PROGRESS": "Hosting order is in progress.",
+        "COMPLETED": "Hosting order is completed.",
+        "REJECTED": "Hosting order is rejected."
+      },
+      "description": "The state of the hosting order."
+    },
+    "type": {
+      "type": "string",
+      "enum": [
+        "HOSTING_ORDER_TYPE_UNSPECIFIED",
+        "IMPORT",
+        "TYPE_TEXT_ENABLE"
+      ],
+      "x-enumDescriptions": {
+        "HOSTING_ORDER_TYPE_UNSPECIFIED": "The type of hosting order is unspecified.",
+        "IMPORT": "Hosting order to import numbers.",
+        "TYPE_TEXT_ENABLE": "Hosting order to text-enable numbers."
+      },
+      "description": "The hosting order type."
+    },
+    "createdTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the hosting order was created",
+      "readOnly": true
+    },
+    "updatedTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the hosting order was last updated",
+      "readOnly": true
+    },
+    "scheduledOsrUpdateTime": {
+      "type": "string",
+      "format": "date-time",
+      "description": "Timestamp when the OSR update will be done",
+      "readOnly": true
+    },
+    "servicePlanId": {
+      "type": "string",
+      "description": "The service plan to which the hosting order is associated."
+    },
+    "campaignId": {
+      "type": "string",
+      "description": "The campaign to which the hosting order is associated."
+    },
+    "migrateToSinchTmo": {
+      "type": "boolean",
+      "readOnly": true,
+      "description": "Displays if a number is assigned to another aggregator in T-Mobile's platform, and requires migration from previous aggregator to Sinch."
+    },
+    "textEnableInfo": {
+      "$ref": "#/$defs/TextEnableInfo"
+    },
+    "callbackUrl": {
+      "type": "string",
+      "description": "The client's callback URL to be called upon finishing the number import."
+    }
+  },
+  "$defs": {
+    "Address": {
+      "description": "The address of the business.",
+      "required": [
+        "buildingNumber",
+        "street",
+        "city",
+        "state",
+        "postalCode",
+        "country"
+      ],
+      "type": "object",
+      "properties": {
+        "buildingNumber": {
+          "type": "string",
+          "description": "The building number of the address."
+        },
+        "street": {
+          "type": "string",
+          "description": "The street name of the address."
+        },
+        "city": {
+          "type": "string",
+          "description": "The city name of the address."
+        },
+        "state": {
+          "type": "string",
+          "description": "The state name of the address."
+        },
+        "postalCode": {
+          "type": "string",
+          "description": "The postal code of the address."
+        },
+        "country": {
+          "type": "string",
+          "description": "The country of the address."
+        }
+      }
+    },
+    "AuthorizedPerson": {
+      "description": "The person authorized and responsible for the hosting order.",
+      "required": [
+        "firstName",
+        "lastName",
+        "email"
+      ],
+      "type": "object",
+      "properties": {
+        "firstName": {
+          "type": "string",
+          "description": "The first name of the authorized person."
+        },
+        "lastName": {
+          "type": "string",
+          "description": "The last name of the authorized person."
+        },
+        "email": {
+          "type": "string",
+          "description": "The email address of the authorized person."
+        }
+      }
+    },
+    "TextEnableInfo": {
+      "type": "object",
+      "properties": {
+        "businessName": {
+          "type": "string",
+          "description": "The name of the business."
+        },
+        "authorisedPerson": {
+          "$ref": "#/$defs/AuthorizedPerson"
+        },
+        "address": {
+          "$ref": "#/$defs/Address"
+        },
+        "serviceProvider": {
+          "type": "string"
+        },
+        "currentVoiceCarrier": {
+          "type": "string",
+          "description": "The current carrier you are using for voice services for the number you want to host on Sinch."
+        },
+        "nnid": {
+          "type": "string",
+          "description": "The Net Number ID for the number you want to host on Sinch."
+        },
+        "loaType": {
+          "description": "The type of the letter of authorization.",
+          "type": "string",
+          "format": "enum",
+          "enum": [
+            "Direct",
+            "Reseller"
+          ],
+          "x-enumDescriptions": {
+            "Direct": "If you are a direct Sinch customer.",
+            "Reseller": "If you are a Sinch partner or reseller."
+          }
+        }
+      }
+    }
+  }
+}
