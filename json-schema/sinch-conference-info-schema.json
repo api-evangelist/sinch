@@ -1,0 +1,50 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-conference-info-schema.json",
+  "title": "ConferenceInfo",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-conferences-api-openapi.yml#/components/schemas/ConferenceInfo",
+  "type": "object",
+  "properties": {
+    "conferenceId": {
+      "type": "string",
+      "description": "The conference identifier"
+    },
+    "participants": {
+      "type": "array",
+      "description": "List of participants in the conference",
+      "items": {
+        "$ref": "#/$defs/Participant"
+      }
+    }
+  },
+  "$defs": {
+    "Participant": {
+      "type": "object",
+      "properties": {
+        "cli": {
+          "type": "string",
+          "description": "The participant caller ID"
+        },
+        "callId": {
+          "type": "string",
+          "description": "The participant call ID"
+        },
+        "duration": {
+          "type": "integer",
+          "description": "Duration in conference in seconds"
+        },
+        "muted": {
+          "type": "boolean",
+          "description": "Whether the participant is muted"
+        },
+        "onhold": {
+          "type": "boolean",
+          "description": "Whether the participant is on hold"
+        }
+      }
+    }
+  }
+}

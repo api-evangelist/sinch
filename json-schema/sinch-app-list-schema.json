@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-app-list-schema.json",
+  "title": "AppList",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-apps-api-openapi.yml#/components/schemas/AppList",
+  "type": "object",
+  "properties": {
+    "apps": {
+      "type": "array",
+      "description": "List of apps",
+      "items": {
+        "$ref": "#/$defs/App"
+      }
+    }
+  },
+  "$defs": {
+    "App": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique app identifier"
+        },
+        "display_name": {
+          "type": "string",
+          "description": "The app display name"
+        },
+        "channel_credentials": {
+          "type": "array",
+          "description": "Channel credential configurations",
+          "items": {
+            "$ref": "#/$defs/ChannelCredential"
+          }
+        },
+        "conversation_metadata_report_view": {
+          "type": "string",
+          "description": "Metadata report configuration"
+        }
+      }
+    },
+    "ChannelCredential": {
+      "type": "object",
+      "properties": {
+        "channel": {
+          "type": "string",
+          "description": "The channel type"
+        },
+        "static_bearer": {
+          "type": "object",
+          "description": "Static bearer token credential",
+          "properties": {
+            "claimed_identity": {
+              "type": "string",
+              "description": "The claimed identity"
+            },
+            "token": {
+              "type": "string",
+              "description": "The bearer token"
+            }
+          }
+        },
+        "static_token": {
+          "type": "object",
+          "description": "Static token credential",
+          "properties": {
+            "token": {
+              "type": "string",
+              "description": "The token value"
+            }
+          }
+        },
+        "callback_secret": {
+          "type": "string",
+          "description": "Secret for validating callbacks from the channel"
+        }
+      }
+    }
+  }
+}

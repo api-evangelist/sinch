@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-update-acl-request-schema.json",
+  "title": "UpdateAclRequest",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-access-control-lists-api-openapi.yml#/components/schemas/UpdateAclRequest",
+  "type": "object",
+  "properties": {
+    "name": {
+      "type": "string",
+      "description": "Updated ACL name"
+    },
+    "enabled": {
+      "type": "boolean",
+      "description": "Updated enabled status"
+    },
+    "entries": {
+      "type": "array",
+      "description": "Updated IP entries",
+      "items": {
+        "$ref": "#/$defs/AclEntry"
+      }
+    }
+  },
+  "$defs": {
+    "AclEntry": {
+      "type": "object",
+      "properties": {
+        "ipRange": {
+          "type": "string",
+          "description": "The IP address or CIDR range"
+        },
+        "description": {
+          "type": "string",
+          "description": "A description of this entry"
+        }
+      }
+    }
+  }
+}

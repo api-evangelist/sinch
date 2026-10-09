@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-report-verification-request-schema.json",
+  "title": "ReportVerificationRequest",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-verifications-api-openapi.yml#/components/schemas/ReportVerificationRequest",
+  "type": "object",
+  "properties": {
+    "method": {
+      "type": "string",
+      "enum": [
+        "sms",
+        "flashcall",
+        "callout"
+      ],
+      "description": "The verification method"
+    },
+    "sms": {
+      "type": "object",
+      "description": "SMS verification report data",
+      "properties": {
+        "code": {
+          "type": "string",
+          "description": "The OTP code received by the user"
+        }
+      }
+    },
+    "flashcall": {
+      "type": "object",
+      "description": "Flashcall verification report data",
+      "properties": {
+        "cli": {
+          "type": "string",
+          "description": "The CLI of the flashcall received"
+        }
+      }
+    }
+  }
+}

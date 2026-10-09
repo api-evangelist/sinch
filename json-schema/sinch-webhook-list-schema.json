@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://raw.githubusercontent.com/api-evangelist/sinch/main/json-schema/sinch-webhook-list-schema.json",
+  "title": "WebhookList",
+  "x-generated": "2026-10-03",
+  "x-method": "derived",
+  "x-generator": "derive-json-schema.py",
+  "x-source": "openapi/sinch-webhooks-api-openapi.yml#/components/schemas/WebhookList",
+  "type": "object",
+  "properties": {
+    "webhooks": {
+      "type": "array",
+      "description": "List of webhooks",
+      "items": {
+        "$ref": "#/$defs/Webhook"
+      }
+    }
+  },
+  "$defs": {
+    "Webhook": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "The unique webhook identifier"
+        },
+        "app_id": {
+          "type": "string",
+          "description": "The app this webhook belongs to"
+        },
+        "target": {
+          "type": "string",
+          "format": "uri",
+          "description": "The webhook target URL"
+        },
+        "target_type": {
+          "type": "string",
+          "enum": [
+            "HTTP",
+            "GRPC"
+          ],
+          "description": "The target type"
+        },
+        "triggers": {
+          "type": "array",
+          "description": "List of event triggers this webhook subscribes to",
+          "items": {
+            "type": "string",
+            "enum": [
+              "MESSAGE_INBOUND",
+              "EVENT_INBOUND",
+              "MESSAGE_DELIVERY",
+              "MESSAGE_SUBMIT",
+              "CONTACT_CREATE",
+              "CONTACT_DELETE",
+              "CONTACT_MERGE",
+              "CONTACT_UPDATE",
+              "CONVERSATION_START",
+              "CONVERSATION_STOP",
+              "CONVERSATION_DELETE",
+              "CAPABILITY",
+              "OPT_IN",
+              "OPT_OUT",
+              "CHANNEL_EVENT",
+              "CONTACT_IDENTITIES_DUPLICATION",
+              "UNSUPPORTED",
+              "RECORD_NOTIFICATION",
+              "SMART_CONVERSATIONS"
+            ]
+          }
+        },
+        "secret": {
+          "type": "string",
+          "description": "Secret for HMAC signature validation"
+        }
+      }
+    }
+  }
+}

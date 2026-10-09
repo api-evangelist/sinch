@@ -1,0 +1,72 @@
+generated: '2026-10-03'
+method: searched
+generator: extract-docs-artifacts.py (local)
+source: https://developers.sinch.com/docs/conversation/callbacks/webhook-routing.md
+sources:
+- https://developers.sinch.com/docs/conversation/callbacks/webhook-routing.md
+- https://developers.sinch.com/docs/voice/tutorials/getting-a-second-number-and-testing-sinch-callbackswebhooks-with-ngrok.md
+- https://developers.sinch.com/docs/voice-2.0/api-reference/webhook-signature.md
+- https://developers.sinch.com/docs/conversation/callbacks.md
+description: Sinch provides webhooks for multiple products. The Conversation API uses a set of trigger names (e.g., MESSAGE_INBOUND) while the
+  Voice API uses event names such as call.incoming, call.answered, call.hangup, etc.
+events:
+- event: call.incoming
+  description: Delivered when an inbound call is received.
+- event: call.answered
+  description: Delivered when a call is answered.
+- event: call.hangup
+  description: Delivered when a call ends.
+- event: call.webhook.call.answered
+  description: Example event name shown in the Voice webhook signature documentation.
+- event: MESSAGE_INBOUND
+  description: Inbound contact messages from end users on the underlying channels.
+- event: MESSAGE_DELIVERY
+  description: Delivery receipts for app messages sent on Conversation API channels.
+- event: EVENT_INBOUND
+  description: Inbound events (e.g., composing events) from end users.
+- event: MESSAGE_SUBMIT
+  description: Message submission notifications for app messages.
+- event: EVENT_DELIVERY
+  description: Delivery receipts for events sent on Conversation API channels.
+- event: CONVERSATION_START
+  description: Conversation start events.
+- event: CONVERSATION_STOP
+  description: Conversation stop events.
+- event: CONVERSATION_DELETE
+  description: Conversation deleted events.
+- event: CONTACT_CREATE
+  description: Contact create events.
+- event: CONTACT_DELETE
+  description: Contact delete events.
+- event: CONTACT_MERGE
+  description: Contact merge events.
+- event: CONTACT_UPDATE
+  description: Contact update events.
+- event: CAPABILITY
+  description: Results of asynchronous capability checks.
+- event: OPT_IN
+  description: Opt‑in events.
+- event: OPT_OUT
+  description: Opt‑out events.
+- event: CONTACT_IDENTITIES_DUPLICATION
+  description: Notifications about contact identity duplications.
+- event: CHANNEL_EVENT
+  description: Channel event notifications.
+- event: RECORD_NOTIFICATION
+  description: Record notifications.
+- event: BATCH_STATUS_UPDATE
+  description: Batch status update notifications.
+- event: UNSUPPORTED
+  description: Channel callbacks that are not natively supported by the Conversation API.
+- event: SMART_CONVERSATION
+  description: Machine‑learning analysis results for inbound messages.
+- event: MESSAGE_INBOUND_SMART_CONVERSATION_REDACTION
+  description: Inbound messages with content redacted based on analysis.
+delivery:
+  signature: Callbacks are signed using HMAC‑SHA256. The signature is placed in the `authorization` header as `service <serviceKey>:<Signature>`
+    where the key/secret are taken from the Sinch dashboard. The request must also include an `x‑timestamp` header (ISO‑8601 UTC) which is part
+    of the signed string.
+  retries: The Conversation API uses exponential backoff retries. Retries occur when the response is not in the 200–299 range, specifically on
+    network/timeout failures, OAuth2 token fetch failures, HTTP 5xx, and 429 status codes. Retries are not performed for other 4xx responses.
+    The exact backoff schedule is not published.
+docs: https://developers.sinch.com/docs/conversation/callbacks/webhook-routing.md
