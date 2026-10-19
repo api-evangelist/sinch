@@ -4,13 +4,20 @@ source:
 - https://zapier.com/apps/sinch/integrations
 - https://n8n.io/integrations/sinch/
 checked:
+- https://api.nuget.org/v3
 - https://composio.dev/toolkits/sinch
+- https://crates.io/api/v1
 - https://github.com/PipedreamHQ/pipedream/tree/94800dd6de6640b942c65ea7ee655f71ac56d438/components/
 - https://hightouch.com/docs/destinations/sinch-campaigns
 - https://monid.ai/tools/sinch
 - https://n8n.io/integrations/sinch/
+- https://proxy.golang.org
+- https://pypi.org/pypi
 - https://raw.githubusercontent.com/camaraproject/camara-landscape/main/landscape.yml
+- https://registry.npmjs.org
 - https://registry.npmjs.org/-/v1/search?text=keywords:n8n-community-node-package
+- https://repo1.maven.org/maven2
+- https://rubygems.org/api/v1
 - https://zapier.com/api/v4/apps/
 - https://zapier.com/apps/sinch/integrations
 - zoom/integrations/zoom-integration-edges.yml
@@ -703,6 +710,105 @@ edges:
   detected: '2026-10-18'
   detected_by: mirror-platform-listings.py
   category: Zoom app
+- partner_name: Maven Central
+  partner: maven-central
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Java/JVM)
+  evidence: https://central.sonatype.com/artifact/com.sinch.sdk/sinch-sdk-java
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Maven Central (public registry JSON)
+    spec_file: null
+    language: Java/JVM
+    packages:
+    - name: com.sinch.sdk:sinch-sdk-java
+      version: 2.3.0
+      released: '2026-10-15'
+      released_field: lastUpdated
+      lapsed: false
+      page: https://central.sonatype.com/artifact/com.sinch.sdk/sinch-sdk-java
+      repo_leg: domain:sinch.com
+      publisher_leg: groupId:sinch.com
+      matched_by: domain+name-among-holders
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: npm registry
+  partner: npm
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (JavaScript/TypeScript)
+  evidence: https://www.npmjs.com/package/@sinch/cli
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: npm registry (public registry JSON)
+    spec_file: null
+    language: JavaScript/TypeScript
+    packages:
+    - name: '@sinch/cli'
+      version: 0.8.1
+      released: '2026-10-08'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@sinch/cli
+      repo_leg: domain:sinch.com
+      publisher_leg: email:sinch.com
+      matched_by: domain+name-among-holders
+    - name: '@sinch/functions-runtime'
+      version: 0.7.0
+      released: '2026-10-07'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@sinch/functions-runtime
+      repo_leg: domain:sinch.com
+      publisher_leg: email:sinch.com
+      matched_by: domain+name-among-holders
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: PyPI
+  partner: pypi
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Python)
+  evidence: https://pypi.org/project/sinch/
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: PyPI (public registry JSON)
+    spec_file: null
+    language: Python
+    packages:
+    - name: sinch
+      version: 2.3.0
+      released: '2026-10-14'
+      released_field: upload_time
+      lapsed: false
+      page: https://pypi.org/project/sinch/
+      repo_leg: domain:sinch.com
+      publisher_leg: email:sinch.com
+      matched_by: domain+name-among-holders
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
 templates:
 - title: Create multiple spreadsheet rows in Google Sheets for new inbound messages in Sinch
   url: https://zapier.com/apps/google-sheets/integrations/sinch/1682473/create-multiple-spreadsheet-rows-in-google-sheets-for-new-inbound-messages-in-sinch
