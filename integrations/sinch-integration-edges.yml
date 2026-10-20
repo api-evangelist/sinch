@@ -8,6 +8,7 @@ checked:
 - https://composio.dev/toolkits/sinch
 - https://crates.io/api/v1
 - https://github.com/PipedreamHQ/pipedream/tree/94800dd6de6640b942c65ea7ee655f71ac56d438/components/
+- https://github.com/PipedreamHQ/pipedream/tree/d5872355ef27b4efa769f05352f2820c299a456e/components/
 - https://hightouch.com/docs/destinations/sinch-campaigns
 - https://monid.ai/tools/sinch
 - https://n8n.io/integrations/sinch/
@@ -20,6 +21,7 @@ checked:
 - https://rubygems.org/api/v1
 - https://zapier.com/api/v4/apps/
 - https://zapier.com/apps/sinch/integrations
+- n8n/integrations/n8n-integration-edges.yml
 - zoom/integrations/zoom-integration-edges.yml
 summary: null
 marketplace_apps:
@@ -404,6 +406,167 @@ edges:
     api_families_basis: null
     detected_by: sweep-telco-network-apis.py
     detected: '2026-10-12'
+- partner_name: Maven Central
+  partner: maven-central
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Java/JVM)
+  evidence: https://central.sonatype.com/artifact/com.sinch.sdk/sinch-sdk-java
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: Maven Central (public registry JSON)
+    spec_file: null
+    language: Java/JVM
+    packages:
+    - name: com.sinch.sdk:sinch-sdk-java
+      version: 2.3.0
+      released: '2026-10-15'
+      released_field: lastUpdated
+      lapsed: false
+      page: https://central.sonatype.com/artifact/com.sinch.sdk/sinch-sdk-java
+      repo_leg: domain:sinch.com
+      publisher_leg: groupId:sinch.com
+      matched_by: domain+name-among-holders
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: npm registry
+  partner: npm
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (JavaScript/TypeScript)
+  evidence: https://www.npmjs.com/package/@sinch/cli
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: npm registry (public registry JSON)
+    spec_file: null
+    language: JavaScript/TypeScript
+    packages:
+    - name: '@sinch/cli'
+      version: 0.8.1
+      released: '2026-10-08'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@sinch/cli
+      repo_leg: domain:sinch.com
+      publisher_leg: email:sinch.com
+      matched_by: domain+name-among-holders
+    - name: '@sinch/functions-runtime'
+      version: 0.7.0
+      released: '2026-10-07'
+      released_field: modified
+      lapsed: false
+      page: https://www.npmjs.com/package/@sinch/functions-runtime
+      repo_leg: domain:sinch.com
+      publisher_leg: email:sinch.com
+      matched_by: domain+name-among-holders
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: PyPI
+  partner: pypi
+  partner_match: register
+  type: register
+  direction: provider-built
+  category: official SDK (Python)
+  evidence: https://pypi.org/project/sinch/
+  channel: package-registry
+  relationship: distribution-channel
+  contract_reference:
+    register: PyPI (public registry JSON)
+    spec_file: null
+    language: Python
+    packages:
+    - name: sinch
+      version: 2.3.0
+      released: '2026-10-14'
+      released_field: upload_time
+      lapsed: false
+      page: https://pypi.org/project/sinch/
+      repo_leg: domain:sinch.com
+      publisher_leg: email:sinch.com
+      matched_by: domain+name-among-holders
+    current: true
+    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
+      24 months'
+    detected_by: sweep-official-sdks.py
+    detected: '2026-10-18'
+  detected_by: sweep-official-sdks.py
+  first_seen: '2026-10-18'
+- partner_name: Hightouch
+  partner: hightouch
+  partner_match: aggregator
+  marketplace: coverage
+  channel: partner-built
+  direction: partner-built
+  type: coverage
+  relationship: connector-coverage
+  evidence: https://hightouch.com/docs/destinations/sinch-campaigns
+  coverage_role:
+  - destination
+  cdp_signals:
+    destination:
+      catalog_entries:
+      - sinch-campaigns
+      - sinch-messagemedia
+      status: released
+      sync_types:
+      - Audience
+      - Campaign trigger
+      - Contact lists
+      - Contacts
+      sync_modes:
+      - add
+      - insert
+      - mirror
+      - remove
+      - upsert
+  detected_by: sweep-cdp.py
+  first_seen: '2026-10-14'
+- partner_name: n8n (n8n-community)
+  partner: n8n
+  partner_match: mirror
+  mirror_match: domain+name-among-holders
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: n8n-community
+  evidence: https://www.npmjs.com/package/@sinch/n8n-nodes-sinch
+  mirror_of: n8n/integrations/n8n-integration-edges.yml
+  apps: []
+  listing_count: 1
+  detected: '2026-10-19'
+  detected_by: mirror-platform-listings.py
+- partner_name: Zoom (own)
+  partner: zoom
+  partner_match: mirror
+  mirror_match: domain+name-among-holders
+  type: marketplace
+  relationship: platform-app
+  direction: third-party
+  channel: partner-built
+  marketplace: own
+  evidence: https://marketplace.zoom.us/apps/OAvaV3kvQEOMeXB0qxXP6w
+  mirror_of: zoom/integrations/zoom-integration-edges.yml
+  apps:
+  - Sinch Calling for Zoom Phone
+  listing_count: 1
+  detected: '2026-10-18'
+  detected_by: mirror-platform-listings.py
+  category: Zoom app
 - partner_name: novu
   partner: novu
   partner_match: domain
@@ -463,7 +626,7 @@ edges:
   contract_reference:
     repo: sinch
     spec_file: sinch-app-api-openapi.yml
-    value: KAKAOTALKCHAT
+    value: KAKAOTALK
     property: components.schemas.ConversationChannel
     matched_domain: kakaocorp.com
     detected_by: sweep-cpaas.py
@@ -580,36 +743,6 @@ edges:
     matched_domain: whatsapp.com
     detected_by: sweep-cpaas.py
     detected: '2026-10-13'
-- partner_name: Hightouch
-  partner: hightouch
-  partner_match: aggregator
-  marketplace: coverage
-  channel: partner-built
-  direction: partner-built
-  type: coverage
-  relationship: connector-coverage
-  evidence: https://hightouch.com/docs/destinations/sinch-campaigns
-  coverage_role:
-  - destination
-  cdp_signals:
-    destination:
-      catalog_entries:
-      - sinch-campaigns
-      - sinch-messagemedia
-      status: released
-      sync_types:
-      - Audience
-      - Campaign trigger
-      - Contact lists
-      - Contacts
-      sync_modes:
-      - add
-      - insert
-      - mirror
-      - remove
-      - upsert
-  detected_by: sweep-cdp.py
-  first_seen: '2026-10-14'
 - partner_name: Zapier
   partner: zapier
   partner_match: aggregator
@@ -675,7 +808,7 @@ edges:
   channel: open-source-node
   relationship: ipaas-bridge
   direction: third-party
-  evidence: https://github.com/PipedreamHQ/pipedream/tree/94800dd6de6640b942c65ea7ee655f71ac56d438/components/sinch
+  evidence: https://github.com/PipedreamHQ/pipedream/tree/d5872355ef27b4efa769f05352f2820c299a456e/components/sinch
   category: null
   contract_reference:
     register: Pipedream components (PipedreamHQ/pipedream components/)
@@ -693,122 +826,6 @@ edges:
     builder: Pipedream repo (component)
   detected_by: sweep-workflow-automation.py
   first_seen: '2026-10-15'
-- partner_name: Zoom (own)
-  partner: zoom
-  partner_match: mirror
-  mirror_match: domain+name-among-holders
-  type: marketplace
-  relationship: platform-app
-  direction: third-party
-  channel: partner-built
-  marketplace: own
-  evidence: https://marketplace.zoom.us/apps/OAvaV3kvQEOMeXB0qxXP6w
-  mirror_of: zoom/integrations/zoom-integration-edges.yml
-  apps:
-  - Sinch Calling for Zoom Phone
-  listing_count: 1
-  detected: '2026-10-18'
-  detected_by: mirror-platform-listings.py
-  category: Zoom app
-- partner_name: Maven Central
-  partner: maven-central
-  partner_match: register
-  type: register
-  direction: provider-built
-  category: official SDK (Java/JVM)
-  evidence: https://central.sonatype.com/artifact/com.sinch.sdk/sinch-sdk-java
-  channel: package-registry
-  relationship: distribution-channel
-  contract_reference:
-    register: Maven Central (public registry JSON)
-    spec_file: null
-    language: Java/JVM
-    packages:
-    - name: com.sinch.sdk:sinch-sdk-java
-      version: 2.3.0
-      released: '2026-10-15'
-      released_field: lastUpdated
-      lapsed: false
-      page: https://central.sonatype.com/artifact/com.sinch.sdk/sinch-sdk-java
-      repo_leg: domain:sinch.com
-      publisher_leg: groupId:sinch.com
-      matched_by: domain+name-among-holders
-    current: true
-    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
-      24 months'
-    detected_by: sweep-official-sdks.py
-    detected: '2026-10-18'
-  detected_by: sweep-official-sdks.py
-  first_seen: '2026-10-18'
-- partner_name: npm registry
-  partner: npm
-  partner_match: register
-  type: register
-  direction: provider-built
-  category: official SDK (JavaScript/TypeScript)
-  evidence: https://www.npmjs.com/package/@sinch/cli
-  channel: package-registry
-  relationship: distribution-channel
-  contract_reference:
-    register: npm registry (public registry JSON)
-    spec_file: null
-    language: JavaScript/TypeScript
-    packages:
-    - name: '@sinch/cli'
-      version: 0.8.1
-      released: '2026-10-08'
-      released_field: modified
-      lapsed: false
-      page: https://www.npmjs.com/package/@sinch/cli
-      repo_leg: domain:sinch.com
-      publisher_leg: email:sinch.com
-      matched_by: domain+name-among-holders
-    - name: '@sinch/functions-runtime'
-      version: 0.7.0
-      released: '2026-10-07'
-      released_field: modified
-      lapsed: false
-      page: https://www.npmjs.com/package/@sinch/functions-runtime
-      repo_leg: domain:sinch.com
-      publisher_leg: email:sinch.com
-      matched_by: domain+name-among-holders
-    current: true
-    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
-      24 months'
-    detected_by: sweep-official-sdks.py
-    detected: '2026-10-18'
-  detected_by: sweep-official-sdks.py
-  first_seen: '2026-10-18'
-- partner_name: PyPI
-  partner: pypi
-  partner_match: register
-  type: register
-  direction: provider-built
-  category: official SDK (Python)
-  evidence: https://pypi.org/project/sinch/
-  channel: package-registry
-  relationship: distribution-channel
-  contract_reference:
-    register: PyPI (public registry JSON)
-    spec_file: null
-    language: Python
-    packages:
-    - name: sinch
-      version: 2.3.0
-      released: '2026-10-14'
-      released_field: upload_time
-      lapsed: false
-      page: https://pypi.org/project/sinch/
-      repo_leg: domain:sinch.com
-      publisher_leg: email:sinch.com
-      matched_by: domain+name-among-holders
-    current: true
-    signal_note: 'an official package on the registry: distribution, not an integration; lapsed = no release in
-      24 months'
-    detected_by: sweep-official-sdks.py
-    detected: '2026-10-18'
-  detected_by: sweep-official-sdks.py
-  first_seen: '2026-10-18'
 templates:
 - title: Create multiple spreadsheet rows in Google Sheets for new inbound messages in Sinch
   url: https://zapier.com/apps/google-sheets/integrations/sinch/1682473/create-multiple-spreadsheet-rows-in-google-sheets-for-new-inbound-messages-in-sinch
