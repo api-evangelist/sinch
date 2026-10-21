@@ -870,6 +870,68 @@
   relationship: ipaas-bridge
   status: pending-partner-spec
   arazzo: null
+- slug: sinch-hubspot-app-certification
+  label: HubSpot App Certification
+  partner: hubspot
+  partner_name: HubSpot App Certification
+  category: HubSpot certified app publisher
+  type: register
+  channel: standard-directory
+  evidence: https://ecosystem.hubspot.com/marketplace/explore?eco_PRODUCT_TYPE=APP&eco_CERTIFIED=true
+  source: edge
+  relationship: standard-participant
+  contract_reference:
+    register: HubSpot App Marketplace Certified Apps (CERTIFIED filter on the storefront's public search JSON)
+    standard: HubSpot App Certification
+    spec_file: null
+    role: certified-app-publisher
+    registered_name: Sinch
+    matched_domain: sinch.com
+    matched_by: domain+name-among-holders
+    identity_source: the listing's own companyUrl (no lookup)
+    certified_products:
+    - product: HubSpot Certified App
+      product_type: APP
+      certifier: HubSpot (App Certification)
+      listings: 1
+      example_listing: https://ecosystem.hubspot.com/marketplace/listing/sinch-engage-sms
+      lapsed: false
+      lapsed_note: the certified flag is printed on a LIVE public listing card (CERTIFIED filter); HubSpot prints
+        no certification date, so the badge reads as current
+    signal_note: certified_products = ONE entry per product type (HubSpot Certified App), never per listing; listing
+      counts are context
+    detected_by: sweep-hubspot-app-marketplace.py
+    detected: '2026-10-21'
+  status: not-a-workflow
+  arazzo: null
+- slug: sinch-zoom-partner-program
+  label: Zoom Partner Program
+  partner: zoom
+  partner_name: Zoom Partner Program
+  category: Zoom technology partner
+  type: register
+  channel: standard-directory
+  evidence: https://partner.zoom.com/partner/sinch/
+  source: edge
+  relationship: standard-participant
+  contract_reference:
+    register: Zoom Partner Locator (partner.zoom.com/partner-locator; /wp-json/wp/v2/partner)
+    standard: Zoom Partner Program
+    spec_file: null
+    role: zoom-hardware-or-peering-partner
+    registered_name: Sinch
+    register_id: https://partner.zoom.com/partner/sinch/
+    matched_domain: null
+    matched_by: register-name
+    identity_source: register-name
+    signal_note: 'participation only: partner type / program tier is partner_tier, never counted; no Zoom certification
+      is printed on the register, so no certified_products'
+    detected_by: sweep-zoom-app-marketplace.py
+    detected: '2026-10-21'
+    identity_note: register gave only the name; exact normalised match to the repo's apis.yml name, one repo, Wikidata
+      P856 not contradicting (Kin 2026-10-20 decision 2)
+  status: not-a-workflow
+  arazzo: null
 - slug: sinch-n8n-n8n-community
   label: n8n (n8n-community)
   partner: n8n
@@ -934,65 +996,16 @@
   relationship: platform-app
   status: not-a-workflow
   arazzo: null
-- slug: sinch-hubspot-app-certification
-  label: HubSpot App Certification
+- slug: sinch-hubspot-own
+  label: HubSpot (own)
   partner: hubspot
-  partner_name: HubSpot App Certification
-  category: HubSpot certified app publisher
-  type: register
-  channel: standard-directory
-  evidence: https://ecosystem.hubspot.com/marketplace/explore?eco_PRODUCT_TYPE=APP&eco_CERTIFIED=true
+  partner_name: HubSpot (own)
+  category: SMS
+  type: marketplace
+  marketplace: own
+  channel: partner-built
+  evidence: https://ecosystem.hubspot.com/marketplace/listing/sinch-engage-sms
   source: edge
-  relationship: standard-participant
-  contract_reference:
-    register: HubSpot App Marketplace Certified Apps (CERTIFIED filter on the storefront's public search JSON)
-    standard: HubSpot App Certification
-    spec_file: null
-    role: certified-app-publisher
-    registered_name: Sinch
-    matched_domain: sinch.com
-    matched_by: domain+name-among-holders
-    identity_source: the listing's own companyUrl (no lookup)
-    certified_products:
-    - product: HubSpot Certified App
-      product_type: APP
-      certifier: HubSpot (App Certification)
-      listings: 1
-      example_listing: https://ecosystem.hubspot.com/marketplace/listing/sinch-engage-sms
-      lapsed: false
-      lapsed_note: the certified flag is printed on a LIVE public listing card (CERTIFIED filter); HubSpot prints
-        no certification date, so the badge reads as current
-    signal_note: certified_products = ONE entry per product type (HubSpot Certified App), never per listing; listing
-      counts are context
-    detected_by: sweep-hubspot-app-marketplace.py
-    detected: '2026-10-21'
-  status: not-a-workflow
-  arazzo: null
-- slug: sinch-zoom-partner-program
-  label: Zoom Partner Program
-  partner: zoom
-  partner_name: Zoom Partner Program
-  category: Zoom technology partner
-  type: register
-  channel: standard-directory
-  evidence: https://partner.zoom.com/partner/sinch/
-  source: edge
-  relationship: standard-participant
-  contract_reference:
-    register: Zoom Partner Locator (partner.zoom.com/partner-locator; /wp-json/wp/v2/partner)
-    standard: Zoom Partner Program
-    spec_file: null
-    role: zoom-hardware-or-peering-partner
-    registered_name: Sinch
-    register_id: https://partner.zoom.com/partner/sinch/
-    matched_domain: null
-    matched_by: register-name
-    identity_source: register-name
-    signal_note: 'participation only: partner type / program tier is partner_tier, never counted; no Zoom certification
-      is printed on the register, so no certified_products'
-    detected_by: sweep-zoom-app-marketplace.py
-    detected: '2026-10-21'
-    identity_note: register gave only the name; exact normalised match to the repo's apis.yml name, one repo, Wikidata
-      P856 not contradicting (Kin 2026-10-20 decision 2)
+  relationship: platform-app
   status: not-a-workflow
   arazzo: null
