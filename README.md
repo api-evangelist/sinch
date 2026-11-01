@@ -74,14 +74,14 @@ Everything profiled for Sinch is published on APIs.io rather than in this reposi
 
 ### APIs (101)
 
-- [Sinch Conversation API](https://apis.io/apis/sinch/sinch-conversation-api/) — Send and receive messages globally over SMS, RCS, WhatsApp, Viber Business, Facebook Messenger and other popular channels through one API, with built-in…
+- [Sinch Conversation API](https://apis.io/apis/sinch/sinch-conversation-api/) — Overview Send and receive messages globally over SMS, RCS, WhatsApp, Viber Business, Facebook messenger and other popular channels using the Sinch…
 - [Sinch Voice API](https://apis.io/apis/sinch/sinch-voice-api/) — This document provides a detailed user guide and reference documentation on the Sinch Voice REST API. For information on how to authenticate API requests,…
 - [Sinch Brands API](https://apis.io/apis/sinch/sinch-brands-api/) — This API describes the set of endpoints available to create customer brands. The list of endpoints allows to create, update and delete a customer brand and…
 - [Sinch MMS API](https://apis.io/apis/sinch/sinch-mms-api/) — Sinch MMS API. Send and receive MMS messages using the JSON API.
-- [Sinch Batches API](https://apis.io/apis/sinch/sinch-batches-api/) — End of sale for new integrations. New integrations should use the Sinch Conversation API (https://developers.sinch.com/docs/conversation/), which supports…
-- [Sinch Delivery Reports API](https://apis.io/apis/sinch/sinch-delivery-reports-api/) — End of sale for new integrations. New integrations should use the Sinch Conversation API (https://developers.sinch.com/docs/conversation/), which supports…
-- [Sinch Inbounds API](https://apis.io/apis/sinch/sinch-inbounds-api/) — End of sale for new integrations. New integrations should use the Sinch Conversation API (https://developers.sinch.com/docs/conversation/), which supports…
-- [Sinch Groups API](https://apis.io/apis/sinch/sinch-groups-api/) — End of sale for new integrations. New integrations should use the Sinch Conversation API (https://developers.sinch.com/docs/conversation/), which supports…
+- [Sinch Batches API](https://apis.io/apis/sinch/sinch-batches-api/) — Batches are sets of SMS messages. You can send a single message or many messages at once. Batches are queued and sent at the rate limit in…
+- [Sinch Delivery Reports API](https://apis.io/apis/sinch/sinch-delivery-reports-api/) — Delivery reports provide the status of sent messages. Reports can be retrieved via the API or delivered via webhook callbacks.
+- [Sinch Inbounds API](https://apis.io/apis/sinch/sinch-inbounds-api/) — Inbound messages (Mobile Originated) are incoming messages sent to your short codes or long numbers from mobile phones.
+- [Sinch Groups API](https://apis.io/apis/sinch/sinch-groups-api/) — Groups are sets of phone numbers (MSISDNs) that can be used as targets when sending SMS. A phone number can only occur once in a group.
 - [Sinch 10DLC Brand Registration API](https://apis.io/apis/sinch/sinch-10dlc-brand-registration-api/) — Create or look up brand registration for 10DLC virtual numbers
 - [Sinch 10DLC Campaign Registration API](https://apis.io/apis/sinch/sinch-10dlc-campaign-registration-api/) — 10DLC is a system in the United States that allows businesses to send Application-to-Person (A2P) messaging via 10-digit-long-codes (10DLC). It uses a…
 - [Sinch Access Control List API](https://apis.io/apis/sinch/sinch-access-control-list-api/) — The Access Control List (ACL) endpoint has operations that allow you to create, view, update, and remove ACLs. You use ACLs to control which IP addresses…
@@ -175,6 +175,219 @@ Everything profiled for Sinch is published on APIs.io rather than in this reposi
 - [Sinch WhatsApp Templates API](https://apis.io/apis/sinch/sinch-whatsapp-templates-api/) — The WhatsApp template endpoint offers a way for you to manage your WhatsApp templates that can be used with the Conversation API. The WhatsApp templates are…
 - [Sinch Knowledge Base API](https://apis.io/apis/sinch/sinch-knowledge-base-api/) — The Knowledge Base API from Sinch — 3 operation(s) for knowledge base.
 - [Sinch Whats App API](https://apis.io/apis/sinch/sinch-whats-app-api/) — The WhatsApp endpoint enables programmatic login to your WhatsApp account and retrieval of its details.
+
+### Published properties
+
+Each property below is a page on APIs.io carrying the machine-readable artifact and what it says.
+
+#### AsyncAPI (5)
+
+Event-driven and webhook contracts.
+
+- [Sinch Conversation API Webhooks](https://apis.io/asyncapis/sinch/sinch-conversation-webhooks-asyncapi/)
+- [Sinch SMS Webhooks](https://apis.io/asyncapis/sinch/sinch-sms-webhooks-asyncapi/)
+- [Sinch Verification Callbacks](https://apis.io/asyncapis/sinch/sinch-verification-callbacks-asyncapi/)
+- [Sinch Voice Callbacks](https://apis.io/asyncapis/sinch/sinch-voice-callbacks-asyncapi/)
+- [Sinch Webhooks](https://apis.io/asyncapis/sinch/sinch-webhooks/)
+
+#### Event channels (23)
+
+Individual events and webhooks the provider emits.
+
+- [/conversation/capability](https://apis.io/channels/sinch/conversation-capability/)
+- [/conversation/channel-event](https://apis.io/channels/sinch/conversation-channel-event/)
+- [/conversation/contact-create](https://apis.io/channels/sinch/conversation-contact-create/)
+- [/conversation/contact-delete](https://apis.io/channels/sinch/conversation-contact-delete/)
+- [/conversation/contact-merge](https://apis.io/channels/sinch/conversation-contact-merge/)
+- [/conversation/contact-update](https://apis.io/channels/sinch/conversation-contact-update/)
+- [/conversation/conversation-start](https://apis.io/channels/sinch/conversation-conversation-start/)
+- [/conversation/conversation-stop](https://apis.io/channels/sinch/conversation-conversation-stop/)
+- [/conversation/event-inbound](https://apis.io/channels/sinch/conversation-event-inbound/)
+- [/conversation/message-delivery](https://apis.io/channels/sinch/conversation-message-delivery/)
+- [/conversation/message-inbound](https://apis.io/channels/sinch/conversation-message-inbound/)
+- [/conversation/opt-in](https://apis.io/channels/sinch/conversation-opt-in/)
+- [/conversation/opt-out](https://apis.io/channels/sinch/conversation-opt-out/)
+- [/conversation/smart-conversations](https://apis.io/channels/sinch/conversation-smart-conversations/)
+- [/sms/delivery-report](https://apis.io/channels/sinch/sms-delivery-report/)
+- [/sms/incoming](https://apis.io/channels/sinch/sms-incoming/)
+- [/verification/request](https://apis.io/channels/sinch/verification-request/)
+- [/verification/result](https://apis.io/channels/sinch/verification-result/)
+- [/voice/ace](https://apis.io/channels/sinch/voice-ace/)
+- [/voice/dice](https://apis.io/channels/sinch/voice-dice/)
+- [/voice/ice](https://apis.io/channels/sinch/voice-ice/)
+- [/voice/notify](https://apis.io/channels/sinch/voice-notify/)
+- [/voice/pie](https://apis.io/channels/sinch/voice-pie/)
+
+#### GraphQL (1)
+
+GraphQL schemas.
+
+- [Moved to /providers/sinch/](https://apis.io/graphqls/sinch/sinch-graphql/)
+
+#### MCP servers (1)
+
+Model Context Protocol servers that expose the API to agents.
+
+- [Sinch MCP servers](https://apis.io/servers/sinch/sinch-mcp-servers/)
+
+#### Agent skills (19)
+
+Agent skills built on the API.
+
+- [sinch-10dlc](https://apis.io/agent-skills/sinch/sinch-10dlc/)
+- [sinch-authentication](https://apis.io/agent-skills/sinch/sinch-authentication/)
+- [sinch-conversation-api](https://apis.io/agent-skills/sinch/sinch-conversation-api/)
+- [sinch-elastic-sip-trunking](https://apis.io/agent-skills/sinch/sinch-elastic-sip-trunking/)
+- [sinch-fax-api](https://apis.io/agent-skills/sinch/sinch-fax-api/)
+- [sinch-imported-numbers-hosting-orders](https://apis.io/agent-skills/sinch/sinch-imported-numbers-hosting-orders/)
+- [sinch-in-app-calling](https://apis.io/agent-skills/sinch/sinch-in-app-calling/)
+- [sinch-mailgun](https://apis.io/agent-skills/sinch/sinch-mailgun/)
+- [sinch-mailgun-inspect](https://apis.io/agent-skills/sinch/sinch-mailgun-inspect/)
+- [sinch-mailgun-optimize](https://apis.io/agent-skills/sinch/sinch-mailgun-optimize/)
+- [sinch-mailgun-validate](https://apis.io/agent-skills/sinch/sinch-mailgun-validate/)
+- [sinch-number-lookup-api](https://apis.io/agent-skills/sinch/sinch-number-lookup-api/)
+- [sinch-number-order-api](https://apis.io/agent-skills/sinch/sinch-number-order-api/)
+- [sinch-numbers-api](https://apis.io/agent-skills/sinch/sinch-numbers-api/)
+- [sinch-porting-api](https://apis.io/agent-skills/sinch/sinch-porting-api/)
+- [sinch-provisioning-api](https://apis.io/agent-skills/sinch/sinch-provisioning-api/)
+- [sinch-sdks](https://apis.io/agent-skills/sinch/sinch-sdks/)
+- [sinch-verification-api](https://apis.io/agent-skills/sinch/sinch-verification-api/)
+- [sinch-voice-api](https://apis.io/agent-skills/sinch/sinch-voice-api/)
+
+#### Agentic access (1)
+
+Which operations an agent can call, which act, and which need a human in the loop.
+
+- [Sinch Agentic Access](https://apis.io/agentic-access/sinch/sinch-agentic-access/)
+
+#### JSON Schema (188)
+
+The data models the API reads and writes.
+
+- [AccessControlList](https://apis.io/schemas/sinch/sinch-access-control-list/)
+- [AccessKey](https://apis.io/schemas/sinch/sinch-access-key/)
+- [Acl](https://apis.io/schemas/sinch/sinch-acl/)
+- [AclList](https://apis.io/schemas/sinch/sinch-acl-list/)
+- [ActiveNumber](https://apis.io/schemas/sinch/sinch-active-number/)
+- [ActiveNumberList](https://apis.io/schemas/sinch/sinch-active-number-list/)
+- [Active Number Response](https://apis.io/schemas/sinch/sinch-active-number-response/)
+- [AddPhoneNumberRequest](https://apis.io/schemas/sinch/sinch-add-phone-number-request/)
+- [App](https://apis.io/schemas/sinch/sinch-app/)
+- [AppList](https://apis.io/schemas/sinch/sinch-app-list/)
+- [ApplicationCallbacks](https://apis.io/schemas/sinch/sinch-application-callbacks/)
+- [Attachment](https://apis.io/schemas/sinch/sinch-attachment/)
+- [AvailableNumber](https://apis.io/schemas/sinch/sinch-available-number/)
+- [AvailableNumberList](https://apis.io/schemas/sinch/sinch-available-number-list/)
+- [AvailableRegionList](https://apis.io/schemas/sinch/sinch-available-region-list/)
+- [Batch](https://apis.io/schemas/sinch/sinch-batch/)
+- [BatchList](https://apis.io/schemas/sinch/sinch-batch-list/)
+- [Batch Summary](https://apis.io/schemas/sinch/sinch-batch-summary/)
+- [Brand](https://apis.io/schemas/sinch/sinch-brand/)
+- [BrandList](https://apis.io/schemas/sinch/sinch-brand-list/)
+- [BrandMetadata](https://apis.io/schemas/sinch/sinch-brand-metadata/)
+- [BrandOrder](https://apis.io/schemas/sinch/sinch-brand-order/)
+- [BrandUpdateRequest](https://apis.io/schemas/sinch/sinch-brand-update-request/)
+- [Call](https://apis.io/schemas/sinch/sinch-call/)
+- [CallInformation](https://apis.io/schemas/sinch/sinch-call-information/)
+- …and 163 more published on APIs.io
+
+#### JSON Structure (2)
+
+Data models expressed in JSON Structure.
+
+- [Sinch Contact Structure](https://apis.io/json-structure/sinch/sinch-contact-structure/)
+- [Sinch Message Structure](https://apis.io/json-structure/sinch/sinch-message-structure/)
+
+#### JSON-LD (1)
+
+Linked-data contexts for the provider's vocabulary.
+
+- [Sinch Context](https://apis.io/jsonld/sinch/sinch-context/)
+
+#### Vocabulary (1)
+
+The provider's domain terms, defined.
+
+- [Sinch Vocabulary](https://apis.io/vocabularies/sinch/sinch-vocabulary/)
+
+#### Examples (3)
+
+Example requests and responses.
+
+- [Sinch Send Conversation Message Example](https://apis.io/examples/sinch/sinch-send-conversation-message-example/)
+- [Sinch Send Sms Batch Example](https://apis.io/examples/sinch/sinch-send-sms-batch-example/)
+- [Sinch Start Verification Example](https://apis.io/examples/sinch/sinch-start-verification-example/)
+
+#### Collections (80)
+
+Postman and Open Collection request collections.
+
+- [Sinch Brands Access Control Lists API](https://apis.io/collections/sinch/open-sinch-access-control-lists-api/)
+- [Sinch Brands Access Control Lists Active Numbers API](https://apis.io/collections/sinch/open-sinch-active-numbers-api/)
+- [Sinch Brands Access Control Lists Applications API](https://apis.io/collections/sinch/open-sinch-applications-api/)
+- [Sinch Brands Access Control Lists Apps API](https://apis.io/collections/sinch/open-sinch-apps-api/)
+- [Sinch Brands Access Control Lists Available Numbers API](https://apis.io/collections/sinch/open-sinch-available-numbers-api/)
+- [Sinch Brands Access Control Lists Available Regions API](https://apis.io/collections/sinch/open-sinch-available-regions-api/)
+- [Sinch Brands Access Control Lists Batches API](https://apis.io/collections/sinch/open-sinch-batches-api/)
+- [Sinch Brands Access Control Lists Brand Metadata API](https://apis.io/collections/sinch/open-sinch-brand-metadata-api/)
+- [Sinch Brands API](https://apis.io/collections/sinch/open-sinch-brands/)
+- [Sinch Access Control Lists Brands API](https://apis.io/collections/sinch/open-sinch-brands-api/)
+- [Sinch Brands Access Control Lists Callouts API](https://apis.io/collections/sinch/open-sinch-callouts-api/)
+- [Sinch Brands Access Control Lists Calls API](https://apis.io/collections/sinch/open-sinch-calls-api/)
+- [Sinch Brands Access Control Lists Capability API](https://apis.io/collections/sinch/open-sinch-capability-api/)
+- [Sinch Brands Access Control Lists Conferences API](https://apis.io/collections/sinch/open-sinch-conferences-api/)
+- [Sinch Brands Access Control Lists Contacts API](https://apis.io/collections/sinch/open-sinch-contacts-api/)
+- [Sinch Conversation API](https://apis.io/collections/sinch/open-sinch-conversation/)
+- [Sinch Brands Access Control Lists Conversations API](https://apis.io/collections/sinch/open-sinch-conversations-api/)
+- [Sinch Brands Access Control Lists Delivery Reports API](https://apis.io/collections/sinch/open-sinch-delivery-reports-api/)
+- [Sinch Elastic SIP Trunking API](https://apis.io/collections/sinch/open-sinch-elastic-sip-trunking/)
+- [Sinch Brands Access Control Lists Events API](https://apis.io/collections/sinch/open-sinch-events-api/)
+- [Sinch Fax API](https://apis.io/collections/sinch/open-sinch-fax/)
+- [Sinch Brands Access Control Lists Fax to Email API](https://apis.io/collections/sinch/open-sinch-fax-to-email-api/)
+- [Sinch Brands Access Control Lists Faxes API](https://apis.io/collections/sinch/open-sinch-faxes-api/)
+- [Sinch Brands Access Control Lists Groups API](https://apis.io/collections/sinch/open-sinch-groups-api/)
+- [Sinch Brands Access Control Lists Inbounds API](https://apis.io/collections/sinch/open-sinch-inbounds-api/)
+- …and 55 more published on APIs.io
+
+#### Governance rules (3)
+
+Spectral rulesets for the provider's contracts.
+
+- [Sinch — asyncapi rules](https://apis.io/rules/sinch/sinch-asyncapi-spectral-rules/)
+- [Sinch — jsonschema rules](https://apis.io/rules/sinch/sinch-jsonschema-spectral-rules/)
+- [Sinch API Rules](https://apis.io/rules/sinch/sinch-rules/)
+
+#### Security (3)
+
+Authentication, trust centre, and vulnerability disclosure.
+
+- [Sinch Authentication](https://apis.io/security/sinch/sinch-authentication/)
+- [Sinch Domain Security](https://apis.io/security/sinch/sinch-domain-security/)
+- [Sinch Trust Center](https://apis.io/security/sinch/sinch-trust-center/)
+
+#### OAuth scopes (1)
+
+The permissions the API asks for.
+
+- [Sinch Scopes](https://apis.io/scopes/sinch/sinch-scopes/)
+
+#### Plans and pricing (1)
+
+Published plans, tiers and prices.
+
+- [Sinch Plans Pricing](https://apis.io/plans/sinch/sinch-plans-pricing/)
+
+#### Rate limits (1)
+
+Published request limits.
+
+- [Sinch Rate Limits](https://apis.io/rate-limits/sinch/sinch-rate-limits/)
+
+#### FinOps (1)
+
+What the API costs to run, by operation.
+
+- [Sinch Finops](https://apis.io/finops/sinch/sinch-finops/)
 
 ## Where to find this API
 
